@@ -36,6 +36,9 @@ import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.lib.team3061.vision.VisionIOSim;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.FeedForwardCharacterization;
+import frc.robot.commands.IntakeControl;
+import frc.robot.commands.IntakeGamePiece;
+import frc.robot.commands.RepelGamePiece;
 import frc.robot.commands.FeedForwardCharacterization.FeedForwardCharacterizationData;
 import frc.robot.commands.RotateToAngle;
 import frc.robot.commands.TeleopSwerve;
@@ -46,6 +49,9 @@ import frc.robot.configs.NovaRobotConfig;
 import frc.robot.configs.PracticeRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.subsystem.Subsystem;
 import frc.robot.subsystems.subsystem.SubsystemIO;
 import java.io.IOException;
@@ -67,6 +73,7 @@ public class RobotContainer {
   private Alliance lastAlliance = DriverStation.Alliance.Red;
   private Vision vision;
   private Subsystem subsystem;
+  private Intake intake;
 
   // use AdvantageKit's LoggedDashboardChooser instead of SendableChooser to ensure accurate logging
   private final LoggedDashboardChooser<Command> autoChooser =
@@ -123,6 +130,7 @@ public class RobotContainer {
 
     } else {
       drivetrain = new Drivetrain(new DrivetrainIO() {});
+      intake = new Intake(new IntakeIOTalonFX());
 
       String[] cameraNames = config.getCameraNames();
       VisionIO[] visionIOs = new VisionIO[cameraNames.length];
@@ -172,6 +180,9 @@ public class RobotContainer {
   private void createCTRESubsystems() {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
+
+    IntakeIO intakeIO = new IntakeIOTalonFX();
+    intake = new Intake(intakeIO);
 
     // String[] cameraNames = config.getCameraNames();
     // Transform3d[] robotToCameraTransforms = config.getRobotToCameraTransforms();
@@ -225,6 +236,9 @@ public class RobotContainer {
     DrivetrainIO drivetrainIO =
         new DrivetrainIOGeneric(gyro, flModule, frModule, blModule, brModule);
     drivetrain = new Drivetrain(drivetrainIO);
+
+    IntakeIO intakeIO = new IntakeIOTalonFX();
+    intake = new Intake(intakeIO);
 
     // FIXME: create the hardware-specific subsystem class
     subsystem = new Subsystem(new SubsystemIO() {});
@@ -517,6 +531,22 @@ public class RobotContainer {
 
     Shuffleboard.getTab("MAIN").add(autoChooser.getSendableChooser());
   }
+
+  private void configureIntakeCommands() {
+    // option 1 (probably doesn't work)
+    intake.setDefaultCommand(
+      Commands.either(
+          new IntakeGamePiece(intake), 
+          new RepelGamePiece(intake),
+          () -> intake.getDrumIRSensor()
+        )
+    );
+
+    // option 2
+    intake.setDefaultCommand(new IntakeControl(intake));
+    
+  }
+
 
   private void configureDrivetrainCommands() {
     /*

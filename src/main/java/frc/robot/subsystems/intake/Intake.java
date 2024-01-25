@@ -26,25 +26,18 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    intakeState = getIntakeState();
   }
 
-  public IntakeStates getIntakeState() {
-    if (inputs.isDrumIRBlocked) {
-      return IntakeStates.DRUMFILLED;
-    } else if (inputs.isRightRollerIRBlocked && inputs.isLeftRollerIRBlocked) {
-      return IntakeStates.INTAKINGBOTHEMERGENCY;
-    } else if (inputs.isRightRollerIRBlocked) {
-      return IntakeStates.INTAKINGLEFT;
-    } else if (inputs.isLeftRollerIRBlocked) {
-      return IntakeStates.INTAKINGRIGHT;
-    } else {
-      return IntakeStates.EMPTY;
-    }
+  public boolean getRightRollerIRSensor() {
+    return inputs.isRightRollerIRBlocked;
   }
 
-  public IntakeStates getCurrentIntakeState() {
-    return intakeState;
+  public boolean getLeftRollerIRSensor() {
+    return inputs.isLeftRollerIRBlocked;
+  }
+
+  public boolean getDrumIRSensor() {
+    return inputs.isDrumIRBlocked;
   }
 
   public void setRightRollerPower(double percentage) {
