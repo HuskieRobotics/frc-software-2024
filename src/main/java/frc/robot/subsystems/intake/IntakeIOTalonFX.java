@@ -9,9 +9,9 @@ public class IntakeIOTalonFX implements IntakeIO {
   private TalonFX rightRollerMotor;
   private TalonFX leftRollerMotor;
   private TalonFX drumMotor;
-  private DigitalInput rightRollerIRSensor;
-  private DigitalInput leftRollerIRSensor;
-  private DigitalInput drumIRSensor;
+  private final DigitalInput rightRollerIRSensor;
+  private final DigitalInput leftRollerIRSensor;
+  private final DigitalInput drumIRSensor;
 
   public IntakeIOTalonFX() {
     rightRollerIRSensor = new DigitalInput(IntakeConstants.INTAKE_RIGHT_ROLLER_IR_SENSOR_ID);

@@ -16,16 +16,31 @@ public class Intake extends SubsystemBase {
     INTAKINGBOTHEMERGENCY
   }
 
+
+  private boolean eStopEnabled;
   private IntakeStates intakeState;
 
   public Intake(IntakeIO io) {
     this.io = io;
     intakeState = IntakeStates.EMPTY;
+    eStopEnabled = false;
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+  }
+
+  public void enableEStop() {
+    eStopEnabled = true;
+  }
+
+  public void disableEStop() {
+    eStopEnabled = false;
+  }
+
+  public boolean getEStopEnabled() {
+    return eStopEnabled;
   }
 
   public boolean getRightRollerIRSensor() {

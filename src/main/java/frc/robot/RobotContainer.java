@@ -37,6 +37,7 @@ import frc.lib.team3061.vision.VisionIOSim;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.IntakeControl;
+import frc.robot.commands.IntakeEmergencyStop;
 import frc.robot.commands.IntakeGamePiece;
 import frc.robot.commands.RepelGamePiece;
 import frc.robot.commands.FeedForwardCharacterization.FeedForwardCharacterizationData;
@@ -339,6 +340,8 @@ public class RobotContainer {
 
     configureDrivetrainCommands();
 
+    configureIntakeCommands();
+
     configureSubsystemCommands();
 
     configureVisionCommands();
@@ -534,16 +537,23 @@ public class RobotContainer {
 
   private void configureIntakeCommands() {
     // option 1 (probably doesn't work)
-    intake.setDefaultCommand(
-      Commands.either(
-          new IntakeGamePiece(intake), 
-          new RepelGamePiece(intake),
-          () -> intake.getDrumIRSensor()
-        )
-    );
+    // intake.setDefaultCommand(
+    //   Commands.either(
+    //       new IntakeGamePiece(intake), 
+    //       new RepelGamePiece(intake),
+    //       () -> intake.getDrumIRSensor()
+    //     )
+    // );
 
-    // option 2
+    // option 2 (probably does work)
     intake.setDefaultCommand(new IntakeControl(intake));
+    
+    oi.getIntakeManualButton().onTrue(
+      Commands.either(
+        Commands.runOnce(intake::disableEStop, intake),
+        new IntakeEmergencyStop(intake),
+        intake::getEStopEnabled
+      ));
     
   }
 

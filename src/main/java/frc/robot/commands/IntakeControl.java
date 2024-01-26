@@ -3,7 +3,6 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
-import frc.robot.subsystems.intake.Intake.IntakeStates;
 
 public class IntakeControl extends Command {
     
@@ -16,7 +15,7 @@ public class IntakeControl extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    // tell the log the command has started
+    intake.disableEStop();
   }
 
   // Called every time the scheduler runs while the command is scheduled.

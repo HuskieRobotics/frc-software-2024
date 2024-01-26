@@ -81,12 +81,17 @@ public class FullOperatorConsoleOI implements OperatorInterface {
 
   @Override
   public Trigger getXStanceButton() {
-    return rotateJoystickButtons[4];
+    return rotateJoystickButtons[6];
   }
 
   @Override
   public Trigger getResetPoseToVisionButton() {
     return rotateJoystickButtons[5];
+  }
+
+  @Override
+  public Trigger getIntakeManualButton() {
+    return rotateJoystickButtons[4];
   }
 
   // Operator Controller

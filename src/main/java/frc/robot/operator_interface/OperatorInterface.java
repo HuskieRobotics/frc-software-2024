@@ -25,6 +25,10 @@ public interface OperatorInterface {
     return 0.0;
   }
 
+  public default Trigger getIntakeManualButton() {
+    return new Trigger(() -> false);
+  }
+
   public default Trigger getFieldRelativeButton() {
     return new Trigger(() -> false);
   }
