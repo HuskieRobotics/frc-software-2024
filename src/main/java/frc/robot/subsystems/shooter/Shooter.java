@@ -1,7 +1,10 @@
 package frc.robot.subsystems.shooter;
 
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
-import static frc.robot.subsystems.shooter.ShooterIOInputsAutoLogged;
+
+import org.littletonrobotics.junction.Logger;
+
+//import frc.robot.subsystems.shooter.ShooterIOInputsAutoLogged;
 
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -37,19 +40,19 @@ public class Shooter extends SubsystemBase{
 	public void periodic() {
     io.updateInputs(shooterInputs);
     Logger.processInputs("Shooter", shooterInputs);
-  	}
   }
+  
 
 
   public void setAngle(double angle){
     io.setAngle(angle);
   }
 
-  public void void setAppliedCurrent(double current){
+  public  void setAppliedCurrent(double current){
     io.setAppliedCurrent(current);
   }
 
-  public void void setMotorPower(double power){
+  public void setMotorPower(double power){
     io.setMotorPower(power);
   }
 

@@ -1,10 +1,10 @@
 package frc.robot.subsystems.shooter;
 
 public class ShooterConstants {
-    
+
   private static final String CONSTRUCTOR_EXCEPTION = "constant class";
 
-  private SubsystemConstants() {
+  private ShooterConstants() {
     throw new IllegalStateException(CONSTRUCTOR_EXCEPTION);
   }
 
@@ -31,5 +31,4 @@ public class ShooterConstants {
   public static final double CONTINUOUS_CURRENT_LIMIT = 40;
   public static final double PEAK_CURRENT_LIMIT = 50;
   public static final double PEAK_CURRENT_DURATION = 0.5;
-    
 }
