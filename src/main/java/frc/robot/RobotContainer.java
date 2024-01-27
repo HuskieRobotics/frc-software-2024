@@ -39,7 +39,7 @@ import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.IntakeControl;
 import frc.robot.commands.IntakeEmergencyStop;
 import frc.robot.commands.IntakeGamePiece;
-import frc.robot.commands.RepelGamePiece;
+import frc.robot.commands.EjectGamePiece;
 import frc.robot.commands.FeedForwardCharacterization.FeedForwardCharacterizationData;
 import frc.robot.commands.RotateToAngle;
 import frc.robot.commands.TeleopSwerve;

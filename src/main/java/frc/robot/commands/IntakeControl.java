@@ -22,13 +22,13 @@ public class IntakeControl extends Command {
   @Override
   public void execute() {
     if (intake.getDrumIRSensor()) {
-        intake.setRightRollerCurrent(IntakeConstants.RIGHT_ROLLER_INTAKING_CURRENT);
-        intake.setLeftRollerCurrent(IntakeConstants.LEFT_ROLLER_INTAKING_CURRENT);
-        intake.setDrumCurrent(IntakeConstants.DRUM_INTAKING_CURRENT);
+      intake.setRightRollerCurrent(IntakeConstants.ROLLERS_CONTINUOUS_CURRENT_LIMIT);
+      intake.setLeftRollerCurrent(IntakeConstants.ROLLERS_CONTINUOUS_CURRENT_LIMIT);
+      intake.setDrumCurrent(IntakeConstants.DRUM_CONTINUOUS_CURRENT_LIMIT);
     } else {
-        intake.setRightRollerCurrent(IntakeConstants.RIGHT_ROLLER_REPELLING_CURRENT);
-        intake.setLeftRollerCurrent(IntakeConstants.LEFT_ROLLER_REPELLING_CURRENT);
-        intake.setDrumCurrent(IntakeConstants.DRUM_REPELLING_CURRENT);
+      intake.setRightRollerCurrent(-IntakeConstants.ROLLERS_CONTINUOUS_CURRENT_LIMIT);
+      intake.setLeftRollerCurrent(-IntakeConstants.ROLLERS_CONTINUOUS_CURRENT_LIMIT);
+      intake.setDrumCurrent(-IntakeConstants.DRUM_CONTINUOUS_CURRENT_LIMIT);
     }
   }
 

@@ -4,11 +4,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 
-public class RepelGamePiece extends Command {
+public class EjectGamePiece extends Command {
 
   private final Intake intake;
 
-  public RepelGamePiece(Intake intake) {
+  public EjectGamePiece(Intake intake) {
     this.intake = intake;
   }
 
@@ -19,9 +19,9 @@ public class RepelGamePiece extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intake.setRightRollerCurrent(IntakeConstants.RIGHT_ROLLER_REPELLING_CURRENT);
-    intake.setLeftRollerCurrent(IntakeConstants.LEFT_ROLLER_REPELLING_CURRENT);
-    intake.setDrumCurrent(IntakeConstants.DRUM_REPELLING_CURRENT);
+    intake.setRightRollerCurrent(-IntakeConstants.ROLLERS_CONTINUOUS_CURRENT_LIMIT);
+    intake.setLeftRollerCurrent(-IntakeConstants.ROLLERS_CONTINUOUS_CURRENT_LIMIT);
+    intake.setDrumCurrent(-IntakeConstants.DRUM_CONTINUOUS_CURRENT_LIMIT);
   }
 
   // Called once the command ends or is interrupted.

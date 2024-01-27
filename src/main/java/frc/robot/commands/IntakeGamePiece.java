@@ -21,9 +21,9 @@ public class IntakeGamePiece extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intake.setRightRollerCurrent(IntakeConstants.RIGHT_ROLLER_INTAKING_CURRENT);
-    intake.setLeftRollerCurrent(IntakeConstants.LEFT_ROLLER_INTAKING_CURRENT);
-    intake.setDrumCurrent(IntakeConstants.DRUM_INTAKING_CURRENT);
+    intake.setRightRollerCurrent(IntakeConstants.ROLLERS_CONTINUOUS_CURRENT_LIMIT);
+    intake.setLeftRollerCurrent(IntakeConstants.ROLLERS_CONTINUOUS_CURRENT_LIMIT);
+    intake.setDrumCurrent(IntakeConstants.DRUM_CONTINUOUS_CURRENT_LIMIT);
   }
 
   // Called once the command ends or is interrupted.

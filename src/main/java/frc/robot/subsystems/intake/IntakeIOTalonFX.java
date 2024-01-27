@@ -97,7 +97,6 @@ public class IntakeIOTalonFX implements IntakeIO {
   }
 
   private void configureIntakeMotors() {
-    // might need to invert motors based on cad
     rightRollerMotor = new TalonFX(IntakeConstants.INTAKE_RIGHT_ROLLER_MOTOR_ID);
     leftRollerMotor = new TalonFX(IntakeConstants.INTAKE_LEFT_ROLLER_MOTOR_ID);
     drumMotor = new TalonFX(IntakeConstants.INTAKE_DRUM_MOTOR_ID);
