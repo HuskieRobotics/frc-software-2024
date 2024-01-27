@@ -72,26 +72,28 @@ public class PracticeRobotConfig extends RobotConfig {
   // FIXME: update the camera names once they have been installed
   private static final String CAN_BUS_NAME = "canbus1";
 
-  private static final String CAMERA_NAME_0 = "OV2311";
+  private static final String CAMERA_NAME_0 = "OV2311L";
 
-  private static final String CAMERA_NAME_1 = "OV2311R";
+  private static final String CAMERA_NAME_1 = "OV2311F";
 
-  // FIXME: update the camera transformations once they have been installed
+  // left camera
   private static final Transform3d ROBOT_TO_CAMERA_0 =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(-10.406),
-              Units.inchesToMeters(6.603),
-              Units.inchesToMeters(49.240)),
-          new Rotation3d(0, Units.degreesToRadians(25), Units.degreesToRadians(30)));
+              Units.inchesToMeters(5.500),
+              Units.inchesToMeters(10.079),
+              Units.inchesToMeters(17.887 + .5)),
+          new Rotation3d(0, Units.degreesToRadians(45), Units.degreesToRadians(90)));
+  // pitch 45 degrees
 
+  // left camera
   private static final Transform3d ROBOT_TO_CAMERA_1 =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(-10.406),
-              Units.inchesToMeters(-6.603),
-              Units.inchesToMeters(49.240)),
-          new Rotation3d(0, Units.degreesToRadians(25), Units.degreesToRadians(-30)));
+              Units.inchesToMeters(7.079),
+              Units.inchesToMeters(-8.500),
+              Units.inchesToMeters(17.387 + .5)),
+          new Rotation3d(0, Units.degreesToRadians(45), Units.degreesToRadians(0)));
 
   private static final double AUTO_MAX_SPEED_METERS_PER_SECOND = 3.5;
   private static final double AUTO_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 10;
