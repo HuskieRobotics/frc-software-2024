@@ -536,16 +536,6 @@ public class RobotContainer {
   }
 
   private void configureIntakeCommands() {
-    // option 1 (probably doesn't work)
-    // intake.setDefaultCommand(
-    //   Commands.either(
-    //       new IntakeGamePiece(intake), 
-    //       new RepelGamePiece(intake),
-    //       () -> intake.getDrumIRSensor()
-    //     )
-    // );
-
-    // option 2 (probably does work)
     intake.setDefaultCommand(new IntakeControl(intake));
     
     oi.getIntakeManualButton().onTrue(

@@ -44,5 +44,4 @@ public class IntakeControl extends Command {
     return false;
   }
 
-
 }

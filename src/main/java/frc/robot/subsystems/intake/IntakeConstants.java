@@ -25,11 +25,13 @@ public class IntakeConstants {
 
   //
 
-  public static final double RIGHT_ROLLER_INTAKING_CURRENT = 0.0;
-  public static final double LEFT_ROLLER_INTAKING_CURRENT = 0.0;
-  public static final double DRUM_INTAKING_CURRENT = 0.0;
+  public static final double ROLLERS_CONTINUOUS_CURRENT_LIMIT = 15.0;
+  public static final double ROLLERS_PEAK_CURRENT_LIMIT = 20.0;
+  public static final double ROLLERS_PEAK_CURRENT_DURATION = 0.1;
+  public static final boolean ROLLERS_MOTOR_INVERTED = false;
 
-  public static final double RIGHT_ROLLER_REPELLING_CURRENT = 0.0;
-  public static final double LEFT_ROLLER_REPELLING_CURRENT = 0.0;
-  public static final double DRUM_REPELLING_CURRENT = 0.0;
+  public static final double DRUM_CONTINUOUS_CURRENT_LIMIT = 15.0;
+  public static final double DRUM_PEAK_CURRENT_LIMIT = 20.0;
+  public static final double DRUM_PEAK_CURRENT_DURATION = 0.1;
+  public static final boolean DRUM_MOTOR_INVERTED = false;
 }
