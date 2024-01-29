@@ -4,8 +4,8 @@
         "ID": 1,
         "pose": {
           "translation": {
-            "x": 15.4765502, // 15.079471999999997,    606.498" (to lower-right corner of black square) + 2.815" (to center of tag)
-            "y": 3.1218124, // 0.24587199999999998,    121.282" (to lower-right corner of black square) + 1.624" (to center of tag)
+            "x": 15.4765502,
+            "y": 3.1218124,
             "z": 1.355852
           },
           "rotation": {
@@ -22,8 +22,8 @@
         "ID": 2,
         "pose": {
           "translation": {
-            "x": 16.5822122, // 16.185134,
-            "y": 3.7596064, // 0.883666,
+            "x": 16.5822122,
+            "y": 3.7596064,
             "z": 1.355852
           },
           "rotation": {
