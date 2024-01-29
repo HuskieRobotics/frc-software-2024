@@ -1,9 +1,11 @@
 package frc.robot.subsystems.intake;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 
@@ -18,20 +20,27 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final DigitalInput leftRollerIRSensor;
   private final DigitalInput drumIRSensor;
 
-  // tunable numbers for roller and drum pid
-  private final TunableNumber rightRollerMotorKP =
-      new TunableNumber("Intake/rightRollerMotorKP", IntakeConstants.INTAKE_RIGHT_ROLLER_MOTOR_KP);
-  private final TunableNumber rightRollerMotorKI =
-      new TunableNumber("Intake/rightRollerMotorKI", IntakeConstants.INTAKE_RIGHT_ROLLER_MOTOR_KI);
-  private final TunableNumber rightRollerMotorKD =
-      new TunableNumber("Intake/rightRollerMotorKD", IntakeConstants.INTAKE_RIGHT_ROLLER_MOTOR_KD);
+  private VelocityTorqueCurrentFOC rightRollerVelocityRequest;
+  private VelocityTorqueCurrentFOC leftRollerVelocityRequest;
+  private VelocityTorqueCurrentFOC drumVelocityRequest;
 
-  private final TunableNumber leftRollerMotorKP =
-      new TunableNumber("Intake/leftRollerMotorKP", IntakeConstants.INTAKE_LEFT_ROLLER_MOTOR_KP);
-  private final TunableNumber leftRollerMotorKI = 
-      new TunableNumber("Intake/leftRollerMotorKI", IntakeConstants.INTAKE_LEFT_ROLLER_MOTOR_KI);
-  private final TunableNumber leftRollerMotorKD = 
-      new TunableNumber("Intake/leftRollerMotorKD", IntakeConstants.INTAKE_LEFT_ROLLER_MOTOR_KD);
+  private StatusSignal<Double> rightRollerVelocityStatusSignal;
+  private StatusSignal<Double> leftRollerVelocityStatusSignal;
+  private StatusSignal<Double> drumVelocityStatusSignal;
+  // status signals for stator current
+  private StatusSignal<Double> rightRollerStatorCurrentStatusSignal;
+  private StatusSignal<Double> leftRollerStatorCurrentStatusSignal;
+  private StatusSignal<Double> drumStatorCurrentStatusSignal;
+
+  // tunable numbers for roller and drum pid
+  private final TunableNumber rollerMotorsKP = 
+      new TunableNumber("Intake/rollerMotorsKP", IntakeConstants.INTAKE_ROLLER_MOTORS_KP);
+
+  private final TunableNumber rollerMotorsKI =
+      new TunableNumber("Intake/rollerMotorsKI", IntakeConstants.INTAKE_ROLLER_MOTORS_KI);
+
+  private final TunableNumber rollerMotorsKD =
+      new TunableNumber("Intake/rollerMotorsKD", IntakeConstants.INTAKE_ROLLER_MOTORS_KD);
 
   private final TunableNumber drumMotorKP =
       new TunableNumber("Intake/drumMotorKP", IntakeConstants.INTAKE_DRUM_MOTOR_KP);
@@ -55,51 +64,49 @@ public class IntakeIOTalonFX implements IntakeIO {
     inputs.isLeftRollerIRBlocked = leftRollerIRSensor.get();
     inputs.isDrumIRBlocked = drumIRSensor.get();
 
-    inputs.rightRollerAppliedPercentage = rightRollerMotor.getDutyCycle().getValueAsDouble();
-    inputs.leftRollerAppliedPercentage = leftRollerMotor.getDutyCycle().getValueAsDouble();
-    inputs.drumAppliedPercentage = drumMotor.getDutyCycle().getValueAsDouble();
+    inputs.rightRollerStatorCurrentAmps = rightRollerStatorCurrentStatusSignal.getValueAsDouble();
+    inputs.leftRollerStatorCurrentAmps = leftRollerStatorCurrentStatusSignal.getValueAsDouble();
+    inputs.drumStatorCurrentAmps = drumStatorCurrentStatusSignal.getValueAsDouble();
 
-    inputs.rightRollerStatorCurrentAmps =
-        new double[] {rightRollerMotor.getStatorCurrent().getValueAsDouble()};
-    inputs.leftRollerStatorCurrentAmps =
-        new double[] {leftRollerMotor.getStatorCurrent().getValueAsDouble()};
-    inputs.drumStatorCurrentAmps = new double[] {drumMotor.getStatorCurrent().getValueAsDouble()};
+    inputs.rightRollerVelocityRotationsPerSecond = rightRollerVelocityStatusSignal.getValueAsDouble();
+    inputs.leftRollerVelocityRotationsPerSecond = leftRollerVelocityStatusSignal.getValueAsDouble();
+    inputs.drumVelocityRotationsPerSecond = drumVelocityStatusSignal.getValueAsDouble();
+
+    // what would I use here for reference velocity?
   }
 
   @Override
-  public void setRightRollerPower(double percentage) {
-    rightRollerMotor.setControl(new DutyCycleOut(percentage));
+  public void setRightRollerVelocity(double rps) {
+    rightRollerMotor.setControl(rightRollerVelocityRequest.withVelocity(rps));
   }
 
   @Override
-  public void setLeftRollerPower(double percentage) {
-    leftRollerMotor.setControl(new DutyCycleOut(percentage));
+  public void setLeftRollerVelocity(double rps) {
+    leftRollerMotor.setControl(leftRollerVelocityRequest.withVelocity(rps));
   }
 
-  @Override
-  public void setDrumPower(double percentage) {
-    drumMotor.setControl(new DutyCycleOut(percentage));
-  }
-
-  @Override
-  public void setRightRollerCurrent(double current) {
-    rightRollerMotor.setControl(new TorqueCurrentFOC(current));
-  }
-
-  @Override
-  public void setLeftRollerCurrent(double current) {
-    leftRollerMotor.setControl(new TorqueCurrentFOC(current));
-  }
-
-  @Override
-  public void setDrumCurrent(double current) {
-    drumMotor.setControl(new TorqueCurrentFOC(current));
+  public void setDrumVelocity(double rps) {
+    drumMotor.setControl(drumVelocityRequest.withVelocity(rps));
   }
 
   private void configureIntakeMotors() {
     rightRollerMotor = new TalonFX(IntakeConstants.INTAKE_RIGHT_ROLLER_MOTOR_ID);
     leftRollerMotor = new TalonFX(IntakeConstants.INTAKE_LEFT_ROLLER_MOTOR_ID);
     drumMotor = new TalonFX(IntakeConstants.INTAKE_DRUM_MOTOR_ID);
+
+    rightRollerVelocityRequest = new VelocityTorqueCurrentFOC(0);
+    leftRollerVelocityRequest = new VelocityTorqueCurrentFOC(0);
+    drumVelocityRequest = new VelocityTorqueCurrentFOC(0);
+
+    
+    // assuming rotorvelocity because in tunerx this is what was used to retrieve rps
+    rightRollerVelocityStatusSignal = rightRollerMotor.getRotorVelocity();
+    leftRollerVelocityStatusSignal = leftRollerMotor.getRotorVelocity();
+    drumVelocityStatusSignal = drumMotor.getRotorVelocity();
+    
+    rightRollerStatorCurrentStatusSignal = rightRollerMotor.getStatorCurrent();
+    leftRollerStatorCurrentStatusSignal = leftRollerMotor.getStatorCurrent();
+    drumStatorCurrentStatusSignal = drumMotor.getStatorCurrent();
 
     TalonFXConfiguration rightRollerConfig = new TalonFXConfiguration();
     TalonFXConfiguration leftRollerConfig = new TalonFXConfiguration();

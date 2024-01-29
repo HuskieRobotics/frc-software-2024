@@ -10,26 +10,28 @@ public interface IntakeIO {
     boolean isLeftRollerIRBlocked = false;
     boolean isDrumIRBlocked = false;
 
-    double rightRollerAppliedPercentage = 0.0; // dutyCycle
-    double leftRollerAppliedPercentage = 0.0; // dutyCycle
-    double drumAppliedPercentage = 0.0; // dutyCycle
+    double rightRollerStatorCurrentAmps = 0;
+    double leftRollerStatorCurrentAmps = 0;
+    double drumStatorCurrentAmps = 0;
 
-    double[] rightRollerStatorCurrentAmps = new double[] {};
-    double[] leftRollerStatorCurrentAmps = new double[] {};
-    double[] drumStatorCurrentAmps = new double[] {};
+    double rightRollerSupplyCurrentAmps = 0;
+    double leftRollerSupplyCurrentAmps = 0;
+    double drumSupplyCurrentAmps = 0;
+
+    double rightRollerVelocityRotationsPerSecond = 0;
+    double leftRollerVelocityRotationsPerSecond = 0;
+    double drumVelocityRotationsPerSecond = 0;
+
+    double rightRollerReferenceVelocityRPS = 0;
+    double leftRollerReferenceVelocityRPS = 0;
+    double drumReferenceVelocityRPS = 0;
   }
 
   public default void updateInputs(IntakeIOInputs inputs) {}
 
-  public default void setRightRollerPower(double percentage) {}
+  public default void setLeftRollerVelocity(double velocity) {}
 
-  public default void setLeftRollerPower(double percentage) {}
+  public default void setRightRollerVelocity(double velocity) {}
 
-  public default void setDrumPower(double percentage) {}
-
-  public default void setRightRollerCurrent(double current) {}
-
-  public default void setLeftRollerCurrent(double current) {}
-
-  public default void setDrumCurrent(double current) {}
+  public default void setDrumVelocity(double velocity) {}
 }
