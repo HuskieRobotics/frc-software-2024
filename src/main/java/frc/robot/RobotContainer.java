@@ -536,15 +536,32 @@ public class RobotContainer {
   }
 
   private void configureIntakeCommands() {
-    intake.setDefaultCommand(new IntakeControl(intake));
+    // intake.setDefaultCommand(new IntakeControl(intake));
     
+    // oi.getIntakeManualButton().onTrue(
+    //   Commands.either(
+    //     Commands.runOnce(intake::disableEStop, intake),
+    //     new IntakeEmergencyStop(intake),
+    //     intake::getEStopEnabled
+    //   ));
+
+    Trigger drumIRSensor = new Trigger(() -> intake.getDrumIRSensor());
+
+    intake.setDefaultCommand(
+      Commands.run(() -> intake.intakeGamePiece(), intake)
+    );
+
+    drumIRSensor.onTrue(
+      Commands.run(() -> intake.repelGamePiece(), intake)
+    );
+
+    // should disable the default command and only run the intake control based off of the controller input
+    // communicate with ian/jake about this
     oi.getIntakeManualButton().onTrue(
-      Commands.either(
-        Commands.runOnce(intake::disableEStop, intake),
-        new IntakeEmergencyStop(intake),
-        intake::getEStopEnabled
-      ));
-    
+      Commands.runOnce(null, intake)
+    );
+
+    // add implementation for buttons for 
   }
 
 

@@ -8,7 +8,6 @@ public class Intake extends SubsystemBase {
     private final IntakeIO io;
     private final IntakeIOInputs inputs = new IntakeIOInputs();
 
-
     private boolean manualOverrideEnabled;
 
     public Intake(IntakeIO io) {
@@ -32,8 +31,24 @@ public class Intake extends SubsystemBase {
         return inputs.isDrumIRBlocked;
     }
 
+    public boolean getManualOverrideEnabled() {
+        return manualOverrideEnabled;
+    }
+
+    public void intakeGamePiece() {
+        this.setRightRollerVelocity(IntakeConstants.INTAKE_VELOCITY_ROLLERS_RPS);
+        this.setLeftRollerVelocity(IntakeConstants.INTAKE_VELOCITY_ROLLERS_RPS);
+        this.setDrumVelocity(IntakeConstants.INTAKE_VELOCITY_DRUM_RPS);
+    }
+
+    public void repelGamePiece() {
+        this.setRightRollerVelocity(IntakeConstants.REPEL_VELOCITY_ROLLERS_RPS);
+        this.setLeftRollerVelocity(IntakeConstants.REPEL_VELOCITY_ROLLERS_RPS);
+        this.setDrumVelocity(IntakeConstants.REPEL_VELOCITY_DRUM_RPS);
+    }
+
     public void setRightRollerVelocity(double rps) {
-    io.setRightRollerVelocity(rps);
+        io.setRightRollerVelocity(rps);
     }
 
     public void setLeftRollerVelocity(double rps) {
