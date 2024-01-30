@@ -81,8 +81,8 @@ public class PracticeRobotConfig extends RobotConfig {
       new Transform3d(
           new Translation3d(
               Units.inchesToMeters(5.500),
-              Units.inchesToMeters(10.079),
-              Units.inchesToMeters(17.887 + .5)),
+              Units.inchesToMeters(10.329),
+              Units.inchesToMeters(18.387)),
           new Rotation3d(0, Units.degreesToRadians(45), Units.degreesToRadians(90)));
   // pitch 45 degrees
 
@@ -90,9 +90,9 @@ public class PracticeRobotConfig extends RobotConfig {
   private static final Transform3d ROBOT_TO_CAMERA_1 =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(7.079),
+              Units.inchesToMeters(7.329),
               Units.inchesToMeters(-8.500),
-              Units.inchesToMeters(17.387 + .5)),
+              Units.inchesToMeters(18.387)),
           new Rotation3d(0, Units.degreesToRadians(45), Units.degreesToRadians(0)));
 
   private static final double AUTO_MAX_SPEED_METERS_PER_SECOND = 3.5;
