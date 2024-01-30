@@ -51,6 +51,7 @@ public class VisionIOPhotonVision implements VisionIO {
       visionEstimate.ifPresent(
           estimate -> {
             inputs.estimatedRobotPose = estimate.estimatedPose;
+            inputs.estimatedRobotPose2d = estimate.estimatedPose.toPose2d();
             inputs.estimatedRobotPoseTimestamp = estimate.timestampSeconds;
             int[] tags = new int[estimate.targetsUsed.size()];
             for (int i = 0; i < estimate.targetsUsed.size(); i++) {

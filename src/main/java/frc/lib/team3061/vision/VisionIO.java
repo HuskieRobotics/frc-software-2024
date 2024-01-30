@@ -1,5 +1,6 @@
 package frc.lib.team3061.vision;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -15,6 +16,7 @@ public interface VisionIO {
   @AutoLog
   public static class VisionIOInputs {
     Pose3d estimatedRobotPose = new Pose3d();
+    Pose2d estimatedRobotPose2d = new Pose2d();
     double estimatedRobotPoseTimestamp = 0.0;
     int[] estimatedRobotPoseTags = new int[] {};
     double lastCameraTimestamp = 0.0;
