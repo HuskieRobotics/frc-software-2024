@@ -83,7 +83,7 @@ public class PracticeRobotConfig extends RobotConfig {
               Units.inchesToMeters(5.500),
               Units.inchesToMeters(10.329),
               Units.inchesToMeters(18.387)),
-          new Rotation3d(0, Units.degreesToRadians(45), Units.degreesToRadians(90)));
+          new Rotation3d(0, Units.degreesToRadians(-45), Units.degreesToRadians(90)));
   // pitch 45 degrees
 
   // left camera
@@ -93,7 +93,7 @@ public class PracticeRobotConfig extends RobotConfig {
               Units.inchesToMeters(7.329),
               Units.inchesToMeters(-8.500),
               Units.inchesToMeters(18.387)),
-          new Rotation3d(0, Units.degreesToRadians(45), Units.degreesToRadians(0)));
+          new Rotation3d(0, Units.degreesToRadians(-45), Units.degreesToRadians(0)));
 
   private static final double AUTO_MAX_SPEED_METERS_PER_SECOND = 3.5;
   private static final double AUTO_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 10;
