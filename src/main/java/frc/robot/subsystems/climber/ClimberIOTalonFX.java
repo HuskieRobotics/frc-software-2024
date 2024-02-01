@@ -2,11 +2,14 @@ package frc.robot.subsystems.climber;
 
 import static frc.robot.subsystems.climber.ClimberConstants.*;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -23,7 +26,28 @@ public class ClimberIOTalonFX implements ClimberIO {
   private TalonFX leftMotor;
   private TalonFX rightMotor;
 
-  private VoltageOut voltageRequest;
+  private double leftRequestedVelocity;
+  private double leftRequestedSetpoint; 
+  private double leftRequestedPower;
+
+  private double rightRequestedVelocity;
+  private double rightRequestedSetpoint;
+  private double rightRequestedPower;
+
+  private StatusSignal<Double> leftVelocityRPMStatusSignal;
+  private StatusSignal<Double> leftPositionStatusSignal;
+  private StatusSignal<Double> leftStatorCurrentAmpsStatusSignal;
+  private StatusSignal<Double> leftDegreesStatusSignal;
+  private StatusSignal<Double> leftSetpointStatusSignal;
+  private StatusSignal<Double> leftPowerStatusSignal;
+
+  private StatusSignal<Double> rightVelocityRPMStatusSignal;
+  private StatusSignal<Double> rightPositionStatusSignal;
+  private StatusSignal<Double> rightStatorCurrentAmpsStatusSignal;
+  private StatusSignal<Double> rightDegreesStatusSignal;
+  private StatusSignal<Double> rightSetpointStatusSignal;
+  private StatusSignal<Double> rightPowerStatusSignal;
+
   private TorqueCurrentFOC currentRequest;
   private PositionVoltage positionRequest;
 
@@ -38,7 +62,13 @@ public class ClimberIOTalonFX implements ClimberIO {
 
   /** Create a TalonFX-specific generic SubsystemIO */
   public ClimberIOTalonFX() {
+    velocityRPMStatusSignal = leftMotor.getRotorVelocity();
+
+
+
+
     configMotor(LEFT_MOTOR_CAN_ID, RIGHT_MOTOR_CAN_ID);
+
   }
 
   /**
@@ -47,19 +77,47 @@ public class ClimberIOTalonFX implements ClimberIO {
    * @param inputs the inputs object to update
    */
   @Override
-  public void updateInputs(ClimberIOInputs inputs) {
-    inputs.positionDeg =
-        Conversions.falconRotationsToMechanismDegrees(
-            leftMotor.getRotorPosition().getValue(), GEAR_RATIO);
-    inputs.velocityRPM =
-        Conversions.falconRPSToMechanismRPM(leftMotor.getRotorVelocity().getValue(), GEAR_RATIO);
-    inputs.closedLoopError = leftMotor.getClosedLoopError().getValue();
-    inputs.setpoint = leftMotor.getClosedLoopReference().getValue();
-    inputs.power = leftMotor.getDutyCycle().getValue();
-    inputs.controlMode = leftMotor.getControlMode().toString();
-    inputs.statorCurrentAmps = leftMotor.getStatorCurrent().getValue();
-    inputs.tempCelsius = leftMotor.getDeviceTemp().getValue();
-    inputs.supplyCurrentAmps = leftMotor.getSupplyCurrent().getValue();
+  public void updateInputs(ClimberIOInputs inputs) { // FIXME: May need inputs for both motors
+    BaseStatusSignal.refreshAll(
+      leftVelocityRPMStatusSignal,
+      leftPositionStatusSignal,
+      leftStatorCurrentAmpsStatusSignal,
+      leftDegreesStatusSignal,
+      leftSetpointStatusSignal,
+      leftPowerStatusSignal,
+      rightVelocityRPMStatusSignal,
+      rightPositionStatusSignal,
+      rightStatorCurrentAmpsStatusSignal,
+      rightDegreesStatusSignal,
+      rightSetpointStatusSignal,
+      rightPowerStatusSignal
+    );
+
+    inputs.leftVelocityRPM = leftVelocityRPMStatusSignal.getValueAsDouble();
+    inputs.leftPosition = leftPositionStatusSignal.getValueAsDouble();
+    inputs.leftStatorCurrentAmps = leftStatorCurrentAmpsStatusSignal.getValueAsDouble();
+    inputs.leftAngleDegrees = leftDegreesStatusSignal.getValueAsDouble(); 
+    inputs.leftSetpoint = leftSetpointStatusSignal.getValueAsDouble();
+    inputs.leftPower = leftPowerStatusSignal.getValueAsDouble();
+
+    inputs.rightVelocityRPM = rightVelocityRPMStatusSignal.getValueAsDouble();
+    inputs.rightPosition = rightPositionStatusSignal.getValueAsDouble();
+    inputs.rightStatorCurrentAmps = rightStatorCurrentAmpsStatusSignal.getValueAsDouble();
+    inputs.rightAngleDegrees = rightDegreesStatusSignal.getValueAsDouble(); 
+    inputs.rightSetpoint = rightSetpointStatusSignal.getValueAsDouble();
+    inputs.rightPower = rightPowerStatusSignal.getValueAsDouble();
+
+    inputs.leftReferenceVelocity = leftRequestedVelocity;
+    inputs.leftReferenceSetpoint = leftRequestedPower;
+    inputs.leftReferencPower = leftRequestedPower;
+
+    inputs.rightReferenceVelocity = rightRequestedVelocity;
+    inputs.rightReferenceSetpoint = rightRequestedSetpoint;
+    inputs.rightReferencePower = rightRequestedPower;
+
+    // inputs.closedLoopError = leftMotor.getClosedLoopError().getValue();
+    // inputs.power = 
+    // inputs.controlMode = leftMotor.getControlMode().toString();
 
     // update configuration if tunables have changed
     if (kP.hasChanged() || kI.hasChanged() || kD.hasChanged() || kPeakOutput.hasChanged()) {
