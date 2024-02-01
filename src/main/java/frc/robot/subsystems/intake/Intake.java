@@ -6,7 +6,7 @@ import frc.robot.subsystems.intake.IntakeIO.IntakeIOInputs;
 public class Intake extends SubsystemBase {
 
     private final IntakeIO io;
-    private final IntakeIOInputs inputs = new IntakeIOInputs();
+    private final IntakeIOInputs inputs = new IntakeIOInputsAutoLogged();
 
     private boolean manualOverrideEnabled;
 
@@ -31,8 +31,16 @@ public class Intake extends SubsystemBase {
         return inputs.isDrumIRBlocked;
     }
 
-    public boolean getManualOverrideEnabled() {
+    public boolean manualOverrideEnabled() {
         return manualOverrideEnabled;
+    }
+
+    public void enableManualOverride() {
+        manualOverrideEnabled = true;
+    }
+
+    public void disableManualOverride() {
+        manualOverrideEnabled = false;
     }
 
     public void intakeGamePiece() {

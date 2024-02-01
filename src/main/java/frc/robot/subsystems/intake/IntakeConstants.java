@@ -14,10 +14,12 @@ public class IntakeConstants {
   public static final double INTAKE_ROLLER_MOTORS_KP = 0.0;
   public static final double INTAKE_ROLLER_MOTORS_KI = 0.0;
   public static final double INTAKE_ROLLER_MOTORS_KD = 0.0;
+  public static final double INTAKE_ROLLER_MOTORS_KS = 0;
 
   public static final double INTAKE_DRUM_MOTOR_KP = 0.0;
   public static final double INTAKE_DRUM_MOTOR_KI = 0.0;
   public static final double INTAKE_DRUM_MOTOR_KD = 0.0;
+  public static final double INTAKE_DRUM_MOTOR_KS = 0;
 
 
   // velocities

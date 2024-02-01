@@ -38,7 +38,6 @@ import frc.robot.Constants.Mode;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.IntakeControl;
 import frc.robot.commands.IntakeEmergencyStop;
-import frc.robot.commands.IntakeGamePiece;
 import frc.robot.commands.EjectGamePiece;
 import frc.robot.commands.FeedForwardCharacterization.FeedForwardCharacterizationData;
 import frc.robot.commands.RotateToAngle;
@@ -131,7 +130,7 @@ public class RobotContainer {
 
     } else {
       drivetrain = new Drivetrain(new DrivetrainIO() {});
-      intake = new Intake(new IntakeIOTalonFX());
+      intake = new Intake(new IntakeIO() {});
 
       String[] cameraNames = config.getCameraNames();
       VisionIO[] visionIOs = new VisionIO[cameraNames.length];
@@ -182,8 +181,7 @@ public class RobotContainer {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
 
-    IntakeIO intakeIO = new IntakeIOTalonFX();
-    intake = new Intake(intakeIO);
+    intake = new Intake(new IntakeIOTalonFX());
 
     // String[] cameraNames = config.getCameraNames();
     // Transform3d[] robotToCameraTransforms = config.getRobotToCameraTransforms();
@@ -551,14 +549,15 @@ public class RobotContainer {
       Commands.run(() -> intake.intakeGamePiece(), intake)
     );
 
-    drumIRSensor.onTrue(
+    // only run repel game piece if the drumir sensor and the manual override are not enabled
+    drumIRSensor.and(() -> !intake.manualOverrideEnabled()).onTrue(
       Commands.run(() -> intake.repelGamePiece(), intake)
     );
 
     // should disable the default command and only run the intake control based off of the controller input
     // communicate with ian/jake about this
     oi.getIntakeManualButton().onTrue(
-      Commands.runOnce(null, intake)
+      Commands.run(intake::enableManualOverride, intake)
     );
 
     // add implementation for buttons for 
