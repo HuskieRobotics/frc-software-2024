@@ -11,41 +11,96 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-
-@java.lang.SuppressWarnings({"java:S1118", "java:S115", "java:S2386"})
+import static edu.wpi.first.apriltag.AprilTagFields.k2024Crescendo;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.util.Units;
+import java.io.IOException;
 
 /**
  * Contains various field dimensions and useful reference points. Dimensions are in meters, and sets
- * of corners start in the lower left moving clockwise.
+ * of corners start in the lower left moving clockwise. <b>All units in Meters</b> <br>
+ * <br>
  *
  * <p>All translations and poses are stored with the origin at the rightmost point on the BLUE
- * ALLIANCE wall. Use the {@link #flipForRedSide(Translation2d)} and {@link #flipForRedSide(Pose2d)}
- * methods to flip these values to get the red alliance version.
+ * ALLIANCE wall.<br>
+ * <br>
+ * Length refers to the <i>x</i> direction (as described by wpilib) <br>
+ * Width refers to the <i>y</i> direction (as described by wpilib)
  */
-public final class FieldConstants {
-  public static final double fieldLength = Units.inchesToMeters(651.25);
-  public static final double fieldWidth = Units.inchesToMeters(323.25);
-  public static final double tapeWidth = Units.inchesToMeters(2.0);
+public class FieldConstants {
+  public static double fieldLength = Units.inchesToMeters(651.223);
+  public static double fieldWidth = Units.inchesToMeters(323.277);
+  public static double wingX = Units.inchesToMeters(229.201);
+  public static double podiumX = Units.inchesToMeters(126.75);
+  public static double startingLineX = Units.inchesToMeters(74.111);
 
-  /**
-   * Flips a translation for a point on the blue side of the field to the corresponding point on the
-   * red side. By default, all translations and poses in {@link FieldConstants} are stored with the
-   * origin at the rightmost point on the BLUE ALLIANCE wall.
-   */
-  public static Translation2d flipForRedSide(Translation2d translation) {
-    return new Translation2d(fieldLength - translation.getX(), translation.getY());
+  public static Translation2d ampCenter =
+      new Translation2d(Units.inchesToMeters(72.455), Units.inchesToMeters(322.996));
+
+  /** Staging locations for each note */
+  public static final class StagingLocations {
+    public static double centerlineX = fieldLength / 2.0;
+
+    // mechadv says they need to be updated but they look correct
+    public static double centerlineFirstY = Units.inchesToMeters(29.638);
+    public static double centerlineSeparationY = Units.inchesToMeters(66);
+    public static double spikeX = Units.inchesToMeters(114.0);
+    // should be right 
+    public static double spikeFirstY = Units.inchesToMeters(161.638);
+    public static double spikeSeparationY = Units.inchesToMeters(57);
+
+    public static Translation2d[] centerlineTranslations = new Translation2d[5];
+    public static Translation2d[] spikeTranslations = new Translation2d[3];
+
+    static {
+      for (int i = 0; i < centerlineTranslations.length; i++) {
+        centerlineTranslations[i] =
+            new Translation2d(centerlineX, centerlineFirstY + (i * centerlineSeparationY));
+      }
+    }
+
+    static {
+      for (int i = 0; i < spikeTranslations.length; i++) {
+        spikeTranslations[i] = new Translation2d(spikeX, spikeFirstY + (i * spikeSeparationY));
+      }
+    }
   }
 
-  /**
-   * Flips a pose from the blue side of the field to the corresponding point on the red side of the
-   * field. By default, all translations and poses in {@link FieldConstants} are stored with the
-   * origin at the rightmost point on the BLUE ALLIANCE wall.
-   */
-  public static Pose2d flipForRedSide(Pose2d pose, boolean rotate180) {
-    int flipSign = rotate180 ? -1 : 0;
-    return new Pose2d(
-        fieldLength - pose.getX(),
-        pose.getY(),
-        new Rotation2d(flipSign * pose.getRotation().getCos(), pose.getRotation().getSin()));
+  /** Each corner of the speaker * */
+  public static final class Speaker {
+
+    /** Center of the speaker opening (blue alliance) */
+    public static Pose2d centerSpeakerOpening =
+        new Pose2d(0.0, fieldWidth - Units.inchesToMeters(104.0), new Rotation2d());
+  }
+
+  // corners (blue alliance origin)
+  public static Translation3d topRightSpeaker =
+      new Translation3d(
+          Units.inchesToMeters(18.055),
+          Units.inchesToMeters(238.815),
+          Units.inchesToMeters(13.091));
+
+  public static Translation3d topLeftSpeaker =
+      new Translation3d(
+          Units.inchesToMeters(18.055),
+          Units.inchesToMeters(197.765),
+          Units.inchesToMeters(83.091));
+
+  public static Translation3d bottomRightSpeaker =
+      new Translation3d(0.0, Units.inchesToMeters(238.815), Units.inchesToMeters(78.324));
+  public static Translation3d bottomLeftSpeaker =
+      new Translation3d(0.0, Units.inchesToMeters(197.765), Units.inchesToMeters(78.324));
+
+  public static double aprilTagWidth = Units.inchesToMeters(6.50);
+  public static AprilTagFieldLayout aprilTags;
+
+  static {
+    try {
+      aprilTags = AprilTagFieldLayout.loadFromResource(k2024Crescendo.m_resourceFile);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team6328.util.TunableNumber;
-import frc.robot.subsystems.subsystem.SubsystemIOInputsAutoLogged;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -30,7 +29,7 @@ public class Climber extends SubsystemBase {
   private final TunableNumber rightMotorCurrent = new TunableNumber("Climber/rightCurrent", 0.0);
   private final TunableNumber rightMotorPosition = new TunableNumber("Climber/rightPosition", 0.0);
 
-  private final SubsystemIOInputsAutoLogged inputs = new SubsystemIOInputsAutoLogged();
+  private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
   private ClimberIO io;
 
   /**
@@ -64,16 +63,30 @@ public class Climber extends SubsystemBase {
 
     // when testing, set the motor power, current, or position based on the Tunables (if non-zero)
     if (TESTING) {
-      if (motorPower.get() != 0) {
-        this.setMotorPower(motorPower.get());
+      // Methods for left motor below
+      if (leftMotorPower.get() != 0) {
+        this.setLeftMotorPower(leftMotorPower.get());
       }
 
-      if (motorCurrent.get() != 0) {
-        this.setMotorCurrent(motorCurrent.get());
+      if (leftMotorCurrent.get() != 0) {
+        this.setLeftMotorCurrent(leftMotorCurrent.get());
       }
 
-      if (motorPosition.get() != 0) {
-        this.setMotorPosition(motorPosition.get());
+      if (leftMotorPosition.get() != 0) {
+        this.setLeftMotorPosition(leftMotorPosition.get());
+      }
+      
+      // Methods for right motor below
+      if (rightMotorPower.get() != 0) {
+        this.setRightMotorPower(rightMotorPower.get());
+      }
+
+      if (rightMotorCurrent.get() != 0) {
+        this.setRightMotorCurrent(rightMotorCurrent.get());
+      }
+
+      if (rightMotorPosition.get() != 0) {
+        this.setRightMotorPosition(rightMotorPosition.get());
       }
     }
   }
@@ -101,7 +114,7 @@ public class Climber extends SubsystemBase {
    *
    * @param position the position to set the motor to in degrees
    */
-  public void seLeftMotorPosition(double position) {
+  public void setLeftMotorPosition(double position) {
     io.setLeftMotorPosition(position, POSITION_FEEDFORWARD);
   }
 
@@ -120,7 +133,11 @@ public class Climber extends SubsystemBase {
 
   private Command getSystemCheckCommand() {
     return Commands.sequence(
-            Commands.run(() -> io.setMotorPower(0.3)).withTimeout(1.0),
+            //return motors to zero (home)
+            Commands.run(() -> {io.setLeftMotorPower(-0.2); io.setRightMotorPower(-0.2);}
+            ).until(() -> inputs.supplyCurrentAmps<=20), //Random value in here for right now
+            //continue with sys check
+            Commands.run(() -> {io.setLeftMotorPower(0.3); io.setRightMotorPower(0.3);}).withTimeout(1.0),
             Commands.runOnce(
                 () -> {
                   if (inputs.velocityRPM < 2.0) {
@@ -132,7 +149,7 @@ public class Climber extends SubsystemBase {
                             true);
                   }
                 }),
-            Commands.run(() -> io.setMotorPower(-0.2)).withTimeout(1.0),
+            Commands.run(() -> {io.setLeftMotorPower(-0.2); io.setRightMotorPower(-0.2);}).withTimeout(1.0),
             Commands.runOnce(
                 () -> {
                   if (inputs.velocityRPM > -2.0) {
@@ -145,6 +162,6 @@ public class Climber extends SubsystemBase {
                   }
                 }))
         .until(() -> !FaultReporter.getInstance().getFaults(CLIMBER).isEmpty())
-        .andThen(Commands.runOnce(() -> io.setMotorPower(0.0)));
+        .andThen(Commands.runOnce(() -> {io.setRightMotorPower(0.0); io.setLeftMotorPower(0.0);}));
   }
 }
