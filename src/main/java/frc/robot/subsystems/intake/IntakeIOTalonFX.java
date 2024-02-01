@@ -20,6 +20,10 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final DigitalInput leftRollerIRSensor;
   private final DigitalInput drumIRSensor;
 
+  private double rightRollerRequestedVelocity;
+  private double leftRollerRequestedVelocity;
+  private double drumRequestedVelocity;
+
   private VelocityTorqueCurrentFOC rightRollerVelocityRequest;
   private VelocityTorqueCurrentFOC leftRollerVelocityRequest;
   private VelocityTorqueCurrentFOC drumVelocityRequest;
@@ -115,21 +119,27 @@ public class IntakeIOTalonFX implements IntakeIO {
     inputs.leftRollerVelocityRotationsPerSecond = leftRollerVelocityStatusSignal.getValueAsDouble();
     inputs.drumVelocityRotationsPerSecond = drumVelocityStatusSignal.getValueAsDouble();
 
-    // what would I use here for reference velocity?
+    inputs.rightRollerReferenceVelocityRPS = rightRollerRequestedVelocity;
+    inputs.leftRollerReferenceVelocityRPS = leftRollerRequestedVelocity;
+    inputs.drumReferenceVelocityRPS = drumRequestedVelocity;
   }
 
   @Override
   public void setRightRollerVelocity(double rps) {
     rightRollerMotor.setControl(rightRollerVelocityRequest.withVelocity(rps));
+    this.rightRollerRequestedVelocity = rps;
   }
 
   @Override
   public void setLeftRollerVelocity(double rps) {
     leftRollerMotor.setControl(leftRollerVelocityRequest.withVelocity(rps));
+    this.leftRollerRequestedVelocity = rps;
   }
 
+  @Override
   public void setDrumVelocity(double rps) {
     drumMotor.setControl(drumVelocityRequest.withVelocity(rps));
+    this.drumRequestedVelocity = rps;
   }
 
   private void configureIntakeRollerMotors(int right_id, int left_id) {
