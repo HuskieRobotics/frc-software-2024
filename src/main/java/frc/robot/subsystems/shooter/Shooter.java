@@ -2,29 +2,16 @@ package frc.robot.subsystems.shooter;
 
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
-import org.littletonrobotics.junction.Logger;
-
-//import frc.robot.subsystems.shooter.ShooterIOInputsAutoLogged;
-
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.team6328.util.TunableNumber;
+import org.littletonrobotics.junction.Logger;
 
 
 public class Shooter extends SubsystemBase{
-    
-  private final TunableNumber shootKP = new TunableNumber("Shooter/SHOOT_KP", 0.0);
-  private final TunableNumber shootKI = new TunableNumber("Shooter/SHOOT_KI", 0.0);
-  private final TunableNumber shootKD = new TunableNumber("Shooter/SHOOT_KD", 0.0);
 
   private ShooterIO io;
   private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
-
-
-
 
   public Shooter(ShooterIO io){
     this.io = io;
@@ -42,18 +29,33 @@ public class Shooter extends SubsystemBase{
     Logger.processInputs("Shooter", shooterInputs);
   }
   
+  public void shoot(double leftMotorVelocity, double rightMotorVelocity){
+    io.setShooterMotorLeftVelocity(leftMotorVelocity);
+    io.setShooterMotorRightVelocity(rightMotorVelocity);
+  }
 
+  public void setDrumMotorVelocity(double velocity){
+    io.setDrumMotorVelocity(velocity);
+  }
+
+  public void setDunkerMotorVelocity(double velocity){
+    io.setDunkerMotorVelocity(velocity);
+  }
 
   public void setAngle(double angle){
     io.setAngle(angle);
   }
 
-  public  void setAppliedCurrent(double current){
-    io.setAppliedCurrent(current);
+  public void getStatorCurrent(){
+    io.getStatorCurrent();
   }
 
-  public void setMotorPower(double power){
-    io.setMotorPower(power);
+  public void getSupplyCurrent(){
+    io.getSupplyCurrent();
+  }
+
+  public void getVelocity(){
+    io.getVelocityRPS();
   }
 
   public void getSensor(){
@@ -62,10 +64,6 @@ public class Shooter extends SubsystemBase{
 
   public void getEncoderAngle(){
     io.getEncoderAngle();
-  }
-
-  public void getVelocity(){
-    io.getVelocity();
   }
 
 
