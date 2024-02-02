@@ -28,25 +28,19 @@ public class ClimberIOTalonFX implements ClimberIO {
 
   private double leftRequestedVelocity;
   private double leftRequestedSetpoint; 
-  private double leftRequestedPower;
 
   private double rightRequestedVelocity;
   private double rightRequestedSetpoint;
-  private double rightRequestedPower;
 
   private StatusSignal<Double> leftVelocityRPMStatusSignal;
   private StatusSignal<Double> leftPositionStatusSignal;
   private StatusSignal<Double> leftStatorCurrentAmpsStatusSignal;
-  private StatusSignal<Double> leftDegreesStatusSignal;
   private StatusSignal<Double> leftSetpointStatusSignal;
-  private StatusSignal<Double> leftPowerStatusSignal;
 
   private StatusSignal<Double> rightVelocityRPMStatusSignal;
   private StatusSignal<Double> rightPositionStatusSignal;
   private StatusSignal<Double> rightStatorCurrentAmpsStatusSignal;
-  private StatusSignal<Double> rightDegreesStatusSignal;
   private StatusSignal<Double> rightSetpointStatusSignal;
-  private StatusSignal<Double> rightPowerStatusSignal;
 
   private TorqueCurrentFOC currentRequest;
   private PositionVoltage positionRequest;
@@ -62,10 +56,16 @@ public class ClimberIOTalonFX implements ClimberIO {
 
   /** Create a TalonFX-specific generic SubsystemIO */
   public ClimberIOTalonFX() {
-    velocityRPMStatusSignal = leftMotor.getRotorVelocity();
+    leftVelocityRPMStatusSignal = leftMotor.getRotorVelocity();
+    leftPositionStatusSignal = leftMotor.getPosition();
+    leftStatorCurrentAmpsStatusSignal = leftMotor.getStatorCurrent();
+    leftSetpointStatusSignal = leftMotor.getClosedLoopReference(); // FIXME: Is closedLoopReference the setpoint?
 
-
-
+    rightVelocityRPMStatusSignal = rightMotor.getPosition();
+    rightPositionStatusSignal = rightMotor.getPosition();
+    rightStatorCurrentAmpsStatusSignal = rightMotor.getStatorCurrent();
+    rightSetpointStatusSignal = rightMotor.getClosedLoopReference();
+    
 
     configMotor(LEFT_MOTOR_CAN_ID, RIGHT_MOTOR_CAN_ID);
 
@@ -82,38 +82,28 @@ public class ClimberIOTalonFX implements ClimberIO {
       leftVelocityRPMStatusSignal,
       leftPositionStatusSignal,
       leftStatorCurrentAmpsStatusSignal,
-      leftDegreesStatusSignal,
       leftSetpointStatusSignal,
-      leftPowerStatusSignal,
       rightVelocityRPMStatusSignal,
       rightPositionStatusSignal,
       rightStatorCurrentAmpsStatusSignal,
-      rightDegreesStatusSignal,
-      rightSetpointStatusSignal,
-      rightPowerStatusSignal
+      rightSetpointStatusSignal
     );
 
     inputs.leftVelocityRPM = leftVelocityRPMStatusSignal.getValueAsDouble();
     inputs.leftPosition = leftPositionStatusSignal.getValueAsDouble();
     inputs.leftStatorCurrentAmps = leftStatorCurrentAmpsStatusSignal.getValueAsDouble();
-    inputs.leftAngleDegrees = leftDegreesStatusSignal.getValueAsDouble(); 
     inputs.leftSetpoint = leftSetpointStatusSignal.getValueAsDouble();
-    inputs.leftPower = leftPowerStatusSignal.getValueAsDouble();
 
     inputs.rightVelocityRPM = rightVelocityRPMStatusSignal.getValueAsDouble();
     inputs.rightPosition = rightPositionStatusSignal.getValueAsDouble();
     inputs.rightStatorCurrentAmps = rightStatorCurrentAmpsStatusSignal.getValueAsDouble();
-    inputs.rightAngleDegrees = rightDegreesStatusSignal.getValueAsDouble(); 
     inputs.rightSetpoint = rightSetpointStatusSignal.getValueAsDouble();
-    inputs.rightPower = rightPowerStatusSignal.getValueAsDouble();
 
     inputs.leftReferenceVelocity = leftRequestedVelocity;
-    inputs.leftReferenceSetpoint = leftRequestedPower;
-    inputs.leftReferencPower = leftRequestedPower;
+    inputs.leftReferenceSetpoint = leftRequestedSetpoint;
 
     inputs.rightReferenceVelocity = rightRequestedVelocity;
     inputs.rightReferenceSetpoint = rightRequestedSetpoint;
-    inputs.rightReferencePower = rightRequestedPower;
 
     // inputs.closedLoopError = leftMotor.getClosedLoopError().getValue();
     // inputs.power = 
