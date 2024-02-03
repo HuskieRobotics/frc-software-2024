@@ -68,6 +68,11 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
+  public Trigger getXStanceButton() {
+    return translateJoystickButtons[5];
+  }
+
+  @Override
   public Trigger getFieldRelativeButton() {
     return translateJoystickButtons[9];
   }
@@ -80,17 +85,12 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getXStanceButton() {
-    return rotateJoystickButtons[6];
-  }
-
-  @Override
   public Trigger getResetPoseToVisionButton() {
     return rotateJoystickButtons[5];
   }
 
   @Override
-  public Trigger getIntakeManualButton() {
+  public Trigger getManualRunIntakeButton() {
     return rotateJoystickButtons[4];
   }
 
@@ -100,10 +100,33 @@ public class FullOperatorConsoleOI implements OperatorInterface {
     return new Trigger(operatorController::getStartButton);
   }
 
+  @Override
+  public Trigger getManualIntakeRightOffButton() {
+    return new Trigger(this::getControllerRightTrigger);
+  }
+  
+  @Override
+  public Trigger getManualIntakeLeftOffButton() {
+    return new Trigger(this::getControllerLeftTrigger);
+  }
+
+  public boolean getControllerLeftTrigger() {
+    return operatorController.getLeftTriggerAxis() > 0.5;
+  }
+
+  public boolean getControllerRightTrigger() {
+    return operatorController.getRightTriggerAxis() > 0.5;
+  }
+
   // Operator Panel
 
   @Override
   public Trigger getVisionIsEnabledSwitch() {
     return operatorPanelButtons[10];
+  }
+
+  @Override
+  public Trigger getIntakeManualOverrideSwitch() {
+    return operatorPanelButtons[12];
   }
 }

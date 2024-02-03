@@ -552,12 +552,34 @@ public class RobotContainer {
     );
 
     // should disable the default command and only run the intake control based off of the controller input
-    // communicate with ian/jake about this
-    oi.getIntakeManualButton().onTrue(
+    oi.getIntakeManualOverrideSwitch().onTrue(
       Commands.run(intake::enableManualOverride, intake)
     );
 
-    // add implementation for buttons 
+    // these need to turn each other off ( will they by default ? )
+    oi.getManualRunIntakeButton().and(intake::manualOverrideEnabled).onTrue(
+      Commands.either(
+        Commands.runOnce(intake::turnIntakeOff, intake).withName("TurnIntakeOff"),
+        Commands.run(intake::intakeGamePiece, intake).withName("IntakeGamePiece"),
+        intake::runningManualIntake
+      )
+    );
+
+    oi.getManualIntakeRightOffButton().and(intake::manualOverrideEnabled).onTrue(
+      Commands.either(
+        Commands.runOnce(intake::turnRightIntakeOff, intake).withName("TurnRightIntakeOff"),
+        Commands.run(intake::intakeGamePieceRight, intake).withName("IntakeGamePieceRight"),
+        intake::runningManualIntake
+      )
+    );
+
+    oi.getManualIntakeLeftOffButton().and(intake::manualOverrideEnabled).onTrue(
+      Commands.either(
+        Commands.runOnce(intake::turnLeftIntakeOff, intake).withName("TurnLeftIntakeOff"),
+        Commands.run(intake::intakeGamePieceLeft, intake).withName("IntakeGamePieceLeft"),
+        intake::runningManualIntake
+      )
+    );
   }
 
 

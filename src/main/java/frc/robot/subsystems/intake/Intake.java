@@ -25,6 +25,7 @@ public class Intake extends SubsystemBase {
     // but first just running through the logic of what we would do in these cases
 
     private boolean manualOverrideEnabled;
+    private boolean runningManualIntake;
 
     public Intake(IntakeIO io) {
         this.io = io;
@@ -50,7 +51,8 @@ public class Intake extends SubsystemBase {
                 this.turnTransitionOff();
             } else if (intakeState == IntakeState.EMERGENCY) {
                 this.turnTransitionOff();
-                this.turnIntakeOff();
+                this.turnRightIntakeOff();
+                this.turnLeftIntakeOff();
             }
         }
     }
@@ -89,6 +91,12 @@ public class Intake extends SubsystemBase {
         return manualOverrideEnabled;
     }
 
+    public boolean runningManualIntake() {
+        return manualOverrideEnabled 
+            && (inputs.leftRollerReferenceVelocityRPS > 0 
+            || inputs.rightRollerReferenceVelocityRPS > 0);
+    }
+
     public void enableManualOverride() {
         manualOverrideEnabled = true;
     }
@@ -98,7 +106,15 @@ public class Intake extends SubsystemBase {
     }
 
     public void intakeGamePiece() {
+        this.intakeGamePieceRight();
+        this.intakeGamePieceLeft();
+    }
+
+    public void intakeGamePieceRight() {
         this.setRightRollerVelocity(IntakeConstants.INTAKE_VELOCITY_ROLLERS_RPS);
+    }
+
+    public void intakeGamePieceLeft() {
         this.setLeftRollerVelocity(IntakeConstants.INTAKE_VELOCITY_ROLLERS_RPS);
     }
 
@@ -107,9 +123,17 @@ public class Intake extends SubsystemBase {
         // Run kicker as well, integrate with shooter
     }
 
-    public void turnIntakeOff() {
+    public void turnRightIntakeOff() {
         this.setRightRollerVelocity(0);
+    }
+
+    public void turnLeftIntakeOff() {
         this.setLeftRollerVelocity(0);
+    }
+
+    public void turnIntakeOff() {
+        this.turnRightIntakeOff();
+        this.turnLeftIntakeOff();
     }
 
     public void transitionGamePiece() {

@@ -25,7 +25,19 @@ public interface OperatorInterface {
     return 0.0;
   }
 
-  public default Trigger getIntakeManualButton() {
+  public default Trigger getIntakeManualOverrideSwitch() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getManualRunIntakeButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getManualIntakeRightOffButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getManualIntakeLeftOffButton() {
     return new Trigger(() -> false);
   }
 
