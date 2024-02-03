@@ -9,6 +9,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -35,6 +36,7 @@ import frc.lib.team3061.vision.VisionConstants;
 import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.lib.team3061.vision.VisionIOSim;
+import frc.lib.team6328.util.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.FeedForwardCharacterization.FeedForwardCharacterizationData;
@@ -49,6 +51,7 @@ import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.subsystem.Subsystem;
 import frc.robot.subsystems.subsystem.SubsystemIO;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Optional;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -533,17 +536,30 @@ public class RobotContainer {
         new TeleopSwerve(drivetrain, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
 
     // lock rotation to the nearest 180° while driving
+    // oi.getLock180Button()
+    //     .whileTrue(
+    //         new TeleopSwerve(
+    //             drivetrain,
+    //             oi::getTranslateX,
+    //             oi::getTranslateY,
+    //             () ->
+    //                 (drivetrain.getPose().getRotation().getDegrees() > -90
+    //                         && drivetrain.getPose().getRotation().getDegrees() < 90)
+    //                     ? Rotation2d.fromDegrees(0.0)
+    //                     : Rotation2d.fromDegrees(180.0)));
+
     oi.getLock180Button()
         .whileTrue(
             new TeleopSwerve(
                 drivetrain,
                 oi::getTranslateX,
                 oi::getTranslateY,
-                () ->
-                    (drivetrain.getPose().getRotation().getDegrees() > -90
-                            && drivetrain.getPose().getRotation().getDegrees() < 90)
-                        ? Rotation2d.fromDegrees(0.0)
-                        : Rotation2d.fromDegrees(180.0)));
+                () -> {
+                  // Transform2d rotation = drivetrain.getPose().minus(FieldConstants.Speaker.centerSpeakerOpening).inverse();
+                  // return Math.atan2(rotation.getY(), rotation.getX());
+                  Transform2d translation = FieldConstants.Speaker.centerSpeakerOpening.minus(drivetrain.getPose());
+                  return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
+                }));
 
     // field-relative toggle
     oi.getFieldRelativeButton()
