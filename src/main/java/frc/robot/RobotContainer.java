@@ -364,6 +364,7 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "disableXStance", Commands.runOnce(drivetrain::disableXstance, drivetrain));
     NamedCommands.registerCommand("wait5Seconds", Commands.waitSeconds(5.0));
+    NamedCommands.registerCommand("Shoot", Commands.waitSeconds(1.0));
 
     // build auto path commands
 
@@ -445,6 +446,39 @@ public class RobotContainer {
      */
     Command tuningCommand = new PathPlannerAuto("Tuning");
     autoChooser.addOption("Auto Tuning", tuningCommand);
+
+    /************ 3 Note ************
+     *
+     * used for testing the 3 note autonomous
+     *
+     */
+    Command threeNoteCommand = new PathPlannerAuto("3 Note");
+    autoChooser.addOption("3 Note", threeNoteCommand);
+
+    Command threeNoteCommand2 = new PathPlannerAuto("3 Note Test");
+    autoChooser.addOption("3 Note Test", threeNoteCommand2);
+
+    /************ 5 Note ************
+     *
+     * used for testing the 5 note autonomous
+     *
+     */
+    Command fiveNoteCommand = new PathPlannerAuto("5 Note Test Amp Side");
+    autoChooser.addOption("5 Note Test Amp Side", fiveNoteCommand);
+
+    Command fiveNoteCollectorSideCommand2 = new PathPlannerAuto("5 Note Test Collector Side");
+    autoChooser.addOption("5 Note Test Collector Side", fiveNoteCollectorSideCommand2);
+
+    Command fiveNoteCommand3 = new PathPlannerAuto("5.1 Amp Side 2");
+    autoChooser.addOption("5.1 Amp Side 2", fiveNoteCommand3);
+
+     /************ 6 Note ************
+     *
+     * used for testing the 6 note autonomous (Still Testing)
+     *
+     */
+     Command sixNoteCommand1 = new PathPlannerAuto("6 Note Test Amp Side");
+    autoChooser.addOption("6 Note Test Amp Side", sixNoteCommand1);
 
     /************ Drive Velocity Tuning ************
      *
