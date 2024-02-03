@@ -5,12 +5,20 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.sim.ChassisReference;
+import com.ctre.phoenix6.sim.TalonFXSimState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team6328.util.TunableNumber;
+import frc.robot.Constants;
 
 public class IntakeIOTalonFX implements IntakeIO {
   private TalonFX rightRollerMotor;
@@ -40,6 +48,17 @@ public class IntakeIOTalonFX implements IntakeIO {
   private StatusSignal<Double> leftRollerSupplyCurrentStatusSignal;
   private StatusSignal<Double> drumSupplyCurrentStatusSignal;
 
+  // simulation related
+  private TalonFXSimState rightRollerMotorSimState;
+  private TalonFXSimState leftRollerMotorSimState;
+  private TalonFXSimState drumMotorSimState;
+  private LinearSystemSim<N1, N1, N1> rightRollerSim;
+  private LinearSystemSim<N1, N1, N1> leftRollerSim;
+  private LinearSystemSim<N1, N1, N1> drumSim;
+  private VelocityVoltage rightRollerVelocitySimRequest;
+  private VelocityVoltage leftRollerVelocitySimRequest;
+  private VelocityVoltage drumVelocitySimRequest;
+
   // tunable numbers for roller and drum pid
   private final TunableNumber rollerMotorsKP =
       new TunableNumber("Intake/rollerMotorsKP", IntakeConstants.INTAKE_ROLLER_MOTORS_KP);
@@ -68,6 +87,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     leftRollerIRSensor = new DigitalInput(IntakeConstants.INTAKE_LEFT_ROLLER_IR_SENSOR_ID);
     drumIRSensor = new DigitalInput(IntakeConstants.INTAKE_DRUM_IR_SENSOR_ID);
 
+    // torque current FOC control mode is not support in simulation yet
     rightRollerVelocityRequest = new VelocityTorqueCurrentFOC(0);
     leftRollerVelocityRequest = new VelocityTorqueCurrentFOC(0);
     drumVelocityRequest = new VelocityTorqueCurrentFOC(0);
@@ -87,10 +107,17 @@ public class IntakeIOTalonFX implements IntakeIO {
     configureIntakeRollerMotors(
         IntakeConstants.INTAKE_RIGHT_ROLLER_MOTOR_ID, IntakeConstants.INTAKE_LEFT_ROLLER_MOTOR_ID);
     configureIntakeDrumMotor(IntakeConstants.INTAKE_DRUM_MOTOR_ID);
+
+    configSim();
   }
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
+    // FIXME: specify gear ratios
+    updateSim(this.rightRollerMotorSimState, this.rightRollerSim, 1.0);
+    updateSim(this.leftRollerMotorSimState, this.leftRollerSim, 1.0);
+    updateSim(this.drumMotorSimState, this.drumSim, 1.0);
+
     BaseStatusSignal.refreshAll(
         rightRollerVelocityStatusSignal,
         leftRollerVelocityStatusSignal,
@@ -126,20 +153,29 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   @Override
   public void setRightRollerVelocity(double rps) {
-    rightRollerMotor.setControl(rightRollerVelocityRequest.withVelocity(rps));
-    this.rightRollerRequestedVelocity = rps;
+    if (Constants.getMode() != Constants.Mode.SIM) {
+      rightRollerMotor.setControl(rightRollerVelocityRequest.withVelocity(rps));
+    } else {
+      rightRollerMotor.setControl(rightRollerVelocitySimRequest.withVelocity(rps));
+    }
   }
 
   @Override
   public void setLeftRollerVelocity(double rps) {
-    leftRollerMotor.setControl(leftRollerVelocityRequest.withVelocity(rps));
-    this.leftRollerRequestedVelocity = rps;
+    if (Constants.getMode() != Constants.Mode.SIM) {
+      leftRollerMotor.setControl(leftRollerVelocityRequest.withVelocity(rps));
+    } else {
+      leftRollerMotor.setControl(leftRollerVelocitySimRequest.withVelocity(rps));
+    }
   }
 
   @Override
   public void setDrumVelocity(double rps) {
-    drumMotor.setControl(drumVelocityRequest.withVelocity(rps));
-    this.drumRequestedVelocity = rps;
+    if (Constants.getMode() != Constants.Mode.SIM) {
+      drumMotor.setControl(drumVelocityRequest.withVelocity(rps));
+    } else {
+      drumMotor.setControl(drumVelocitySimRequest.withVelocity(rps));
+    }
   }
 
   private void configureIntakeRollerMotors(int right_id, int left_id) {
@@ -157,6 +193,8 @@ public class IntakeIOTalonFX implements IntakeIO {
     rollerConfig.CurrentLimits = rollerCurrentLimits;
 
     rollerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    // FIXME: need different values for simulation; hard code?
     rollerConfig.Slot0.kP = rollerMotorsKP.get();
     rollerConfig.Slot0.kI = rollerMotorsKI.get();
     rollerConfig.Slot0.kD = rollerMotorsKD.get();
@@ -185,6 +223,8 @@ public class IntakeIOTalonFX implements IntakeIO {
     drumConfig.CurrentLimits = drumCurrentLimits;
 
     drumConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    // FIXME: need different values for simulation; hard code?
     drumConfig.Slot0.kP = drumMotorKP.get();
     drumConfig.Slot0.kI = drumMotorKI.get();
     drumConfig.Slot0.kD = drumMotorKD.get();
@@ -196,5 +236,59 @@ public class IntakeIOTalonFX implements IntakeIO {
             : InvertedValue.CounterClockwise_Positive;
 
     drumMotor.getConfigurator().apply(drumConfig);
+  }
+
+  private void configSim() {
+    if (Constants.getMode() != Constants.Mode.SIM) {
+      return;
+    }
+
+    this.rightRollerMotorSimState = this.rightRollerMotor.getSimState();
+    this.rightRollerMotorSimState.Orientation =
+        IntakeConstants.ROLLERS_MOTOR_INVERTED
+            ? ChassisReference.Clockwise_Positive
+            : ChassisReference.CounterClockwise_Positive;
+    this.leftRollerMotorSimState = this.leftRollerMotor.getSimState();
+    this.leftRollerMotorSimState.Orientation =
+        IntakeConstants.ROLLERS_MOTOR_INVERTED
+            ? ChassisReference.Clockwise_Positive
+            : ChassisReference.CounterClockwise_Positive;
+    this.drumMotorSimState = this.drumMotor.getSimState();
+    this.drumMotorSimState.Orientation =
+        IntakeConstants.DRUM_MOTOR_INVERTED
+            ? ChassisReference.Clockwise_Positive
+            : ChassisReference.CounterClockwise_Positive;
+
+    // FIXME: characterize the system to obtain the kV and kA values
+    this.rightRollerSim = new LinearSystemSim<>(LinearSystemId.identifyVelocitySystem(2.0, 0.2));
+    this.leftRollerSim = new LinearSystemSim<>(LinearSystemId.identifyVelocitySystem(2.0, 0.2));
+    this.drumSim = new LinearSystemSim<>(LinearSystemId.identifyVelocitySystem(2.0, 0.2));
+
+    this.rightRollerVelocitySimRequest = new VelocityVoltage(0);
+    this.leftRollerVelocitySimRequest = new VelocityVoltage(0);
+    this.drumVelocitySimRequest = new VelocityVoltage(0);
+  }
+
+  private void updateSim(
+      TalonFXSimState simState, LinearSystemSim<N1, N1, N1> sim, double gearRatio) {
+    if (Constants.getMode() != Constants.Mode.SIM) {
+      return;
+    }
+
+    // update the sim states supply voltage based on the simulated battery
+    simState.setSupplyVoltage(RobotController.getBatteryVoltage());
+
+    // update the input voltages of the models based on the outputs of the simulated TalonFXs
+    sim.setInput(simState.getMotorVoltage());
+
+    // update the models
+    sim.update(Constants.LOOP_PERIOD_SECS);
+
+    // update the simulated TalonFX based on the model outputs
+    double mechanismRadiansPerSec = sim.getOutput(0);
+    double motorRPS = mechanismRadiansPerSec * gearRatio / (2 * Math.PI);
+    double motorRotations = motorRPS * Constants.LOOP_PERIOD_SECS;
+    simState.addRotorPosition(motorRotations);
+    simState.setRotorVelocity(motorRPS);
   }
 }
