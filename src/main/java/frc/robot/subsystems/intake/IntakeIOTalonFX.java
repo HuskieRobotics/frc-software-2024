@@ -259,7 +259,7 @@ public class IntakeIOTalonFX implements IntakeIO {
             ? ChassisReference.Clockwise_Positive
             : ChassisReference.CounterClockwise_Positive;
 
-    // FIXME: characterize the system to obtain the kV and kA values
+    // FIXME: characterize the system to obtain the kV and kA values (use recalc)
     this.rightRollerSim = new LinearSystemSim<>(LinearSystemId.identifyVelocitySystem(2.0, 0.2));
     this.leftRollerSim = new LinearSystemSim<>(LinearSystemId.identifyVelocitySystem(2.0, 0.2));
     this.drumSim = new LinearSystemSim<>(LinearSystemId.identifyVelocitySystem(2.0, 0.2));
