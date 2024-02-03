@@ -37,7 +37,7 @@ public class VisionIOPhotonVision implements VisionIO {
     this.camera = new PhotonCamera(cameraName);
     this.photonEstimator =
         new PhotonPoseEstimator(
-            layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, robotToCamera);
+            layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, new Transform3d());
 
     // the index of the array corresponds to the tag ID; so, add one since there is no tag ID 0
     this.tagsSeen = new boolean[layout.getTags().size() + 1];

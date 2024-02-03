@@ -13,6 +13,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.Alert;
 import frc.lib.team6328.util.Alert.AlertType;
@@ -142,7 +143,10 @@ public class Vision extends SubsystemBase {
     // only process the vision data if the timestamp is newer than the last one
     if (this.lastTimestamps[i] < ios[i].lastCameraTimestamp) {
       this.lastTimestamps[i] = ios[i].lastCameraTimestamp;
-      Pose2d estimatedRobotPose2d = ios[i].estimatedRobotPose.toPose2d();
+      Pose3d estimatedRobotPose3d =
+          ios[i].estimatedRobotPose.plus(
+              RobotConfig.getInstance().getRobotToCameraTransforms()[i].inverse());
+      Pose2d estimatedRobotPose2d = estimatedRobotPose3d.toPose2d();
 
       // only update the pose estimator if the vision subsystem is enabled
       if (isEnabled) {
@@ -156,7 +160,11 @@ public class Vision extends SubsystemBase {
         isVisionUpdating = true;
       }
 
-      Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/RobotPose", estimatedRobotPose2d);
+      Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/CameraPose3d", ios[i].estimatedRobotPose);
+      Logger.recordOutput(
+          SUBSYSTEM_NAME + "/" + i + "/CameraPose2d", ios[i].estimatedRobotPose.toPose2d());
+      Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/RobotPose3d", estimatedRobotPose3d);
+      Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/RobotPose2d", estimatedRobotPose2d);
       this.cyclesWithNoResults[i] = 0;
     } else {
       this.cyclesWithNoResults[i] += 1;
