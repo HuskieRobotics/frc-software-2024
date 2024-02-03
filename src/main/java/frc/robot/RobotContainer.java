@@ -480,6 +480,9 @@ public class RobotContainer {
     Command sixNoteCommand1 = new PathPlannerAuto("6 Note Test Amp Side");
     autoChooser.addOption("6 Note Test Amp Side", sixNoteCommand1);
 
+    Command sixNoteCommand2 = new PathPlannerAuto("6 Note Step-by-Step");
+    autoChooser.addOption("6 Note Step-by-Step", sixNoteCommand2);
+
     /************ Drive Velocity Tuning ************
      *
      * useful for tuning the drive velocity PID controller
