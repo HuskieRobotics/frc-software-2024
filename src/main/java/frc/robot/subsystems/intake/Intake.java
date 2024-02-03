@@ -1,12 +1,14 @@
 package frc.robot.subsystems.intake;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.intake.IntakeIO.IntakeIOInputs;
 
 public class Intake extends SubsystemBase {
 
     private final IntakeIO io;
-    private final IntakeIOInputs inputs = new IntakeIOInputsAutoLogged();
+    private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
     private boolean manualOverrideEnabled;
 
@@ -17,6 +19,7 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
+        Logger.processInputs("Intake", inputs);
     }
 
     public boolean getRightRollerIRSensor() {
@@ -52,7 +55,6 @@ public class Intake extends SubsystemBase {
     public void repelGamePiece() {
         this.setRightRollerVelocity(IntakeConstants.REPEL_VELOCITY_ROLLERS_RPS);
         this.setLeftRollerVelocity(IntakeConstants.REPEL_VELOCITY_ROLLERS_RPS);
-        this.setDrumVelocity(IntakeConstants.REPEL_VELOCITY_DRUM_RPS);
     }
 
     public void setRightRollerVelocity(double rps) {

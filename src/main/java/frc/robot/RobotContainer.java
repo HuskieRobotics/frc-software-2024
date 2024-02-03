@@ -36,9 +36,6 @@ import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.lib.team3061.vision.VisionIOSim;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.FeedForwardCharacterization;
-import frc.robot.commands.IntakeControl;
-import frc.robot.commands.IntakeEmergencyStop;
-import frc.robot.commands.EjectGamePiece;
 import frc.robot.commands.FeedForwardCharacterization.FeedForwardCharacterizationData;
 import frc.robot.commands.RotateToAngle;
 import frc.robot.commands.TeleopSwerve;
@@ -543,15 +540,15 @@ public class RobotContainer {
     //     intake::getEStopEnabled
     //   ));
 
-    Trigger drumIRSensor = new Trigger(() -> intake.getDrumIRSensor());
+    Trigger drumIRSensor = new Trigger(intake::getDrumIRSensor);
 
     intake.setDefaultCommand(
-      Commands.run(() -> intake.intakeGamePiece(), intake)
+      Commands.run(() -> intake.intakeGamePiece(), intake).withName("IntakeGamePiece")
     );
 
-    // only run repel game piece if the drumir sensor and the manual override are not enabled
+    // only run repel game piece if the drum IR sensor and the manual override are not enabled
     drumIRSensor.and(() -> !intake.manualOverrideEnabled()).onTrue(
-      Commands.run(() -> intake.repelGamePiece(), intake)
+      Commands.run(() -> intake.repelGamePiece(), intake).until(() -> intake.getDrumIRSensor())
     );
 
     // should disable the default command and only run the intake control based off of the controller input
@@ -560,7 +557,7 @@ public class RobotContainer {
       Commands.run(intake::enableManualOverride, intake)
     );
 
-    // add implementation for buttons for 
+    // add implementation for buttons 
   }
 
 

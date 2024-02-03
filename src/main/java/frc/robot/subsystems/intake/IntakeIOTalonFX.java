@@ -20,10 +20,6 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final DigitalInput leftRollerIRSensor;
   private final DigitalInput drumIRSensor;
 
-  private double rightRollerRequestedVelocity;
-  private double leftRollerRequestedVelocity;
-  private double drumRequestedVelocity;
-
   private VelocityTorqueCurrentFOC rightRollerVelocityRequest;
   private VelocityTorqueCurrentFOC leftRollerVelocityRequest;
   private VelocityTorqueCurrentFOC drumVelocityRequest;
@@ -72,9 +68,9 @@ public class IntakeIOTalonFX implements IntakeIO {
     leftRollerVelocityRequest = new VelocityTorqueCurrentFOC(0);
     drumVelocityRequest = new VelocityTorqueCurrentFOC(0);
 
-    rightRollerVelocityStatusSignal = rightRollerMotor.getRotorVelocity();
-    leftRollerVelocityStatusSignal = leftRollerMotor.getRotorVelocity();
-    drumVelocityStatusSignal = drumMotor.getRotorVelocity();
+    rightRollerVelocityStatusSignal = rightRollerMotor.getVelocity();
+    leftRollerVelocityStatusSignal = leftRollerMotor.getVelocity();
+    drumVelocityStatusSignal = drumMotor.getVelocity();
 
     rightRollerStatorCurrentStatusSignal = rightRollerMotor.getStatorCurrent();
     leftRollerStatorCurrentStatusSignal = leftRollerMotor.getStatorCurrent();
@@ -84,9 +80,13 @@ public class IntakeIOTalonFX implements IntakeIO {
     leftRollerSupplyCurrentStatusSignal = leftRollerMotor.getSupplyCurrent();
     drumSupplyCurrentStatusSignal = drumMotor.getSupplyCurrent();
 
-    configureIntakeRollerMotors(
-        IntakeConstants.INTAKE_RIGHT_ROLLER_MOTOR_ID, IntakeConstants.INTAKE_LEFT_ROLLER_MOTOR_ID);
-    configureIntakeDrumMotor(IntakeConstants.INTAKE_DRUM_MOTOR_ID);
+    rightRollerMotor = new TalonFX(IntakeConstants.INTAKE_RIGHT_ROLLER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
+    leftRollerMotor = new TalonFX(IntakeConstants.INTAKE_LEFT_ROLLER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
+    drumMotor = new TalonFX(IntakeConstants.INTAKE_DRUM_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
+
+    configureIntakeRollerMotor(rightRollerMotor, true);
+    configureIntakeRollerMotor(leftRollerMotor, false);
+    configureIntakeDrumMotor(drumMotor);
   }
 
   @Override
@@ -119,33 +119,29 @@ public class IntakeIOTalonFX implements IntakeIO {
     inputs.leftRollerVelocityRotationsPerSecond = leftRollerVelocityStatusSignal.getValueAsDouble();
     inputs.drumVelocityRotationsPerSecond = drumVelocityStatusSignal.getValueAsDouble();
 
-    inputs.rightRollerReferenceVelocityRPS = rightRollerRequestedVelocity;
-    inputs.leftRollerReferenceVelocityRPS = leftRollerRequestedVelocity;
-    inputs.drumReferenceVelocityRPS = drumRequestedVelocity;
+    // what method would be used to get the value of the reference velocity as a status signal?
+    // could not find any methods that returned a status signal for the reference velocity
+    inputs.rightRollerReferenceVelocityRPS = rightRollerMotor.getClosedLoopReference().getValueAsDouble();
+    inputs.leftRollerReferenceVelocityRPS = leftRollerMotor.getClosedLoopReference().getValueAsDouble();
+    inputs.drumReferenceVelocityRPS = drumMotor.getClosedLoopReference().getValueAsDouble();
   }
 
   @Override
   public void setRightRollerVelocity(double rps) {
     rightRollerMotor.setControl(rightRollerVelocityRequest.withVelocity(rps));
-    this.rightRollerRequestedVelocity = rps;
   }
 
   @Override
   public void setLeftRollerVelocity(double rps) {
     leftRollerMotor.setControl(leftRollerVelocityRequest.withVelocity(rps));
-    this.leftRollerRequestedVelocity = rps;
   }
 
   @Override
   public void setDrumVelocity(double rps) {
     drumMotor.setControl(drumVelocityRequest.withVelocity(rps));
-    this.drumRequestedVelocity = rps;
   }
 
-  private void configureIntakeRollerMotors(int right_id, int left_id) {
-    rightRollerMotor = new TalonFX(right_id, RobotConfig.getInstance().getCANBusName());
-    leftRollerMotor = new TalonFX(left_id, RobotConfig.getInstance().getCANBusName());
-
+  private void configureIntakeRollerMotor(TalonFX rollerMotor, boolean isRight) {
     TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
     CurrentLimitsConfigs rollerCurrentLimits = new CurrentLimitsConfigs();
 
@@ -162,18 +158,24 @@ public class IntakeIOTalonFX implements IntakeIO {
     rollerConfig.Slot0.kD = rollerMotorsKD.get();
     rollerConfig.Slot0.kS = rollerMotorsKS.get();
 
-    rollerConfig.MotorOutput.Inverted =
-        IntakeConstants.ROLLERS_MOTOR_INVERTED
-            ? InvertedValue.Clockwise_Positive
-            : InvertedValue.CounterClockwise_Positive;
+    if (isRight) {
+      rollerConfig.MotorOutput.Inverted =
+          IntakeConstants.RIGHT_ROLLER_MOTOR_INVERTED
+              ? InvertedValue.Clockwise_Positive
+              : InvertedValue.CounterClockwise_Positive;
+    } else {
+      rollerConfig.MotorOutput.Inverted =
+          IntakeConstants.LEFT_ROLLER_MOTOR_INVERTED
+              ? InvertedValue.Clockwise_Positive
+              : InvertedValue.CounterClockwise_Positive;
+    }
 
-    rightRollerMotor.getConfigurator().apply(rollerConfig);
-    leftRollerMotor.getConfigurator().apply(rollerConfig);
+    rollerConfig.Feedback.SensorToMechanismRatio = IntakeConstants.ROLLERS_SENSOR_TO_MECHANISM_RATIO;
+
+    rollerMotor.getConfigurator().apply(rollerConfig);
   }
 
-  private void configureIntakeDrumMotor(int drum_id) {
-    drumMotor = new TalonFX(drum_id, RobotConfig.getInstance().getCANBusName());
-
+  private void configureIntakeDrumMotor(TalonFX drumMotor) {
     TalonFXConfiguration drumConfig = new TalonFXConfiguration();
     CurrentLimitsConfigs drumCurrentLimits = new CurrentLimitsConfigs();
 

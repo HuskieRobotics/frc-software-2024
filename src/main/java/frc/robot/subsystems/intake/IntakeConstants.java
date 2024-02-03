@@ -39,5 +39,10 @@ public class IntakeConstants {
   public static final double DRUM_CONTINUOUS_CURRENT_LIMIT = 15.0;
   public static final double DRUM_PEAK_CURRENT_LIMIT = 20.0;
   public static final double DRUM_PEAK_CURRENT_DURATION = 0.1;
+
+  public static final boolean RIGHT_ROLLER_MOTOR_INVERTED = false;
+  public static final boolean LEFT_ROLLER_MOTOR_INVERTED = false;
   public static final boolean DRUM_MOTOR_INVERTED = false;
+
+  public static final double ROLLERS_SENSOR_TO_MECHANISM_RATIO = 0.0;
 }
