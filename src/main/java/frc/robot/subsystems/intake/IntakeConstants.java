@@ -25,9 +25,8 @@ public class IntakeConstants {
   // velocities
 
   public static final double INTAKE_VELOCITY_ROLLERS_RPS = 0.0;
-  public static final double INTAKE_VELOCITY_DRUM_RPS = 0.0;
+  public static final double DRUM_VELOCITY_RPS = 0.0;
   public static final double REPEL_VELOCITY_ROLLERS_RPS = 0.0;
-  public static final double REPEL_VELOCITY_DRUM_RPS = 0.0;
 
   // current limits
 

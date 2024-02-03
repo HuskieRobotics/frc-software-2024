@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -124,6 +125,28 @@ public class IntakeIOTalonFX implements IntakeIO {
     inputs.rightRollerReferenceVelocityRPS = rightRollerMotor.getClosedLoopReference().getValueAsDouble();
     inputs.leftRollerReferenceVelocityRPS = leftRollerMotor.getClosedLoopReference().getValueAsDouble();
     inputs.drumReferenceVelocityRPS = drumMotor.getClosedLoopReference().getValueAsDouble();
+
+    if (rollerMotorsKP.hasChanged()
+      || rollerMotorsKI.hasChanged()
+      || rollerMotorsKD.hasChanged()
+      || rollerMotorsKS.hasChanged() 
+      || drumMotorKP.hasChanged()
+      || drumMotorKI.hasChanged()
+      || drumMotorKD.hasChanged()
+      || drumMotorKS.hasChanged()) {
+        
+       for (TalonFX motor : new TalonFX[] {rightRollerMotor, leftRollerMotor, drumMotor}) {
+          Slot0Configs slot0Configs = new Slot0Configs();
+          motor.getConfigurator().refresh(slot0Configs);
+          slot0Configs.kP = rollerMotorsKP.get();
+          slot0Configs.kI = rollerMotorsKI.get();
+          slot0Configs.kD = rollerMotorsKD.get();
+          slot0Configs.kS = rollerMotorsKS.get();
+
+          motor.getConfigurator().apply(slot0Configs);
+       }
+
+      }
   }
 
   @Override
