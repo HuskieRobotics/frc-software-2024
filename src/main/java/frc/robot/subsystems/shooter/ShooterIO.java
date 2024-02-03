@@ -22,15 +22,14 @@ public interface ShooterIO {
     // Angle Motor Inputs
     double angleMotorStatorCurrentAmps = 0.0;
     double angleMotorSupplyCurrentAmps = 0.0;
-    double angleMotorVelocityRPS = 0.0;
-    double angleMotorReferenceVelocityRPS = 0.0;
-    double angleEncoderAngle = 0.0;
+    double angleMotorReferenceAngleDegrees  = 0.0;
+    double angleEncoderAngleDegrees = 0.0;
 
-    // Drum Motor Inputs
-    double drumMotorStatorCurrentAmps = 0.0;
-    double drumMotorSupplyCurrentAmps = 0.0;
-    double drumMotorVelocityRPS = 0.0;
-    double drumMotorReferenceVelocityRPS = 0.0;
+    // Kicker Motor Inputs
+    double kickerMotorStatorCurrentAmps = 0.0;
+    double kickerMotorSupplyCurrentAmps = 0.0;
+    double kickerMotorVelocityRPS = 0.0;
+    double kickerMotorReferenceVelocityRPS = 0.0;
 
     // Dunker Motor Inputs
     double dunkerMotorStatorCurrentAmps = 0.0;
@@ -39,29 +38,22 @@ public interface ShooterIO {
     double dunkerMotorReferenceVelocityRPS = 0.0;
 
     // Shooter Sensor
-    boolean isShooterSensorBlocked = true;    
+    boolean isKickerSensorBlocked = true;    
   }
 
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ShooterIOInputs inputs) {}
 
-  public default void setDrumMotorVelocity(double rps) {}
+  public default void setKickerWheelVelocity(double rps) {}
 
   public default void setDunkerMotorVelocity(double rps) {}
 
-  public default void setShooterMotorLeftVelocity(double rps) {}
+  public default void setShooterWheelLeftVelocity(double rps) {}
 
-  public default void setShooterMotorRightVelocity(double rps) {}
+  public default void setShooterWheelRightVelocity(double rps) {}
 
   public default void setAngle(double angle) {}
 
   public default void getSensor() {}
 
-  public default void getEncoderAngle() {}
-
-  public default void getVelocityRPS() {}
-
-  public default void getStatorCurrent() {}
-  
-  public default void getSupplyCurrent() {}
 }

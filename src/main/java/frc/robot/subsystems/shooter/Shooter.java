@@ -26,46 +26,28 @@ public class Shooter extends SubsystemBase{
   @Override
 	public void periodic() {
     io.updateInputs(shooterInputs);
-    Logger.processInputs("Shooter", shooterInputs);
+    Logger.processInputs(SUBSYSTEM_NAME, shooterInputs);
   }
   
-  public void shoot(double leftMotorVelocity, double rightMotorVelocity){
-    io.setShooterMotorLeftVelocity(leftMotorVelocity);
-    io.setShooterMotorRightVelocity(rightMotorVelocity);
+  public void shoot(double leftWheelVelocityRPS, double rightWheelVelocityRPS){
+    io.setShooterWheelLeftVelocity(leftWheelVelocityRPS);
+    io.setShooterWheelRightVelocity(rightWheelVelocityRPS);
   }
 
-  public void setDrumMotorVelocity(double velocity){
-    io.setDrumMotorVelocity(velocity);
+  public void setKickerMotorVelocity(double velocityRPS){
+    io.setKickerWheelVelocity(velocityRPS);
   }
 
-  public void setDunkerMotorVelocity(double velocity){
-    io.setDunkerMotorVelocity(velocity);
+  public void setDunkerMotorVelocity(double velocityRPS){
+    io.setDunkerMotorVelocity(velocityRPS);
   }
 
   public void setAngle(double angle){
     io.setAngle(angle);
   }
 
-  public void getStatorCurrent(){
-    io.getStatorCurrent();
-  }
-
-  public void getSupplyCurrent(){
-    io.getSupplyCurrent();
-  }
-
-  public void getVelocity(){
-    io.getVelocityRPS();
-  }
-
   public void getSensor(){
     io.getSensor();
   }
-
-  public void getEncoderAngle(){
-    io.getEncoderAngle();
-  }
-
-
-    
+  
 }
