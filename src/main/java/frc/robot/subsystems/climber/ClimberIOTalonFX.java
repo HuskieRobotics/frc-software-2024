@@ -32,6 +32,12 @@ public class ClimberIOTalonFX implements ClimberIO {
   private double rightRequestedVelocity;
   private double rightRequestedSetpoint;
 
+  private VelocityTorqueCurrentFOC leftVelocityRequest;
+  private Double leftPositionRequest;
+
+  private VelocityTorqueCurrentFOC rightVelocityRequest;
+  private double rightPositionRequest;
+
   private StatusSignal<Double> leftVelocityRPMStatusSignal;
   private StatusSignal<Double> leftPositionStatusSignal;
   private StatusSignal<Double> leftStatorCurrentAmpsStatusSignal;
@@ -42,17 +48,20 @@ public class ClimberIOTalonFX implements ClimberIO {
   private StatusSignal<Double> rightStatorCurrentAmpsStatusSignal;
   private StatusSignal<Double> rightSetpointStatusSignal;
 
-  private TorqueCurrentFOC currentRequest;
-  private PositionVoltage positionRequest;
-
   private Alert configAlert =
       new Alert("Failed to apply configuration for Climber.", AlertType.ERROR);
 
-  private final TunableNumber kP = new TunableNumber("Climber/kP", POSITION_PID_P);
-  private final TunableNumber kI = new TunableNumber("Climber/kI", POSITION_PID_I);
-  private final TunableNumber kD = new TunableNumber("Climber/kD", POSITION_PID_D);
-  private final TunableNumber kPeakOutput =
-      new TunableNumber("Climber/kPeakOutput", POSITION_PID_PEAK_OUTPUT);
+  private final TunableNumber leftMotorKP = new TunableNumber("Climber/leftMotorKP", LEFT_POSITION_PID_P);
+  private final TunableNumber leftMotorKI = new TunableNumber("Climber/leftMotorKI", LEFT_POSITION_PID_I);
+  private final TunableNumber leftMotorKD = new TunableNumber("Climber/leftMotorKD", LEFT_POSITION_PID_D);
+  private final TunableNumber leftMotorKS =
+      new TunableNumber("Climber/leftMotorKS", LEFT_POSITION_PID_KS);
+
+  private final TunableNumber rightMotorKP = new TunableNumber("Climber/rightMotorKP", RIGHT_POSITION_PID_P);
+  private final TunableNumber rightMotorKI = new TunableNumber("Climber/rightMotorKI", RIGHT_POSITION_PID_I);
+  private final TunableNumber rightMotorKD = new TunableNumber("Climber/rightMotorKD", RIGHT_POSITION_PID_D);
+  private final TunableNumber rightMotorKS =
+      new TunableNumber("Climber/rightMotorKS", RIGHT_POSITION_PID_KS);
 
   /** Create a TalonFX-specific generic SubsystemIO */
   public ClimberIOTalonFX() {
@@ -110,37 +119,32 @@ public class ClimberIOTalonFX implements ClimberIO {
     // inputs.controlMode = leftMotor.getControlMode().toString();
 
     // update configuration if tunables have changed
-    if (kP.hasChanged() || kI.hasChanged() || kD.hasChanged() || kPeakOutput.hasChanged()) {
+    if (leftMotorKP.hasChanged() || leftMotorKI.hasChanged() || leftMotorKD.hasChanged() || leftMotorKS.hasChanged()) {
       TalonFXConfiguration config = new TalonFXConfiguration();
       this.leftMotor.getConfigurator().refresh(config);
-      config.Slot0.kP = kP.get();
-      config.Slot0.kI = kI.get();
-      config.Slot0.kD = kD.get();
-      config.Voltage.PeakForwardVoltage = kPeakOutput.get();
-      config.Voltage.PeakReverseVoltage = kPeakOutput.get();
+      config.Slot0.kP = leftMotorKP.get();
+      config.Slot0.kI = leftMotorKI.get();
+      config.Slot0.kD = leftMotorKD.get();
+      config.TorqueCurrent.PeakForwardTorqueCurrent = leftMotorKS.get(); // FIXME: Is this the right way to set the peak forward torque current?
+      config.TorqueCurrent.PeakReverseTorqueCurrent = leftMotorKS.get();
       this.leftMotor.getConfigurator().apply(config);
     }
   }
 
-  // FIXME: Replace voltage requests 
-  /**
-   * Set the leftMotor power to the specified percentage of maximum power.
-   *
-   * @param power the percentage of maximum power to set the leftMotor to
-   */
   @Override
   public void setLeftMotorPower(double power) {
-    this.leftMotor.setControl(voltageRequest.withOutput(power * 12.0));
+    this.leftMotor.setControl(leftPowerRequest.withPower(power));
   }
 
   /**
    * Set the leftMotor current to the specified value in amps.
    *
-   * @param power the current to set the leftMotor to in amps
+   * @param rps the rotations per second to set the leftMotor
    */
   @Override
-  public void setLeftMotorCurrent(double current) {
-    this.leftMotor.setControl(currentRequest.withOutput(current));
+  public void setLeftMotorVelocity(double rps) {
+    this.leftMotor.setControl(leftVelocityRequest.withVelocity(rps));
+    this.leftRequestedVelocity = rps;
   }
 
   /**
@@ -151,21 +155,18 @@ public class ClimberIOTalonFX implements ClimberIO {
    */
   @Override
   public void setLeftMotorPosition(double position, double arbitraryFeedForward) {
-    this.leftMotor.setControl(
-        positionRequest
-            .withPosition(Conversions.degreesToFalconRotations(position, GEAR_RATIO))
-            .withFeedForward(arbitraryFeedForward));
-  }
-
-  // Methods for right motor below
-  @Override
-  public void setRightMotorPower(double power) {
-    this.rightMotor.setControl(voltageRequest.withOutput(power * 12.0));
+    
   }
   
   @Override
-  public void setRightMotorCurrent(double current) {
-    this.rightMotor.setControl(currentRequest.withOutput(current));
+  public void setLeftMotorPower(double power) {
+    this.leftMotor.setControl(leftPowerRequest.withPower(power));
+  }
+  
+  @Override
+  public void setRightMotorVelocity(double rps) {
+    this.rightMotor.setControl(rightVelocityRequest.withVelocity(rps));
+    this.rightRequestedVelocity = rps;
   }
 
   @Override
