@@ -559,6 +559,8 @@ public class RobotContainer {
                   // return Math.atan2(rotation.getY(), rotation.getX());
                   Transform2d translation = FieldConstants.Speaker.centerSpeakerOpening.minus(drivetrain.getPose());
                   return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
+                  //Try return translation.getRotation();
+                  //It might work but I'm not quite sure if the range of values goes from -pi to pi
                 }));
 
     // field-relative toggle
