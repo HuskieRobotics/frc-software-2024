@@ -87,8 +87,8 @@ public class VisionIOSim implements VisionIO {
     if (newResult) {
       visionEstimate.ifPresent(
           estimate -> {
-            inputs.estimatedRobotPose = estimate.estimatedPose;
-            inputs.estimatedRobotPoseTimestamp = estimate.timestampSeconds;
+            inputs.estimatedCameraPose = estimate.estimatedPose;
+            inputs.estimatedCameraPoseTimestamp = estimate.timestampSeconds;
             for (int i = 0; i < this.tagsSeen.length; i++) {
               this.tagsSeen[i] = false;
             }
