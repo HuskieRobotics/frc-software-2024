@@ -103,4 +103,13 @@ public class FieldConstants {
       throw new RuntimeException(e);
     }
   }
+
+  public static Translation2d flipForRedSide(Translation2d translation) {
+    return new Translation2d(fieldLength - translation.getX(), translation.getY());
+  }
+
+  public static Pose2d flipForRedSide(Pose2d pose) {
+    return new Pose2d(
+        fieldLength - pose.getX(), pose.getY(), Rotation2d.fromDegrees(180).minus(pose.getRotation()));
+  }
 }
