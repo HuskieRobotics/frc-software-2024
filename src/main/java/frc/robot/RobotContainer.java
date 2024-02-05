@@ -51,7 +51,6 @@ import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.subsystem.Subsystem;
 import frc.robot.subsystems.subsystem.SubsystemIO;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Optional;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -243,14 +242,7 @@ public class RobotContainer {
       } catch (IOException e) {
         layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
       }
-      vision =
-          new Vision(
-              new VisionIO[] {
-                new VisionIOSim(
-                    layout,
-                    drivetrain::getPose,
-                    RobotConfig.getInstance().getRobotToCameraTransforms()[0])
-              });
+      vision = new Vision(new VisionIO[] {new VisionIO() {}});
     } else {
       String[] cameraNames = config.getCameraNames();
       Transform3d[] robotToCameraTransforms = config.getRobotToCameraTransforms();
@@ -555,12 +547,14 @@ public class RobotContainer {
                 oi::getTranslateX,
                 oi::getTranslateY,
                 () -> {
-                  // Transform2d rotation = drivetrain.getPose().minus(FieldConstants.Speaker.centerSpeakerOpening).inverse();
+                  // Transform2d rotation =
+                  // drivetrain.getPose().minus(FieldConstants.Speaker.centerSpeakerOpening).inverse();
                   // return Math.atan2(rotation.getY(), rotation.getX());
-                  Transform2d translation = FieldConstants.Speaker.centerSpeakerOpening.minus(drivetrain.getPose());
-                  return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
-                  //Try return translation.getRotation();
-                  //It might work but I'm not quite sure if the range of values goes from -pi to pi
+                  Transform2d translation =
+                      FieldConstants.Speaker.centerSpeakerOpening.minus(drivetrain.getPose());
+                  return new Rotation2d(translation.getX(), translation.getY());
+                  // Try return translation.getRotation();
+                  // It might work but I'm not quite sure if the range of values goes from -pi to pi
                 }));
 
     // field-relative toggle
