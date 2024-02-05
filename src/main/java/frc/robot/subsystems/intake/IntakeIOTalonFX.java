@@ -9,14 +9,9 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.sim.ChassisReference;
-import com.ctre.phoenix6.sim.TalonFXSimState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import frc.lib.team3061.RobotConfig;
+import frc.lib.team3061.util.VelocitySystemSim;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
 
@@ -49,12 +44,9 @@ public class IntakeIOTalonFX implements IntakeIO {
   private StatusSignal<Double> drumSupplyCurrentStatusSignal;
 
   // simulation related
-  private TalonFXSimState rightRollerMotorSimState;
-  private TalonFXSimState leftRollerMotorSimState;
-  private TalonFXSimState drumMotorSimState;
-  private LinearSystemSim<N1, N1, N1> rightRollerSim;
-  private LinearSystemSim<N1, N1, N1> leftRollerSim;
-  private LinearSystemSim<N1, N1, N1> drumSim;
+  private VelocitySystemSim rightRollerSim;
+  private VelocitySystemSim leftRollerSim;
+  private VelocitySystemSim drumMotorSim;
   private VelocityVoltage rightRollerVelocitySimRequest;
   private VelocityVoltage leftRollerVelocitySimRequest;
   private VelocityVoltage drumVelocitySimRequest;
@@ -108,15 +100,27 @@ public class IntakeIOTalonFX implements IntakeIO {
         IntakeConstants.INTAKE_RIGHT_ROLLER_MOTOR_ID, IntakeConstants.INTAKE_LEFT_ROLLER_MOTOR_ID);
     configureIntakeDrumMotor(IntakeConstants.INTAKE_DRUM_MOTOR_ID);
 
-    configSim();
+    // FIXME: characterize the system to obtain the kV and kA values (use recalc)
+    // FIXME: specify gear ratios
+    this.rightRollerSim =
+        new VelocitySystemSim(
+            rightRollerMotor, IntakeConstants.ROLLERS_MOTOR_INVERTED, 2.0, 2.0, 1.0);
+    this.leftRollerSim =
+        new VelocitySystemSim(
+            leftRollerMotor, IntakeConstants.ROLLERS_MOTOR_INVERTED, 2.0, 2.0, 1.0);
+    this.drumMotorSim =
+        new VelocitySystemSim(drumMotor, IntakeConstants.DRUM_MOTOR_INVERTED, 2.0, 2.0, 1.0);
+
+    this.rightRollerVelocitySimRequest = new VelocityVoltage(0);
+    this.leftRollerVelocitySimRequest = new VelocityVoltage(0);
+    this.drumVelocitySimRequest = new VelocityVoltage(0);
   }
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    // FIXME: specify gear ratios
-    updateSim(this.rightRollerMotorSimState, this.rightRollerSim, 1.0);
-    updateSim(this.leftRollerMotorSimState, this.leftRollerSim, 1.0);
-    updateSim(this.drumMotorSimState, this.drumSim, 1.0);
+    this.rightRollerSim.updateSim();
+    this.leftRollerSim.updateSim();
+    this.drumMotorSim.updateSim();
 
     BaseStatusSignal.refreshAll(
         rightRollerVelocityStatusSignal,
@@ -236,59 +240,5 @@ public class IntakeIOTalonFX implements IntakeIO {
             : InvertedValue.CounterClockwise_Positive;
 
     drumMotor.getConfigurator().apply(drumConfig);
-  }
-
-  private void configSim() {
-    if (Constants.getMode() != Constants.Mode.SIM) {
-      return;
-    }
-
-    this.rightRollerMotorSimState = this.rightRollerMotor.getSimState();
-    this.rightRollerMotorSimState.Orientation =
-        IntakeConstants.ROLLERS_MOTOR_INVERTED
-            ? ChassisReference.Clockwise_Positive
-            : ChassisReference.CounterClockwise_Positive;
-    this.leftRollerMotorSimState = this.leftRollerMotor.getSimState();
-    this.leftRollerMotorSimState.Orientation =
-        IntakeConstants.ROLLERS_MOTOR_INVERTED
-            ? ChassisReference.Clockwise_Positive
-            : ChassisReference.CounterClockwise_Positive;
-    this.drumMotorSimState = this.drumMotor.getSimState();
-    this.drumMotorSimState.Orientation =
-        IntakeConstants.DRUM_MOTOR_INVERTED
-            ? ChassisReference.Clockwise_Positive
-            : ChassisReference.CounterClockwise_Positive;
-
-    // FIXME: characterize the system to obtain the kV and kA values (use recalc)
-    this.rightRollerSim = new LinearSystemSim<>(LinearSystemId.identifyVelocitySystem(2.0, 0.2));
-    this.leftRollerSim = new LinearSystemSim<>(LinearSystemId.identifyVelocitySystem(2.0, 0.2));
-    this.drumSim = new LinearSystemSim<>(LinearSystemId.identifyVelocitySystem(2.0, 0.2));
-
-    this.rightRollerVelocitySimRequest = new VelocityVoltage(0);
-    this.leftRollerVelocitySimRequest = new VelocityVoltage(0);
-    this.drumVelocitySimRequest = new VelocityVoltage(0);
-  }
-
-  private void updateSim(
-      TalonFXSimState simState, LinearSystemSim<N1, N1, N1> sim, double gearRatio) {
-    if (Constants.getMode() != Constants.Mode.SIM) {
-      return;
-    }
-
-    // update the sim states supply voltage based on the simulated battery
-    simState.setSupplyVoltage(RobotController.getBatteryVoltage());
-
-    // update the input voltages of the models based on the outputs of the simulated TalonFXs
-    sim.setInput(simState.getMotorVoltage());
-
-    // update the models
-    sim.update(Constants.LOOP_PERIOD_SECS);
-
-    // update the simulated TalonFX based on the model outputs
-    double mechanismRadiansPerSec = sim.getOutput(0);
-    double motorRPS = mechanismRadiansPerSec * gearRatio / (2 * Math.PI);
-    double motorRotations = motorRPS * Constants.LOOP_PERIOD_SECS;
-    simState.addRotorPosition(motorRotations);
-    simState.setRotorVelocity(motorRPS);
   }
 }
