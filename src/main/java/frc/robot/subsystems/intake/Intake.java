@@ -49,10 +49,10 @@ public class Intake extends SubsystemBase {
                 this.repelGamePiece();
             } else if (intakeState == IntakeState.NOTE_IN_KICKER) {
                 this.turnTransitionOff();
+                this.turnKickerOff();
             } else if (intakeState == IntakeState.EMERGENCY) {
                 this.turnTransitionOff();
-                this.turnRightIntakeOff();
-                this.turnLeftIntakeOff();
+                this.turnIntakeOff();
             }
         }
     }
@@ -70,7 +70,7 @@ public class Intake extends SubsystemBase {
             intakeState = IntakeState.NOTE_IN_INTAKE;
         } else if (inputs.isDrumIRBlocked) {
             intakeState = IntakeState.NOTE_IN_DRUM;
-        } else if ( true /* access kicker sensor */) {
+        } else if (inputs.isKickerIRBlocked) {
             intakeState = IntakeState.NOTE_IN_KICKER;
         }
     }
@@ -138,7 +138,11 @@ public class Intake extends SubsystemBase {
 
     public void transitionGamePiece() {
         this.setDrumVelocity(IntakeConstants.DRUM_VELOCITY_RPS);
-        // Run kicker as well, integrate with shooter
+        this.setKickerVelocity(IntakeConstants.KICKER_VELOCITY_RPS);
+    }
+
+    public void turnKickerOff() {
+        this.setKickerVelocity(0);
     }
 
     public void repelGamePiece() {
@@ -156,5 +160,9 @@ public class Intake extends SubsystemBase {
 
     public void setDrumVelocity(double rps) {
         io.setDrumVelocity(rps);
+    }
+
+    public void setKickerVelocity(double rps) {
+        io.setKickerVelocity(rps);
     }
 }

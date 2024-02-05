@@ -17,25 +17,31 @@ public class IntakeIOTalonFX implements IntakeIO {
   private TalonFX rightRollerMotor;
   private TalonFX leftRollerMotor;
   private TalonFX drumMotor;
+  private TalonFX kickerMotor;
   private final DigitalInput rightRollerIRSensor;
   private final DigitalInput leftRollerIRSensor;
   private final DigitalInput drumIRSensor;
+  private final DigitalInput kickerIRSensor;
 
   private VelocityTorqueCurrentFOC rightRollerVelocityRequest;
   private VelocityTorqueCurrentFOC leftRollerVelocityRequest;
   private VelocityTorqueCurrentFOC drumVelocityRequest;
+  private VelocityTorqueCurrentFOC kickerVelocityRequest;
 
   private StatusSignal<Double> rightRollerVelocityStatusSignal;
   private StatusSignal<Double> leftRollerVelocityStatusSignal;
   private StatusSignal<Double> drumVelocityStatusSignal;
+  private StatusSignal<Double> kickerVelocityStatusSignal;
   // status signals for stator current
   private StatusSignal<Double> rightRollerStatorCurrentStatusSignal;
   private StatusSignal<Double> leftRollerStatorCurrentStatusSignal;
   private StatusSignal<Double> drumStatorCurrentStatusSignal;
+  private StatusSignal<Double> kickerStatorCurrentStatusSignal;
 
   private StatusSignal<Double> rightRollerSupplyCurrentStatusSignal;
   private StatusSignal<Double> leftRollerSupplyCurrentStatusSignal;
   private StatusSignal<Double> drumSupplyCurrentStatusSignal;
+  private StatusSignal<Double> kickerSupplyCurrentStatusSignal;
 
   // tunable numbers for roller and drum pid
   private final TunableNumber rollerMotorsKP =
@@ -60,34 +66,53 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final TunableNumber drumMotorKS =
       new TunableNumber("Intake/drumMotorKS", IntakeConstants.INTAKE_DRUM_MOTOR_KS);
 
+  private final TunableNumber kickerMotorKP =
+      new TunableNumber("Intake/kickerMotorKP", IntakeConstants.INTAKE_KICKER_MOTOR_KP);
+    
+  private final TunableNumber kickerMotorKI =
+      new TunableNumber("Intake/kickerMotorKI", IntakeConstants.INTAKE_KICKER_MOTOR_KI);
+  
+  private final TunableNumber kickerMotorKD =
+      new TunableNumber("Intake/kickerMotorKD", IntakeConstants.INTAKE_KICKER_MOTOR_KD);
+  
+  private final TunableNumber kickerMotorKS =
+      new TunableNumber("Intake/kickerMotorKS", IntakeConstants.INTAKE_KICKER_MOTOR_KS);
+
   public IntakeIOTalonFX() {
     rightRollerIRSensor = new DigitalInput(IntakeConstants.INTAKE_RIGHT_ROLLER_IR_SENSOR_ID);
     leftRollerIRSensor = new DigitalInput(IntakeConstants.INTAKE_LEFT_ROLLER_IR_SENSOR_ID);
     drumIRSensor = new DigitalInput(IntakeConstants.INTAKE_DRUM_IR_SENSOR_ID);
+    kickerIRSensor = new DigitalInput(IntakeConstants.INTAKE_KICKER_IR_SENSOR_ID);
 
     rightRollerVelocityRequest = new VelocityTorqueCurrentFOC(0);
     leftRollerVelocityRequest = new VelocityTorqueCurrentFOC(0);
     drumVelocityRequest = new VelocityTorqueCurrentFOC(0);
+    kickerVelocityRequest = new VelocityTorqueCurrentFOC(0);
 
     rightRollerVelocityStatusSignal = rightRollerMotor.getVelocity();
     leftRollerVelocityStatusSignal = leftRollerMotor.getVelocity();
     drumVelocityStatusSignal = drumMotor.getVelocity();
+    kickerVelocityStatusSignal = kickerMotor.getVelocity();
 
     rightRollerStatorCurrentStatusSignal = rightRollerMotor.getStatorCurrent();
     leftRollerStatorCurrentStatusSignal = leftRollerMotor.getStatorCurrent();
     drumStatorCurrentStatusSignal = drumMotor.getStatorCurrent();
+    kickerStatorCurrentStatusSignal = kickerMotor.getStatorCurrent();
 
     rightRollerSupplyCurrentStatusSignal = rightRollerMotor.getSupplyCurrent();
     leftRollerSupplyCurrentStatusSignal = leftRollerMotor.getSupplyCurrent();
     drumSupplyCurrentStatusSignal = drumMotor.getSupplyCurrent();
+    kickerSupplyCurrentStatusSignal = kickerMotor.getSupplyCurrent();
 
     rightRollerMotor = new TalonFX(IntakeConstants.INTAKE_RIGHT_ROLLER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
     leftRollerMotor = new TalonFX(IntakeConstants.INTAKE_LEFT_ROLLER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
     drumMotor = new TalonFX(IntakeConstants.INTAKE_DRUM_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
+    kickerMotor = new TalonFX(IntakeConstants.INTAKE_KICKER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
 
     configureIntakeRollerMotor(rightRollerMotor, true);
     configureIntakeRollerMotor(leftRollerMotor, false);
     configureIntakeDrumMotor(drumMotor);
+    configureIntakeKickerMotor(kickerMotor);
   }
 
   @Override
@@ -101,30 +126,38 @@ public class IntakeIOTalonFX implements IntakeIO {
         drumStatorCurrentStatusSignal,
         rightRollerSupplyCurrentStatusSignal,
         leftRollerSupplyCurrentStatusSignal,
-        drumSupplyCurrentStatusSignal);
+        drumSupplyCurrentStatusSignal,
+        kickerSupplyCurrentStatusSignal,
+        kickerStatorCurrentStatusSignal,
+        kickerVelocityStatusSignal);
 
     inputs.isRightRollerIRBlocked = rightRollerIRSensor.get();
     inputs.isLeftRollerIRBlocked = leftRollerIRSensor.get();
     inputs.isDrumIRBlocked = drumIRSensor.get();
+    inputs.isKickerIRBlocked = kickerIRSensor.get();
 
     inputs.rightRollerStatorCurrentAmps = rightRollerStatorCurrentStatusSignal.getValueAsDouble();
     inputs.leftRollerStatorCurrentAmps = leftRollerStatorCurrentStatusSignal.getValueAsDouble();
     inputs.drumStatorCurrentAmps = drumStatorCurrentStatusSignal.getValueAsDouble();
+    inputs.kickerStatorCurrentAmps = kickerStatorCurrentStatusSignal.getValueAsDouble();
 
     inputs.rightRollerSupplyCurrentAmps = rightRollerSupplyCurrentStatusSignal.getValueAsDouble();
     inputs.leftRollerSupplyCurrentAmps = leftRollerSupplyCurrentStatusSignal.getValueAsDouble();
     inputs.drumSupplyCurrentAmps = drumSupplyCurrentStatusSignal.getValueAsDouble();
+    inputs.kickerSupplyCurrentAmps = kickerSupplyCurrentStatusSignal.getValueAsDouble();
 
     inputs.rightRollerVelocityRotationsPerSecond =
         rightRollerVelocityStatusSignal.getValueAsDouble();
     inputs.leftRollerVelocityRotationsPerSecond = leftRollerVelocityStatusSignal.getValueAsDouble();
     inputs.drumVelocityRotationsPerSecond = drumVelocityStatusSignal.getValueAsDouble();
+    inputs.kickerVelocityRotationsPerSecond = kickerVelocityStatusSignal.getValueAsDouble();
 
     // what method would be used to get the value of the reference velocity as a status signal?
     // could not find any methods that returned a status signal for the reference velocity
     inputs.rightRollerReferenceVelocityRPS = rightRollerMotor.getClosedLoopReference().getValueAsDouble();
     inputs.leftRollerReferenceVelocityRPS = leftRollerMotor.getClosedLoopReference().getValueAsDouble();
     inputs.drumReferenceVelocityRPS = drumMotor.getClosedLoopReference().getValueAsDouble();
+    inputs.kickerReferenceVelocityRPS = kickerMotor.getClosedLoopReference().getValueAsDouble();
 
     if (rollerMotorsKP.hasChanged()
       || rollerMotorsKI.hasChanged()
@@ -133,9 +166,13 @@ public class IntakeIOTalonFX implements IntakeIO {
       || drumMotorKP.hasChanged()
       || drumMotorKI.hasChanged()
       || drumMotorKD.hasChanged()
-      || drumMotorKS.hasChanged()) {
+      || drumMotorKS.hasChanged()
+      || kickerMotorKP.hasChanged()
+      || kickerMotorKI.hasChanged()
+      || kickerMotorKD.hasChanged()
+      || kickerMotorKS.hasChanged()){
         
-       for (TalonFX motor : new TalonFX[] {rightRollerMotor, leftRollerMotor, drumMotor}) {
+       for (TalonFX motor : new TalonFX[] {rightRollerMotor, leftRollerMotor, drumMotor, kickerMotor}) {
           Slot0Configs slot0Configs = new Slot0Configs();
           motor.getConfigurator().refresh(slot0Configs);
           slot0Configs.kP = rollerMotorsKP.get();
@@ -162,6 +199,11 @@ public class IntakeIOTalonFX implements IntakeIO {
   @Override
   public void setDrumVelocity(double rps) {
     drumMotor.setControl(drumVelocityRequest.withVelocity(rps));
+  }
+
+  @Override
+  public void setKickerVelocity(double rps) {
+    kickerMotor.setControl(kickerVelocityRequest.withVelocity(rps));
   }
 
   private void configureIntakeRollerMotor(TalonFX rollerMotor, boolean isRight) {
@@ -221,5 +263,30 @@ public class IntakeIOTalonFX implements IntakeIO {
             : InvertedValue.CounterClockwise_Positive;
 
     drumMotor.getConfigurator().apply(drumConfig);
+  }
+
+  private void configureIntakeKickerMotor(TalonFX kickerMotor) {
+    TalonFXConfiguration kickerConfig = new TalonFXConfiguration();
+    CurrentLimitsConfigs kickerCurrentLimits = new CurrentLimitsConfigs();
+
+    kickerCurrentLimits.SupplyCurrentLimit = IntakeConstants.KICKER_CONTINUOUS_CURRENT_LIMIT;
+    kickerCurrentLimits.SupplyCurrentThreshold = IntakeConstants.DRUM_PEAK_CURRENT_LIMIT;
+    kickerCurrentLimits.SupplyTimeThreshold = IntakeConstants.DRUM_PEAK_CURRENT_DURATION;
+    kickerCurrentLimits.SupplyCurrentLimitEnable = true;
+
+    kickerConfig.CurrentLimits = kickerCurrentLimits;
+
+    kickerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    kickerConfig.Slot0.kP = kickerMotorKP.get();
+    kickerConfig.Slot0.kI = kickerMotorKI.get();
+    kickerConfig.Slot0.kD = kickerMotorKD.get();
+    kickerConfig.Slot0.kS = kickerMotorKS.get();
+
+    kickerConfig.MotorOutput.Inverted =
+        IntakeConstants.KICKER_MOTOR_INVERTED
+            ? InvertedValue.Clockwise_Positive
+            : InvertedValue.CounterClockwise_Positive;
+    
+    kickerMotor.getConfigurator().apply(kickerConfig);
   }
 }
