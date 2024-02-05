@@ -18,6 +18,8 @@ import edu.wpi.first.math.util.Units;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
+@java.lang.SuppressWarnings({"java:S1118", "java:S115", "java:S2386"})
+
 /**
  * Contains various field dimensions and useful reference points. Dimensions are in meters, and sets
  * of corners start in the lower left moving clockwise. <b>All units in Meters</b> <br>
