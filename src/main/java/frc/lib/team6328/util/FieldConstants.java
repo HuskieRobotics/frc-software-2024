@@ -110,6 +110,10 @@ public class FieldConstants {
 
   public static Pose2d flipForRedSide(Pose2d pose) {
     return new Pose2d(
-        fieldLength - pose.getX(), pose.getY(), Rotation2d.fromDegrees(180).minus(pose.getRotation()));
+        fieldLength - pose.getX(), pose.getY(), new Rotation2d(Math.PI).minus(pose.getRotation()));
+  }
+
+  public static Rotation2d flipForRedSide(Rotation2d rotation) {
+    return new Rotation2d(Math.PI).minus(rotation);
   }
 }
