@@ -104,7 +104,7 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   public Trigger getManualIntakeRightOffButton() {
     return new Trigger(this::getControllerRightTrigger);
   }
-  
+
   @Override
   public Trigger getManualIntakeLeftOffButton() {
     return new Trigger(this::getControllerLeftTrigger);

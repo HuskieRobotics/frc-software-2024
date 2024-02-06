@@ -279,6 +279,8 @@ public class RobotContainer {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
 
+    intake = new Intake(new IntakeIOTalonFX());
+
     AprilTagFieldLayout layout;
     try {
       layout = new AprilTagFieldLayout(VisionConstants.APRILTAG_FIELD_LAYOUT_PATH);
@@ -532,7 +534,7 @@ public class RobotContainer {
 
   private void configureIntakeCommands() {
     // intake.setDefaultCommand(new IntakeControl(intake));
-    
+
     // oi.getIntakeManualButton().onTrue(
     //   Commands.either(
     //     Commands.runOnce(intake::disableEStop, intake),
@@ -543,45 +545,44 @@ public class RobotContainer {
     Trigger drumIRSensor = new Trigger(intake::getDrumIRSensor);
 
     intake.setDefaultCommand(
-      Commands.run(() -> intake.intakeGamePiece(), intake).withName("IntakeGamePiece")
-    );
+        Commands.run(() -> intake.intakeGamePiece(), intake).withName("IntakeGamePiece"));
 
     // only run repel game piece if the drum IR sensor and the manual override are not enabled
-    drumIRSensor.and(() -> !intake.manualOverrideEnabled()).onTrue(
-      Commands.run(() -> intake.repelGamePiece(), intake).until(() -> intake.getDrumIRSensor())
-    );
+    drumIRSensor
+        .and(() -> !intake.manualOverrideEnabled())
+        .onTrue(
+            Commands.run(() -> intake.repelGamePiece(), intake)
+                .until(() -> intake.getDrumIRSensor()));
 
-    // should disable the default command and only run the intake control based off of the controller input
-    oi.getIntakeManualOverrideSwitch().onTrue(
-      Commands.run(intake::enableManualOverride, intake)
-    );
+    // should disable the default command and only run the intake control based off of the
+    // controller input
+    oi.getIntakeManualOverrideSwitch().onTrue(Commands.run(intake::enableManualOverride, intake));
 
     // these need to turn each other off ( will they by default ? )
-    oi.getManualRunIntakeButton().and(intake::manualOverrideEnabled).onTrue(
-      Commands.either(
-        Commands.runOnce(intake::turnIntakeOff, intake).withName("TurnIntakeOff"),
-        Commands.run(intake::intakeGamePiece, intake).withName("IntakeGamePiece"),
-        intake::runningManualIntake
-      )
-    );
+    oi.getManualRunIntakeButton()
+        .and(intake::manualOverrideEnabled)
+        .onTrue(
+            Commands.either(
+                Commands.runOnce(intake::turnIntakeOff, intake).withName("TurnIntakeOff"),
+                Commands.run(intake::intakeGamePiece, intake).withName("IntakeGamePiece"),
+                intake::runningManualIntake));
 
-    oi.getManualIntakeRightOffButton().and(intake::manualOverrideEnabled).onTrue(
-      Commands.either(
-        Commands.runOnce(intake::turnRightIntakeOff, intake).withName("TurnRightIntakeOff"),
-        Commands.run(intake::intakeGamePieceRight, intake).withName("IntakeGamePieceRight"),
-        intake::runningManualIntake
-      )
-    );
+    oi.getManualIntakeRightOffButton()
+        .and(intake::manualOverrideEnabled)
+        .onTrue(
+            Commands.either(
+                Commands.runOnce(intake::turnRightIntakeOff, intake).withName("TurnRightIntakeOff"),
+                Commands.run(intake::intakeGamePieceRight, intake).withName("IntakeGamePieceRight"),
+                intake::runningManualIntake));
 
-    oi.getManualIntakeLeftOffButton().and(intake::manualOverrideEnabled).onTrue(
-      Commands.either(
-        Commands.runOnce(intake::turnLeftIntakeOff, intake).withName("TurnLeftIntakeOff"),
-        Commands.run(intake::intakeGamePieceLeft, intake).withName("IntakeGamePieceLeft"),
-        intake::runningManualIntake
-      )
-    );
+    oi.getManualIntakeLeftOffButton()
+        .and(intake::manualOverrideEnabled)
+        .onTrue(
+            Commands.either(
+                Commands.runOnce(intake::turnLeftIntakeOff, intake).withName("TurnLeftIntakeOff"),
+                Commands.run(intake::intakeGamePieceLeft, intake).withName("IntakeGamePieceLeft"),
+                intake::runningManualIntake));
   }
-
 
   private void configureDrivetrainCommands() {
     /*
