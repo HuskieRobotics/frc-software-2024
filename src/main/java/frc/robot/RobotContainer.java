@@ -547,9 +547,9 @@ public class RobotContainer {
                   // Transform2d rotation =
                   // drivetrain.getPose().minus(FieldConstants.Speaker.centerSpeakerOpening).inverse();
                   // return Math.atan2(rotation.getY(), rotation.getX());
-                  Transform2d translation =
-                      FieldConstants.Speaker.centerSpeakerOpening.minus(drivetrain.getPose());
-                  return new Rotation2d(translation.getX(), translation.getY());
+                  Transform2d translation = new Transform2d(FieldConstants.Speaker.centerSpeakerOpening.getX()-drivetrain.getPose().getX(), 
+                      FieldConstants.Speaker.centerSpeakerOpening.getY()-drivetrain.getPose().getY(), new Rotation2d());
+                  return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
                   // Try return translation.getRotation();
                   // It might work but I'm not quite sure if the range of values goes from -pi to pi
                 }));

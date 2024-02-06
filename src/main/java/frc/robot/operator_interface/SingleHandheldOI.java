@@ -63,7 +63,7 @@ public class SingleHandheldOI implements OperatorInterface {
 
   @Override
   public Trigger getLock180Button() {
-    return new Trigger(controller::getAButtonPressed);
+    return new Trigger(controller::getAButton);
   }
 
 
