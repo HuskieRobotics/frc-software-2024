@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.957999597405573,
-        "y": 5.509074011915007
+        "x": 2.393146604475027,
+        "y": 5.028194056388113
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.8012958736331153,
-        "y": 4.11050362756931
+        "x": 2.4304615881959033,
+        "y": 4.123305701156857
       },
       "prevControl": {
-        "x": 2.7798322662614576,
-        "y": 4.087759410784579
+        "x": 2.1505992102893297,
+        "y": 4.496455538365622
       },
       "nextControl": null,
       "isLocked": false,
@@ -39,11 +39,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0,
+    "rotation": -91.08092418666068,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "5 Note Test Amp Side",
+  "folder": null,
   "previewStartingState": {
     "rotation": 179.40654158333112,
     "velocity": 0

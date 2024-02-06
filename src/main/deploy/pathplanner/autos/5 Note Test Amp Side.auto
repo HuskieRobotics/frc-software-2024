@@ -40,6 +40,12 @@
           "data": {
             "pathName": "Note 4 -5"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Note 5-End"
+          }
         }
       ]
     }
