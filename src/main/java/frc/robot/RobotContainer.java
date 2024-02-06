@@ -532,9 +532,9 @@ public class RobotContainer {
                   // return Math.atan2(rotation.getY(), rotation.getX());
                   Transform2d translation =
                       new Transform2d(
-                          FieldConstants.Speaker.centerSpeakerOpening.getX()
+                          FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.getX()
                               - drivetrain.getPose().getX(),
-                          FieldConstants.Speaker.centerSpeakerOpening.getY()
+                          FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.getY()
                               - drivetrain.getPose().getY(),
                           new Rotation2d());
                   return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
