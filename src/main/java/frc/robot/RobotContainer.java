@@ -10,7 +10,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -35,7 +34,6 @@ import frc.lib.team3061.vision.Vision;
 import frc.lib.team3061.vision.VisionConstants;
 import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
-import frc.lib.team3061.vision.VisionIOSim;
 import frc.lib.team6328.util.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.FeedForwardCharacterization;
@@ -175,26 +173,16 @@ public class RobotContainer {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
 
-    // String[] cameraNames = config.getCameraNames();
-    // Transform3d[] robotToCameraTransforms = config.getRobotToCameraTransforms();
-    // VisionIO[] visionIOs = new VisionIO[cameraNames.length];
-    // AprilTagFieldLayout layout;
-    // try {
-    //   layout = new AprilTagFieldLayout(VisionConstants.APRILTAG_FIELD_LAYOUT_PATH);
-    // } catch (IOException e) {
-    //   layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
-    // }
-    // for (int i = 0; i < visionIOs.length; i++) {
-    //   visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout,
-    // robotToCameraTransforms[i]);
-    // }
-    // vision = new Vision(visionIOs);
-
-    // FIXME: re-enable cameras when installed
     String[] cameraNames = config.getCameraNames();
     VisionIO[] visionIOs = new VisionIO[cameraNames.length];
+    AprilTagFieldLayout layout;
+    try {
+      layout = new AprilTagFieldLayout(VisionConstants.APRILTAG_FIELD_LAYOUT_PATH);
+    } catch (IOException e) {
+      layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
+    }
     for (int i = 0; i < visionIOs.length; i++) {
-      visionIOs[i] = new VisionIO() {};
+      visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout);
     }
     vision = new Vision(visionIOs);
 
@@ -245,7 +233,6 @@ public class RobotContainer {
       vision = new Vision(new VisionIO[] {new VisionIO() {}});
     } else {
       String[] cameraNames = config.getCameraNames();
-      Transform3d[] robotToCameraTransforms = config.getRobotToCameraTransforms();
       VisionIO[] visionIOs = new VisionIO[cameraNames.length];
       AprilTagFieldLayout layout;
       try {
@@ -254,7 +241,7 @@ public class RobotContainer {
         layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
       }
       for (int i = 0; i < visionIOs.length; i++) {
-        visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout, robotToCameraTransforms[i]);
+        visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout);
       }
       vision = new Vision(visionIOs);
     }
@@ -270,11 +257,7 @@ public class RobotContainer {
     } catch (IOException e) {
       layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
     }
-    vision =
-        new Vision(
-            new VisionIO[] {
-              new VisionIO(){}
-            });
+    vision = new Vision(new VisionIO[] {new VisionIO() {}});
 
     // FIXME: create the hardware-specific subsystem class
   }
@@ -547,8 +530,13 @@ public class RobotContainer {
                   // Transform2d rotation =
                   // drivetrain.getPose().minus(FieldConstants.Speaker.centerSpeakerOpening).inverse();
                   // return Math.atan2(rotation.getY(), rotation.getX());
-                  Transform2d translation = new Transform2d(FieldConstants.Speaker.centerSpeakerOpening.getX()-drivetrain.getPose().getX(), 
-                      FieldConstants.Speaker.centerSpeakerOpening.getY()-drivetrain.getPose().getY(), new Rotation2d());
+                  Transform2d translation =
+                      new Transform2d(
+                          FieldConstants.Speaker.centerSpeakerOpening.getX()
+                              - drivetrain.getPose().getX(),
+                          FieldConstants.Speaker.centerSpeakerOpening.getY()
+                              - drivetrain.getPose().getY(),
+                          new Rotation2d());
                   return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
                   // Try return translation.getRotation();
                   // It might work but I'm not quite sure if the range of values goes from -pi to pi
