@@ -13,20 +13,20 @@ public class IntakeConstants {
 
   // add all current limiting
 
-  public static final double INTAKE_ROLLER_MOTORS_KP = 0.0;
-  public static final double INTAKE_ROLLER_MOTORS_KI = 0.0;
-  public static final double INTAKE_ROLLER_MOTORS_KD = 0.0;
-  public static final double INTAKE_ROLLER_MOTORS_KS = 0;
+  public static final double INTAKE_ROLLER_MOTORS_KP = 1.0;
+  public static final double INTAKE_ROLLER_MOTORS_KI = 1.0;
+  public static final double INTAKE_ROLLER_MOTORS_KD = 1.0;
+  public static final double INTAKE_ROLLER_MOTORS_KS = 1;
 
-  public static final double INTAKE_DRUM_MOTOR_KP = 0.0;
-  public static final double INTAKE_DRUM_MOTOR_KI = 0.0;
-  public static final double INTAKE_DRUM_MOTOR_KD = 0.0;
-  public static final double INTAKE_DRUM_MOTOR_KS = 0;
+  public static final double INTAKE_DRUM_MOTOR_KP = 1.0;
+  public static final double INTAKE_DRUM_MOTOR_KI = 1.0;
+  public static final double INTAKE_DRUM_MOTOR_KD = 1.0;
+  public static final double INTAKE_DRUM_MOTOR_KS = 1;
 
-  public static final double INTAKE_KICKER_MOTOR_KP = 0.0;
-  public static final double INTAKE_KICKER_MOTOR_KI = 0.0;
-  public static final double INTAKE_KICKER_MOTOR_KD = 0.0;
-  public static final double INTAKE_KICKER_MOTOR_KS = 0.0;
+  public static final double INTAKE_KICKER_MOTOR_KP = 1.0;
+  public static final double INTAKE_KICKER_MOTOR_KI = 1.0;
+  public static final double INTAKE_KICKER_MOTOR_KD = 1.0;
+  public static final double INTAKE_KICKER_MOTOR_KS = 1.0;
 
   // velocities
 
