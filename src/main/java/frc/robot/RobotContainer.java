@@ -273,10 +273,7 @@ public class RobotContainer {
     vision =
         new Vision(
             new VisionIO[] {
-              new VisionIOSim(
-                  layout,
-                  drivetrain::getPose,
-                  RobotConfig.getInstance().getRobotToCameraTransforms()[0])
+              new VisionIO(){}
             });
 
     // FIXME: create the hardware-specific subsystem class
