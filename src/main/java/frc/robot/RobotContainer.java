@@ -542,18 +542,6 @@ public class RobotContainer {
     //     intake::getEStopEnabled
     //   ));
 
-    Trigger drumIRSensor = new Trigger(intake::getDrumIRSensor);
-
-    intake.setDefaultCommand(
-        Commands.run(() -> intake.intakeGamePiece(), intake).withName("IntakeGamePiece"));
-
-    // only run repel game piece if the drum IR sensor and the manual override are not enabled
-    drumIRSensor
-        .and(() -> !intake.manualOverrideEnabled())
-        .onTrue(
-            Commands.run(() -> intake.repelGamePiece(), intake)
-                .until(() -> intake.getDrumIRSensor()));
-
     // should disable the default command and only run the intake control based off of the
     // controller input
     oi.getIntakeManualOverrideSwitch().onTrue(Commands.run(intake::enableManualOverride, intake));

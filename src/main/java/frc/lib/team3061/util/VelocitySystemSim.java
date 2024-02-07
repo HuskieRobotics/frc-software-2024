@@ -50,7 +50,7 @@ public class VelocitySystemSim {
 
     // update the simulated TalonFX based on the model outputs
     double mechanismRadiansPerSec = this.systemSim.getOutput(0);
-    double motorRPS = mechanismRadiansPerSec * this.gearRatio / (2 * Math.PI);
+    double motorRPS = mechanismRadiansPerSec / this.gearRatio / (2 * Math.PI);
     double motorRotations = motorRPS * Constants.LOOP_PERIOD_SECS;
     this.motorSimState.addRotorPosition(motorRotations);
     this.motorSimState.setRotorVelocity(motorRPS);

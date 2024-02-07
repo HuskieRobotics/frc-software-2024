@@ -1,12 +1,13 @@
 package frc.robot.subsystems.intake;
 
+import static frc.robot.subsystems.intake.IntakeConstants.*;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -14,7 +15,6 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.util.VelocitySystemSim;
 import frc.lib.team6328.util.TunableNumber;
-import frc.robot.Constants;
 
 public class IntakeIOTalonFX implements IntakeIO {
   private TalonFX rightRollerMotor;
@@ -51,10 +51,6 @@ public class IntakeIOTalonFX implements IntakeIO {
   private VelocitySystemSim leftRollerSim;
   private VelocitySystemSim drumMotorSim;
   private VelocitySystemSim kickerMotorSim;
-  private VelocityVoltage rightRollerVelocitySimRequest;
-  private VelocityVoltage leftRollerVelocitySimRequest;
-  private VelocityVoltage drumVelocitySimRequest;
-  private VelocityVoltage kickerVelocitySimRequest;
 
   // tunable numbers for roller and drum pid
   private final TunableNumber rollerMotorsKP =
@@ -139,22 +135,24 @@ public class IntakeIOTalonFX implements IntakeIO {
     kickerSupplyCurrentStatusSignal = kickerMotor.getSupplyCurrent();
 
     // FIXME: characterize the system to obtain the kV and kA values (use recalc)
-    // FIXME: specify gear ratios
     this.rightRollerSim =
         new VelocitySystemSim(
-            rightRollerMotor, IntakeConstants.ROLLERS_MOTOR_INVERTED, 2.0, 2.0, 1.0);
+            rightRollerMotor,
+            IntakeConstants.ROLLERS_MOTOR_INVERTED,
+            0.02,
+            0.001,
+            ROLLERS_SENSOR_TO_MECHANISM_RATIO);
     this.leftRollerSim =
         new VelocitySystemSim(
-            leftRollerMotor, IntakeConstants.ROLLERS_MOTOR_INVERTED, 2.0, 2.0, 1.0);
+            leftRollerMotor,
+            IntakeConstants.ROLLERS_MOTOR_INVERTED,
+            0.02,
+            0.001,
+            ROLLERS_SENSOR_TO_MECHANISM_RATIO);
     this.drumMotorSim =
-        new VelocitySystemSim(drumMotor, IntakeConstants.DRUM_MOTOR_INVERTED, 2.0, 2.0, 1.0);
+        new VelocitySystemSim(drumMotor, IntakeConstants.DRUM_MOTOR_INVERTED, 1.0, 0.3, 5.0 / 2.0);
     this.kickerMotorSim =
-        new VelocitySystemSim(kickerMotor, IntakeConstants.KICKER_MOTOR_INVERTED, 2.0, 2.0, 1.0);
-
-    this.rightRollerVelocitySimRequest = new VelocityVoltage(0);
-    this.leftRollerVelocitySimRequest = new VelocityVoltage(0);
-    this.drumVelocitySimRequest = new VelocityVoltage(0);
-    this.kickerVelocitySimRequest = new VelocityVoltage(0);
+        new VelocitySystemSim(kickerMotor, IntakeConstants.KICKER_MOTOR_INVERTED, 1.0, 0.3, 1.0);
   }
 
   @Override
@@ -208,6 +206,10 @@ public class IntakeIOTalonFX implements IntakeIO {
     inputs.drumReferenceVelocityRPS = drumMotor.getClosedLoopReference().getValueAsDouble();
     inputs.kickerReferenceVelocityRPS = kickerMotor.getClosedLoopReference().getValueAsDouble();
 
+    inputs.leftRollerAppliedVolts = leftRollerMotor.getMotorVoltage().getValue();
+    inputs.leftRollerClosedLoopError = leftRollerMotor.getClosedLoopError().getValue();
+    inputs.leftRollerRotorVelocity = leftRollerMotor.getRotorVelocity().getValue();
+
     if (rollerMotorsKP.hasChanged()
         || rollerMotorsKI.hasChanged()
         || rollerMotorsKD.hasChanged()
@@ -237,38 +239,22 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   @Override
   public void setRightRollerVelocity(double rps) {
-    if (Constants.getMode() != Constants.Mode.SIM) {
-      rightRollerMotor.setControl(rightRollerVelocityRequest.withVelocity(rps));
-    } else {
-      rightRollerMotor.setControl(rightRollerVelocitySimRequest.withVelocity(rps));
-    }
+    rightRollerMotor.setControl(rightRollerVelocityRequest.withVelocity(rps));
   }
 
   @Override
   public void setLeftRollerVelocity(double rps) {
-    if (Constants.getMode() != Constants.Mode.SIM) {
-      leftRollerMotor.setControl(leftRollerVelocityRequest.withVelocity(rps));
-    } else {
-      leftRollerMotor.setControl(leftRollerVelocitySimRequest.withVelocity(rps));
-    }
+    leftRollerMotor.setControl(leftRollerVelocityRequest.withVelocity(rps));
   }
 
   @Override
   public void setDrumVelocity(double rps) {
-    if (Constants.getMode() != Constants.Mode.SIM) {
-      drumMotor.setControl(drumVelocityRequest.withVelocity(rps));
-    } else {
-      drumMotor.setControl(drumVelocitySimRequest.withVelocity(rps));
-    }
+    drumMotor.setControl(drumVelocityRequest.withVelocity(rps));
   }
 
   @Override
   public void setKickerVelocity(double rps) {
-    if (Constants.getMode() != Constants.Mode.SIM) {
-      kickerMotor.setControl(kickerVelocityRequest.withVelocity(rps));
-    } else {
-      kickerMotor.setControl(kickerVelocitySimRequest.withVelocity(rps));
-    }
+    kickerMotor.setControl(kickerVelocityRequest.withVelocity(rps));
   }
 
   private void configureIntakeRollerMotor(TalonFX rollerMotor, boolean isRight) {
@@ -280,11 +266,10 @@ public class IntakeIOTalonFX implements IntakeIO {
     rollerCurrentLimits.SupplyTimeThreshold = IntakeConstants.ROLLERS_PEAK_CURRENT_DURATION;
     rollerCurrentLimits.SupplyCurrentLimitEnable = true;
 
-    rollerConfig.CurrentLimits = rollerCurrentLimits;
+    // rollerConfig.CurrentLimits = rollerCurrentLimits;
 
     rollerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    // FIXME: need different values for simulation; hard code?
     rollerConfig.Slot0.kP = rollerMotorsKP.get();
     rollerConfig.Slot0.kI = rollerMotorsKI.get();
     rollerConfig.Slot0.kD = rollerMotorsKD.get();
@@ -321,7 +306,6 @@ public class IntakeIOTalonFX implements IntakeIO {
 
     drumConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    // FIXME: need different values for simulation; hard code?
     drumConfig.Slot0.kP = drumMotorKP.get();
     drumConfig.Slot0.kI = drumMotorKI.get();
     drumConfig.Slot0.kD = drumMotorKD.get();

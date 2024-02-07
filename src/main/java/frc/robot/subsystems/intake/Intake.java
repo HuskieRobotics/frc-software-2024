@@ -38,66 +38,67 @@ public class Intake extends SubsystemBase {
     Logger.recordOutput("Intake/State", intakeState.toString());
 
     this.runIntakeStateMachine();
-    
   }
 
   public void runIntakeStateMachine() {
-    
 
     // FIXME: possible update to have the different methods (intake, repel, transition) run
-    // in the initiation of every state in the if statement every 20ms instead of when the state is changed
-    // to that specific one only one time per state change. This was added beforehand as a way to save 
+    // in the initiation of every state in the if statement every 20ms instead of when the state is
+    // changed
+    // to that specific one only one time per state change. This was added beforehand as a way to
+    // save
     // processing power of running the method over and over again, might have to do this however.
     if (intakeState == IntakeState.EMPTY) {
-        // if it is empty, then these are the two possible next steps / situations
-        //   1. we are truly empty, and waiting for a game piece
-        //   2. we are in between the drum and the kicker with nothing
-        //   3. possible in between of us being in between the intake and the drum
-        if (inputs.isRightRollerIRBlocked || inputs.isLeftRollerIRBlocked) {
-            intakeState = IntakeState.NOTE_IN_INTAKE;
-            this.intakeGamePiece();
-            this.transitionGamePiece();
-        } else if (inputs.isKickerIRBlocked) {
-            intakeState = IntakeState.NOTE_IN_KICKER;
-            this.turnTransitionOff();
-            this.turnKickerOff();
-        } else if (inputs.isDrumIRBlocked) {
-            intakeState = IntakeState.NOTE_IN_DRUM;
-            this.transitionGamePiece();
-        }
+      // if it is empty, then these are the two possible next steps / situations
+      //   1. we are truly empty, and waiting for a game piece
+      //   2. we are in between the drum and the kicker with nothing
+      //   3. possible in between of us being in between the intake and the drum
+      if (inputs.isRightRollerIRBlocked || inputs.isLeftRollerIRBlocked) {
+        intakeState = IntakeState.NOTE_IN_INTAKE;
+        this.intakeGamePiece();
+        this.transitionGamePiece();
+      } else if (inputs.isKickerIRBlocked) {
+        intakeState = IntakeState.NOTE_IN_KICKER;
+        this.turnTransitionOff();
+        this.turnKickerOff();
+      } else if (inputs.isDrumIRBlocked) {
+        intakeState = IntakeState.NOTE_IN_DRUM;
+        this.transitionGamePiece();
+      }
     } else if (intakeState == IntakeState.NOTE_IN_INTAKE) {
-        // if there is a note in the intake, then there are two possible next steps depending on the robot
-        //   1. we get both the drum and the intake to be sensed at the same time
-        //   2. we have no sensors sensed as we are in between the intake and the drum
-        if (inputs.isDrumIRBlocked) {
-            intakeState = IntakeState.NOTE_IN_INTAKE_AND_DRUM;
-            this.transitionGamePiece();
-        } else if (inputs.isLeftRollerIRBlocked || inputs.isRightRollerIRBlocked) {
-            intakeState = IntakeState.NOTE_IN_INTAKE;
-        } else {
-            intakeState = IntakeState.EMPTY;
-            this.repelGamePiece();
-        }
+      // if there is a note in the intake, then there are two possible next steps depending on the
+      // robot
+      //   1. we get both the drum and the intake to be sensed at the same time
+      //   2. we have no sensors sensed as we are in between the intake and the drum
+      if (inputs.isDrumIRBlocked) {
+        intakeState = IntakeState.NOTE_IN_INTAKE_AND_DRUM;
+        this.transitionGamePiece();
+      } else if (inputs.isLeftRollerIRBlocked || inputs.isRightRollerIRBlocked) {
+        intakeState = IntakeState.NOTE_IN_INTAKE;
+      } else {
+        intakeState = IntakeState.EMPTY;
+        this.repelGamePiece();
+      }
     } else if (intakeState == IntakeState.NOTE_IN_INTAKE_AND_DRUM) {
-        // the only possible next step is that we are only in the drum
-        //    1. this is when the intake IR stops being detected
-        // assuming that we do not need to call transitionGamePiece() again because we already called
-        if (!(inputs.isLeftRollerIRBlocked || inputs.isRightRollerIRBlocked)) {
-            intakeState = IntakeState.NOTE_IN_DRUM;
-            this.repelGamePiece();
-        }
+      // the only possible next step is that we are only in the drum
+      //    1. this is when the intake IR stops being detected
+      // assuming that we do not need to call transitionGamePiece() again because we already called
+      if (!(inputs.isLeftRollerIRBlocked || inputs.isRightRollerIRBlocked)) {
+        intakeState = IntakeState.NOTE_IN_DRUM;
+        this.repelGamePiece();
+      }
     } else if (intakeState == IntakeState.NOTE_IN_DRUM) {
-        // the only possible next step is becoming empty between the drum and the kicker
-        if (!inputs.isDrumIRBlocked) {
-            intakeState = IntakeState.EMPTY;
-            this.turnTransitionOff();
-        }
+      // the only possible next step is becoming empty between the drum and the kicker
+      if (!inputs.isDrumIRBlocked) {
+        intakeState = IntakeState.EMPTY;
+        this.turnTransitionOff();
+      }
     } else if (intakeState == IntakeState.NOTE_IN_KICKER) {
-        // the only possible next step is that we become empty after shooting
-        if (!inputs.isKickerIRBlocked) {
-            intakeState = IntakeState.EMPTY;
-            this.intakeGamePiece();
-        }
+      // the only possible next step is that we become empty after shooting
+      if (!inputs.isKickerIRBlocked) {
+        intakeState = IntakeState.EMPTY;
+        this.intakeGamePiece();
+      }
     }
   }
 
