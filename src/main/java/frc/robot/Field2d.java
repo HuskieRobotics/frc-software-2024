@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.Drivetrain;
+import frc.lib.team6328.util.FieldConstants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -32,7 +33,6 @@ public class Field2d {
   private Region2d[] regions;
 
   private Alliance alliance;
-  
 
   /**
    * Get the singleton instance of the Field2d class.
@@ -210,5 +210,21 @@ public class Field2d {
    */
   public Alliance getAlliance() {
     return alliance;
+  }
+
+  public Pose2d getAllianceSpeakerCenter() {
+    if (alliance == Alliance.Blue) {
+      return FieldConstants.BlueSpeaker.blueCenterSpeakerOpening;
+    } else {
+      return FieldConstants.RedSpeaker.redCenterSpeakerOpening;
+    }
+  }
+
+  public Pose2d getOpponentSpeakerCenter() {
+    if (alliance == Alliance.Blue) {
+      return FieldConstants.RedSpeaker.redCenterSpeakerOpening;
+    } else {
+      return FieldConstants.BlueSpeaker.blueCenterSpeakerOpening;
+    }
   }
 }

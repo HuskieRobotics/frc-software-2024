@@ -34,7 +34,6 @@ import frc.lib.team3061.vision.Vision;
 import frc.lib.team3061.vision.VisionConstants;
 import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
-import frc.lib.team6328.util.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.FeedForwardCharacterization.FeedForwardCharacterizationData;
@@ -49,7 +48,6 @@ import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.subsystem.Subsystem;
 import frc.robot.subsystems.subsystem.SubsystemIO;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Optional;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -534,9 +532,9 @@ public class RobotContainer {
                   // return Math.atan2(rotation.getY(), rotation.getX());
                   Transform2d translation =
                       new Transform2d(
-                          FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.getX()
+                          Field2d.getInstance().getAllianceSpeakerCenter().getX()
                               - drivetrain.getPose().getX(),
-                          FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.getY()
+                          Field2d.getInstance().getAllianceSpeakerCenter().getY()
                               - drivetrain.getPose().getY(),
                           new Rotation2d());
                   return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
