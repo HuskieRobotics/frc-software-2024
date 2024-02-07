@@ -6,6 +6,8 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.Drivetrain;
 import java.util.ArrayList;
@@ -28,6 +30,9 @@ public class Field2d {
   private static Field2d instance = null;
 
   private Region2d[] regions;
+
+  private Alliance alliance;
+  
 
   /**
    * Get the singleton instance of the Field2d class.
@@ -184,5 +189,26 @@ public class Field2d {
       }
     }
     return new ArrayList<>();
+  }
+
+  /**
+   * This method should be invoked once the alliance color is known. Refer to the RobotContainer's
+   * checkAllianceColor method for best practices on when to check the alliance's color. The
+   * alliance color is needed when running auto paths as those paths are always defined for
+   * blue-alliance robots and need to be flipped for red-alliance robots.
+   *
+   * @param newAlliance the new alliance color
+   */
+  public void updateAlliance(DriverStation.Alliance newAlliance) {
+    this.alliance = newAlliance;
+  }
+
+  /**
+   * Get the alliance color.
+   *
+   * @return the alliance color
+   */
+  public Alliance getAlliance() {
+    return alliance;
   }
 }

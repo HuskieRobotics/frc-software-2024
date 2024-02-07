@@ -49,6 +49,7 @@ import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.subsystem.Subsystem;
 import frc.robot.subsystems.subsystem.SubsystemIO;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Optional;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -257,6 +258,7 @@ public class RobotContainer {
     } catch (IOException e) {
       layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
     }
+    // FIXME: Restore vision
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
 
     // FIXME: create the hardware-specific subsystem class
@@ -609,6 +611,7 @@ public class RobotContainer {
     if (alliance.isPresent() && alliance.get() != lastAlliance) {
       this.lastAlliance = alliance.get();
       this.drivetrain.updateAlliance(this.lastAlliance);
+      Field2d.getInstance().updateAlliance(this.lastAlliance);
     }
   }
 }
