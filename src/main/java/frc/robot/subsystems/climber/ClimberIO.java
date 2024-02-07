@@ -18,6 +18,7 @@ public interface ClimberIO {
     double rightPositionMeters = 0.0;
     double rightStatorCurrentAmps = 0.0;
     double rightSupplyCurrentAmps = 0.0;
+    double rightCurrentSetpoint = 0.0;
     double rightReferenceSetpointMeters = 0.0;
     }
 
@@ -25,23 +26,12 @@ public interface ClimberIO {
   public default void updateInputs(ClimberIOInputs inputs) {}
 
   /**
-   * Set the motor current to the specified value in amps.
-   *
-   * @param rps the rotations per second to set the motor
-   */
-  public default void setLeftMotorVelocity(double rps) {}
-
-  /**
    * Set the motor position to the specified value in degrees.
    *
    * @param position the position to set the motor to in degrees
    * @param arbitraryFeedForward the arbitrary feed forward as a percentage of maximum power
    */
-  public default void setLeftMotorPosition(double position, double arbitraryFeedForward) {}
+  public default void setLeftMotorPosition(double position) {}
 
-  // Methods for right motor below
-
-  public default void setRightMotorVelocity(double current) {}
-
-  public default void setRightMotorPosition(double position, double arbitraryFeedForward) {}
+  public default void setRightMotorPosition(double position) {}
 }

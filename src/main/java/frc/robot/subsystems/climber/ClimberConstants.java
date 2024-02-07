@@ -37,6 +37,8 @@ public class ClimberConstants {
   public static final double RIGHT_POSITION_PID_KV_EXPO = 0.0;
   public static final double RIGHT_POSITION_PID_KA_EXPO = 0.0;
 
+  public static final double POSITION_PID_KG = 0.0; // FIXME: update position PID KG
+
   public static final double CONTINUOUS_CURRENT_LIMIT = 40;
   public static final double PEAK_CURRENT_LIMIT = 50;
   public static final double PEAK_CURRENT_DURATION = 0.2;

@@ -6,8 +6,9 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -23,8 +24,8 @@ public class ClimberIOTalonFX implements ClimberIO {
   private TalonFX leftMotor;
   private TalonFX rightMotor;
 
-  private PositionTorqueCurrentFOC leftPositionCurrentRequest;
-  private PositionTorqueCurrentFOC rightPositionCurrentRequest;
+  private MotionMagicExpoTorqueCurrentFOC leftPositionCurrentRequest;
+  private MotionMagicExpoTorqueCurrentFOC rightPositionCurrentRequest;
 
   private double leftRequestedReferenceSetpointMeters;
   private double rightRequestedReferenceSetpointMeters;
@@ -88,14 +89,13 @@ public class ClimberIOTalonFX implements ClimberIO {
     leftSetpointStatusSignal =
         leftMotor.getClosedLoopReference(); 
 
-    rightVelocityRPSStatusSignal = rightMotor.getPosition();
+    rightVelocityRPSStatusSignal = rightMotor.getVelocity();
     rightPositionMetersStatusSignal = rightMotor.getPosition();
     rightStatorCurrentAmpsStatusSignal = rightMotor.getStatorCurrent();
     rightSetpointStatusSignal = rightMotor.getClosedLoopReference();
 
-    leftPositionCurrentRequest = new PositionTorqueCurrentFOC(0.0);
-
-    rightPositionCurrentRequest = new PositionTorqueCurrentFOC(0.0);
+    leftPositionCurrentRequest = new MotionMagicExpoTorqueCurrentFOC(0.0);
+    rightPositionCurrentRequest = new MotionMagicExpoTorqueCurrentFOC(0.0);
 
     leftConfigMotor(LEFT_MOTOR_CAN_ID);
     rightConfigMotor(RIGHT_MOTOR_CAN_ID);
@@ -147,34 +147,31 @@ public class ClimberIOTalonFX implements ClimberIO {
         || rightMotorKD.hasChanged()
         || rightMotorKS.hasChanged()) {
       TalonFXConfiguration config = new TalonFXConfiguration();
+      MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
+
       this.leftMotor.getConfigurator().refresh(config);
       config.Slot0.kP = leftMotorKP.get();
       config.Slot0.kI = leftMotorKI.get();
       config.Slot0.kD = leftMotorKD.get();
-      config.TorqueCurrent.PeakForwardTorqueCurrent =
-          leftMotorKS.get(); // FIXME: Is this the right way to set the peak forward torque current?
-      config.TorqueCurrent.PeakReverseTorqueCurrent = leftMotorKS.get();
+      config.Slot0.kS = leftMotorKS.get();
+      config.Slot0.kV = leftMotorKV.get();
+      config.Slot0.kA = leftMotorKA.get();
+      motionMagicConfigs.MotionMagicExpo_kV = leftMotorKVExpo.get();
+      motionMagicConfigs.MotionMagicExpo_kA = leftMotorKAExpo.get();
+
       this.leftMotor.getConfigurator().apply(config);
 
       this.rightMotor.getConfigurator().refresh(config);
       config.Slot0.kP = rightMotorKP.get();
       config.Slot0.kI = rightMotorKI.get();
       config.Slot0.kD = rightMotorKD.get();
-      config.TorqueCurrent.PeakForwardTorqueCurrent = rightMotorKS.get();
-      config.TorqueCurrent.PeakReverseTorqueCurrent = rightMotorKS.get();
+      config.Slot0.kS = rightMotorKS.get();
+      config.Slot0.kV = rightMotorKV.get();
+      config.Slot0.kA = rightMotorKA.get();
+      motionMagicConfigs.MotionMagicExpo_kV = rightMotorKVExpo.get();
+      motionMagicConfigs.MotionMagicExpo_kA = rightMotorKAExpo.get();
       this.rightMotor.getConfigurator().apply(config);
     }
-  }
-
-  /**
-   * Set the leftMotor current to the specified value in amps.x
-   *
-   * @param rps the rotations per second to set the leftMotor
-   */
-  @Override
-  public void setLeftMotorVelocity(double rps) {
-    this.leftMotor.setControl(leftVelocityRequest.withVelocity(rps));
-    this.leftRequestedVelocity = rps;
   }
 
   /**
@@ -184,25 +181,19 @@ public class ClimberIOTalonFX implements ClimberIO {
    * @param arbitraryFeedForward the arbitrary feed forward as a percentage of maximum power
    */
   @Override
-  public void setLeftMotorPosition(double position, double arbitraryFeedForward) {
+  public void setLeftMotorPosition(double position) {
     leftMotor.setControl(
         leftPositionCurrentRequest
             .withPosition(Conversions.degreesToFalconRotations(position, GEAR_RATIO))
-            .withFeedForward(arbitraryFeedForward));
+            .withFeedForward(POSITION_PID_KG)); 
   }
 
   @Override
-  public void setRightMotorVelocity(double rps) {
-    this.rightMotor.setControl(rightVelocityRequest.withVelocity(rps));
-    this.rightRequestedVelocity = rps;
-  }
-
-  @Override
-  public void setRightMotorPosition(double position, double arbitraryFeedForward) {
+  public void setRightMotorPosition(double position) {
     this.rightMotor.setControl(
         rightPositionCurrentRequest
             .withPosition(Conversions.degreesToFalconRotations(position, GEAR_RATIO))
-            .withFeedForward(arbitraryFeedForward));
+            .withFeedForward(POSITION_PID_KG));
   }
 
   private void leftConfigMotor(int leftMotorID) {
@@ -217,15 +208,13 @@ public class ClimberIOTalonFX implements ClimberIO {
     currentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits = currentLimits;
 
+    config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
     config.MotorOutput.Inverted =
         MOTOR_INVERTED ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.Slot0.kP = leftMotorKP.get();
     config.Slot0.kI = leftMotorKI.get();
     config.Slot0.kD = leftMotorKD.get();
-
-    config.Voltage.PeakForwardVoltage = leftMotorKS.get();
-    config.Voltage.PeakReverseVoltage = leftMotorKS.get();
 
     StatusCode status = StatusCode.StatusCodeNotInitialized;
     for (int i = 0; i < 5; ++i) {
@@ -248,8 +237,8 @@ public class ClimberIOTalonFX implements ClimberIO {
   private void rightConfigMotor(int rightMotorID) {
     this.rightMotor = new TalonFX(rightMotorID, RobotConfig.getInstance().getCANBusName());
 
-    TalonFXConfiguration config = new TalonFXConfiguration();
-
+    TalonFXConfiguration config = new TalonFXConfiguration();    
+    
     CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
     currentLimits.SupplyCurrentLimit = CONTINUOUS_CURRENT_LIMIT;
     currentLimits.SupplyCurrentThreshold = PEAK_CURRENT_LIMIT;
@@ -257,6 +246,7 @@ public class ClimberIOTalonFX implements ClimberIO {
     currentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits = currentLimits;
 
+    config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
     config.MotorOutput.Inverted =
         MOTOR_INVERTED ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
