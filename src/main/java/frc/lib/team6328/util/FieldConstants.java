@@ -112,7 +112,7 @@ public class FieldConstants {
   public static final class RedSpeaker {
     /** Center of the speaker opening (blue alliance) */
     public static Pose2d redCenterSpeakerOpening =
-        new Pose2d(0.0, fieldWidth - Units.inchesToMeters(104.0), new Rotation2d());
+        flipForRedSide(BlueSpeaker.blueCenterSpeakerOpening);
 
     // corners (red alliance origin)
     public static Translation3d redTopRightSpeaker =
