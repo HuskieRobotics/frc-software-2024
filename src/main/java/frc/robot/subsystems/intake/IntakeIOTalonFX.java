@@ -206,10 +206,6 @@ public class IntakeIOTalonFX implements IntakeIO {
     inputs.drumReferenceVelocityRPS = drumMotor.getClosedLoopReference().getValueAsDouble();
     inputs.kickerReferenceVelocityRPS = kickerMotor.getClosedLoopReference().getValueAsDouble();
 
-    inputs.leftRollerAppliedVolts = leftRollerMotor.getMotorVoltage().getValue();
-    inputs.leftRollerClosedLoopError = leftRollerMotor.getClosedLoopError().getValue();
-    inputs.leftRollerRotorVelocity = leftRollerMotor.getRotorVelocity().getValue();
-
     if (rollerMotorsKP.hasChanged()
         || rollerMotorsKI.hasChanged()
         || rollerMotorsKD.hasChanged()
@@ -266,7 +262,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     rollerCurrentLimits.SupplyTimeThreshold = IntakeConstants.ROLLERS_PEAK_CURRENT_DURATION;
     rollerCurrentLimits.SupplyCurrentLimitEnable = true;
 
-    // rollerConfig.CurrentLimits = rollerCurrentLimits;
+    rollerConfig.CurrentLimits = rollerCurrentLimits;
 
     rollerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 

@@ -13,7 +13,7 @@ public class IntakeConstants {
 
   // add all current limiting
 
-  public static final double INTAKE_ROLLER_MOTORS_KP = 28.0;
+  public static final double INTAKE_ROLLER_MOTORS_KP = 18.0;
   public static final double INTAKE_ROLLER_MOTORS_KI = 0.0;
   public static final double INTAKE_ROLLER_MOTORS_KD = 0.0;
   public static final double INTAKE_ROLLER_MOTORS_KS = 2.0;

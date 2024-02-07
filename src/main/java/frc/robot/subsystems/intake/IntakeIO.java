@@ -30,10 +30,6 @@ public interface IntakeIO {
     double leftRollerReferenceVelocityRPS = 0;
     double drumReferenceVelocityRPS = 0;
     double kickerReferenceVelocityRPS = 0;
-
-    double leftRollerAppliedVolts = 0;
-    double leftRollerClosedLoopError = 0;
-    double leftRollerRotorVelocity = 0;
   }
 
   public default void updateInputs(IntakeIOInputs inputs) {}
