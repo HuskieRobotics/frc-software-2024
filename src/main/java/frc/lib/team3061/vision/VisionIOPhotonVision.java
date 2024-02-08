@@ -32,8 +32,7 @@ public class VisionIOPhotonVision implements VisionIO {
    *
    * @param cameraName the name of the PhotonVision camera to use; the name must be unique
    */
-  public VisionIOPhotonVision(
-      String cameraName, AprilTagFieldLayout layout, Transform3d robotToCamera) {
+  public VisionIOPhotonVision(String cameraName, AprilTagFieldLayout layout) {
     this.camera = new PhotonCamera(cameraName);
     this.photonEstimator =
         new PhotonPoseEstimator(
@@ -59,8 +58,8 @@ public class VisionIOPhotonVision implements VisionIO {
     if (newResult) {
       visionEstimate.ifPresent(
           estimate -> {
-            inputs.estimatedRobotPose = estimate.estimatedPose;
-            inputs.estimatedRobotPoseTimestamp = estimate.timestampSeconds;
+            inputs.estimatedCameraPose = estimate.estimatedPose;
+            inputs.estimatedCameraPoseTimestamp = estimate.timestampSeconds;
             for (int i = 0; i < this.tagsSeen.length; i++) {
               this.tagsSeen[i] = false;
             }

@@ -183,7 +183,7 @@ public class RobotContainer {
       layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
     }
     for (int i = 0; i < visionIOs.length; i++) {
-      visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout, robotToCameraTransforms[i]);
+      visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout);
     }
     vision = new Vision(visionIOs);
 
@@ -241,7 +241,6 @@ public class RobotContainer {
               });
     } else {
       String[] cameraNames = config.getCameraNames();
-      Transform3d[] robotToCameraTransforms = config.getRobotToCameraTransforms();
       VisionIO[] visionIOs = new VisionIO[cameraNames.length];
       AprilTagFieldLayout layout;
       try {
@@ -250,7 +249,7 @@ public class RobotContainer {
         layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
       }
       for (int i = 0; i < visionIOs.length; i++) {
-        visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout, robotToCameraTransforms[i]);
+        visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout);
       }
       vision = new Vision(visionIOs);
     }

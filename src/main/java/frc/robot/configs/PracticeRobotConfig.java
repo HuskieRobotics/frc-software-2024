@@ -35,7 +35,6 @@ public class PracticeRobotConfig extends RobotConfig {
 
   private static final int GYRO_ID = 3;
 
-  // FIXME: needs to be reviewed before the bot is driven
   private static final double TRACKWIDTH_METERS = 0.57785; // 22.75
   private static final double WHEELBASE_METERS = 0.57785; // 22.75
   private static final double WHEEL_DIAMETER_METERS = 0.09659072671;
@@ -69,11 +68,9 @@ public class PracticeRobotConfig extends RobotConfig {
   private static final double MAX_DRIVE_ACCELERATION_METERS_PER_SECOND_SQUARED = 11.365;
   private static final double MAX_TURN_ACCELERATION_RADIANS_PER_SECOND_SQUARED = 36.0;
 
-  // FIXME: update the camera names once they have been installed
   private static final String CAN_BUS_NAME = "canbus1";
 
   private static final String CAMERA_NAME_0 = "OV2311L";
-
   private static final String CAMERA_NAME_1 = "OV2311F";
 
   // left camera

@@ -144,7 +144,7 @@ public class Vision extends SubsystemBase {
     if (this.lastTimestamps[i] < ios[i].lastCameraTimestamp) {
       this.lastTimestamps[i] = ios[i].lastCameraTimestamp;
       Pose3d estimatedRobotPose3d =
-          ios[i].estimatedRobotPose.plus(
+          ios[i].estimatedCameraPose.plus(
               RobotConfig.getInstance().getRobotToCameraTransforms()[i].inverse());
       Pose2d estimatedRobotPose2d = estimatedRobotPose3d.toPose2d();
 
@@ -155,14 +155,14 @@ public class Vision extends SubsystemBase {
         // in the measurement)
         odometry.addVisionMeasurement(
             estimatedRobotPose2d,
-            ios[i].estimatedRobotPoseTimestamp,
+            ios[i].estimatedCameraPoseTimestamp,
             getStandardDeviations(i, estimatedRobotPose2d));
         isVisionUpdating = true;
       }
 
-      Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/CameraPose3d", ios[i].estimatedRobotPose);
+      Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/CameraPose3d", ios[i].estimatedCameraPose);
       Logger.recordOutput(
-          SUBSYSTEM_NAME + "/" + i + "/CameraPose2d", ios[i].estimatedRobotPose.toPose2d());
+          SUBSYSTEM_NAME + "/" + i + "/CameraPose2d", ios[i].estimatedCameraPose.toPose2d());
       Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/RobotPose3d", estimatedRobotPose3d);
       Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/RobotPose2d", estimatedRobotPose2d);
       this.cyclesWithNoResults[i] = 0;
@@ -196,9 +196,9 @@ public class Vision extends SubsystemBase {
     Pose3d robotPoseFromMostRecentData = null;
     double mostRecentTimestamp = 0.0;
     for (int i = 0; i < visionIOs.length; i++) {
-      if (ios[i].estimatedRobotPoseTimestamp > mostRecentTimestamp) {
-        robotPoseFromMostRecentData = ios[i].estimatedRobotPose;
-        mostRecentTimestamp = ios[i].estimatedRobotPoseTimestamp;
+      if (ios[i].estimatedCameraPoseTimestamp > mostRecentTimestamp) {
+        robotPoseFromMostRecentData = ios[i].estimatedCameraPose;
+        mostRecentTimestamp = ios[i].estimatedCameraPoseTimestamp;
       }
     }
     return robotPoseFromMostRecentData;
@@ -223,7 +223,7 @@ public class Vision extends SubsystemBase {
    */
   public boolean posesHaveConverged() {
     for (int i = 0; i < visionIOs.length; i++) {
-      Pose3d robotPose = ios[i].estimatedRobotPose;
+      Pose3d robotPose = ios[i].estimatedCameraPose;
       if (odometry.getEstimatedPosition().minus(robotPose.toPose2d()).getTranslation().getNorm()
           < poseDifferenceThreshold.get()) {
         Logger.recordOutput(SUBSYSTEM_NAME + "/posesInLine", true);
