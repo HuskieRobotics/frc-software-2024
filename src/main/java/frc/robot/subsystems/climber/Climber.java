@@ -22,15 +22,15 @@ public class Climber extends SubsystemBase {
 
   // these Tunables are convenient when testing as they provide direct control of the subsystem's
   // motor
-  private final TunableNumber leftMotorPower = new TunableNumber("Climber/leftPower", 0.0);
-  private final TunableNumber leftMotorCurrent = new TunableNumber("Climber/leftCurrent", 0.0);
-  private final TunableNumber leftMotorPosition = new TunableNumber("Climber/leftPosition", 0.0);
+  // private final TunableNumber leftMotorPower = new TunableNumber("Climber/leftPower", 0.0);
+  // private final TunableNumber leftMotorCurrent = new TunableNumber("Climber/leftCurrent", 0.0);
+  // private final TunableNumber leftMotorPosition = new TunableNumber("Climber/leftPosition", 0.0);
 
-  private final TunableNumber rightMotorPower = new TunableNumber("Climber/rightPower", 0.0);
-  private final TunableNumber rightMotorCurrent = new TunableNumber("Climber/rightCurrent", 0.0);
-  private final TunableNumber rightMotorPosition = new TunableNumber("Climber/rightPosition", 0.0);
+  // private final TunableNumber rightMotorPower = new TunableNumber("Climber/rightPower", 0.0);
+  // private final TunableNumber rightMotorCurrent = new TunableNumber("Climber/rightCurrent", 0.0);
+  // private final TunableNumber rightMotorPosition = new TunableNumber("Climber/rightPosition", 0.0);
 
-  private final SubsystemIOInputsAutoLogged inputs = new SubsystemIOInputsAutoLogged();
+  private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
   private ClimberIO io;
 
   /**
@@ -61,21 +61,6 @@ public class Climber extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Climber", inputs);
-
-    // when testing, set the motor power, current, or position based on the Tunables (if non-zero)
-    if (TESTING) {
-      if (motorPower.get() != 0) {
-        this.setMotorPower(motorPower.get());
-      }
-
-      if (motorCurrent.get() != 0) {
-        this.setMotorCurrent(motorCurrent.get());
-      }
-
-      if (motorPosition.get() != 0) {
-        this.setMotorPosition(motorPosition.get());
-      }
-    }
   }
 
   /**

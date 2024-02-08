@@ -2,6 +2,8 @@ package frc.robot.subsystems.climber;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+
 /** Generic subsystem hardware interface. */
 public interface ClimberIO {
   /** Contains all of the input data received from hardware. */
@@ -34,4 +36,10 @@ public interface ClimberIO {
   public default void setLeftMotorPosition(double position) {}
 
   public default void setRightMotorPosition(double position) {}
+
+  public default void setPositionZero() {}
+
+  public default void setLeftMotorCurrent(double current) {}
+
+  public default void setRightMotorCurrent(double current) {}
 }
