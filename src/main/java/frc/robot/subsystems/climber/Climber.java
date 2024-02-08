@@ -76,6 +76,10 @@ public class Climber extends SubsystemBase {
     io.setRightMotorPosition(position);
   }
 
+  public void setPositionZero() {
+    io.setPositionZero();
+  }
+
   // FIXME: Needs a command check for the right motor. May need to change the commands that are used.
   private Command getSystemCheckCommand() {
     return Commands.sequence(
