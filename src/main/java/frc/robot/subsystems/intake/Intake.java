@@ -193,4 +193,8 @@ public class Intake extends SubsystemBase {
   public void setKickerVelocity(double rps) {
     io.setKickerVelocity(rps);
   }
+
+  public void shoot() {
+    this.setKickerVelocity(IntakeConstants.KICKER_VELOCITY_RPS);
+  }
 }
