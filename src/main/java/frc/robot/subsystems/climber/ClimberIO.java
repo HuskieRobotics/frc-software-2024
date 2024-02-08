@@ -39,7 +39,7 @@ public interface ClimberIO {
 
   public default void setPositionZero() {}
 
-  public default void setLeftMotorCurrent(double current) {}
+  public default void setLeftMotorPower(double current) {}
 
-  public default void setRightMotorCurrent(double current) {}
+  public default void setRightMotorPower(double current) {}
 }

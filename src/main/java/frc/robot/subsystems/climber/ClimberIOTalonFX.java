@@ -218,13 +218,13 @@ public class ClimberIOTalonFX implements ClimberIO {
   }
 
   @Override
-  public void setLeftMotorCurrent(double current) {
+  public void setLeftMotorPower(double current) {
     leftMotor.setControl(leftSupplyAmpsRequest.withOutput(current)); // FIXME: Is this how we set current?
     leftRequestedSupplyAmps = current;
   }
 
   @Override
-  public void setRightMotorCurrent(double current) {
+  public void setRightMotorPower(double current) {
     leftMotor.setControl(leftSupplyAmpsRequest.withOutput(current));    
     rightRequestedSupplyAmps = current;
   }

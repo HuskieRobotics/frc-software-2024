@@ -8,8 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
-import frc.lib.team6328.util.TunableNumber;
-import frc.robot.subsystems.subsystem.SubsystemIOInputsAutoLogged;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -19,16 +17,6 @@ import org.littletonrobotics.junction.Logger;
  * be used for quick prototyping.
  */
 public class Climber extends SubsystemBase {
-
-  // these Tunables are convenient when testing as they provide direct control of the subsystem's
-  // motor
-  // private final TunableNumber leftMotorPower = new TunableNumber("Climber/leftPower", 0.0);
-  // private final TunableNumber leftMotorCurrent = new TunableNumber("Climber/leftCurrent", 0.0);
-  // private final TunableNumber leftMotorPosition = new TunableNumber("Climber/leftPosition", 0.0);
-
-  // private final TunableNumber rightMotorPower = new TunableNumber("Climber/rightPower", 0.0);
-  // private final TunableNumber rightMotorCurrent = new TunableNumber("Climber/rightCurrent", 0.0);
-  // private final TunableNumber rightMotorPosition = new TunableNumber("Climber/rightPosition", 0.0);
 
   private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
   private ClimberIO io;
@@ -52,7 +40,6 @@ public class Climber extends SubsystemBase {
     FaultReporter.getInstance().registerSystemCheck(CLIMBER, getSystemCheckCommand());
   }
 
-  // FIXME: Update inputs needs to be fixed, currently have no idea what to do
   /**
    * The subsystem's periodic method needs to update and process the inputs from the hardware
    * interface object.
@@ -64,21 +51,12 @@ public class Climber extends SubsystemBase {
   }
 
   /**
-   * Set the motor power to the specified percentage of maximum power.
-   *
-   * @param power the percentage of maximum power to set the motor to
-   */
-  public void setLeftMotorPower(double power) {
-    io.setLeftMotorPower(power);
-  }
-
-  /**
    * Set the motor current to the specified value in amps.
    *
    * @param power the current to set the motor to in amps
    */
   public void setLeftMotorCurrent(double power) {
-    io.setLeftMotorCurrent(power);
+    io.setLeftMotorPower(power);
   }
 
   /**
@@ -86,50 +64,21 @@ public class Climber extends SubsystemBase {
    *
    * @param position the position to set the motor to in degrees
    */
-  public void seLeftMotorPosition(double position) {
-    io.setLeftMotorPosition(position, POSITION_FEEDFORWARD);
+  public void setLeftMotorPosition(double position) {
+    io.setLeftMotorPosition(position);
   }
 
-  // Methods for right motor below
-  public void setRightMotorPower(double power) {
+   public void setRightMotorCurrent(double power) {
     io.setRightMotorPower(power);
   }
 
-  public void setRightMotorCurrent(double power) {
-    io.setRightMotorCurrent(power);
-  }
-
   public void setRightMotorPosition(double position) {
-    io.setRightMotorPosition(position, POSITION_FEEDFORWARD);
+    io.setRightMotorPosition(position);
   }
 
+  // FIXME: Needs a command check for the right motor. May need to change the commands that are used.
   private Command getSystemCheckCommand() {
     return Commands.sequence(
-            Commands.run(() -> io.setMotorPower(0.3)).withTimeout(1.0),
-            Commands.runOnce(
-                () -> {
-                  if (inputs.velocityRPM < 2.0) {
-                    FaultReporter.getInstance()
-                        .addFault(
-                            CLIMBER,
-                            "[System Check] Climber motor not moving as fast as expected",
-                            false,
-                            true);
-                  }
-                }),
-            Commands.run(() -> io.setMotorPower(-0.2)).withTimeout(1.0),
-            Commands.runOnce(
-                () -> {
-                  if (inputs.velocityRPM > -2.0) {
-                    FaultReporter.getInstance()
-                        .addFault(
-                            CLIMBER,
-                            "[System Check] Climber motor moving too slow or in the wrong direction",
-                            false,
-                            true);
-                  }
-                }))
-        .until(() -> !FaultReporter.getInstance().getFaults(CLIMBER).isEmpty())
-        .andThen(Commands.runOnce(() -> io.setMotorPower(0.0)));
+            Commands.run(() -> io.setLeftMotorPower(0.3)).withTimeout(1.0));
   }
 }
