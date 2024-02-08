@@ -11,6 +11,7 @@ public class Intake extends SubsystemBase {
   // Intakes, Drum, Kicker
   enum IntakeState {
     EMPTY, // 0, 0, 0
+    IN_BETWEEN_DRUM_AND_KICKER,
     NOTE_IN_KICKER, // 0, 0, 1
     NOTE_IN_DRUM, // 0, 1, 0
     NOTE_IN_INTAKE, // 1, 0, 0
@@ -49,35 +50,34 @@ public class Intake extends SubsystemBase {
     // save
     // processing power of running the method over and over again, might have to do this however.
     if (intakeState == IntakeState.EMPTY) {
-      // if it is empty, then these are the two possible next steps / situations
+      // if it is empty, then this is the only 1 possible next steps / situations
       //   1. we are truly empty, and waiting for a game piece
-      //   2. we are in between the drum and the kicker with nothing
-      //   3. possible in between of us being in between the intake and the drum
       if (inputs.isRightRollerIRBlocked || inputs.isLeftRollerIRBlocked) {
         intakeState = IntakeState.NOTE_IN_INTAKE;
         this.intakeGamePiece();
         this.transitionGamePiece();
-      } else if (inputs.isKickerIRBlocked) {
+      }
+    } else if (intakeState == IntakeState.IN_BETWEEN_DRUM_AND_KICKER) {
+      if (inputs.isKickerIRBlocked) {
         intakeState = IntakeState.NOTE_IN_KICKER;
         this.turnTransitionOff();
         this.turnKickerOff();
-      } else if (inputs.isDrumIRBlocked) {
-        intakeState = IntakeState.NOTE_IN_DRUM;
-        this.transitionGamePiece();
       }
     } else if (intakeState == IntakeState.NOTE_IN_INTAKE) {
       // if there is a note in the intake, then there are two possible next steps depending on the
       // robot
       //   1. we get both the drum and the intake to be sensed at the same time
       //   2. we have no sensors sensed as we are in between the intake and the drum
+      //   3. we lost the piece, go back to empty
       if (inputs.isDrumIRBlocked) {
         intakeState = IntakeState.NOTE_IN_INTAKE_AND_DRUM;
         this.transitionGamePiece();
       } else if (inputs.isLeftRollerIRBlocked || inputs.isRightRollerIRBlocked) {
         intakeState = IntakeState.NOTE_IN_INTAKE;
       } else {
+        // we lost the piece to another robot
         intakeState = IntakeState.EMPTY;
-        this.repelGamePiece();
+        this.turnTransitionOff();
       }
     } else if (intakeState == IntakeState.NOTE_IN_INTAKE_AND_DRUM) {
       // the only possible next step is that we are only in the drum
@@ -90,8 +90,9 @@ public class Intake extends SubsystemBase {
     } else if (intakeState == IntakeState.NOTE_IN_DRUM) {
       // the only possible next step is becoming empty between the drum and the kicker
       if (!inputs.isDrumIRBlocked) {
-        intakeState = IntakeState.EMPTY;
+        intakeState = IntakeState.IN_BETWEEN_DRUM_AND_KICKER;
         this.turnTransitionOff();
+        this.repelGamePiece();
       }
     } else if (intakeState == IntakeState.NOTE_IN_KICKER) {
       // the only possible next step is that we become empty after shooting
