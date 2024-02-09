@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.0,
-      "y": 7.0
+      "x": 1.204397837367104,
+      "y": 7.109837076817011
     },
-    "rotation": -102.0
+    "rotation": -135.0
   },
   "command": {
     "type": "sequential",
@@ -26,12 +26,6 @@
         {
           "type": "named",
           "data": {
-            "name": "Deploy Intake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "Shoot"
           }
         },
@@ -44,7 +38,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Deploy Intake"
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4 Note 2-Note 3"
           }
         },
         {
@@ -56,13 +56,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "4 Note 2-3"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Deploy Intake"
+            "pathName": "Note 3 - Shoot 3"
           }
         },
         {

@@ -28,11 +28,17 @@
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": -179.59069203758452,
+      "rotateFast": true
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.833,
+    "maxVelocity": 1.0,
     "maxAcceleration": 8.269,
     "maxAngularVelocity": 537.5,
     "maxAngularAcceleration": 2390.0
@@ -45,7 +51,7 @@
   "reversed": false,
   "folder": "4 Note Inside Wing",
   "previewStartingState": {
-    "rotation": 180.0,
+    "rotation": -91.63645243807998,
     "velocity": 0
   },
   "useDefaultConstraints": false

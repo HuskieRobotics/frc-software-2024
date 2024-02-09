@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.74,
-        "y": 4.12
+        "x": 2.630987604317551,
+        "y": 4.086158802948237
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.7484482160256167,
-        "y": 4.135228446341035
+        "x": 2.6394358203431674,
+        "y": 4.101387249289272
       },
       "isLocked": false,
       "linkedName": null
@@ -49,7 +49,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "4 Note Test Right Side",
+  "folder": "4 Note Test Source side",
   "previewStartingState": {
     "rotation": 90.0,
     "velocity": 0

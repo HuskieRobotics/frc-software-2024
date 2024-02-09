@@ -183,9 +183,9 @@ public class RobotContainer {
       layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
     }
     for (int i = 0; i < visionIOs.length; i++) {
-      visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout);
+      // visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout);
     }
-    vision = new Vision(visionIOs);
+    vision = new Vision(new VisionIO[] {});
 
     // FIXME: create the hardware-specific subsystem class
     subsystem = new Subsystem(new SubsystemIO() {});
@@ -481,6 +481,15 @@ public class RobotContainer {
 
     Command sixNoteCommand2 = new PathPlannerAuto("6 Note Step-by-Step");
     autoChooser.addOption("6 Note Step-by-Step", sixNoteCommand2);
+
+    Command oneNoteExitBlue = new PathPlannerAuto("1 Note Exit Blue Auto");
+    autoChooser.addOption("1 Note Exit Source", oneNoteExitBlue);
+
+    Command fourNoteAmpSide = new PathPlannerAuto("4 Note Side Wing");
+    autoChooser.addOption("4 Note Wing Amp Side", fourNoteAmpSide);
+
+    Command fourNoteTestSourceSide = new PathPlannerAuto("4 Note Test");
+    autoChooser.addOption("4 Note Wing Source Side", fourNoteTestSourceSide);
 
     /************ Drive Velocity Tuning ************
      *

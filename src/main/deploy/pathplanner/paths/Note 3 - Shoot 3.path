@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.92,
-        "y": 5.52
+        "x": 2.6032534947952777,
+        "y": 4.104648209296419
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.6450227445909436,
-        "y": 4.63638672731891
+        "x": 2.122528929742544,
+        "y": 3.808817707725506
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.514420301567876,
-        "y": 4.132634447087077
+        "x": 1.4476655980338986,
+        "y": 3.7441047855068685
       },
       "prevControl": {
-        "x": 2.78495393354423,
-        "y": 5.046851548248552
+        "x": 2.196486555135272,
+        "y": 3.9012647394664164
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,20 +32,20 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.833,
+    "maxVelocity": 1.0,
     "maxAcceleration": 8.269,
     "maxAngularVelocity": 537.5,
     "maxAngularAcceleration": 2390.0
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": 180.0,
+    "velocity": 0,
+    "rotation": 131.5663696375495,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "4 Note Inside Wing",
   "previewStartingState": {
-    "rotation": 180.0,
+    "rotation": 90.0,
     "velocity": 0
   },
   "useDefaultConstraints": false
