@@ -7,47 +7,36 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
-
-public class Shooter extends SubsystemBase{
+public class Shooter extends SubsystemBase {
 
   private ShooterIO io;
   private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
 
-  public Shooter(ShooterIO io){
+  public Shooter(ShooterIO io) { // TODO: Add intake reference
     this.io = io;
 
-		if (TESTING) {
+    if (TESTING) {
       ShuffleboardTab tab = Shuffleboard.getTab(SUBSYSTEM_NAME);
       tab.add(SUBSYSTEM_NAME, this);
     }
   }
 
-
   @Override
-	public void periodic() {
+  public void periodic() {
     io.updateInputs(shooterInputs);
     Logger.processInputs(SUBSYSTEM_NAME, shooterInputs);
   }
-  
-  public void shoot(double leftWheelVelocityRPS, double rightWheelVelocityRPS){
-    io.setShooterWheelLeftVelocity(leftWheelVelocityRPS);
-    io.setShooterWheelRightVelocity(rightWheelVelocityRPS);
+
+  public void shoot(double topWheelVelocityRPS, double bottomWheelVelocityRPS) {
+    io.setShooterWheelTopVelocity(topWheelVelocityRPS);
+    io.setShooterWheelBottomVelocity(bottomWheelVelocityRPS);
   }
 
-  public void setKickerMotorVelocity(double velocityRPS){
-    io.setKickerWheelVelocity(velocityRPS);
-  }
-
-  public void setDunkerMotorVelocity(double velocityRPS){
+  public void setDunkerMotorVelocity(double velocityRPS) {
     io.setDunkerMotorVelocity(velocityRPS);
   }
 
-  public void setAngle(double angle){
+  public void setAngle(double angle) {
     io.setAngle(angle);
   }
-
-  public void getSensor(){
-    io.getSensor();
-  }
-  
 }
