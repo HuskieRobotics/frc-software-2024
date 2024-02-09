@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.2460941542253459,
-      "y": 4.118285254401658
+      "x": 0.7543128599770712,
+      "y": 4.465191633085969
     },
-    "rotation": 133.15238973400542
+    "rotation": 120.25643716352927
   },
   "command": {
     "type": "sequential",
@@ -26,13 +26,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Starting Point 1 to Note 1"
+            "pathName": "4 Source Starting Point 1 to Note 1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Note 1 to Shoot 1"
+            "pathName": "4 Source Note 1 to Shoot 1"
           }
         },
         {
@@ -44,7 +44,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Shoot 1 to Note 2"
+            "pathName": "4 Source Shoot 1 to Note 2"
           }
         },
         {
@@ -56,7 +56,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Note 2 to Note 3"
+            "pathName": "4 Source Note 2 to Note 3"
           }
         }
       ]
