@@ -463,7 +463,7 @@ public class RobotContainer {
      *
      */
     Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Test Amp Side");
-    autoChooser.addOption("5 Note Test Amp Side", fiveNoteAmpSide;
+    autoChooser.addOption("5 Note Test Amp Side", fiveNoteAmpSide);
 
     Command fiveNoteCollectorSide = new PathPlannerAuto("5 Note Test Collector Side");
     autoChooser.addOption("5 Note Test Collector Side", fiveNoteCollectorSide);
