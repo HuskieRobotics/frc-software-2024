@@ -212,12 +212,6 @@ public class ClimberIOTalonFX implements ClimberIO {
   }
 
   @Override
-  public void setPositionZero() { // FIXME: Is this how we zero the position?
-    leftMotor.setPosition(0);
-    rightMotor.setPosition(0);
-  }
-
-  @Override
   public void setLeftMotorPower(double current) {
     leftMotor.setControl(leftSupplyAmpsRequest.withOutput(current)); // FIXME: Is this how we set current?
     leftRequestedSupplyAmps = current;
@@ -225,7 +219,7 @@ public class ClimberIOTalonFX implements ClimberIO {
 
   @Override
   public void setRightMotorPower(double current) {
-    leftMotor.setControl(leftSupplyAmpsRequest.withOutput(current));    
+    rightMotor.setControl(leftSupplyAmpsRequest.withOutput(current));    
     rightRequestedSupplyAmps = current;
   }
 

@@ -76,8 +76,10 @@ public class Climber extends SubsystemBase {
     io.setRightMotorPosition(position);
   }
 
+  // FIXME: Is this how setPositionZero should be implemented?
   public void setPositionZero() {
-    io.setPositionZero();
+    io.setLeftMotorPosition(0);
+    io.setRightMotorPosition(0);
   }
 
   // FIXME: Needs a command check for the right motor. May need to change the commands that are used.
