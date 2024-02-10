@@ -17,6 +17,7 @@ public class Intake extends SubsystemBase {
   enum IntakeState {
     EMPTY, // 0, 0, 0
     IN_BETWEEN_DRUM_AND_KICKER,
+    IN_BETWEEN_INTAKE_AND_DRUM,
     NOTE_IN_KICKER, // 0, 0, 1
     NOTE_IN_DRUM, // 0, 1, 0
     NOTE_IN_INTAKE, // 1, 0, 0
@@ -29,7 +30,6 @@ public class Intake extends SubsystemBase {
   // but first just running through the logic of what we would do in these cases
 
   private boolean manualOverrideEnabled;
-  private boolean runningManualIntake;
 
   public Intake(IntakeIO io) {
     this.io = io;
@@ -52,13 +52,20 @@ public class Intake extends SubsystemBase {
 
   public void runIntakeStateMachine() {
 
+    // TODO: write state for in between intake and drum
+    // TODO: as soon as we detect one IR, repel the other one, then repel both when we get in the drum
+
     if (intakeState == IntakeState.EMPTY) {
       // if it is empty, then this is the only 1 possible next steps / situations
       //   1. we are truly empty, and waiting for a game piece
       if (inputs.isRightRollerIRBlocked || inputs.isLeftRollerIRBlocked) {
         intakeState = IntakeState.NOTE_IN_INTAKE;
         leds.setIntakeLEDState(IntakeLEDState.HAS_GAME_PIECE);
-        this.intakeGamePiece();
+        if (inputs.isRightRollerIRBlocked) {
+          this.repelGamePieceLeft();
+        } else {
+          this.repelGamePieceRight();
+        }
         this.transitionGamePiece();
       }
     } else if (intakeState == IntakeState.IN_BETWEEN_DRUM_AND_KICKER) {
@@ -72,17 +79,22 @@ public class Intake extends SubsystemBase {
       // robot
       //   1. we get both the drum and the intake to be sensed at the same time
       //   2. we have no sensors sensed as we are in between the intake and the drum
-      //   3. we lost the piece, go back to empty
+      //   3. we are going in between intake and drum
       if (inputs.isDrumIRBlocked) {
         intakeState = IntakeState.NOTE_IN_INTAKE_AND_DRUM;
         this.transitionGamePiece();
       } else if (inputs.isLeftRollerIRBlocked || inputs.isRightRollerIRBlocked) {
         intakeState = IntakeState.NOTE_IN_INTAKE;
       } else {
-        // we lost the piece to another robot
-        intakeState = IntakeState.EMPTY;
+        // we are no in between intake and drum
+        intakeState = IntakeState.IN_BETWEEN_INTAKE_AND_DRUM;
         leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
-        this.turnTransitionOff();
+      }
+    } else if (intakeState == IntakeState.IN_BETWEEN_INTAKE_AND_DRUM) {
+      //  the only possible next step is that we are only in the drum
+      if (inputs.isDrumIRBlocked) {
+        intakeState = IntakeState.NOTE_IN_DRUM;
+        this.transitionGamePiece();
       }
     } else if (intakeState == IntakeState.NOTE_IN_INTAKE_AND_DRUM) {
       // the only possible next step is that we are only in the drum
@@ -181,6 +193,14 @@ public class Intake extends SubsystemBase {
 
   public void repelGamePiece() {
     this.setRightRollerVelocity(IntakeConstants.REPEL_VELOCITY_ROLLERS_RPS);
+    this.setLeftRollerVelocity(IntakeConstants.REPEL_VELOCITY_ROLLERS_RPS);
+  }
+
+  public void repelGamePieceRight() {
+    this.setRightRollerVelocity(IntakeConstants.REPEL_VELOCITY_ROLLERS_RPS);
+  }
+
+  public void repelGamePieceLeft() {
     this.setLeftRollerVelocity(IntakeConstants.REPEL_VELOCITY_ROLLERS_RPS);
   }
 
