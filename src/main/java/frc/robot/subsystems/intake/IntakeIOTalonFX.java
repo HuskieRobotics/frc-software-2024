@@ -178,10 +178,11 @@ public class IntakeIOTalonFX implements IntakeIO {
         kickerStatorCurrentStatusSignal,
         kickerVelocityStatusSignal);
 
-    inputs.isRightRollerIRBlocked = rightRollerIRSensor.get();
-    inputs.isLeftRollerIRBlocked = leftRollerIRSensor.get();
-    inputs.isDrumIRBlocked = drumIRSensor.get();
-    inputs.isKickerIRBlocked = kickerIRSensor.get();
+    // FIXME: TEMPORARILY added ! to the IRSensor.get() as it was contradictory on the actual intake
+    inputs.isRightRollerIRBlocked = !rightRollerIRSensor.get();
+    inputs.isLeftRollerIRBlocked = !leftRollerIRSensor.get();
+    inputs.isDrumIRBlocked = !drumIRSensor.get();
+    inputs.isKickerIRBlocked = !kickerIRSensor.get();
 
     inputs.rightRollerStatorCurrentAmps = rightRollerStatorCurrentStatusSignal.getValueAsDouble();
     inputs.leftRollerStatorCurrentAmps = leftRollerStatorCurrentStatusSignal.getValueAsDouble();

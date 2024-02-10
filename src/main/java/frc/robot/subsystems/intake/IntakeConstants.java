@@ -50,8 +50,8 @@ public class IntakeConstants {
   public static final double KICKER_PEAK_CURRENT_LIMIT = 20.0;
   public static final double KICKER_PEAK_CURRENT_DURATION = 0.1;
 
-  public static final boolean RIGHT_ROLLER_MOTOR_INVERTED = false;
-  public static final boolean LEFT_ROLLER_MOTOR_INVERTED = false;
+  public static final boolean RIGHT_ROLLER_MOTOR_INVERTED = true;
+  public static final boolean LEFT_ROLLER_MOTOR_INVERTED = true;
   public static final boolean DRUM_MOTOR_INVERTED = false;
   public static final boolean KICKER_MOTOR_INVERTED = false;
 
