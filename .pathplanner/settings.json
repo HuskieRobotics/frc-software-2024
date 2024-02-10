@@ -3,12 +3,8 @@
   "robotLength": 0.88,
   "holonomicMode": true,
   "pathFolders": [
-    "2 Note Center Line",
-    "4 Note Inside Wing",
-    "4 Note Test Source side",
-    "5 Note Source Side",
-    "5 Note Amp Side",
-    "6 Note Amp Side"
+    "4 Note Amp-Side Wing",
+    "4 Note Source-Side Wing"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.88,
