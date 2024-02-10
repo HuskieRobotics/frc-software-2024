@@ -4,9 +4,12 @@
   "holonomicMode": true,
   "pathFolders": [
     "4 Note Amp-Side Wing",
-    "4 Note Source-Side Wing"
+    "4 Note Source-Side Wing",
+    "Tuning"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "Tuning"
+  ],
   "defaultMaxVel": 3.88,
   "defaultMaxAccel": 11.805,
   "defaultMaxAngVel": 537.0,
