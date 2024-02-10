@@ -36,8 +36,6 @@ import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.lib.team3061.vision.VisionIOSim;
 import frc.robot.Constants.Mode;
-import frc.robot.commands.FeedForwardCharacterization;
-import frc.robot.commands.FeedForwardCharacterization.FeedForwardCharacterizationData;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.configs.DefaultRobotConfig;
 import frc.robot.configs.NovaCTRERobotConfig;
@@ -370,22 +368,6 @@ public class RobotContainer {
     // add commands to the auto chooser
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
 
-    /************ Test Path ************
-     *
-     * demonstration of PathPlanner auto with event markers
-     *
-     */
-    Command autoTest = new PathPlannerAuto("TestAuto");
-    autoChooser.addOption("Test Auto", autoTest);
-
-    /************ Choreo Test Path ************
-     *
-     * demonstration of PathPlanner hosted Choreo path
-     *
-     */
-    Command choreoAutoTest = new PathPlannerAuto("ChoreoTest");
-    autoChooser.addOption("Choreo Auto", choreoAutoTest);
-
     /************ Start Point ************
      *
      * useful for initializing the pose of the robot to a known location
@@ -399,36 +381,6 @@ public class RobotContainer {
                     PathPlannerPath.fromPathFile("StartPoint").getPreviewStartingHolonomicPose()),
             drivetrain);
     autoChooser.addOption("Start Point", startPoint);
-
-    /************ Drive Characterization ************
-     *
-     * useful for characterizing the swerve modules for driving (i.e, determining kS and kV)
-     *
-     */
-    autoChooser.addOption(
-        "Swerve Drive Characterization",
-        new FeedForwardCharacterization(
-            drivetrain,
-            true,
-            new FeedForwardCharacterizationData("drive"),
-            drivetrain::runDriveCharacterizationVolts,
-            drivetrain::getDriveCharacterizationVelocity,
-            drivetrain::getDriveCharacterizationAcceleration));
-
-    /************ Swerve Rotate Characterization ************
-     *
-     * useful for characterizing the swerve modules for rotating (i.e, determining kS and kV)
-     *
-     */
-    autoChooser.addOption(
-        "Swerve Rotate Characterization",
-        new FeedForwardCharacterization(
-            drivetrain,
-            true,
-            new FeedForwardCharacterizationData("rotate"),
-            drivetrain::runRotateCharacterizationVolts,
-            drivetrain::getRotateCharacterizationVelocity,
-            drivetrain::getRotateCharacterizationAcceleration));
 
     /************ Distance Test ************
      *
@@ -446,45 +398,16 @@ public class RobotContainer {
     Command tuningCommand = new PathPlannerAuto("Tuning");
     autoChooser.addOption("Auto Tuning", tuningCommand);
 
-    /************ 3 Note ************
-     *
-     * used for testing the 3 note autonomous
-     *
-     */
-    Command threeNoteCommand = new PathPlannerAuto("3 Note");
-    autoChooser.addOption("3 Note", threeNoteCommand);
-
-    Command threeNoteCommand2 = new PathPlannerAuto("3 Note Test");
-    autoChooser.addOption("3 Note Test", threeNoteCommand2);
-
-    /************ 5 Note ************
-     *
-     * used for testing the 5 note autonomous
-     *
-     */
-    Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Test Amp Side");
-    autoChooser.addOption("5 Note Test Amp Side", fiveNoteAmpSide);
-
-    Command fiveNoteCollectorSide = new PathPlannerAuto("5 Note Test Collector Side");
-    autoChooser.addOption("5 Note Test Collector Side", fiveNoteCollectorSide);
-
-
-    /************ 6 Note ************
+    /************ 4 Note ************
      *
      * used for testing the 6 note autonomous (Still Testing)
      *
      */
-    Command sixNoteAmpSide = new PathPlannerAuto("6 Note Test Amp Side");
-    autoChooser.addOption("6 Note Test Amp Side", sixNoteAmpSide);
+    Command fourNoteAmpSideWing = new PathPlannerAuto("4 Note Amp-Side Wing");
+    autoChooser.addOption("4 Note Amp-Side Wing", fourNoteAmpSideWing);
 
-    Command oneNoteExitBlue = new PathPlannerAuto("1 Note Exit Blue Auto");
-    autoChooser.addOption("1 Note Exit Source", oneNoteExitBlue);
-
-    Command fourNoteAmpSide = new PathPlannerAuto("4 Note Inside Wing");
-    autoChooser.addOption("4 Note Inside Amp Side", fourNoteAmpSide);
-
-    Command fourNoteTestSourceSide = new PathPlannerAuto("4 Note Test");
-    autoChooser.addOption("4 Note Wing Source Side", fourNoteTestSourceSide);
+    Command fourNoteSourceSideWing = new PathPlannerAuto("4 Note Source-Side Wing");
+    autoChooser.addOption("4 Note Source-Side Wing", fourNoteSourceSideWing);
 
     /************ Drive Velocity Tuning ************
      *
