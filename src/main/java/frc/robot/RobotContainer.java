@@ -9,7 +9,6 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -172,7 +171,6 @@ public class RobotContainer {
     drivetrain = new Drivetrain(drivetrainIO);
 
     String[] cameraNames = config.getCameraNames();
-    Transform3d[] robotToCameraTransforms = config.getRobotToCameraTransforms();
     VisionIO[] visionIOs = new VisionIO[cameraNames.length];
     AprilTagFieldLayout layout;
     try {
@@ -256,13 +254,6 @@ public class RobotContainer {
   private void createCTRESimSubsystems() {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
-
-    AprilTagFieldLayout layout;
-    try {
-      layout = new AprilTagFieldLayout(VisionConstants.APRILTAG_FIELD_LAYOUT_PATH);
-    } catch (IOException e) {
-      layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
-    }
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
 
     // FIXME: create the hardware-specific subsystem class
