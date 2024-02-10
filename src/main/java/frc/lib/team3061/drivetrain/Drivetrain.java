@@ -400,8 +400,8 @@ public class Drivetrain extends SubsystemBase {
       xVelocity *= slowModeMultiplier;
       yVelocity *= slowModeMultiplier;
     }
-
-    this.io.driveFieldRelativeFacingAngle(xVelocity, yVelocity, targetDirection, isOpenLoop);
+    int allianceMultiplier = this.alliance == Alliance.Blue ? 1 : -1;
+    this.io.driveFieldRelativeFacingAngle(xVelocity*allianceMultiplier, yVelocity*allianceMultiplier, targetDirection, isOpenLoop);
   }
 
   /**
