@@ -41,6 +41,10 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
+  public default Trigger getManualRepelAllButton() {
+    return new Trigger(() -> false);
+  }
+
   public default Trigger getFieldRelativeButton() {
     return new Trigger(() -> false);
   }

@@ -49,6 +49,8 @@ public abstract class LEDs extends SubsystemBase {
   private double lastEnabledTime = 0.0;
   private boolean estopped = false;
 
+  private IntakeLEDState intakeLEDState;
+
   // LED IO
   private final Notifier loadingNotifier;
 
@@ -295,6 +297,18 @@ public abstract class LEDs extends SubsystemBase {
     this.demoMode = demoMode;
   }
 
+  public enum IntakeLEDState {
+    WAITING_FOR_GAME_PIECE,
+    HAS_GAME_PIECE,
+    MANUAL_REPEL,
+    INTAKE_MANUALLY_TURNED_OFF,
+    // TODO: add implementation for ready to shoot after talking with Jake and Mr. Schmit
+  }
+  
+  public void setIntakeLEDState(IntakeLEDState state) {
+    this.intakeLEDState = state;
+  }
+
   protected abstract void updateLEDs();
 
   protected abstract void setLEDBuffer(int index, Color color);
@@ -375,6 +389,7 @@ public abstract class LEDs extends SubsystemBase {
       setLEDBuffer(i, colors.get(colorIndex));
     }
   }
+
 
   private enum Section {
     STATIC,

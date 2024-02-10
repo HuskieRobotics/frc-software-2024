@@ -27,6 +27,8 @@ import frc.lib.team3061.drivetrain.swerve.SwerveModuleIOTalonFXPhoenix6;
 import frc.lib.team3061.gyro.GyroIO;
 import frc.lib.team3061.gyro.GyroIOPigeon2Phoenix6;
 import frc.lib.team3061.leds.LEDs;
+import frc.lib.team3061.leds.LEDsRIO;
+import frc.lib.team3061.leds.LEDs.IntakeLEDState;
 import frc.lib.team3061.pneumatics.Pneumatics;
 import frc.lib.team3061.pneumatics.PneumaticsIORev;
 import frc.lib.team3061.vision.Vision;
@@ -71,6 +73,7 @@ public class RobotContainer {
   private Vision vision;
   private Subsystem subsystem;
   private Intake intake;
+  private LEDs leds;
 
   // use AdvantageKit's LoggedDashboardChooser instead of SendableChooser to ensure accurate logging
   private final LoggedDashboardChooser<Command> autoChooser =
@@ -95,7 +98,7 @@ public class RobotContainer {
      */
     createRobotConfig();
 
-    LEDs.getInstance();
+    leds = LEDs.getInstance();
 
     // create real, simulated, or replay subsystems based on the mode and robot specified
     if (Constants.getMode() != Mode.REPLAY) {
@@ -570,6 +573,17 @@ public class RobotContainer {
                 Commands.runOnce(intake::turnLeftIntakeOff, intake).withName("TurnLeftIntakeOff"),
                 Commands.run(intake::intakeGamePieceLeft, intake).withName("IntakeGamePieceLeft"),
                 intake::runningManualIntake));
+    
+    oi.getManualRepelAllButton()
+        .and(intake::manualOverrideEnabled)
+        .onTrue(
+          Commands.sequence(
+            Commands.runOnce(intake::repelGamePiece, intake).withName("RepelGamePiece"),
+            Commands.runOnce(() -> leds.setIntakeLEDState(IntakeLEDState.MANUAL_REPEL), leds)
+          )
+        );
+    
+    
   }
 
   private void configureDrivetrainCommands() {

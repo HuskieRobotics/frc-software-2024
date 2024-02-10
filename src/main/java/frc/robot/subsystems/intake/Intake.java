@@ -1,12 +1,17 @@
 package frc.robot.subsystems.intake;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.team3061.leds.LEDs;
+import frc.lib.team3061.leds.LEDsRIO;
+import frc.lib.team3061.leds.LEDs.IntakeLEDState;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+  private final LEDs leds;
 
   // Intakes, Drum, Kicker
   enum IntakeState {
@@ -28,9 +33,13 @@ public class Intake extends SubsystemBase {
 
   public Intake(IntakeIO io) {
     this.io = io;
-    intakeState = IntakeState.EMPTY;
+    leds = LEDs.getInstance();
+    intakeState = IntakeState.EMPTY;    
+
+    leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
     this.intakeGamePiece();
   }
+
 
   @Override
   public void periodic() {
@@ -43,17 +52,12 @@ public class Intake extends SubsystemBase {
 
   public void runIntakeStateMachine() {
 
-    // FIXME: possible update to have the different methods (intake, repel, transition) run
-    // in the initiation of every state in the if statement every 20ms instead of when the state is
-    // changed
-    // to that specific one only one time per state change. This was added beforehand as a way to
-    // save
-    // processing power of running the method over and over again, might have to do this however.
     if (intakeState == IntakeState.EMPTY) {
       // if it is empty, then this is the only 1 possible next steps / situations
       //   1. we are truly empty, and waiting for a game piece
       if (inputs.isRightRollerIRBlocked || inputs.isLeftRollerIRBlocked) {
         intakeState = IntakeState.NOTE_IN_INTAKE;
+        leds.setIntakeLEDState(IntakeLEDState.HAS_GAME_PIECE);
         this.intakeGamePiece();
         this.transitionGamePiece();
       }
@@ -77,6 +81,7 @@ public class Intake extends SubsystemBase {
       } else {
         // we lost the piece to another robot
         intakeState = IntakeState.EMPTY;
+        leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
         this.turnTransitionOff();
       }
     } else if (intakeState == IntakeState.NOTE_IN_INTAKE_AND_DRUM) {
@@ -98,6 +103,7 @@ public class Intake extends SubsystemBase {
       // the only possible next step is that we become empty after shooting
       if (!inputs.isKickerIRBlocked) {
         intakeState = IntakeState.EMPTY;
+        leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
         this.intakeGamePiece();
       }
     }

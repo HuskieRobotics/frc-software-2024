@@ -57,8 +57,14 @@ public class FullOperatorConsoleOI implements OperatorInterface {
     return -translateJoystick.getX();
   }
 
+  // temporary replacement as it was in the spot of repel all
   @Override
   public Trigger getLock180Button() {
+    return translateJoystickButtons[6];
+  }
+
+  @Override
+  public Trigger getManualRepelAllButton() {
     return translateJoystickButtons[3];
   }
 

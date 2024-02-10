@@ -13,6 +13,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.lib.team3061.RobotConfig;
+import frc.lib.team3061.leds.LEDs;
+import frc.lib.team3061.leds.LEDsRIO;
 import frc.lib.team3061.util.VelocitySystemSim;
 import frc.lib.team6328.util.TunableNumber;
 
