@@ -549,13 +549,18 @@ public class RobotContainer {
     // controller input
     oi.getIntakeManualOverrideSwitch().onTrue(Commands.run(intake::enableManualOverride, intake));
 
-    // these need to turn each other off ( will they by default ? )
     oi.getManualRunIntakeButton()
         .and(intake::manualOverrideEnabled)
         .onTrue(
             Commands.either(
-                Commands.runOnce(intake::turnIntakeOff, intake).withName("TurnIntakeOff"),
-                Commands.run(intake::intakeGamePiece, intake).withName("IntakeGamePiece"),
+                Commands.sequence(
+                  Commands.runOnce(() -> leds.setIntakeLEDState(IntakeLEDState.INTAKE_MANUALLY_TURNED_OFF), leds),
+                  Commands.runOnce(intake::turnIntakeOff, intake).withName("TurnIntakeOff")
+                ),
+                Commands.sequence(
+                  Commands.runOnce(() -> leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE), leds),
+                  Commands.run(intake::intakeGamePiece, intake).withName("IntakeGamePiece")
+                ),
                 intake::runningManualIntake));
 
     oi.getManualIntakeRightOffButton()

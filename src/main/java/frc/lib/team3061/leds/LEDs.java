@@ -148,10 +148,48 @@ public abstract class LEDs extends SubsystemBase {
       strobe(Section.FULL, Color.kWhite, STROBE_FAST_DURATION);
     } else if (DriverStation.isAutonomous()) {
       updateToAutoPattern();
+    } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
+      // Waiting for game piece
+      updateToWaitingForGamePiecePattern();
+    } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
+      // Has game piece
+      updateToHasGamePiecePattern();
+    } else if (intakeLEDState == IntakeLEDState.MANUAL_REPEL) {
+      // Manual repel
+      updateToManualRepelPattern();
+    } else if (intakeLEDState == IntakeLEDState.INTAKE_MANUALLY_TURNED_OFF) {
+      // Intake manually turned off
+      updateToIntakeManuallyTurnedOffPattern();
     } else { // teleop
 
       updateToTeleopPattern();
     }
+  }
+
+  private void updateToWaitingForGamePiecePattern() {
+    // blue white wave
+    wave(
+      Section.FULL,
+      Color.kBlue,
+      Color.kWhite,
+      WAVE_SLOW_CYCLE_LENGTH,
+      WAVE_SLOW_DURATION
+    );
+  }
+
+  private void updateToHasGamePiecePattern() {
+    // orange strobe
+    strobe(Section.FULL, Color.kOrange, STROBE_FAST_DURATION);
+  }
+
+  private void updateToManualRepelPattern() {
+    // pink strobe
+    strobe(Section.FULL, Color.kDeepPink, STROBE_FAST_DURATION);
+  }
+
+  private void updateToIntakeManuallyTurnedOffPattern() {
+    // yellow solid
+    solid(Section.FULL, Color.kYellow);
   }
 
   private void updateToTeleopPattern() {
