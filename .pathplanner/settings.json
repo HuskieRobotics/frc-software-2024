@@ -1,6 +1,6 @@
 {
-  "robotWidth": 0.84,
-  "robotLength": 0.84,
+  "robotWidth": 0.88,
+  "robotLength": 0.88,
   "holonomicMode": true,
   "pathFolders": [
     "2 Note Center Line",
@@ -9,9 +9,9 @@
     "4 Note Test Source side"
   ],
   "autoFolders": [],
-  "defaultMaxVel": 3.833,
-  "defaultMaxAccel": 8.269,
-  "defaultMaxAngVel": 537.5,
-  "defaultMaxAngAccel": 2390.0,
-  "maxModuleSpeed": 4.02
+  "defaultMaxVel": 3.88,
+  "defaultMaxAccel": 11.805,
+  "defaultMaxAngVel": 537.0,
+  "defaultMaxAngAccel": 2303.0,
+  "maxModuleSpeed": 3.88
 }

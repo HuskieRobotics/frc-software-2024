@@ -183,9 +183,8 @@ public class RobotContainer {
       layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
     }
     for (int i = 0; i < visionIOs.length; i++) {
-      // visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout);
+      visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout);
     }
-    vision = new Vision(new VisionIO[] {});
 
     // FIXME: create the hardware-specific subsystem class
     subsystem = new Subsystem(new SubsystemIO() {});
