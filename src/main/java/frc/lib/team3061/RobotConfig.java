@@ -640,7 +640,7 @@ public abstract class RobotConfig {
    *     facing angle
    */
   public double getDriveFacingAngleThetaKP() {
-    return 0.0;
+    return 6.0;
   }
 
   /**
