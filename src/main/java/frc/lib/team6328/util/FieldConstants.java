@@ -7,15 +7,11 @@
 
 package frc.lib.team6328.util;
 
-import static edu.wpi.first.apriltag.AprilTagFields.k2024Crescendo;
-
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import java.io.IOException;
 
 @java.lang.SuppressWarnings({"java:S1118", "java:S115", "java:S2386"})
 
@@ -31,35 +27,35 @@ import java.io.IOException;
  * Width refers to the <i>y</i> direction (as described by wpilib)
  */
 public class FieldConstants {
-  public static double fieldLength = Units.inchesToMeters(651.223);
-  public static double fieldWidth = Units.inchesToMeters(323.277);
+  public static final double fieldLength = Units.inchesToMeters(651.223);
+  public static final double fieldWidth = Units.inchesToMeters(323.277);
 
-  public static double blueWingX = Units.inchesToMeters(229.201);
-  public static double redWingX = fieldLength - blueWingX;
-  public static double bluePodiumX = Units.inchesToMeters(126.75);
-  public static double redPodiumX = fieldLength - bluePodiumX;
-  public static double blueStartingLineX = Units.inchesToMeters(74.111);
-  public static double redStartingLineX = fieldLength - blueStartingLineX;
+  public static final double blueWingX = Units.inchesToMeters(229.201);
+  public static final double redWingX = fieldLength - blueWingX;
+  public static final double bluePodiumX = Units.inchesToMeters(126.75);
+  public static final double redPodiumX = fieldLength - bluePodiumX;
+  public static final double blueStartingLineX = Units.inchesToMeters(74.111);
+  public static final double redStartingLineX = fieldLength - blueStartingLineX;
 
-  public static Translation2d blueAmpCenter =
+  public static final Translation2d blueAmpCenter =
       new Translation2d(Units.inchesToMeters(72.455), Units.inchesToMeters(322.996));
-  public static Translation2d redAmpCenter = FieldConstants.flipForRedSide(blueAmpCenter);
+  public static final Translation2d redAmpCenter = FieldConstants.flipForRedSide(blueAmpCenter);
 
   /** Staging locations for each note */
   public static final class StagingLocations {
-    public static double centerlineX = fieldLength / 2.0;
+    public static final double centerlineX = fieldLength / 2.0;
 
-    // mechadv says they need to be updated but they look correct
-    public static double centerlineFirstY = Units.inchesToMeters(29.638);
-    public static double centerlineSeparationY = Units.inchesToMeters(66);
-    public static double blueSpikeX = Units.inchesToMeters(114.0);
+    public static final double centerlineFirstY = Units.inchesToMeters(29.638);
+    private static final double centerlineSeparationY = Units.inchesToMeters(66);
+    private static final double blueSpikeX = Units.inchesToMeters(114.0);
     // should be right
-    public static double blueSpikeFirstY = Units.inchesToMeters(161.638);
-    public static double blueSpikeSeparationY = Units.inchesToMeters(57);
+    private static final double blueSpikeFirstY = Units.inchesToMeters(161.638);
+    private static final double blueSpikeSeparationY = Units.inchesToMeters(57);
 
-    public static Translation2d[] centerlineTranslations = new Translation2d[5];
-    public static Translation2d[] blueSpikeTranslations = new Translation2d[3];
-    public static Translation2d[] redSpikeTranslations = new Translation2d[3];
+    // Notes in center
+    public static final Translation2d[] centerlineTranslations = new Translation2d[5];
+    public static final Translation2d[] blueSpikeTranslations = new Translation2d[3];
+    public static final Translation2d[] redSpikeTranslations = new Translation2d[3];
 
     static {
       for (int i = 0; i < centerlineTranslations.length; i++) {
@@ -86,54 +82,45 @@ public class FieldConstants {
   public static final class BlueSpeaker {
 
     /** Center of the speaker opening (blue alliance) */
-    public static Pose2d blueCenterSpeakerOpening =
+    public static final Pose2d blueCenterSpeakerOpening =
         new Pose2d(0.0, fieldWidth - Units.inchesToMeters(104.0), new Rotation2d());
 
     // corners (blue alliance origin)
-    public static Translation3d blueTopRightSpeaker =
+    public static final Translation3d blueTopRightSpeaker =
         new Translation3d(
             Units.inchesToMeters(18.055),
             Units.inchesToMeters(238.815),
             Units.inchesToMeters(13.091));
 
-    public static Translation3d blueTopLeftSpeaker =
+    public static final Translation3d blueTopLeftSpeaker =
         new Translation3d(
             Units.inchesToMeters(18.055),
             Units.inchesToMeters(197.765),
             Units.inchesToMeters(83.091));
 
-    public static Translation3d blueBottomRightSpeaker =
+    public static final Translation3d blueBottomRightSpeaker =
         new Translation3d(0.0, Units.inchesToMeters(238.815), Units.inchesToMeters(78.324));
-    public static Translation3d blueBottomLeftSpeaker =
+    public static final Translation3d blueBottomLeftSpeaker =
         new Translation3d(0.0, Units.inchesToMeters(197.765), Units.inchesToMeters(78.324));
   }
 
   public static final class RedSpeaker {
     /** Center of the speaker opening (blue alliance) */
-    public static Pose2d redCenterSpeakerOpening =
-        new Pose2d(0.0, fieldWidth - Units.inchesToMeters(104.0), new Rotation2d());
+    public static final Pose2d redCenterSpeakerOpening =
+        flipForRedSide(BlueSpeaker.blueCenterSpeakerOpening);
 
     // corners (red alliance origin)
-    public static Translation3d redTopRightSpeaker =
+    public static final Translation3d redTopRightSpeaker =
         FieldConstants.flipForRedSide(BlueSpeaker.blueTopLeftSpeaker);
-    public static Translation3d redTopLeftSpeaker =
+    public static final Translation3d redTopLeftSpeaker =
         FieldConstants.flipForRedSide(BlueSpeaker.blueTopRightSpeaker);
-    public static Translation3d redBottomRightSpeaker =
+    public static final Translation3d redBottomRightSpeaker =
         FieldConstants.flipForRedSide(BlueSpeaker.blueBottomLeftSpeaker);
-    public static Translation3d redBottomLeftSpeaker =
+    public static final Translation3d redBottomLeftSpeaker =
         FieldConstants.flipForRedSide(BlueSpeaker.blueBottomRightSpeaker);
   }
 
-  public static double aprilTagWidth = Units.inchesToMeters(6.50);
-  public static AprilTagFieldLayout aprilTags;
-
-  static {
-    try {
-      aprilTags = AprilTagFieldLayout.loadFromResource(k2024Crescendo.m_resourceFile);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
+  public static final double aprilTagWidth = Units.inchesToMeters(6.50);
 
   public static Translation3d flipForRedSide(Translation3d translation) {
     return new Translation3d(

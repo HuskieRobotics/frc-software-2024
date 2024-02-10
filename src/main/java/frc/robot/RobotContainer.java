@@ -643,6 +643,7 @@ public class RobotContainer {
     if (alliance.isPresent() && alliance.get() != lastAlliance) {
       this.lastAlliance = alliance.get();
       this.drivetrain.updateAlliance(this.lastAlliance);
+      Field2d.getInstance().updateAlliance(this.lastAlliance);
     }
   }
 }
