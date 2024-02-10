@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.7987428243044774,
-        "y": 4.461828723942754
+        "x": 8.68,
+        "y": 7.51
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.7778742005415524,
-        "y": 4.485250397034318
+        "x": 8.621426509382687,
+        "y": 7.451426509382686
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.7427416909042077,
-        "y": 4.461828723942754
+        "x": 5.810980865898964,
+        "y": 6.90939356201109
       },
       "prevControl": {
-        "x": 0.7636103146671328,
-        "y": 4.461828723942754
+        "x": 5.799270029353184,
+        "y": 6.921104398556872
       },
       "nextControl": null,
       "isLocked": false,
@@ -39,14 +39,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 117.61302782308445,
+    "rotation": -165.2564371635293,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
-  "previewStartingState": {
-    "rotation": 119.19748604606451,
-    "velocity": 0
-  },
+  "folder": "6 Note Amp Side",
+  "previewStartingState": null,
   "useDefaultConstraints": false
 }

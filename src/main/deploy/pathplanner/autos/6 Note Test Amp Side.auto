@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3842846515935527,
-      "y": 5.960815801802787
+      "x": 0.8246156027195783,
+      "y": 6.814156597901747
     },
-    "rotation": -178.15238973400562
+    "rotation": -119.98163936884934
   },
   "command": {
     "type": "sequential",
@@ -14,31 +14,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "6 Note Amp Start-1"
+            "pathName": "6 Note Amp Start-4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "6 Note Amp 1-S"
+            "pathName": "6 Note Amp 4-S"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "6 Note Amp S-2"
+            "pathName": "6 Note Amp S-5"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "6 Note Amp Side 2-3"
+            "pathName": "6 Note Amp Side 5-1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "6 Note Amp Side 4-5"
+            "pathName": "6 Note Amp Side 1-2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Note 2-Note 3"
           }
         }
       ]

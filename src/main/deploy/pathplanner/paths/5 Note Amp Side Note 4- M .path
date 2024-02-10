@@ -3,32 +3,38 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.94,
-        "y": 6.28
+        "x": 8.28012348332389,
+        "y": 7.439674879349759
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.9410430719009586,
-        "y": 6.30620525592903
+        "x": 7.520368886891621,
+        "y": 7.193001309079541
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.94,
-        "y": 6.969528758501962
+        "x": 2.8598500563620233,
+        "y": 6.218454205809981
       },
       "prevControl": {
-        "x": 2.918536392628341,
-        "y": 6.946784541717231
+        "x": 4.206751702444517,
+        "y": 6.210030760188162
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.6,
+      "rotationDegrees": -179.32270321300805,
+      "rotateFast": true
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -39,14 +45,14 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 179.03396041730073,
+    "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "5 Note Test Amp Side",
+  "folder": "5 Note Amp Side",
   "previewStartingState": {
-    "rotation": 180.0,
-    "velocity": 0
+    "rotation": -91.30084773310149,
+    "velocity": 0.0
   },
   "useDefaultConstraints": false
 }

@@ -14,37 +14,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Start to Note"
+            "pathName": "5 Amp Side Start to Note 4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Note 1 -2 "
+            "pathName": "5 Note Amp Side Note 4- M "
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Note 2 -3"
+            "pathName": "5 Note Amp Side M- Note 1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Note 3 -4"
+            "pathName": "5 Note Amp Side Note 1- Note 2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Note 4 -5"
+            "pathName": "5 Note Amp Side 2-3"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Note 5-End"
+            "pathName": "5 Amp Side 3-End"
           }
         }
       ]

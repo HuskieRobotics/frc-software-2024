@@ -3,41 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.293678213604645,
-        "y": 5.773442417070284
+        "x": 8.45,
+        "y": 5.77
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.243678213604644,
-        "y": 5.773442417070284
+        "x": 3.5156569029257874,
+        "y": 7.155321129472502
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.576764134983334,
-        "y": 6.499514282908736
-      },
-      "prevControl": {
-        "x": 7.64958220358666,
-        "y": 6.0193699845316955
-      },
-      "nextControl": {
-        "x": 3.5831017816640043,
-        "y": 6.961323076615472
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.9066934025451485,
+        "x": 2.883271729453586,
         "y": 6.991369417831561
       },
       "prevControl": {
-        "x": 4.31199378803893,
-        "y": 6.792285196553275
+        "x": 2.9066934025451485,
+        "y": 7.003080254377343
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,12 +30,24 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1.0,
-      "rotationDegrees": -143.471144633015,
+      "waypointRelativePos": 0.0,
+      "rotationDegrees": 176.94187806593595,
       "rotateFast": true
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "New Constraints Zone",
+      "minWaypointRelativePos": 0.05,
+      "maxWaypointRelativePos": 0.2,
+      "constraints": {
+        "maxVelocity": 2.75,
+        "maxAcceleration": 4.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    }
+  ],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.0,
@@ -61,11 +57,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -128.88449643371453,
+    "rotation": -90.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "5 Note Amp Side 2",
+  "folder": "6 Note Amp Side",
   "previewStartingState": null,
   "useDefaultConstraints": false
 }

@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.82,
-      "y": 3.26
+      "x": 0.7543128599770712,
+      "y": 6.637696878997361
     },
-    "rotation": 91.21864282159774
+    "rotation": -121.4295656148386
   },
   "command": {
     "type": "sequential",
@@ -20,19 +20,43 @@
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "Start-1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Deploy Intake"
+            "name": "Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "2 Note 1 to Shoot"
+            "pathName": "Note 1-2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Note 2-Note 3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Note 3 - Shoot 3"
           }
         },
         {

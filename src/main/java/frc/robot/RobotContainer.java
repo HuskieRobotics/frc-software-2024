@@ -461,31 +461,26 @@ public class RobotContainer {
      * used for testing the 5 note autonomous
      *
      */
-    Command fiveNoteCommand = new PathPlannerAuto("5 Note Test Amp Side");
-    autoChooser.addOption("5 Note Test Amp Side", fiveNoteCommand);
+    Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Test Amp Side");
+    autoChooser.addOption("5 Note Test Amp Side", fiveNoteAmpSide;
 
-    Command fiveNoteCollectorSideCommand2 = new PathPlannerAuto("5 Note Test Collector Side");
-    autoChooser.addOption("5 Note Test Collector Side", fiveNoteCollectorSideCommand2);
+    Command fiveNoteCollectorSide = new PathPlannerAuto("5 Note Test Collector Side");
+    autoChooser.addOption("5 Note Test Collector Side", fiveNoteCollectorSide);
 
-    Command fiveNoteCommand3 = new PathPlannerAuto("5.1 Amp Side 2");
-    autoChooser.addOption("5.1 Amp Side 2", fiveNoteCommand3);
 
     /************ 6 Note ************
      *
      * used for testing the 6 note autonomous (Still Testing)
      *
      */
-    Command sixNoteCommand1 = new PathPlannerAuto("6 Note Test Amp Side");
-    autoChooser.addOption("6 Note Test Amp Side", sixNoteCommand1);
-
-    Command sixNoteCommand2 = new PathPlannerAuto("6 Note Step-by-Step");
-    autoChooser.addOption("6 Note Step-by-Step", sixNoteCommand2);
+    Command sixNoteAmpSide = new PathPlannerAuto("6 Note Test Amp Side");
+    autoChooser.addOption("6 Note Test Amp Side", sixNoteAmpSide);
 
     Command oneNoteExitBlue = new PathPlannerAuto("1 Note Exit Blue Auto");
     autoChooser.addOption("1 Note Exit Source", oneNoteExitBlue);
 
-    Command fourNoteAmpSide = new PathPlannerAuto("4 Note Side Wing");
-    autoChooser.addOption("4 Note Wing Amp Side", fourNoteAmpSide);
+    Command fourNoteAmpSide = new PathPlannerAuto("4 Note Inside Wing");
+    autoChooser.addOption("4 Note Inside Amp Side", fourNoteAmpSide);
 
     Command fourNoteTestSourceSide = new PathPlannerAuto("4 Note Test");
     autoChooser.addOption("4 Note Wing Source Side", fourNoteTestSourceSide);

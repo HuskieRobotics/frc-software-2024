@@ -26,13 +26,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "4 Source Starting Point 1 to Note 1"
+            "pathName": "4 Source Start to Note 3"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "4 Source Note 1 to Shoot 1"
+            "pathName": "4 Source Note 3 to Shoot"
           }
         },
         {
@@ -44,7 +44,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "4 Source Shoot 1 to Note 2"
+            "pathName": "4 Source Shoot to Note 2"
           }
         },
         {
@@ -56,7 +56,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "4 Source Note 2 to Note 3"
+            "pathName": "4 Source Note 2 to Note 1"
           }
         }
       ]

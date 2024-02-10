@@ -5,8 +5,10 @@
   "pathFolders": [
     "2 Note Center Line",
     "4 Note Inside Wing",
-    "5 Note Test Collector",
-    "4 Note Test Source side"
+    "4 Note Test Source side",
+    "5 Note Source Side",
+    "5 Note Amp Side",
+    "6 Note Amp Side"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.88,
