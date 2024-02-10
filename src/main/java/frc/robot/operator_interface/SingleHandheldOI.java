@@ -65,6 +65,4 @@ public class SingleHandheldOI implements OperatorInterface {
   public Trigger getLock180Button() {
     return new Trigger(controller::getAButton);
   }
-
-
 }
