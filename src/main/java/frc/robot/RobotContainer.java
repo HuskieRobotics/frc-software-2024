@@ -185,6 +185,7 @@ public class RobotContainer {
     for (int i = 0; i < visionIOs.length; i++) {
       visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout);
     }
+    vision = new Vision(visionIOs);
 
     // FIXME: create the hardware-specific subsystem class
     subsystem = new Subsystem(new SubsystemIO() {});
