@@ -12,9 +12,8 @@ import frc.lib.team3015.subsystem.FaultReporter;
 import org.littletonrobotics.junction.Logger;
 
 /**
- * Models a generic subsystem for a rotational mechanism. The other subsystems defined in this
- * library aren't good examples for typical robot subsystems. This class can serve as an example or
- * be used for quick prototyping.
+ * The climber subsystem is responsible for controlling the robot's climber. 
+ * It is composed of two motors that are used to control the climber's position and current.
  */
 public class Climber extends SubsystemBase {
 
@@ -22,7 +21,7 @@ public class Climber extends SubsystemBase {
   private ClimberIO io;
 
   /**
-   * Create a new subsystem with its associated hardware interface object.
+   * Create a new climber with its associated hardware interface object.
    *
    * @param io the hardware interface object for this subsystem
    */
@@ -30,7 +29,7 @@ public class Climber extends SubsystemBase {
 
     this.io = io;
 
-    // Create a Shuffleboard tab for this subsystem if testing is enabled. Add additional indicators
+    // Create a Shuffleboard tab for this climber if testing is enabled. Add additional indicators
     // and controls as needed.
     if (TESTING) {
       ShuffleboardTab tab = Shuffleboard.getTab(CLIMBER);
@@ -41,7 +40,7 @@ public class Climber extends SubsystemBase {
   }
 
   /**
-   * The subsystem's periodic method needs to update and process the inputs from the hardware
+   * The climber's periodic method needs to update and process the inputs from the hardware
    * interface object.
    */
   @Override
@@ -55,31 +54,35 @@ public class Climber extends SubsystemBase {
    *
    * @param power the current to set the motor to in amps
    */
-  public void setLeftMotorCurrent(double power) {
-    io.setLeftMotorPower(power);
+  public void setLeftMotorCurrent(double current) {
+    io.setLeftMotorPower(current);
   }
 
   /**
-   * Set the motor position to the specified value in degrees.
+   * Set the motor position to the specified value in meters.
    *
-   * @param position the position to set the motor to in degrees
+   * @param position the position to set the motor to in meters
    */
   public void setLeftMotorPosition(double position) {
     io.setLeftMotorPosition(position);
   }
 
-   public void setRightMotorCurrent(double power) {
-    io.setRightMotorPower(power);
+   public void setRightMotorCurrent(double current) {
+    io.setRightMotorPower(current);
   }
 
+  /**
+   * Set the motor position to the specified value in meters.
+   * 
+   * @param position the position to set the motor to in meters
+   */
   public void setRightMotorPosition(double position) {
-    io.setRightMotorPosition(position);
+    io.setRightMotorPosition(position); // FIXME: Needed info; starting point, arc length. Using these, we can calculate 
+    // the height of the arm. Why we would do this is becuase the rate that the arm's height changes is not constant.
   }
 
-  // FIXME: Is this how setPositionZero should be implemented?
-  public void setPositionZero() {
-    io.setLeftMotorPosition(0);
-    io.setRightMotorPosition(0);
+  public void setCurrentPositionZero() {
+    io.setPositionZero();
   }
 
   // FIXME: Needs a command check for the right motor. May need to change the commands that are used.

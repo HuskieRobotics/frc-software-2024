@@ -19,30 +19,20 @@ public class ClimberConstants {
   public static final double GEAR_RATIO = 25.0;
   public static final boolean MOTOR_INVERTED = false;
 
-  public static final double LEFT_POSITION_PID_P = 0.0;
-  public static final double LEFT_POSITION_PID_I = 0;
-  public static final double LEFT_POSITION_PID_D = 0;
-  public static final double LEFT_POSITION_PID_KS = 1.0;
-  public static final double LEFT_POSITION_PID_KV = 0.0;
-  public static final double LEFT_POSITION_PID_KA = 0.0;
-  public static final double LEFT_POSITION_PID_KV_EXPO = 0.0;
-  public static final double LEFT_POSITION_PID_KA_EXPO = 0.0;
+  public static final double KP = 0.0;
+  public static final double KI = 0;
+  public static final double KD = 0;
 
-  public static final double RIGHT_POSITION_PID_P = 0.0;
-  public static final double RIGHT_POSITION_PID_I = 0;
-  public static final double RIGHT_POSITION_PID_D = 0;
-  public static final double RIGHT_POSITION_PID_KS = 1.0;
-  public static final double RIGHT_POSITION_PID_KV = 0.0;
-  public static final double RIGHT_POSITION_PID_KA = 0.0;
-  public static final double RIGHT_POSITION_PID_KV_EXPO = 0.0;
-  public static final double RIGHT_POSITION_PID_KA_EXPO = 0.0;
-
-  public static final double POSITION_PID_KG = 0.0; // FIXME: update position PID KG
+  public static final double KS = 1.0;
+  public static final double KV = 0.0;
+  public static final double KA = 0.0;
+  public static final double KV_EXPO = 0.0;
+  public static final double KA_EXPO = 0.0;
+  public static final double KG = 0.0; // FIXME: Update all K values
 
   public static final double CONTINUOUS_CURRENT_LIMIT = 40;
   public static final double PEAK_CURRENT_LIMIT = 50;
   public static final double PEAK_CURRENT_DURATION = 0.2;
 
   public static final int TIMEOUT_MS = 30;
-  public static final int SLOT_INDEX = 0;
 }

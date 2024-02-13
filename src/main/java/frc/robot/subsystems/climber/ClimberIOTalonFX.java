@@ -12,6 +12,7 @@ import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.core.CoreCANcoder;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -28,17 +29,14 @@ public class ClimberIOTalonFX implements ClimberIO {
   private TalonFX leftMotor;
   private TalonFX rightMotor;
 
+  private CoreCANcoder leftEncoder;
+  private CoreCANcoder rightEncoder;
+
   private MotionMagicExpoTorqueCurrentFOC leftPositionCurrentRequest;
   private TorqueCurrentFOC leftSupplyAmpsRequest;
 
   private MotionMagicExpoTorqueCurrentFOC rightPositionCurrentRequest;
   private TorqueCurrentFOC rightSupplyAmpsRequest;
-
-  private double leftRequestedReferenceSetpointMeters;
-  private double leftRequestedSupplyAmps;
-
-  private double rightRequestedReferenceSetpointMeters;
-  private double rightRequestedSupplyAmps;
 
   private StatusSignal<Double> leftVelocityRPSStatusSignal;
   private StatusSignal<Double> leftPositionMeterStatusSignal;
@@ -56,43 +54,28 @@ public class ClimberIOTalonFX implements ClimberIO {
       new Alert("Failed to apply configuration for Climber.", AlertType.ERROR);
 
   // FIXME: Add KV, KA, 
-  private final TunableNumber leftMotorKP =
-      new TunableNumber("Climber/leftMotorKP", LEFT_POSITION_PID_P);
-  private final TunableNumber leftMotorKI =
-      new TunableNumber("Climber/leftMotorKI", LEFT_POSITION_PID_I);
-  private final TunableNumber leftMotorKD =
-      new TunableNumber("Climber/leftMotorKD", LEFT_POSITION_PID_D);
-  private final TunableNumber leftMotorKS =
-      new TunableNumber("Climber/leftMotorKS", LEFT_POSITION_PID_KS);
-  private final TunableNumber leftMotorKV =
-      new TunableNumber("Climber/leftMotorKV", LEFT_POSITION_PID_KV);
-  private final TunableNumber leftMotorKA = 
-      new TunableNumber("Climber/leftMotorKA", LEFT_POSITION_PID_KA);
-  private final TunableNumber leftMotorKVExpo = 
-      new TunableNumber("Climber/leftMotorKVExpo", LEFT_POSITION_PID_KV_EXPO);
-  private final TunableNumber leftMotorKAExpo = 
-      new TunableNumber("Climber/leftMotorKAExpo", LEFT_POSITION_PID_KA_EXPO);
-  
-
-  private final TunableNumber rightMotorKP =
-      new TunableNumber("Climber/rightMotorKP", RIGHT_POSITION_PID_P);
-  private final TunableNumber rightMotorKI =
-      new TunableNumber("Climber/rightMotorKI", RIGHT_POSITION_PID_I);
-  private final TunableNumber rightMotorKD =
-      new TunableNumber("Climber/rightMotorKD", RIGHT_POSITION_PID_D);
-  private final TunableNumber rightMotorKS =
-      new TunableNumber("Climber/rightMotorKS", RIGHT_POSITION_PID_KS);
-  private final TunableNumber rightMotorKV = 
-      new TunableNumber("Climber/rightMotorKV", RIGHT_POSITION_PID_KV);
-  private final TunableNumber rightMotorKA = 
-      new TunableNumber("Climber/rightMotorKA", RIGHT_POSITION_PID_KA);
-  private final TunableNumber rightMotorKVExpo = 
-      new TunableNumber("Climber/rightMotorKVExpo", RIGHT_POSITION_PID_KV_EXPO);
-  private final TunableNumber rightMotorKAExpo = 
-      new TunableNumber("Climber/rightMotorKAExpo", RIGHT_POSITION_PID_KA_EXPO);
+  private final TunableNumber kP =
+      new TunableNumber("Climber/KP", KP);
+  private final TunableNumber kI =
+      new TunableNumber("Climber/KI", KI);
+  private final TunableNumber kD =
+      new TunableNumber("Climber/KD", KD);
+      
+  private final TunableNumber kS =
+      new TunableNumber("Climber/KS", KS);
+  private final TunableNumber kV =
+      new TunableNumber("Climber/KV", KV);
+  private final TunableNumber kA = 
+      new TunableNumber("Climber/KA", KA);
+  private final TunableNumber kVExpo = 
+      new TunableNumber("Climber/KVExpo", KV_EXPO);
+  private final TunableNumber kAExpo = 
+      new TunableNumber("Climber/KAExpo", KA_EXPO);
 
   /** Create a TalonFX-specific generic SubsystemIO */
   public ClimberIOTalonFX() {
+    configMotors(leftMotor, rightMotor);
+
     leftVelocityRPSStatusSignal = leftMotor.getVelocity();
     leftPositionMeterStatusSignal = leftMotor.getPosition();
     leftStatorCurrentAmpsStatusSignal = leftMotor.getStatorCurrent();
@@ -106,9 +89,6 @@ public class ClimberIOTalonFX implements ClimberIO {
 
     leftPositionCurrentRequest = new MotionMagicExpoTorqueCurrentFOC(0.0);
     rightPositionCurrentRequest = new MotionMagicExpoTorqueCurrentFOC(0.0);
-
-    leftConfigMotor(LEFT_MOTOR_CAN_ID);
-    rightConfigMotor(RIGHT_MOTOR_CAN_ID);
   }
 
   /**
@@ -142,49 +122,33 @@ public class ClimberIOTalonFX implements ClimberIO {
     inputs.rightSupplyCurrentAmps = rightSupplyCurrentAmpsStatusSignal.getValueAsDouble();
     inputs.rightCurrentSetpoint = rightSetpointStatusSignal.getValueAsDouble();
 
-    inputs.leftReferenceSetpointMeters = leftRequestedReferenceSetpointMeters;
-    inputs.leftSupplyCurrentAmps = leftRequestedSupplyAmps;
-
-    inputs.rightReferenceSetpointMeters = rightRequestedReferenceSetpointMeters;
-    inputs.rightSupplyCurrentAmps = rightRequestedSupplyAmps;
-
     // inputs.closedLoopError = leftMotor.getClosedLoopError().getValue();
     // inputs.power =
     // inputs.controlMode = leftMotor.getControlMode().toString();
 
     // update configuration if tunables have changed
-    if (leftMotorKP.hasChanged()
-        || leftMotorKI.hasChanged()
-        || leftMotorKD.hasChanged()
-        || leftMotorKS.hasChanged()
-        || rightMotorKP.hasChanged()
-        || rightMotorKI.hasChanged()
-        || rightMotorKD.hasChanged()
-        || rightMotorKS.hasChanged()) {
+    if (kP.hasChanged()
+        || kI.hasChanged()
+        || kD.hasChanged()
+        || kS.hasChanged()
+        || kA.hasChanged()
+        || kV.hasChanged()
+        || kVExpo.hasChanged()
+        || kAExpo.hasChanged()) {
       TalonFXConfiguration config = new TalonFXConfiguration();
       MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
 
       this.leftMotor.getConfigurator().refresh(config);
-      config.Slot0.kP = leftMotorKP.get();
-      config.Slot0.kI = leftMotorKI.get();
-      config.Slot0.kD = leftMotorKD.get();
-      config.Slot0.kS = leftMotorKS.get();
-      config.Slot0.kV = leftMotorKV.get();
-      config.Slot0.kA = leftMotorKA.get();
-      motionMagicConfigs.MotionMagicExpo_kV = leftMotorKVExpo.get();
-      motionMagicConfigs.MotionMagicExpo_kA = leftMotorKAExpo.get();
+      config.Slot0.kP = kP.get();
+      config.Slot0.kI = kI.get();
+      config.Slot0.kD = kD.get();
+      config.Slot0.kS = kS.get();
+      config.Slot0.kV = kV.get();
+      config.Slot0.kA = kA.get();
+      motionMagicConfigs.MotionMagicExpo_kV = kVExpo.get();
+      motionMagicConfigs.MotionMagicExpo_kA = kAExpo.get();
 
       this.leftMotor.getConfigurator().apply(config);
-
-      this.rightMotor.getConfigurator().refresh(config);
-      config.Slot0.kP = rightMotorKP.get();
-      config.Slot0.kI = rightMotorKI.get();
-      config.Slot0.kD = rightMotorKD.get();
-      config.Slot0.kS = rightMotorKS.get();
-      config.Slot0.kV = rightMotorKV.get();
-      config.Slot0.kA = rightMotorKA.get();
-      motionMagicConfigs.MotionMagicExpo_kV = rightMotorKVExpo.get();
-      motionMagicConfigs.MotionMagicExpo_kA = rightMotorKAExpo.get();
       this.rightMotor.getConfigurator().apply(config);
     }
   }
@@ -200,7 +164,7 @@ public class ClimberIOTalonFX implements ClimberIO {
     leftMotor.setControl(
         leftPositionCurrentRequest
             .withPosition(Conversions.degreesToFalconRotations(position, GEAR_RATIO))
-            .withFeedForward(POSITION_PID_KG)); 
+            .withFeedForward(KG)); 
   }
 
   @Override
@@ -208,23 +172,31 @@ public class ClimberIOTalonFX implements ClimberIO {
     this.rightMotor.setControl(
         rightPositionCurrentRequest
             .withPosition(Conversions.degreesToFalconRotations(position, GEAR_RATIO))
-            .withFeedForward(POSITION_PID_KG));
+            .withFeedForward(KG));
   }
 
   @Override
   public void setLeftMotorPower(double current) {
-    leftMotor.setControl(leftSupplyAmpsRequest.withOutput(current)); // FIXME: Is this how we set current?
-    leftRequestedSupplyAmps = current;
+    leftMotor.setControl(leftSupplyAmpsRequest.withOutput(current)); 
   }
 
   @Override
   public void setRightMotorPower(double current) {
-    rightMotor.setControl(leftSupplyAmpsRequest.withOutput(current));    
-    rightRequestedSupplyAmps = current;
+    rightMotor.setControl(rightSupplyAmpsRequest.withOutput(current)); 
   }
 
-  private void leftConfigMotor(int leftMotorID) {
-    this.leftMotor = new TalonFX(leftMotorID, RobotConfig.getInstance().getCANBusName());
+  @Override
+  public void setPositionZero() {
+    leftEncoder.setPosition(0);
+    rightEncoder.setPosition(0);
+  }
+
+  private void configMotors(TalonFX leftMotor, TalonFX rightMotor) {
+    this.leftMotor = new TalonFX(LEFT_MOTOR_CAN_ID, RobotConfig.getInstance().getCANBusName());
+    this.rightMotor = new TalonFX(RIGHT_MOTOR_CAN_ID, RobotConfig.getInstance().getCANBusName());
+
+    this.leftEncoder = new CoreCANcoder(LEFT_MOTOR_CAN_ID);
+    this.rightEncoder = new CoreCANcoder(RIGHT_MOTOR_CAN_ID);
 
     TalonFXConfiguration config = new TalonFXConfiguration();
 
@@ -239,14 +211,16 @@ public class ClimberIOTalonFX implements ClimberIO {
     config.MotorOutput.Inverted =
         MOTOR_INVERTED ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.Slot0.kP = leftMotorKP.get();
-    config.Slot0.kI = leftMotorKI.get();
-    config.Slot0.kD = leftMotorKD.get();
+    config.Slot0.kP = kP.get();
+    config.Slot0.kI = kI.get();
+    config.Slot0.kD = kD.get();
 
     StatusCode status = StatusCode.StatusCodeNotInitialized;
+    StatusCode rightStatus = StatusCode.StatusCodeNotInitialized;
     for (int i = 0; i < 5; ++i) {
       status = this.leftMotor.getConfigurator().apply(config);
-      if (status.isOK()) {
+      rightStatus = this.rightMotor.getConfigurator().apply(config);
+      if (status.isOK() && rightStatus.isOK()) {
         configAlert.set(false);
         break;
       }
@@ -256,49 +230,8 @@ public class ClimberIOTalonFX implements ClimberIO {
       configAlert.setText(status.toString());
     }
 
-    this.leftMotor.setPosition(0);
-
+    setPositionZero();
     FaultReporter.getInstance().registerHardware(CLIMBER, "Climber leftMotor", leftMotor);
-  }
-
-  private void rightConfigMotor(int rightMotorID) {
-    this.rightMotor = new TalonFX(rightMotorID, RobotConfig.getInstance().getCANBusName());
-
-    TalonFXConfiguration config = new TalonFXConfiguration();    
-    
-    CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
-    currentLimits.SupplyCurrentLimit = CONTINUOUS_CURRENT_LIMIT;
-    currentLimits.SupplyCurrentThreshold = PEAK_CURRENT_LIMIT;
-    currentLimits.SupplyTimeThreshold = PEAK_CURRENT_DURATION;
-    currentLimits.SupplyCurrentLimitEnable = true;
-    config.CurrentLimits = currentLimits;
-
-    config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
-    config.MotorOutput.Inverted =
-        MOTOR_INVERTED ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.Slot0.kP = rightMotorKP.get();
-    config.Slot0.kI = rightMotorKI.get();
-    config.Slot0.kD = rightMotorKD.get();
-
-    config.Voltage.PeakForwardVoltage = rightMotorKS.get();
-    config.Voltage.PeakReverseVoltage = rightMotorKS.get();
-
-    StatusCode status = StatusCode.StatusCodeNotInitialized;
-    for (int i = 0; i < 5; ++i) {
-      status = this.rightMotor.getConfigurator().apply(config);
-      if (status.isOK()) {
-        configAlert.set(false);
-        break;
-      }
-    }
-    if (!status.isOK()) {
-      configAlert.set(true);
-      configAlert.setText(status.toString());
-    }
-
-    this.rightMotor.setPosition(0);
-
     FaultReporter.getInstance().registerHardware(CLIMBER, "Climber rightMotor", rightMotor);
   }
 }
