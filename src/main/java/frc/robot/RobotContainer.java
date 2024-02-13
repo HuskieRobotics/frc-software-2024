@@ -468,7 +468,6 @@ public class RobotContainer {
     Command fiveNoteCollectorSide = new PathPlannerAuto("5 Note Test Collector Side");
     autoChooser.addOption("5 Note Test Collector Side", fiveNoteCollectorSide);
 
-
     /************ 6 Note ************
      *
      * used for testing the 6 note autonomous (Still Testing)
@@ -485,6 +484,30 @@ public class RobotContainer {
 
     Command fourNoteTestSourceSide = new PathPlannerAuto("4 Note Test");
     autoChooser.addOption("4 Note Wing Source Side", fourNoteTestSourceSide);
+
+    // 1 note Anywhere
+
+    // Command test = Commands.runOnce(()->{System.out.println("hi");}, drivetrain);
+    /*
+     * shoot
+     * drive out for a 2 seconds
+     */
+    // Command oneNoteAnywhere = Commands.race(Commands.run(()-> {drivetrain.drive(3, 0, 0, true,
+    // true);}), Commands.waitSeconds(2.0));
+    Command oneNoteAnywhere =
+        Commands.run(
+                () -> {
+                  drivetrain.drive(3, 0, 0, true, true);
+                },
+                drivetrain)
+            .withTimeout(2)
+            .andThen(
+                Commands.runOnce(
+                    () -> {
+                      drivetrain.drive(0, 0, 0, false, false);
+                    },
+                    drivetrain));
+    autoChooser.addOption("One Note Anywhere", oneNoteAnywhere);
 
     /************ Drive Velocity Tuning ************
      *
