@@ -497,10 +497,10 @@ public class RobotContainer {
     Command oneNoteAnywhere =
         Commands.run(
                 () -> {
-                  drivetrain.drive(3, 0, 0, true, true);
+                  drivetrain.drive(1, 0, 0, false, true);
                 },
                 drivetrain)
-            .withTimeout(2)
+            .withTimeout(2.5)
             .andThen(
                 Commands.runOnce(
                     () -> {
