@@ -16,7 +16,7 @@ public class ShooterConstants {
   public static final int BOTTOM_SHOOTER_MOTOR_ID = 13;
   public static final int ANGLE_MOTOR_ID = 14;
   public static final int DUNKER_MOTOR_ID = 17;
-  public static final int ANGLE_ENCODER_ID = 0;
+  public static final int ANGLE_ENCODER_ID = 4;
 
   // Shooter Velocity PID Constants
   public static final double SHOOT_KP = 0.0;
@@ -53,21 +53,24 @@ public class ShooterConstants {
   public static final double ANGLE_MOTOR_STATOR_CURRENT_LIMIT = 30;
   public static final double ANGLE_MOTOR_STATOR_CURRENT_PEAK = 40;
   public static final double ANGLE_MOTOR_STATOR_CURRENT_LIMIT_TIME = 0.5;
+  public static final double MOTION_MAGIC_CRUISE_VELOCITY = 0;
+  public static final double MOTION_MAGIC_ACCELERATION = 0;
+  public static final double MOTION_MAGIC_JERK = 0;
+  public static final double ANGLE_MOTOR_GEAR_RATIO = 1;
   public static final boolean ANGLE_MOTOR_INVERTED = false;
-  // 0.01
 
   // Dunker Motor
   public static final double DUNKER_MOTOR_CONTINUOUS_CURRENT_LIMIT = 15;
   public static final double DUNKER_MOTOR_PEAK_CURRENT_LIMIT = 20;
   public static final double DUNKER_MOTOR_PEAK_CURRENT_DURATION = 0.5;
-  public static final double DUNKER_MOTOR_GEAR_RATIO = 0.06667;
+  public static final double DUNKER_MOTOR_GEAR_RATIO = 15;
   public static final boolean DUNKER_MOTOR_INVERTED = false;
 
   // Feed Forward Constants (More Need to be added)
   public static final double POSITION_FEEDFORWARD = 0.0;
 
   public static final double MAGNET_OFFSET = 0.0;
-  public static final double SENSOR_TO_MECHANISM_RATIO = 0.0;
-  public static final double ROTOR_TO_SENSOR_RATIO = 0.0;
+  public static final double SENSOR_TO_MECHANISM_RATIO = 1;
+  public static final double ROTOR_TO_SENSOR_RATIO = 100;
 
 }
