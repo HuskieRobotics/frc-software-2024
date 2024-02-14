@@ -10,13 +10,10 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.core.CoreCANcoder;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
-import edu.wpi.first.units.Current;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.swerve.Conversions;
@@ -39,7 +36,7 @@ public class ClimberIOTalonFX implements ClimberIO {
   private TorqueCurrentFOC rightSupplyAmpsRequest;
 
   private StatusSignal<Double> leftVelocityRPSStatusSignal;
-  private StatusSignal<Double> leftPositionMeterStatusSignal;
+  private StatusSignal<Double> leftPositionRotationsStatusSignal;
   private StatusSignal<Double> leftStatorCurrentAmpsStatusSignal;
   private StatusSignal<Double> leftSetpointStatusSignal;
   private StatusSignal<Double> leftSupplyCurrentAmpsStatusSignal;
@@ -53,34 +50,25 @@ public class ClimberIOTalonFX implements ClimberIO {
   private Alert configAlert =
       new Alert("Failed to apply configuration for Climber.", AlertType.ERROR);
 
-  // FIXME: Add KV, KA, 
-  private final TunableNumber kP =
-      new TunableNumber("Climber/KP", KP);
-  private final TunableNumber kI =
-      new TunableNumber("Climber/KI", KI);
-  private final TunableNumber kD =
-      new TunableNumber("Climber/KD", KD);
-      
-  private final TunableNumber kS =
-      new TunableNumber("Climber/KS", KS);
-  private final TunableNumber kV =
-      new TunableNumber("Climber/KV", KV);
-  private final TunableNumber kA = 
-      new TunableNumber("Climber/KA", KA);
-  private final TunableNumber kVExpo = 
-      new TunableNumber("Climber/KVExpo", KV_EXPO);
-  private final TunableNumber kAExpo = 
-      new TunableNumber("Climber/KAExpo", KA_EXPO);
+  // FIXME: Add KV, KA,
+  private final TunableNumber kP = new TunableNumber("Climber/KP", KP);
+  private final TunableNumber kI = new TunableNumber("Climber/KI", KI);
+  private final TunableNumber kD = new TunableNumber("Climber/KD", KD);
+
+  private final TunableNumber kS = new TunableNumber("Climber/KS", KS);
+  private final TunableNumber kV = new TunableNumber("Climber/KV", KV);
+  private final TunableNumber kA = new TunableNumber("Climber/KA", KA);
+  private final TunableNumber kVExpo = new TunableNumber("Climber/KVExpo", KV_EXPO);
+  private final TunableNumber kAExpo = new TunableNumber("Climber/KAExpo", KA_EXPO);
 
   /** Create a TalonFX-specific generic SubsystemIO */
   public ClimberIOTalonFX() {
     configMotors(leftMotor, rightMotor);
 
     leftVelocityRPSStatusSignal = leftMotor.getVelocity();
-    leftPositionMeterStatusSignal = leftMotor.getPosition();
+    leftPositionRotationsStatusSignal = leftMotor.getPosition();
     leftStatorCurrentAmpsStatusSignal = leftMotor.getStatorCurrent();
-    leftSetpointStatusSignal =
-        leftMotor.getClosedLoopReference(); 
+    leftSetpointStatusSignal = leftMotor.getClosedLoopReference();
 
     rightVelocityRPSStatusSignal = rightMotor.getVelocity();
     rightPositionMetersStatusSignal = rightMotor.getPosition();
@@ -100,7 +88,7 @@ public class ClimberIOTalonFX implements ClimberIO {
   public void updateInputs(ClimberIOInputs inputs) { // FIXME: May need inputs for both motors
     BaseStatusSignal.refreshAll(
         leftVelocityRPSStatusSignal,
-        leftPositionMeterStatusSignal,
+        leftPositionRotationsStatusSignal,
         leftStatorCurrentAmpsStatusSignal,
         leftSetpointStatusSignal,
         leftSupplyCurrentAmpsStatusSignal,
@@ -111,16 +99,17 @@ public class ClimberIOTalonFX implements ClimberIO {
         rightSupplyCurrentAmpsStatusSignal);
 
     inputs.leftVelocityRPS = leftVelocityRPSStatusSignal.getValueAsDouble();
-    inputs.leftPositionMeters = leftPositionMeterStatusSignal.getValueAsDouble();
+    inputs.leftPositionMeters =
+        leftPositionRotationsStatusSignal.getValueAsDouble() * DRUM_CIRCUMFERENCE;
     inputs.leftStatorCurrentAmps = leftStatorCurrentAmpsStatusSignal.getValueAsDouble();
     inputs.leftSupplyCurrentAmps = leftSupplyCurrentAmpsStatusSignal.getValueAsDouble();
-    inputs.leftCurrentSetpoint = leftSetpointStatusSignal.getValueAsDouble();
+    inputs.leftSetpoint = leftSetpointStatusSignal.getValueAsDouble();
 
     inputs.rightVelocityRPS = rightVelocityRPSStatusSignal.getValueAsDouble();
     inputs.rightPositionMeters = rightPositionMetersStatusSignal.getValueAsDouble();
     inputs.rightStatorCurrentAmps = rightStatorCurrentAmpsStatusSignal.getValueAsDouble();
     inputs.rightSupplyCurrentAmps = rightSupplyCurrentAmpsStatusSignal.getValueAsDouble();
-    inputs.rightCurrentSetpoint = rightSetpointStatusSignal.getValueAsDouble();
+    inputs.rightSetpoint = rightSetpointStatusSignal.getValueAsDouble();
 
     // inputs.closedLoopError = leftMotor.getClosedLoopError().getValue();
     // inputs.power =
@@ -164,7 +153,7 @@ public class ClimberIOTalonFX implements ClimberIO {
     leftMotor.setControl(
         leftPositionCurrentRequest
             .withPosition(Conversions.degreesToFalconRotations(position, GEAR_RATIO))
-            .withFeedForward(KG)); 
+            .withFeedForward(KG));
   }
 
   @Override
@@ -177,12 +166,12 @@ public class ClimberIOTalonFX implements ClimberIO {
 
   @Override
   public void setLeftMotorPower(double current) {
-    leftMotor.setControl(leftSupplyAmpsRequest.withOutput(current)); 
+    leftMotor.setControl(leftSupplyAmpsRequest.withOutput(current));
   }
 
   @Override
   public void setRightMotorPower(double current) {
-    rightMotor.setControl(rightSupplyAmpsRequest.withOutput(current)); 
+    rightMotor.setControl(rightSupplyAmpsRequest.withOutput(current));
   }
 
   @Override

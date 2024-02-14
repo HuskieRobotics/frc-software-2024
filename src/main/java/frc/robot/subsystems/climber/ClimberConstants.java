@@ -17,6 +17,7 @@ public class ClimberConstants {
 
   // FIXME: update gear ratio
   public static final double GEAR_RATIO = 25.0;
+  public static final double DRUM_CIRCUMFERENCE = 0.0254;
   public static final boolean MOTOR_INVERTED = false;
 
   public static final double KP = 0.0;
