@@ -125,6 +125,16 @@ public class FieldConstants {
         FieldConstants.flipForRedSide(BlueSpeaker.blueBottomRightSpeaker);
   }
 
+  public static class RedSource{
+    public static Translation2d redSourceCenter = new Translation2d(Units.inchesToMeters(35.6247), Units.inchesToMeters(21.9704));
+    public static Pose2d redSourcePose = new Pose2d(redSourceCenter, new Rotation2d(2.8163-(Math.PI)/2));
+  }
+
+  public static class BlueSource{
+    public static Translation2d blueSourceCenter = flipForRedSide(RedSource.redSourceCenter);
+    public static Pose2d blueSourcePose = flipForRedSide(RedSource.redSourcePose);
+  }
+
   public static double aprilTagWidth = Units.inchesToMeters(6.50);
   public static AprilTagFieldLayout aprilTags;
 
