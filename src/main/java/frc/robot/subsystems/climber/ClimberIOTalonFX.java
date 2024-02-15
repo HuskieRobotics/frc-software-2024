@@ -145,23 +145,21 @@ public class ClimberIOTalonFX implements ClimberIO {
   /**
    * Set the leftMotor position to the specified value in degrees.
    *
-   * @param position the position to set the leftMotor to in degrees
+   * @param position the position to set the leftMotor to in meters
    * @param arbitraryFeedForward the arbitrary feed forward as a percentage of maximum power
    */
   @Override
   public void setLeftMotorPosition(double position) {
     leftMotor.setControl(
         leftPositionCurrentRequest
-            .withPosition(Conversions.degreesToFalconRotations(position, GEAR_RATIO))
-            .withFeedForward(KG));
+            .withPosition(Conversions.degreesToFalconRotations(position, GEAR_RATIO))); // FIXME: Feed forward should be acounted for already.
   }
 
   @Override
   public void setRightMotorPosition(double position) {
     this.rightMotor.setControl(
         rightPositionCurrentRequest
-            .withPosition(Conversions.degreesToFalconRotations(position, GEAR_RATIO))
-            .withFeedForward(KG));
+            .withPosition(Conversions.degreesToFalconRotations(position, GEAR_RATIO)));
   }
 
   @Override
