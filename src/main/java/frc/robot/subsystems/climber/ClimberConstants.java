@@ -31,9 +31,10 @@ public class ClimberConstants {
   public static final double KA_EXPO = 0.0;
   public static final double KG = 0.0; // FIXME: Update all K values
 
-  public static final double CONTINUOUS_CURRENT_LIMIT = 40;
-  public static final double PEAK_CURRENT_LIMIT = 50;
-  public static final double PEAK_CURRENT_DURATION = 0.2;
+  public static final double CONTINUOUS_CURRENT_LIMIT = 50;
+  public static final double PEAK_CURRENT_LIMIT = 60;
+  public static final double PEAK_CURRENT_DURATION = 0.5;
+  public static final double STATOR_CURRENT_LIMIT = ; // FIXME: Update stator current limit. Software feature sheet is not updated
 
   public static final int TIMEOUT_MS = 30;
 }

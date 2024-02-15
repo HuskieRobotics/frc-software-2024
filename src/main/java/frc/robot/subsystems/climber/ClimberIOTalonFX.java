@@ -189,6 +189,7 @@ public class ClimberIOTalonFX implements ClimberIO {
 
     CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
     currentLimits.SupplyCurrentLimit = CONTINUOUS_CURRENT_LIMIT;
+    currentLimits.StatorCurrentLimit = STATOR_CURRENT_LIMIT;
     currentLimits.SupplyCurrentThreshold = PEAK_CURRENT_LIMIT;
     currentLimits.SupplyTimeThreshold = PEAK_CURRENT_DURATION;
     currentLimits.SupplyCurrentLimitEnable = true;
