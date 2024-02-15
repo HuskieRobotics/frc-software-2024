@@ -5,12 +5,16 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.Drivetrain;
 import frc.lib.team6328.util.FieldConstants;
+import frc.lib.team6328.util.FieldConstants.BlueSource;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -227,4 +231,23 @@ public class Field2d {
       return FieldConstants.BlueSpeaker.blueCenterSpeakerOpening;
     }
   }
+
+
+  public Pose2d getRobotSourcePose(){
+
+    double distanceFromSource = ((RobotConfig.getInstance().getRobotLengthWithBumpers())/2) + Units.inchesToMeters(6);
+
+    if (alliance == Alliance.Blue) {
+      return FieldConstants.BlueSource.blueSourcePose.plus(new Transform2d(Math.cos(FieldConstants.BlueSource.blueSourcePose.getRotation().getRadians())*distanceFromSource, Math.sin(FieldConstants.BlueSource.blueSourcePose.getRotation().getRadians())*distanceFromSource, new Rotation2d())).plus(new Transform2d(0,0, new Rotation2d(Math.PI)));
+
+    } else {
+      return FieldConstants.RedSource.redSourcePose.plus(new Transform2d(Math.cos(FieldConstants.RedSource.redSourcePose.getRotation().getRadians())*distanceFromSource, Math.sin(FieldConstants.RedSource.redSourcePose.getRotation().getRadians())*distanceFromSource, new Rotation2d())).plus(new Transform2d(0,0, new Rotation2d(Math.PI)));
+
+    }
+
+    
+
+  }
+
+  
 }
