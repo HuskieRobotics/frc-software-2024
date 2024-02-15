@@ -46,6 +46,7 @@ import frc.robot.configs.NovaRobotConfig;
 import frc.robot.configs.PracticeRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.subsystem.Subsystem;
 import frc.robot.subsystems.subsystem.SubsystemIO;
 import java.io.IOException;
@@ -67,6 +68,7 @@ public class RobotContainer {
   private Alliance lastAlliance = DriverStation.Alliance.Red;
   private Vision vision;
   private Subsystem subsystem;
+  private Shooter shooter;
 
   // use AdvantageKit's LoggedDashboardChooser instead of SendableChooser to ensure accurate logging
   private final LoggedDashboardChooser<Command> autoChooser =
@@ -612,6 +614,7 @@ public class RobotContainer {
     if (alliance.isPresent() && alliance.get() != lastAlliance) {
       this.lastAlliance = alliance.get();
       this.drivetrain.updateAlliance(this.lastAlliance);
+      this.shooter.updateAlliance(this.lastAlliance);
     }
   }
 }

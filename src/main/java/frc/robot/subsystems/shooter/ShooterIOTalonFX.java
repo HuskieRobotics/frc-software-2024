@@ -19,6 +19,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team6328.util.TunableNumber;
@@ -122,6 +123,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     configShootMotor(shootMotorBottom, SHOOT_BOTTOM_INVERTED);
     configAngleMotor(angleMotor, angleEncoder);
     configDunkerMotor(dunkerMotor);
+
   }
 
   @Override
@@ -154,6 +156,7 @@ public class ShooterIOTalonFX implements ShooterIO {
       topShootMotorConfig.kI = shootMotorsKI.get();
       topShootMotorConfig.kD = shootMotorsKD.get();
       topShootMotorConfig.kS = shootMotorsKS.get();
+      
       shootMotorTop.getConfigurator().apply(topShootMotorConfig);
     }
 
