@@ -8,7 +8,7 @@ public class NoteTargeting extends SubsystemBase{
     private final NoteTargetingIO rightio;
     public final String SUBSYSTEM_NAME = "NoteTargeting";
     private NoteTargetingIOInputsAutoLogged primaryTarget = null;
-    private PIDController pid = new PIDController(0.0, 0.0, 0.0);
+    private PIDController pid = new PIDController(0.1, 0.0, 0.1);
     private NoteTargetingIOInputsAutoLogged leftInputs = new NoteTargetingIOInputsAutoLogged();
     private NoteTargetingIOInputsAutoLogged rightInputs = new NoteTargetingIOInputsAutoLogged();
 
