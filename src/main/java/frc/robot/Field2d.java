@@ -232,11 +232,11 @@ public class Field2d {
   }
 
   public Pose2d getRobotSourcePose() {
-
+    //6 inches in front of source
     double distanceFromSource =
         ((RobotConfig.getInstance().getRobotLengthWithBumpers()) / 2) + Units.inchesToMeters(6);
-    Logger.recordOutput("SourcePose", FieldConstants.RedSource.redSourcePose);
-
+    //Logger.recordOutput("SourcePose", FieldConstants.RedSource.redSourcePose);
+    
     if (alliance == Alliance.Blue) {
       return new Pose2d(
               FieldConstants.BlueSource.blueSourcePose.getX() + (Math.cos(FieldConstants.BlueSource.blueSourcePose.getRotation().getRadians()) * distanceFromSource),
