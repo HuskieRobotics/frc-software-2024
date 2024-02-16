@@ -76,6 +76,9 @@ public class Drive2Note extends Command {
     double y = ty.getDouble(0.0);
     double area = ta.getDouble(0.0);
     //maybe add a check to see if the target is in view and if area is big enough
+    Logger.recordOutput("Limelight/x", x);
+    Logger.recordOutput("Limelight/y", y);
+    Logger.recordOutput("Limelight/area", area);
     double turnVelocity = pid.calculate(x, 0.0);
     Logger.recordOutput("DriveToNote/turnVelocity", turnVelocity);
     drivetrain.drive(0.0, 0.0,turnVelocity,false,false);

@@ -53,7 +53,8 @@ import java.util.ArrayList;
 import java.util.Optional;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
-
+import frc.robot.subsystems.noteTargeting.NoteTargeting;
+import frc.robot.subsystems.noteTargeting.NoteTargetingIOLimelight;
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -67,6 +68,7 @@ public class RobotContainer {
   private Alliance lastAlliance = DriverStation.Alliance.Red;
   private Vision vision;
   private Subsystem subsystem;
+  private NoteTargeting noteTargeting; 
 
   // use AdvantageKit's LoggedDashboardChooser instead of SendableChooser to ensure accurate logging
   private final LoggedDashboardChooser<Command> autoChooser =
@@ -123,6 +125,7 @@ public class RobotContainer {
 
     } else {
       drivetrain = new Drivetrain(new DrivetrainIO() {});
+      noteTargeting = new NoteTargeting(new NoteTargetingIOLimelight("limelight"), new NoteTargetingIOLimelight("test"));
 
       String[] cameraNames = config.getCameraNames();
       VisionIO[] visionIOs = new VisionIO[cameraNames.length];
@@ -533,17 +536,19 @@ public class RobotContainer {
         new TeleopSwerve(drivetrain, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
 
     // lock rotation to the nearest 180° while driving
-    oi.getLock180Button()
-        .whileTrue(
-            new TeleopSwerve(
-                drivetrain,
-                oi::getTranslateX,
-                oi::getTranslateY,
-                () ->
-                    (drivetrain.getPose().getRotation().getDegrees() > -90
-                            && drivetrain.getPose().getRotation().getDegrees() < 90)
-                        ? Rotation2d.fromDegrees(0.0)
-                        : Rotation2d.fromDegrees(180.0)));
+    // oi.getLock180Button()
+    //     .whileTrue(
+    //         new TeleopSwerve(
+    //             drivetrain,
+    //             oi::getTranslateX,
+    //             oi::getTranslateY,
+    //             () ->
+    //                 (drivetrain.getPose().getRotation().getDegrees() > -90
+    //                         && drivetrain.getPose().getRotation().getDegrees() < 90)
+    //                     ? Rotation2d.fromDegrees(0.0)
+    //                     : Rotation2d.fromDegrees(180.0)));
+
+    oi.getLock180Button().whileTrue(new TeleopSwerve(drivetrain, oi::getTranslateX, oi::getTranslateY, noteTargeting::getRotateVelocity));
 
     // field-relative toggle
     oi.getFieldRelativeButton()
