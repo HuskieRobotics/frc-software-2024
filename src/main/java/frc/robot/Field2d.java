@@ -13,8 +13,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.Drivetrain;
 import frc.lib.team6328.util.FieldConstants;
-import frc.lib.team6328.util.FieldConstants.BlueSource;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * This singleton class models the field as a collection of regions. This class is used to create a
@@ -232,22 +231,23 @@ public class Field2d {
     }
   }
 
+  public Pose2d getRobotSourcePose() {
 
-  public Pose2d getRobotSourcePose(){
-
-    double distanceFromSource = ((RobotConfig.getInstance().getRobotLengthWithBumpers())/2) + Units.inchesToMeters(6);
+    double distanceFromSource =
+        ((RobotConfig.getInstance().getRobotLengthWithBumpers()) / 2) + Units.inchesToMeters(6);
+    Logger.recordOutput("SourcePose", FieldConstants.RedSource.redSourcePose);
 
     if (alliance == Alliance.Blue) {
-      return FieldConstants.BlueSource.blueSourcePose.plus(new Transform2d(Math.cos(FieldConstants.BlueSource.blueSourcePose.getRotation().getRadians())*distanceFromSource, Math.sin(FieldConstants.BlueSource.blueSourcePose.getRotation().getRadians())*distanceFromSource, new Rotation2d(Math.PI)));
+      return new Pose2d(
+              FieldConstants.BlueSource.blueSourcePose.getX() + (Math.cos(FieldConstants.BlueSource.blueSourcePose.getRotation().getRadians()) * distanceFromSource),
+              FieldConstants.BlueSource.blueSourcePose.getY() + (Math.sin(FieldConstants.BlueSource.blueSourcePose.getRotation().getRadians()) * distanceFromSource),
+              new Rotation2d(FieldConstants.BlueSource.blueSourcePose.getRotation().getRadians()+Math.PI));
 
     } else {
-      return FieldConstants.RedSource.redSourcePose.plus(new Transform2d(Math.cos(FieldConstants.RedSource.redSourcePose.getRotation().getRadians())*distanceFromSource, Math.sin(FieldConstants.RedSource.redSourcePose.getRotation().getRadians())*distanceFromSource, new Rotation2d(Math.PI)));
-
+      return new Pose2d(
+              FieldConstants.RedSource.redSourcePose.getX() + (Math.cos(FieldConstants.RedSource.redSourcePose.getRotation().getRadians()) * distanceFromSource),
+              FieldConstants.RedSource.redSourcePose.getY() + (Math.sin(FieldConstants.RedSource.redSourcePose.getRotation().getRadians()) * distanceFromSource),
+              new Rotation2d(FieldConstants.RedSource.redSourcePose.getRotation().getRadians()+Math.PI));
     }
-
-    
-
   }
-
-  
 }
