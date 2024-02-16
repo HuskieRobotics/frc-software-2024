@@ -12,8 +12,8 @@ public class ClimberConstants {
   public static final boolean TESTING = false;
   public static final String CLIMBER = "Climber";
 
-  public static final int LEFT_MOTOR_CAN_ID = 15;
-  public static final int RIGHT_MOTOR_CAN_ID = 16;
+  public static final int LEFT_MOTOR_CAN_ID = 16;
+  public static final int RIGHT_MOTOR_CAN_ID = 17;
 
   // FIXME: update gear ratio
   public static final double GEAR_RATIO = 25.0;
