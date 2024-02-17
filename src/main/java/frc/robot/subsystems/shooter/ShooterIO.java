@@ -30,6 +30,12 @@ public interface ShooterIO {
     double dunkerMotorSupplyCurrentAmps = 0.0;
     double dunkerMotorVelocityRPS = 0.0;
     double dunkerMotorReferenceVelocityRPS = 0.0;
+
+    // Kicker Motor Inputs
+    double kickerMotorStatorCurrentAmps = 0.0;
+    double kickerMotorSupplyCurrentAmps = 0.0;
+    double kickerMotorVelocityRPS = 0.0;
+    double kickerMotorReferenceVelocityRPS = 0.0;
   }
 
   /** Updates the set of loggable inputs. */

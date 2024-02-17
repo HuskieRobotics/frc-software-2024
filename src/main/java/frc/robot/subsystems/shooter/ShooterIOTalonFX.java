@@ -37,18 +37,23 @@ public class ShooterIOTalonFX implements ShooterIO {
   private StatusSignal<Double> shootMotorBottomStatorCurrentStatusSignal;
   private StatusSignal<Double> dunkerMotorStatorCurrentStatusSignal;
   private StatusSignal<Double> angleMotorStatorCurrentStatusSignal;
+  private StatusSignal<Double> kickerMotorStatorCurrentStatusSignal;
 
   // Using StatusSignal to get the supply current of the motors
   private StatusSignal<Double> shootMotorTopSupplyCurrentStatusSignal;
   private StatusSignal<Double> shootMotorBottomSupplyCurrentStatusSignal;
   private StatusSignal<Double> dunkerMotorSupplyCurrentStatusSignal;
   private StatusSignal<Double> angleMotorSupplyCurrentStatusSignal;
+  private StatusSignal<Double> kickerMotorSupplyCurrentStatusSignal;
 
   // Using StatusSignal to get the velocity of the motors
   private StatusSignal<Double> shootMotorTopVelocityStatusSignal;
   private StatusSignal<Double> shootMotorBottomVelocityStatusSignal;
   private StatusSignal<Double> dunkerMotorVelocityStatusSignal;
   private StatusSignal<Double> angleMotorPositionStatusSignal;
+  private StatusSignal<Double> kickerMotorVelocityStatusSignal;
+
+  private StatusSignal<Double> kickerMotorVelocityReferenceStatusSignal;
 
   // Shoot PID Tunable Numbers
   private final TunableNumber shootMotorsKP =
@@ -122,16 +127,21 @@ public class ShooterIOTalonFX implements ShooterIO {
     shootMotorBottomVelocityStatusSignal = shootMotorBottom.getVelocity();
     dunkerMotorVelocityStatusSignal = dunkerMotor.getVelocity();
     angleMotorPositionStatusSignal = angleMotor.getPosition();
+    kickerMotorVelocityStatusSignal = kickerMotor.getVelocity();
 
     shootMotorTopStatorCurrentStatusSignal = shootMotorTop.getStatorCurrent();
     shootMotorBottomStatorCurrentStatusSignal = shootMotorBottom.getStatorCurrent();
     dunkerMotorStatorCurrentStatusSignal = dunkerMotor.getStatorCurrent();
     angleMotorStatorCurrentStatusSignal = angleMotor.getStatorCurrent();
+    kickerMotorStatorCurrentStatusSignal = kickerMotor.getStatorCurrent();
 
     shootMotorTopSupplyCurrentStatusSignal = shootMotorTop.getSupplyCurrent();
     shootMotorBottomSupplyCurrentStatusSignal = shootMotorBottom.getSupplyCurrent();
     dunkerMotorSupplyCurrentStatusSignal = dunkerMotor.getSupplyCurrent();
     angleMotorSupplyCurrentStatusSignal = angleMotor.getSupplyCurrent();
+    kickerMotorSupplyCurrentStatusSignal = kickerMotor.getSupplyCurrent();
+
+    kickerMotorVelocityReferenceStatusSignal = dunkerMotor.getClosedLoopReference();
 
     configShootMotor(shootMotorTop, SHOOT_TOP_INVERTED);
     configShootMotor(shootMotorBottom, SHOOT_BOTTOM_INVERTED);
@@ -229,6 +239,14 @@ public class ShooterIOTalonFX implements ShooterIO {
       dunkerMotor.getConfigurator().apply(dunkerMotorConfig);
     }
 
+    // Updates Kicker Motor Inputs
+    shooterInputs.kickerMotorStatorCurrentAmps =
+        kickerMotorStatorCurrentStatusSignal.getValueAsDouble();
+    shooterInputs.kickerMotorSupplyCurrentAmps =
+        kickerMotorSupplyCurrentStatusSignal.getValueAsDouble();
+    shooterInputs.kickerMotorVelocityRPS = kickerMotorVelocityStatusSignal.getValueAsDouble();
+    shooterInputs.kickerMotorReferenceVelocityRPS =
+        kickerMotorVelocityReferenceStatusSignal.getValueAsDouble();
     if (kickerMotorKP.hasChanged() || kickerMotorKS.hasChanged()) {
       Slot0Configs kickerMotorConfig = new Slot0Configs();
       kickerMotorConfig.kP = kickerMotorKP.get();

@@ -45,7 +45,7 @@ public class Shooter extends SubsystemBase {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
       io.setDunkerMotorVelocity(dunkerWheelVelocity.get());
-      //io.setAngle(angle.get());
+      // io.setAngle(angle.get());
 
       // temporary
       io.setKickerVelocity(kickerVelocity.get());
