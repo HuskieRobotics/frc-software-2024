@@ -352,3 +352,4 @@ public class ShooterIOTalonFX implements ShooterIO {
     dunkerMotor.getConfigurator().apply(dunkerMotorConfig);
   }
 }
+

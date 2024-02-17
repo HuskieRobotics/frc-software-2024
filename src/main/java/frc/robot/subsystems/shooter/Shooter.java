@@ -40,7 +40,7 @@ public class Shooter extends SubsystemBase {
     Logger.processInputs(SUBSYSTEM_NAME, shooterInputs);
     if (TESTING) {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
-      io.setShooterWheelTopVelocity(bottomWheelVelocity.get());
+      io.setShooterWheelTopVelocity(topWheelVelocity.get());
       io.setDunkerMotorVelocity(dunkerWheelVelocity.get());
       io.setAngle(angle.get());
     }else{
