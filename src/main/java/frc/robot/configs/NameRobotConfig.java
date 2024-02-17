@@ -12,28 +12,34 @@ import frc.lib.team3061.drivetrain.swerve.SwerveConstants;
  * these methods, refer to the documentation in the RobotConfig class.
  */
 public class NameRobotConfig extends RobotConfig {
+  // FIXME: update all CAN IDs and steer offsets
+  private static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1;
+  private static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2;
+  private static final int FRONT_LEFT_MODULE_STEER_ENCODER = 22;
+  private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = -0.22591;
 
-  private static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 13;
-  private static final int FRONT_LEFT_MODULE_STEER_MOTOR = 12;
-  private static final int FRONT_LEFT_MODULE_STEER_ENCODER = 14;
-  private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = -0.013428 + 0.5;
-
-  private static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 16;
-  private static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 15;
-  private static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 17;
-  private static final double FRONT_RIGHT_MODULE_STEER_OFFSET_ROT = -0.342773;
+  private static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 3;
+  private static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 4;
+  private static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 23;
+  private static final double FRONT_RIGHT_MODULE_STEER_OFFSET_ROT = -0.390381;
 
   private static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 7;
-  private static final int BACK_LEFT_MODULE_STEER_MOTOR = 6;
-  private static final int BACK_LEFT_MODULE_STEER_ENCODER = 8;
-  private static final double BACK_LEFT_MODULE_STEER_OFFSET_ROT = 0.263184 + 0.5;
+  private static final int BACK_LEFT_MODULE_STEER_MOTOR = 8;
+  private static final int BACK_LEFT_MODULE_STEER_ENCODER = 24;
+  private static final double BACK_LEFT_MODULE_STEER_OFFSET_ROT = 0.327393;
 
-  private static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 10;
-  private static final int BACK_RIGHT_MODULE_STEER_MOTOR = 9;
-  private static final int BACK_RIGHT_MODULE_STEER_ENCODER = 11;
-  private static final double BACK_RIGHT_MODULE_STEER_OFFSET_ROT = -0.024658;
+  private static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 5;
+  private static final int BACK_RIGHT_MODULE_STEER_MOTOR = 6;
+  private static final int BACK_RIGHT_MODULE_STEER_ENCODER = 25;
+  private static final double BACK_RIGHT_MODULE_STEER_OFFSET_ROT = -0.336670;
 
-  private static final int GYRO_ID = 3;
+// Shooter IDs
+  private static final int SHOOTER_KICKER = 21;
+  private static final int SHOOTER_TOP_MOTOR = 27;
+  private static final int SHOOTER_BOTTOM_MOTOR = 28;
+  private static final int SHOOTER_PIVOT_MOTOR = 29;
+
+  private static final int GYRO_ID = 26; // FIXME: Update gyro ID
 
   private static final double TRACKWIDTH_METERS = 0.57785; // 22.75
   private static final double WHEELBASE_METERS = 0.57785; // 22.75
@@ -73,7 +79,7 @@ public class NameRobotConfig extends RobotConfig {
   private static final String CAMERA_NAME_0 = "OV2311L";
   private static final String CAMERA_NAME_1 = "OV2311F";
 
-  // left camera
+  // camera
   private static final Transform3d ROBOT_TO_CAMERA_0 =
       new Transform3d(
           new Translation3d(
@@ -83,7 +89,7 @@ public class NameRobotConfig extends RobotConfig {
           new Rotation3d(0, Units.degreesToRadians(-35), Units.degreesToRadians(90)));
   // pitch 45 degrees
 
-  // left camera
+  // camera
   private static final Transform3d ROBOT_TO_CAMERA_1 =
       new Transform3d(
           new Translation3d(
