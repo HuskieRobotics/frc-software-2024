@@ -46,6 +46,9 @@ import frc.robot.configs.NovaRobotConfig;
 import frc.robot.configs.PracticeRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberConstants;
+import frc.robot.subsystems.climber.ClimberIOTalonFX;
 import frc.robot.subsystems.subsystem.Subsystem;
 import frc.robot.subsystems.subsystem.SubsystemIO;
 import java.io.IOException;
@@ -67,6 +70,7 @@ public class RobotContainer {
   private Alliance lastAlliance = DriverStation.Alliance.Red;
   private Vision vision;
   private Subsystem subsystem;
+  private Climber climber; 
 
   // use AdvantageKit's LoggedDashboardChooser instead of SendableChooser to ensure accurate logging
   private final LoggedDashboardChooser<Command> autoChooser =
@@ -172,6 +176,8 @@ public class RobotContainer {
   private void createCTRESubsystems() {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
+
+    climber = new Climber(new ClimberIOTalonFX() {});
 
     // String[] cameraNames = config.getCameraNames();
     // Transform3d[] robotToCameraTransforms = config.getRobotToCameraTransforms();
@@ -582,6 +588,22 @@ public class RobotContainer {
 
   private void configureSubsystemCommands() {
     // FIXME: add commands for the subsystem
+  }
+
+  private void configureClimberCommands() {
+    oi.getExtendClimberButton().onTrue(
+      Commands.parallel(
+        Commands.runOnce(() -> climber.setLeftMotorPosition(ClimberConstants.LEFT_EXTEND_POSITION)),
+        Commands.runOnce(() -> climber.setRightMotorPosition(ClimberConstants.RIGHT_EXTEND_POSITION))
+      )
+    );
+    oi.getContinueClimberButton().onTrue(
+      Commands.parallel(
+        Commands.runOnce(() -> climber.setLeftMotorPosition(ClimberConstants.LEFT_CONTINUE_POSITION)),
+        Commands.runOnce(() -> climber.setRightMotorPosition(ClimberConstants.RIGHT_CONTINUE_POSITION))
+      )
+    );
+
   }
 
   private void configureVisionCommands() {

@@ -34,7 +34,11 @@ public class ClimberConstants {
   public static final double CONTINUOUS_CURRENT_LIMIT = 50;
   public static final double PEAK_CURRENT_LIMIT = 60;
   public static final double PEAK_CURRENT_DURATION = 0.5;
-  public static final double STATOR_CURRENT_LIMIT = ; // FIXME: Update stator current limit. Software feature sheet is not updated
+  public static final double STATOR_CURRENT_LIMIT = 0; // FIXME: Update stator current limit. Software feature sheet is not updated
 
   public static final int TIMEOUT_MS = 30;
+  public static final double LEFT_EXTEND_POSITION = 0;
+public static final double RIGHT_EXTEND_POSITION = 0;
+public static final double LEFT_CONTINUE_POSITION = 0;
+public static final double RIGHT_CONTINUE_POSITION = 0;
 }
