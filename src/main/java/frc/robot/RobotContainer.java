@@ -8,7 +8,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -43,6 +42,8 @@ import frc.robot.configs.NovaRobotConfig;
 import frc.robot.configs.PracticeRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
+import frc.robot.subsystems.noteTargeting.NoteTargeting;
+import frc.robot.subsystems.noteTargeting.NoteTargetingIOLimelight;
 import frc.robot.subsystems.subsystem.Subsystem;
 import frc.robot.subsystems.subsystem.SubsystemIO;
 import java.io.IOException;
@@ -50,8 +51,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
-import frc.robot.subsystems.noteTargeting.NoteTargeting;
-import frc.robot.subsystems.noteTargeting.NoteTargetingIOLimelight;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -65,7 +65,7 @@ public class RobotContainer {
   private Alliance lastAlliance = DriverStation.Alliance.Red;
   private Vision vision;
   private Subsystem subsystem;
-  private NoteTargeting noteTargeting; 
+  private NoteTargeting noteTargeting;
 
   // use AdvantageKit's LoggedDashboardChooser instead of SendableChooser to ensure accurate logging
   private final LoggedDashboardChooser<Command> autoChooser =
@@ -122,7 +122,9 @@ public class RobotContainer {
 
     } else {
       drivetrain = new Drivetrain(new DrivetrainIO() {});
-      noteTargeting = new NoteTargeting(new NoteTargetingIOLimelight("limelight"), new NoteTargetingIOLimelight("test"));
+      noteTargeting =
+          new NoteTargeting(
+              new NoteTargetingIOLimelight("limelight"), new NoteTargetingIOLimelight("test"));
 
       String[] cameraNames = config.getCameraNames();
       VisionIO[] visionIOs = new VisionIO[cameraNames.length];
@@ -188,6 +190,10 @@ public class RobotContainer {
 
     // FIXME: create the hardware-specific subsystem class
     subsystem = new Subsystem(new SubsystemIO() {});
+
+    noteTargeting =
+        new NoteTargeting(
+            new NoteTargetingIOLimelight("limelight"), new NoteTargetingIOLimelight("test"));
   }
 
   private void createSubsystems() {
@@ -486,7 +492,13 @@ public class RobotContainer {
     //                     ? Rotation2d.fromDegrees(0.0)
     //                     : Rotation2d.fromDegrees(180.0)));
 
-    oi.getLock180Button().whileTrue(new TeleopSwerve(drivetrain, oi::getTranslateX, oi::getTranslateY, noteTargeting::getRotateVelocity));
+    oi.getLock180Button()
+        .whileTrue(
+            new TeleopSwerve(
+                drivetrain,
+                oi::getTranslateX,
+                oi::getTranslateY,
+                noteTargeting::getRotateVelocity));
 
     // field-relative toggle
     oi.getFieldRelativeButton()
