@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
+import frc.robot.subsystems.climber.ClimberIO.ClimberIOInputs;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -17,8 +18,8 @@ import org.littletonrobotics.junction.Logger;
  */
 public class Climber extends SubsystemBase {
 
-  private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
   private ClimberIO io;
+  private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
 
   /**
    * Create a new climber with its associated hardware interface object.

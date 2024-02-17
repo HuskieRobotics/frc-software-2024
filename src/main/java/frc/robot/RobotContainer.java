@@ -36,6 +36,7 @@ import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.lib.team3061.vision.VisionIOSim;
 import frc.robot.Constants.Mode;
+import frc.robot.commands.BalanceArms;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.FeedForwardCharacterization.FeedForwardCharacterizationData;
 import frc.robot.commands.TeleopSwerve;
@@ -598,12 +599,7 @@ public class RobotContainer {
       )
     );
     oi.getContinueClimberButton().onTrue(
-      Commands.parallel(
-        Commands.runOnce(() -> climber.setLeftMotorPosition(ClimberConstants.LEFT_CONTINUE_POSITION)),
-        Commands.runOnce(() -> climber.setRightMotorPosition(ClimberConstants.RIGHT_CONTINUE_POSITION))
-      )
-    );
-
+      Commands.runOnce(() -> new BalanceArms(climber, drivetrain)));
   }
 
   private void configureVisionCommands() {

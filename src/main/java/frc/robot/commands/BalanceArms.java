@@ -4,25 +4,84 @@
 
 package frc.robot.commands;
 
+import static frc.robot.subsystems.climber.ClimberConstants.KP;
+
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.team3061.drivetrain.Drivetrain;
+import frc.robot.subsystems.climber.Climber;
+
+import edu.wpi.first.math.controller.PIDController;
 
 public class BalanceArms extends Command {
+  // FIXME: Update constants
+  private static final double THRESHOLD = 5.0;
+  private static final double MAX_VELOCITY_MPS = 0.0;
+  private static final double CONSTANT_CLIMBER_CURRENT = 6.0;
+
+  private static double autoBalanceKP = 0.0;
+  private static double autoBalanceKI = 0.0;
+  private static double autoBalanceKD = 0.0;
+
+  private Climber climber;
+  private Drivetrain drivetrain;
+  private PIDController pidController;
+
+  private enum ClimbingState {
+    EXTENDING,
+    RETRACTING,
+    BALANCED
+  }
+
+
   /** Creates a new BalanceArms. */
-  public BalanceArms() {
-    // Use addRequirements() here to declare subsystem dependencies.
+  public BalanceArms(Climber climber, Drivetrain drivetrain) {
+    this.climber = climber;
+    this.drivetrain = drivetrain;
+    addRequirements(climber, drivetrain);
+    this.pidController = new PIDController(autoBalanceKP, autoBalanceKD, autoBalanceKI);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+
+    climber.setLeftMotorCurrent(CONSTANT_CLIMBER_CURRENT);
+    climber.setRightMotorCurrent(CONSTANT_CLIMBER_CURRENT);
+
+    
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    if (drivetrain.getRoll() < THRESHOLD && drivetrain.getRoll() > -THRESHOLD) {
+      climber.setLeftMotorCurrent(CONSTANT_CLIMBER_CURRENT);
+      climber.setRightMotorCurrent(CONSTANT_CLIMBER_CURRENT);
+    }
+
+    else if (drivetrain.getRoll() > THRESHOLD) {
+      climber.setLeftMotorCurrent(pidController.calculate(drivetrain.getRoll(), 0));
+      climber.setRightMotorCurrent(0);
+    }
+
+    else if (drivetrain.getRoll() < THRESHOLD) {
+      climber.setRightMotorCurrent(pidController.calculate(drivetrain.getRoll(), 0));
+      climber.setLeftMotorCurrent(0);
+    }
+
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    climber.setLeftMotorCurrent(0);
+    climber.setRightMotorCurrent(0);
+    
+  }
 
   // Returns true when the command should end.
   @Override
