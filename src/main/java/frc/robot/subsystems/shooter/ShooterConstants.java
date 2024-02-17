@@ -19,7 +19,7 @@ public class ShooterConstants {
   public static final int ANGLE_ENCODER_ID = 9;
 
   // Shooter Velocity PID Constants
-  public static final double SHOOT_KP = 10.0;
+  public static final double SHOOT_KP = 40.0;
   public static final double SHOOT_KI = 0.0;
   public static final double SHOOT_KD = 0.0;
   public static final double SHOOT_KS = 14.0;

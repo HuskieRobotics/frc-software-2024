@@ -85,12 +85,9 @@ public class ShooterIOTalonFX implements ShooterIO {
   private final TunableNumber dunkerMotorKS =
       new TunableNumber("Shooter/DUNKER_KS", ShooterConstants.DUNKER_KS);
 
+  private final TunableNumber kickerMotorKP = new TunableNumber("Shooter/KICKER_KP", 10);
 
-  private final TunableNumber kickerMotorKP = 
-      new TunableNumber("Shooter/KICKER_KP", 0);
-
-  private final TunableNumber kickerMotorKS = 
-      new TunableNumber("Shooter/KICKER_KS", 0); 
+  private final TunableNumber kickerMotorKS = new TunableNumber("Shooter/KICKER_KS", 30);
 
   private TalonFX shootMotorTop;
   private TalonFX shootMotorBottom;
@@ -232,8 +229,7 @@ public class ShooterIOTalonFX implements ShooterIO {
       dunkerMotor.getConfigurator().apply(dunkerMotorConfig);
     }
 
-    if (kickerMotorKP.hasChanged()
-        || kickerMotorKS.hasChanged()) {
+    if (kickerMotorKP.hasChanged() || kickerMotorKS.hasChanged()) {
       Slot0Configs kickerMotorConfig = new Slot0Configs();
       kickerMotorConfig.kP = kickerMotorKP.get();
       kickerMotorConfig.kS = kickerMotorKS.get();
@@ -304,15 +300,12 @@ public class ShooterIOTalonFX implements ShooterIO {
     shootMotor.getConfigurator().apply(shootMotorsConfig);
   }
 
-  private void configKickerMotor(TalonFX kickerMotor)
-  {
+  private void configKickerMotor(TalonFX kickerMotor) {
     TalonFXConfiguration kickerMotorConfig = new TalonFXConfiguration();
     CurrentLimitsConfigs kickerMotorCurrentLimits = new CurrentLimitsConfigs();
 
-    kickerMotorCurrentLimits.SupplyCurrentLimit =
-        ShooterConstants.SHOOT_MOTORS_CONTINUOUS_CURRENT_LIMIT;
-    kickerMotorCurrentLimits.SupplyCurrentThreshold =
-        ShooterConstants.SHOOT_MOTORS_PEAK_CURRENT_LIMIT;
+    kickerMotorCurrentLimits.SupplyCurrentLimit = 30;
+    kickerMotorCurrentLimits.SupplyCurrentThreshold = 40;
     kickerMotorCurrentLimits.SupplyTimeThreshold =
         ShooterConstants.SHOOT_MOTORS_PEAK_CURRENT_DURATION;
     kickerMotorCurrentLimits.SupplyCurrentLimitEnable = true;
@@ -328,7 +321,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     kickerMotorConfig.Feedback.SensorToMechanismRatio = 1.0;
 
     kickerMotorConfig.MotorOutput.Inverted =
-        true ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+        false ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
 
     kickerMotor.getConfigurator().apply(kickerMotorConfig);
   }
