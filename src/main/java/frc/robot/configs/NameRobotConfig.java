@@ -76,10 +76,14 @@ public class NameRobotConfig extends RobotConfig {
 
   private static final String CAN_BUS_NAME = "canbus1";
 
+  // FIXME: Update camera names
   private static final String CAMERA_NAME_0 = "OV2311L";
   private static final String CAMERA_NAME_1 = "OV2311F";
+  private static final String CAMERA_NAME_2 = "";
+  private static final String CAMERA_NAME_3 = "";
 
-  // camera
+  // FIXME: Update camera transforms
+  // Front right camera
   private static final Transform3d ROBOT_TO_CAMERA_0 =
       new Transform3d(
           new Translation3d(
@@ -89,7 +93,7 @@ public class NameRobotConfig extends RobotConfig {
           new Rotation3d(0, Units.degreesToRadians(-35), Units.degreesToRadians(90)));
   // pitch 45 degrees
 
-  // camera
+  // Back right camera
   private static final Transform3d ROBOT_TO_CAMERA_1 =
       new Transform3d(
           new Translation3d(
@@ -97,6 +101,24 @@ public class NameRobotConfig extends RobotConfig {
               Units.inchesToMeters(-8.500),
               Units.inchesToMeters(18.387)),
           new Rotation3d(0, Units.degreesToRadians(-35), Units.degreesToRadians(0)));
+
+  // Front left camera
+  private static final Transform3d ROBOT_TO_CAMERA_2 =
+      new Transform3d(
+          new Translation3d(
+              Units.inchesToMeters(5.500),
+              Units.inchesToMeters(10.329),
+              Units.inchesToMeters(18.387)),
+          new Rotation3d(0, Units.degreesToRadians(-35), Units.degreesToRadians(90)));
+
+  // Back left camera
+  private static final Transform3d ROBOT_TO_CAMERA_3 =
+      new Transform3d(
+          new Translation3d(
+              Units.inchesToMeters(5.500),
+              Units.inchesToMeters(10.329),
+              Units.inchesToMeters(18.387)),
+          new Rotation3d(0, Units.degreesToRadians(-35), Units.degreesToRadians(90)));
 
   private static final double AUTO_MAX_SPEED_METERS_PER_SECOND = 3.5;
   private static final double AUTO_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 10;
@@ -267,7 +289,7 @@ public class NameRobotConfig extends RobotConfig {
 
   @Override
   public Transform3d[] getRobotToCameraTransforms() {
-    return new Transform3d[] {ROBOT_TO_CAMERA_0, ROBOT_TO_CAMERA_1};
+    return new Transform3d[] {ROBOT_TO_CAMERA_0, ROBOT_TO_CAMERA_1, ROBOT_TO_CAMERA_2, ROBOT_TO_CAMERA_3};
   }
 
   @Override
