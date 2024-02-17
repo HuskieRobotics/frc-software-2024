@@ -9,7 +9,7 @@ public class ShooterConstants {
   }
 
   public static final boolean DEBUGGING = false;
-  public static final boolean TESTING = false;
+  public static final boolean TESTING = true;
   public static final String SUBSYSTEM_NAME = "Shooter";
 
   public static final int TOP_SHOOTER_MOTOR_ID = 27;
@@ -19,10 +19,10 @@ public class ShooterConstants {
   public static final int ANGLE_ENCODER_ID = 9;
 
   // Shooter Velocity PID Constants
-  public static final double SHOOT_KP = 0.0;
+  public static final double SHOOT_KP = 10.0;
   public static final double SHOOT_KI = 0.0;
   public static final double SHOOT_KD = 0.0;
-  public static final double SHOOT_KS = 0.0;
+  public static final double SHOOT_KS = 14.0;
   public static final double SHOOT_PID_PEAK_OUTPUT = 1.0;
 
   // Shooter Rotation PID Constants

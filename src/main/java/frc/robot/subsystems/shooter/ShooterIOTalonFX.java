@@ -85,6 +85,13 @@ public class ShooterIOTalonFX implements ShooterIO {
   private final TunableNumber dunkerMotorKS =
       new TunableNumber("Shooter/DUNKER_KS", ShooterConstants.DUNKER_KS);
 
+
+  private final TunableNumber kickerMotorKP = 
+      new TunableNumber("Shooter/KICKER_KP", 0);
+
+  private final TunableNumber kickerMotorKS = 
+      new TunableNumber("Shooter/KICKER_KS", 0); 
+
   private TalonFX shootMotorTop;
   private TalonFX shootMotorBottom;
   private TalonFX angleMotor;
@@ -133,6 +140,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     configShootMotor(shootMotorBottom, SHOOT_BOTTOM_INVERTED);
     configAngleMotor(angleMotor, angleEncoder);
     configDunkerMotor(dunkerMotor);
+    configKickerMotor(kickerMotor);
   }
 
   @Override
@@ -223,6 +231,14 @@ public class ShooterIOTalonFX implements ShooterIO {
       dunkerMotorConfig.kS = dunkerMotorKS.get();
       dunkerMotor.getConfigurator().apply(dunkerMotorConfig);
     }
+
+    if (kickerMotorKP.hasChanged()
+        || kickerMotorKS.hasChanged()) {
+      Slot0Configs kickerMotorConfig = new Slot0Configs();
+      kickerMotorConfig.kP = kickerMotorKP.get();
+      kickerMotorConfig.kS = kickerMotorKS.get();
+      kickerMotor.getConfigurator().apply(kickerMotorConfig);
+    }
   }
 
   @Override
@@ -286,6 +302,35 @@ public class ShooterIOTalonFX implements ShooterIO {
         isInverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
 
     shootMotor.getConfigurator().apply(shootMotorsConfig);
+  }
+
+  private void configKickerMotor(TalonFX kickerMotor)
+  {
+    TalonFXConfiguration kickerMotorConfig = new TalonFXConfiguration();
+    CurrentLimitsConfigs kickerMotorCurrentLimits = new CurrentLimitsConfigs();
+
+    kickerMotorCurrentLimits.SupplyCurrentLimit =
+        ShooterConstants.SHOOT_MOTORS_CONTINUOUS_CURRENT_LIMIT;
+    kickerMotorCurrentLimits.SupplyCurrentThreshold =
+        ShooterConstants.SHOOT_MOTORS_PEAK_CURRENT_LIMIT;
+    kickerMotorCurrentLimits.SupplyTimeThreshold =
+        ShooterConstants.SHOOT_MOTORS_PEAK_CURRENT_DURATION;
+    kickerMotorCurrentLimits.SupplyCurrentLimitEnable = true;
+
+    kickerMotorConfig.CurrentLimits = kickerMotorCurrentLimits;
+
+    kickerMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    kickerMotorConfig.Slot0.kP = kickerMotorKP.get();
+    kickerMotorConfig.Slot0.kI = 0;
+    kickerMotorConfig.Slot0.kD = 0;
+    kickerMotorConfig.Slot0.kS = kickerMotorKS.get();
+
+    kickerMotorConfig.Feedback.SensorToMechanismRatio = 1.0;
+
+    kickerMotorConfig.MotorOutput.Inverted =
+        true ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+
+    kickerMotor.getConfigurator().apply(kickerMotorConfig);
   }
 
   private void configAngleMotor(TalonFX angleMotor, CANcoder angleEncoder) {
