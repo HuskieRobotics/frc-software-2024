@@ -31,7 +31,7 @@ public class PracticeRobotConfig extends RobotConfig {
   private static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 10;
   private static final int BACK_RIGHT_MODULE_STEER_MOTOR = 9;
   private static final int BACK_RIGHT_MODULE_STEER_ENCODER = 11;
-  private static final double BACK_RIGHT_MODULE_STEER_OFFSET_ROT = -0.024658;
+  private static final double BACK_RIGHT_MODULE_STEER_OFFSET_ROT = 0.052246;
 
   private static final int GYRO_ID = 3;
 
