@@ -16,6 +16,13 @@ import frc.robot.subsystems.climber.Climber;
 
 import edu.wpi.first.math.controller.PIDController;
 
+/**
+ * IDEA: Have arms move to a predetermined position in rotations. Once aligned with chain, retract arms until
+ * a current spike is detected one arm, then stop that arm. Do this until both arms have a current spike. 
+ * Take the # of rotations and subtract from the predetermined position to get each arms position. 
+ * Now that the arms are on the chain, begin retracting the arms at constant speed until the robot is balanced.
+ */
+
 public class BalanceArms extends Command {
   // FIXME: Update constants
   private static final double THRESHOLD = 5.0;
