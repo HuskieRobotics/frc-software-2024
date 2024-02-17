@@ -47,6 +47,7 @@ import frc.robot.configs.PracticeRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 import frc.robot.subsystems.subsystem.Subsystem;
 import frc.robot.subsystems.subsystem.SubsystemIO;
 import java.io.IOException;
@@ -198,6 +199,8 @@ public class RobotContainer {
     }
     vision = new Vision(visionIOs);
 
+    shooter = new Shooter(new ShooterIOTalonFX() {});
+
     // FIXME: create the hardware-specific subsystem class
     subsystem = new Subsystem(new SubsystemIO() {});
   }
@@ -330,6 +333,8 @@ public class RobotContainer {
     configureSubsystemCommands();
 
     configureVisionCommands();
+
+    configureShooterCommands();
 
     // Endgame alerts
     new Trigger(
@@ -594,6 +599,10 @@ public class RobotContainer {
             Commands.parallel(
                 Commands.runOnce(() -> vision.enable(false), vision),
                 Commands.runOnce(drivetrain::resetPoseRotationToGyro)));
+  }
+
+  private void configureShooterCommands() {
+    oi.getShootButton().onTrue(Commands.runOnce(() -> shooter.shoot(0.0, 0.0)));
   }
 
   /**

@@ -12,11 +12,11 @@ public class ShooterConstants {
   public static final boolean TESTING = false;
   public static final String SUBSYSTEM_NAME = "Shooter";
 
-  public static final int TOP_SHOOTER_MOTOR_ID = 12;
-  public static final int BOTTOM_SHOOTER_MOTOR_ID = 13;
-  public static final int ANGLE_MOTOR_ID = 14;
-  public static final int DUNKER_MOTOR_ID = 17;
-  public static final int ANGLE_ENCODER_ID = 4;
+  public static final int TOP_SHOOTER_MOTOR_ID = 27;
+  public static final int BOTTOM_SHOOTER_MOTOR_ID = 28;
+  public static final int ANGLE_MOTOR_ID = 29;
+  public static final int DUNKER_MOTOR_ID = 30;
+  public static final int ANGLE_ENCODER_ID = 9;
 
   // Shooter Velocity PID Constants
   public static final double SHOOT_KP = 0.0;

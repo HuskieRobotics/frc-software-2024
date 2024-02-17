@@ -9,9 +9,17 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3061.util.RobotOdometry;
+import frc.lib.team6328.util.TunableNumber;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
+
+  private final TunableNumber topWheelVelocity = new TunableNumber("Shooter/Top Wheel Velocity", 0);
+  private final TunableNumber bottomWheelVelocity =
+      new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
+  private final TunableNumber angle = new TunableNumber("Shooter/Angle", 0);
+  private final TunableNumber dunkerWheelVelocity =
+      new TunableNumber("Shooter/Dunker Wheel Velocity", 0);
 
   private ShooterIO io;
   private Alliance alliance = Alliance.Red;
@@ -30,7 +38,14 @@ public class Shooter extends SubsystemBase {
   public void periodic() {
     io.updateInputs(shooterInputs);
     Logger.processInputs(SUBSYSTEM_NAME, shooterInputs);
-    this.runAngleStateMachine();
+    if (TESTING) {
+      io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
+      io.setShooterWheelTopVelocity(bottomWheelVelocity.get());
+      io.setDunkerMotorVelocity(dunkerWheelVelocity.get());
+      io.setAngle(angle.get());
+    }else{
+      this.runAngleStateMachine();
+    }
   }
 
   public void updateAlliance(Alliance newAlliance) {
@@ -38,18 +53,22 @@ public class Shooter extends SubsystemBase {
   }
 
   private void runAngleStateMachine() {
-    if (RobotOdometry.getInstance().getEstimatedPosition().getX() >= Units.inchesToMeters(421.02)&& this.alliance == Alliance.Blue) {
+    if (RobotOdometry.getInstance().getEstimatedPosition().getX() >= Units.inchesToMeters(421.02)
+        && this.alliance == Alliance.Blue) {
       io.setAngle(angleTreeMap.get(RobotOdometry.getInstance().getEstimatedPosition().getX()));
-    } 
-    else if (RobotOdometry.getInstance().getEstimatedPosition().getX() <= Units.inchesToMeters(230.2) && this.alliance == Alliance.Red) {
+    } else if (RobotOdometry.getInstance().getEstimatedPosition().getX()
+            <= Units.inchesToMeters(230.2)
+        && this.alliance == Alliance.Red) {
       io.setAngle(angleTreeMap.get(RobotOdometry.getInstance().getEstimatedPosition().getX()));
-    }
-    else{
+    } else {
       io.setAngle(0);
     }
+
+    this.goToConstantVelocity();
   }
 
   public void shoot(double topWheelVelocityRPS, double bottomWheelVelocityRPS) {
+    //needs to utilize kicker
     io.setShooterWheelTopVelocity(topWheelVelocityRPS);
     io.setShooterWheelBottomVelocity(bottomWheelVelocityRPS);
   }
@@ -60,5 +79,10 @@ public class Shooter extends SubsystemBase {
 
   public void setAngle(double angle) {
     io.setAngle(angle);
+  }
+
+  public void goToConstantVelocity() {
+    io.setShooterWheelTopVelocity(topWheelVelocity.get());
+    io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
   }
 }
