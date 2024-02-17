@@ -21,6 +21,9 @@ public class Shooter extends SubsystemBase {
   private final TunableNumber dunkerWheelVelocity =
       new TunableNumber("Shooter/Dunker Wheel Velocity", 0);
 
+  // temporary
+  private final TunableNumber kickerVelocity = new TunableNumber("Shooter/Kicker Velocity", 0);
+
   private ShooterIO io;
   private Alliance alliance = Alliance.Red;
   private InterpolatingTreeMap<Double, Double> angleTreeMap;
@@ -43,7 +46,10 @@ public class Shooter extends SubsystemBase {
       io.setShooterWheelTopVelocity(bottomWheelVelocity.get());
       io.setDunkerMotorVelocity(dunkerWheelVelocity.get());
       io.setAngle(angle.get());
-    }else{
+
+      // temporary
+      io.setKickerVelocity(kickerVelocity.get());
+    } else {
       this.runAngleStateMachine();
     }
   }
@@ -67,10 +73,11 @@ public class Shooter extends SubsystemBase {
     this.goToConstantVelocity();
   }
 
-  public void shoot(double topWheelVelocityRPS, double bottomWheelVelocityRPS) {
-    //needs to utilize kicker
-    io.setShooterWheelTopVelocity(topWheelVelocityRPS);
-    io.setShooterWheelBottomVelocity(bottomWheelVelocityRPS);
+  public void shoot(double kickerVelocityRPS) {
+    // needs to utilize kicker
+    // io.setShooterWheelTopVelocity(topWheelVelocityRPS);
+    // io.setShooterWheelBottomVelocity(bottomWheelVelocityRPS);
+    io.setKickerVelocity(kickerVelocityRPS);
   }
 
   public void setDunkerMotorVelocity(double velocityRPS) {

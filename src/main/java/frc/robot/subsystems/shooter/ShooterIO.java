@@ -42,4 +42,7 @@ public interface ShooterIO {
   public default void setShooterWheelBottomVelocity(double rps) {}
 
   public default void setAngle(double angle) {}
+
+  // temperory
+  public default void setKickerVelocity(double rps) {}
 }

@@ -29,6 +29,9 @@ public class ShooterIOTalonFX implements ShooterIO {
   private VelocityTorqueCurrentFOC dunkerMotorVelocityRequest;
   private MotionMagicExpoTorqueCurrentFOC angleMotorPositionRequest;
 
+  // temporrary`
+  private VelocityTorqueCurrentFOC kickerMotorVelocityRequest;
+
   // Using StatusSignal to get the stator current of the motors
   private StatusSignal<Double> shootMotorTopStatorCurrentStatusSignal;
   private StatusSignal<Double> shootMotorBottomStatorCurrentStatusSignal;
@@ -88,6 +91,9 @@ public class ShooterIOTalonFX implements ShooterIO {
   private TalonFX dunkerMotor;
   private CANcoder angleEncoder;
 
+  // temporary
+  private TalonFX kickerMotor;
+
   public ShooterIOTalonFX() {
 
     shootMotorTop = new TalonFX(TOP_SHOOTER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
@@ -97,10 +103,16 @@ public class ShooterIOTalonFX implements ShooterIO {
     dunkerMotor = new TalonFX(DUNKER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
     angleEncoder = new CANcoder(ANGLE_ENCODER_ID);
 
+    // temporary
+    kickerMotor = new TalonFX(21, RobotConfig.getInstance().getCANBusName());
+
     shootMotorTopVelocityRequest = new VelocityTorqueCurrentFOC(0);
     shootMotorBottomVelocityRequest = new VelocityTorqueCurrentFOC(0);
     dunkerMotorVelocityRequest = new VelocityTorqueCurrentFOC(0);
     angleMotorPositionRequest = new MotionMagicExpoTorqueCurrentFOC(0);
+
+    // temporary
+    kickerMotorVelocityRequest = new VelocityTorqueCurrentFOC(0);
 
     shootMotorTopVelocityStatusSignal = shootMotorTop.getVelocity();
     shootMotorBottomVelocityStatusSignal = shootMotorBottom.getVelocity();
@@ -233,6 +245,12 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotor.setControl(angleMotorPositionRequest.withPosition(degreesToRotations(angle)));
   }
 
+  // temporary
+  @Override
+  public void setKickerVelocity(double rps) {
+    kickerMotor.setControl(kickerMotorVelocityRequest.withVelocity(rps));
+  }
+
   private double degreesToRotations(double degrees) {
     return degrees / 360;
   }
@@ -321,6 +339,8 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotorConfig.Feedback.RotorToSensorRatio = ShooterConstants.ROTOR_TO_SENSOR_RATIO;
 
     angleMotor.getConfigurator().apply(angleMotorConfig);
+
+    angleMotor.setInverted(true);
   }
 
   private void configDunkerMotor(TalonFX dunkerMotor) {

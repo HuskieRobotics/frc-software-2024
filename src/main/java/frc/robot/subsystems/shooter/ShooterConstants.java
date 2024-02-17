@@ -72,5 +72,4 @@ public class ShooterConstants {
   public static final double MAGNET_OFFSET = 0.0;
   public static final double SENSOR_TO_MECHANISM_RATIO = 1;
   public static final double ROTOR_TO_SENSOR_RATIO = 100;
-
 }
