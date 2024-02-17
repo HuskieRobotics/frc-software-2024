@@ -321,6 +321,8 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotorConfig.Feedback.RotorToSensorRatio = ShooterConstants.ROTOR_TO_SENSOR_RATIO;
 
     angleMotor.getConfigurator().apply(angleMotorConfig);
+
+    angleMotor.setInverted(true);
   }
 
   private void configDunkerMotor(TalonFX dunkerMotor) {
