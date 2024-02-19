@@ -2,10 +2,8 @@ package frc.robot.subsystems.shooter;
 
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
-import java.util.Comparator;
-
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -13,6 +11,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
+import frc.robot.Field2d;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
@@ -47,7 +46,7 @@ public class Shooter extends SubsystemBase {
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
       io.setDunkerMotorVelocity(dunkerWheelVelocity.get());
       io.setAngle(angle.get());
-    }else{
+    } else {
       this.runAngleStateMachine();
     }
   }
@@ -57,9 +56,15 @@ public class Shooter extends SubsystemBase {
   }
 
   private void runAngleStateMachine() {
+    double test =
+        Field2d.getInstance()
+            .getAllianceSpeakerCenter()
+            .minus(RobotOdometry.getInstance().getEstimatedPosition())
+            .getTranslation()
+            .getNorm();
     if (RobotOdometry.getInstance().getEstimatedPosition().getX() >= Units.inchesToMeters(421.02)
         && this.alliance == Alliance.Blue) {
-      io.setAngle(angleTreeMap.get(RobotOdometry.getInstance().getEstimatedPosition().getX()));
+      io.setAngle(angleTreeMap.get(test));
     } else if (RobotOdometry.getInstance().getEstimatedPosition().getX()
             <= Units.inchesToMeters(230.2)
         && this.alliance == Alliance.Red) {
@@ -72,7 +77,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void shoot(double topWheelVelocityRPS, double bottomWheelVelocityRPS) {
-    //needs to utilize kicker
+    // needs to utilize kicker
     io.setShooterWheelTopVelocity(topWheelVelocityRPS);
     io.setShooterWheelBottomVelocity(bottomWheelVelocityRPS);
   }
