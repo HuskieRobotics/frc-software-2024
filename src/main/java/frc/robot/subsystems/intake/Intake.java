@@ -1,6 +1,7 @@
 package frc.robot.subsystems.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.leds.LEDs;
@@ -9,9 +10,25 @@ import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
 
+  private static final String SUBSYSTEM_NAME = "INTAKE";
+
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
   private final LEDs leds;
+
+  private final IntakeMotor[] intakeMotors = { 
+    IntakeMotor.RIGHT_ROLLER, 
+    IntakeMotor.LEFT_ROLLER,
+    IntakeMotor.DRUM,
+    IntakeMotor.KICKER,
+  };
+
+  enum IntakeMotor {
+    RIGHT_ROLLER,
+    LEFT_ROLLER,
+    DRUM,
+    KICKER
+  }
 
   private int intakeAndDrumTimeout;
 
@@ -133,8 +150,79 @@ public class Intake extends SubsystemBase {
   }
 
   public Command getSystemCheckCommand() {
+    /*
+     * Order of what will be tested
+     * 1. make sure everything works at right velocities
+     * 2. then check that all the states it goes through when it gets a note are correct  
+     *
+     */
+    return Commands.sequence(
+      getVelocitiesCheckCommand(),
+      getStatesCheckCommand()
+    ).until(() -> !FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).isEmpty())
+    .andThen(Commands.runOnce(this::turnIntakeOff))
+    .withName(SUBSYSTEM_NAME + "SystemCheck");
+  }
+
+
+  private Command getVelocitiesCheckCommand() {
+    return Commands.parallel(
+      Commands.run(this::runIntakeStateMachine),
+      Commands.waitSeconds(1).andThen(
+        Commands.runOnce(() -> {
+          for (int i = 0; i < 4; i++) {
+            checkMotorVelocity(intakeMotors[i]);
+          }
+        })
+      )
+    );
+  }
+
+  private void checkMotorVelocity(IntakeMotor motor) {
+    if (motor == IntakeMotor.RIGHT_ROLLER) {
+      if (inputs.rightRollerVelocityRotationsPerSecond 
+      - inputs.rightRollerReferenceVelocityRPS 
+      > IntakeConstants.ROLLER_VELOCITY_TOLERANCE) {
+        FaultReporter.getInstance().addFault(
+          SUBSYSTEM_NAME,
+          "[System Check] Right Roller Too Slow"
+        );
+      }
+    } else if (motor == IntakeMotor.LEFT_ROLLER) {
+      if (inputs.leftRollerVelocityRotationsPerSecond 
+      - inputs.leftRollerReferenceVelocityRPS 
+      > IntakeConstants.ROLLER_VELOCITY_TOLERANCE) {
+        FaultReporter.getInstance().addFault(
+          SUBSYSTEM_NAME,
+          "[System Check] Left Roller Too Slow"
+        );
+      }
+    } else if (motor == IntakeMotor.DRUM) {
+      if (inputs.drumVelocityRotationsPerSecond 
+      - inputs.drumReferenceVelocityRPS 
+      > IntakeConstants.DRUM_VELOCITY_TOLERANCE) {
+        FaultReporter.getInstance().addFault(
+          SUBSYSTEM_NAME,
+          "[System Check] Drum Too Slow"
+        );
+      }
+    } else if (motor == IntakeMotor.KICKER) {
+      if (inputs.kickerVelocityRotationsPerSecond 
+      - inputs.kickerReferenceVelocityRPS 
+      > IntakeConstants.KICKER_VELOCITY_TOLERANCE) {
+        FaultReporter.getInstance().addFault(
+          SUBSYSTEM_NAME,
+          "[System Check] Kicker Too Slow"
+        );
+      }
+    }
+  }
+
+  private Command getStatesCheckCommand() {
     return null;
   }
+
+  
 
   public boolean manualOverrideEnabled() {
     return manualOverrideEnabled;

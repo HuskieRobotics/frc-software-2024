@@ -42,6 +42,10 @@ public class IntakeConstants {
   public static final double DRUM_VELOCITY_RPS = 8.0;
   public static final double KICKER_VELOCITY_RPS = 6.0;
 
+  public static final double ROLLER_VELOCITY_TOLERANCE = 1.0;
+  public static final double DRUM_VELOCITY_TOLERANCE = 0.5;
+  public static final double KICKER_VELOCITY_TOLERANCE = 0.5;
+
   // current limits
 
   public static final double ROLLERS_CONTINUOUS_CURRENT_LIMIT = 15.0;
