@@ -554,7 +554,7 @@ public class RobotContainer {
       )
       );  
 
-    oi.getLock180Button().onTrue(
+    oi.getMoveToSourceButton().onTrue(
       new DriveToPose(
         drivetrain, 
         () -> Field2d.getInstance().getRobotSourcePose()

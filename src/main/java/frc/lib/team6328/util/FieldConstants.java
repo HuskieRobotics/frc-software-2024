@@ -126,18 +126,18 @@ public class FieldConstants {
 
 
    public static class BlueChainAmpCenter{
-    public static Translation2d blueChainAmp =  new Translation2d(Units.inchesToMeters(179.384), Units.inchesToMeters(182.896)); //Change coordinates to be 17 centimeters in front of the chain
+    public static Translation2d blueChainAmp =  new Translation2d(Units.inchesToMeters(170.73), Units.inchesToMeters(197.885)); 
     public static Pose2d blueChainAmpPose = new Pose2d(blueChainAmp, new Rotation2d((2*Math.PI)/3)); 
 
   }
 
   public static class BlueChainSourceCenter{
-    public static Translation2d blueChainSource = new Translation2d(Units.inchesToMeters(179.384), Units.inchesToMeters(140.394)); //Change coordinates to be 17 centimeters in front of the chain
+    public static Translation2d blueChainSource = new Translation2d(Units.inchesToMeters(170.73), Units.inchesToMeters(125.405)); 
     public static Pose2d blueChainSourcePose = new Pose2d(blueChainSource, new Rotation2d(-(2*Math.PI)/3));
   }
 
    public static class BlueChainMiddleCenter{
-    public static Translation2d blueChainMiddle =  new Translation2d(Units.inchesToMeters(216.173), Units.inchesToMeters(161.62)); //Change coordinates to be 17 centimeters in front of the chain
+    public static Translation2d blueChainMiddle =  new Translation2d(Units.inchesToMeters(233.48), Units.inchesToMeters(161.62)); 
     public static Pose2d blueChainMiddlePose = new Pose2d(blueChainMiddle, new Rotation2d(0));
   }
 
