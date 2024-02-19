@@ -2,6 +2,9 @@ package frc.robot.subsystems.shooter;
 
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
+import java.util.Comparator;
+
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -23,11 +26,12 @@ public class Shooter extends SubsystemBase {
 
   private ShooterIO io;
   private Alliance alliance = Alliance.Red;
-  private InterpolatingTreeMap<Double, Double> angleTreeMap;
+  private InterpolatingDoubleTreeMap angleTreeMap;
   private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
 
   public Shooter(ShooterIO io) { // TODO: Add intake reference
     this.io = io;
+    this.angleTreeMap = new InterpolatingDoubleTreeMap();
     if (TESTING) {
       ShuffleboardTab tab = Shuffleboard.getTab(SUBSYSTEM_NAME);
       tab.add(SUBSYSTEM_NAME, this);
