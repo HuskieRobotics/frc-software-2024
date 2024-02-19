@@ -127,7 +127,7 @@ public class FieldConstants {
 
   public static class RedSource{
     public static Translation2d redSourceCenter = new Translation2d(Units.inchesToMeters(35.6247), Units.inchesToMeters(21.9704));
-    public static Pose2d redSourcePose = new Pose2d(redSourceCenter, new Rotation2d(2.8163-((Math.PI)/2)));
+    public static Pose2d redSourcePose = new Pose2d(redSourceCenter, new Rotation2d(2.6183-((Math.PI)/2)));
   }
 
 
