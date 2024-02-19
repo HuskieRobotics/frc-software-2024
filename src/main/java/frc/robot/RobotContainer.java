@@ -8,7 +8,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -35,9 +35,6 @@ import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.lib.team3061.vision.VisionIOSim;
 import frc.robot.Constants.Mode;
-import frc.robot.commands.FeedForwardCharacterization;
-import frc.robot.commands.FeedForwardCharacterization.FeedForwardCharacterizationData;
-import frc.robot.commands.RotateToAngle;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.configs.DefaultRobotConfig;
 import frc.robot.configs.NovaCTRERobotConfig;
@@ -176,26 +173,16 @@ public class RobotContainer {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
 
-    // String[] cameraNames = config.getCameraNames();
-    // Transform3d[] robotToCameraTransforms = config.getRobotToCameraTransforms();
-    // VisionIO[] visionIOs = new VisionIO[cameraNames.length];
-    // AprilTagFieldLayout layout;
-    // try {
-    //   layout = new AprilTagFieldLayout(VisionConstants.APRILTAG_FIELD_LAYOUT_PATH);
-    // } catch (IOException e) {
-    //   layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
-    // }
-    // for (int i = 0; i < visionIOs.length; i++) {
-    //   visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout,
-    // robotToCameraTransforms[i]);
-    // }
-    // vision = new Vision(visionIOs);
-
-    // FIXME: re-enable cameras when installed
     String[] cameraNames = config.getCameraNames();
     VisionIO[] visionIOs = new VisionIO[cameraNames.length];
+    AprilTagFieldLayout layout;
+    try {
+      layout = new AprilTagFieldLayout(VisionConstants.APRILTAG_FIELD_LAYOUT_PATH);
+    } catch (IOException e) {
+      layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
+    }
     for (int i = 0; i < visionIOs.length; i++) {
-      visionIOs[i] = new VisionIO() {};
+      visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout);
     }
     vision = new Vision(visionIOs);
 
@@ -255,7 +242,6 @@ public class RobotContainer {
               });
     } else {
       String[] cameraNames = config.getCameraNames();
-      Transform3d[] robotToCameraTransforms = config.getRobotToCameraTransforms();
       VisionIO[] visionIOs = new VisionIO[cameraNames.length];
       AprilTagFieldLayout layout;
       try {
@@ -264,7 +250,7 @@ public class RobotContainer {
         layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
       }
       for (int i = 0; i < visionIOs.length; i++) {
-        visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout, robotToCameraTransforms[i]);
+        visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout);
       }
       vision = new Vision(visionIOs);
     }
@@ -273,21 +259,7 @@ public class RobotContainer {
   private void createCTRESimSubsystems() {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
-
-    AprilTagFieldLayout layout;
-    try {
-      layout = new AprilTagFieldLayout(VisionConstants.APRILTAG_FIELD_LAYOUT_PATH);
-    } catch (IOException e) {
-      layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
-    }
-    vision =
-        new Vision(
-            new VisionIO[] {
-              new VisionIOSim(
-                  layout,
-                  drivetrain::getPose,
-                  RobotConfig.getInstance().getRobotToCameraTransforms()[0])
-            });
+    vision = new Vision(new VisionIO[] {new VisionIO() {}});
 
     // FIXME: create the hardware-specific subsystem class
   }
@@ -380,27 +352,12 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "disableXStance", Commands.runOnce(drivetrain::disableXstance, drivetrain));
     NamedCommands.registerCommand("wait5Seconds", Commands.waitSeconds(5.0));
+    NamedCommands.registerCommand("Shoot", Commands.waitSeconds(1.0));
 
     // build auto path commands
 
     // add commands to the auto chooser
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
-
-    /************ Test Path ************
-     *
-     * demonstration of PathPlanner auto with event markers
-     *
-     */
-    Command autoTest = new PathPlannerAuto("TestAuto");
-    autoChooser.addOption("Test Auto", autoTest);
-
-    /************ Choreo Test Path ************
-     *
-     * demonstration of PathPlanner hosted Choreo path
-     *
-     */
-    Command choreoAutoTest = new PathPlannerAuto("ChoreoTest");
-    autoChooser.addOption("Choreo Auto", choreoAutoTest);
 
     /************ Start Point ************
      *
@@ -415,36 +372,6 @@ public class RobotContainer {
                     PathPlannerPath.fromPathFile("StartPoint").getPreviewStartingHolonomicPose()),
             drivetrain);
     autoChooser.addOption("Start Point", startPoint);
-
-    /************ Drive Characterization ************
-     *
-     * useful for characterizing the swerve modules for driving (i.e, determining kS and kV)
-     *
-     */
-    autoChooser.addOption(
-        "Swerve Drive Characterization",
-        new FeedForwardCharacterization(
-            drivetrain,
-            true,
-            new FeedForwardCharacterizationData("drive"),
-            drivetrain::runDriveCharacterizationVolts,
-            drivetrain::getDriveCharacterizationVelocity,
-            drivetrain::getDriveCharacterizationAcceleration));
-
-    /************ Swerve Rotate Characterization ************
-     *
-     * useful for characterizing the swerve modules for rotating (i.e, determining kS and kV)
-     *
-     */
-    autoChooser.addOption(
-        "Swerve Rotate Characterization",
-        new FeedForwardCharacterization(
-            drivetrain,
-            true,
-            new FeedForwardCharacterizationData("rotate"),
-            drivetrain::runRotateCharacterizationVolts,
-            drivetrain::getRotateCharacterizationVelocity,
-            drivetrain::getRotateCharacterizationAcceleration));
 
     /************ Distance Test ************
      *
@@ -461,6 +388,17 @@ public class RobotContainer {
      */
     Command tuningCommand = new PathPlannerAuto("Tuning");
     autoChooser.addOption("Auto Tuning", tuningCommand);
+
+    /************ 4 Note ************
+     *
+     * used for testing the 6 note autonomous (Still Testing)
+     *
+     */
+    Command fourNoteAmpSideWing = new PathPlannerAuto("4 Note Amp-Side Wing");
+    autoChooser.addOption("4 Note Amp-Side Wing", fourNoteAmpSideWing);
+
+    Command fourNoteSourceSideWing = new PathPlannerAuto("4 Note Source-Side Wing");
+    autoChooser.addOption("4 Note Source-Side Wing", fourNoteSourceSideWing);
 
     /************ Drive Velocity Tuning ************
      *
@@ -541,16 +479,16 @@ public class RobotContainer {
 
     // lock rotation to the nearest 180° while driving
     oi.getLock180Button()
-        .onTrue(
-            new RotateToAngle(
+        .whileTrue(
+            new TeleopSwerve(
                 drivetrain,
                 oi::getTranslateX,
                 oi::getTranslateY,
                 () ->
                     (drivetrain.getPose().getRotation().getDegrees() > -90
                             && drivetrain.getPose().getRotation().getDegrees() < 90)
-                        ? 0.0
-                        : 180.0));
+                        ? Rotation2d.fromDegrees(0.0)
+                        : Rotation2d.fromDegrees(180.0)));
 
     // field-relative toggle
     oi.getFieldRelativeButton()
@@ -624,6 +562,7 @@ public class RobotContainer {
       this.lastAlliance = alliance.get();
       this.drivetrain.updateAlliance(this.lastAlliance);
       this.shooter.updateAlliance(this.lastAlliance);
+      Field2d.getInstance().updateAlliance(this.lastAlliance);
     }
   }
 }
