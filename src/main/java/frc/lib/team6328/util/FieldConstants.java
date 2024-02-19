@@ -105,8 +105,7 @@ public class FieldConstants {
 
     public static Translation3d blueBottomRightSpeaker =
         new Translation3d(0.0, Units.inchesToMeters(238.815), Units.inchesToMeters(78.324));
-    public static Translation3d blueBottomLeftSpeaker =
-        new Translation3d(0.0, Units.inchesToMeters(197.765), Units.inchesToMeters(78.324));
+    public static Translation3d blueBottomLeftSpeaker =        new Translation3d(0.0, Units.inchesToMeters(197.765), Units.inchesToMeters(78.324));
   }
 
   public static final class RedSpeaker {
@@ -125,8 +124,43 @@ public class FieldConstants {
         FieldConstants.flipForRedSide(BlueSpeaker.blueBottomRightSpeaker);
   }
 
+
+   public static class BlueChainAmpCenter{
+    public static Translation2d blueChainAmp =  new Translation2d(Units.inchesToMeters(182.73), Units.inchesToMeters(177.10)); //Change coordinates to be 17 centimeters in front of the chain
+    public static Pose2d blueChainAmpPose = new Pose2d(blueChainAmp, new Rotation2d(-((Math.PI)/3))); 
+
+  }
+
+  public static class BlueChainSourceCenter{
+    public static Translation2d blueChainSource = new Translation2d(Units.inchesToMeters(182.73), Units.inchesToMeters(146.19)); //Change coordinates to be 17 centimeters in front of the chain
+    public static Pose2d blueChainSourcePose = new Pose2d(blueChainSource, new Rotation2d(((Math.PI)/3)));
+  }
+
+   public static class BlueChainMiddleCenter{
+    public static Translation2d blueChainMiddle =  new Translation2d(Units.inchesToMeters(209.48), Units.inchesToMeters(161.62)); //Change coordinates to be 17 centimeters in front of the chain
+    public static Pose2d blueChainMiddlePose = new Pose2d(blueChainMiddle, new Rotation2d(((Math.PI))));
+  }
+
+  public static class RedChainAmpCenter{
+    public static Translation2d redChainAmp =  new Translation2d(Units.inchesToMeters(468.69), Units.inchesToMeters(177.10)); //Change coordinates to be 17 centimeters in front of the chain
+    public static Pose2d redChainAmpPose = flipForRedSide(BlueChainAmpCenter.blueChainAmpPose); 
+  }
+
+  public static class RedChainSourceCenter{
+    public static Translation2d redChainSource = new Translation2d(Units.inchesToMeters(468.69), Units.inchesToMeters(146.19)); //Change coordinates to be 17 centimeters in front of the chain
+    public static Pose2d redChainSourcePose = flipForRedSide(BlueChainSourceCenter.blueChainSourcePose);
+  }
+
+   public static class RedChainMiddleCenter{
+    public static Translation2d redChainMiddle =  new Translation2d(Units.inchesToMeters(441.79), Units.inchesToMeters(161.62)); //Change coordinates to be 17 centimeters in front of the april tag
+    public static Pose2d redChainMiddlePose = flipForRedSide(BlueChainMiddleCenter.blueChainMiddlePose); 
+  }
+
+
+
+
   public static class RedSource{
-    public static Translation2d redSourceCenter = new Translation2d(Units.inchesToMeters(35.6247), Units.inchesToMeters(21.9704));
+    public static Translation2d redSourceCenter = new Translation2d(Units.inchesToMeters(35.6247), Units.inchesToMeters(21.9704)); //Change coordinates to be 17 centimeters in front of the chain
     public static Pose2d redSourcePose = new Pose2d(redSourceCenter, new Rotation2d(2.8163-((Math.PI)/2)));
   }
 

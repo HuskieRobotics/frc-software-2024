@@ -34,6 +34,7 @@ import frc.lib.team3061.vision.Vision;
 import frc.lib.team3061.vision.VisionConstants;
 import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
+import frc.lib.team6328.util.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.DriveToPose;
 import frc.robot.commands.FeedForwardCharacterization;
@@ -543,7 +544,15 @@ public class RobotContainer {
                   // It might work but I'm not quite sure if the range of values goes from -pi to pi
                 }));
 
+   
+                
+    oi.getLock180Button().onTrue(
+      new DriveToPose(
+        drivetrain, 
+        () -> Field2d.getInstance().getClosestChain(Drivetrain.Pose2d)
+      )
       
+      );  
 
     oi.getLock180Button().onTrue(
       new DriveToPose(

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.Drivetrain;
+import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.FieldConstants;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -250,4 +251,32 @@ public class Field2d {
               new Rotation2d(FieldConstants.RedSource.redSourcePose.getRotation().getRadians()+Math.PI));
     }
   }
-}
+
+  public Pose2d getClosestChain(Pose2d robotPose){   
+
+    ArrayList<Pose2d> aprilTagArray = new ArrayList<Pose2d>();
+
+    if(alliance == Alliance.Blue){
+      aprilTagArray.add(FieldConstants.BlueChainAmpCenter.blueChainAmpPose);
+      aprilTagArray.add(FieldConstants.BlueChainMiddleCenter.blueChainMiddlePose);
+      aprilTagArray.add(FieldConstants.BlueChainSourceCenter.blueChainSourcePose);
+
+      return robotPose.nearest(aprilTagArray);
+ } else {
+      aprilTagArray.add(FieldConstants.RedChainAmpCenter.redChainAmpPose);
+      aprilTagArray.add(FieldConstants.RedChainMiddleCenter.redChainMiddlePose);
+      aprilTagArray.add(FieldConstants.RedChainSourceCenter.redChainSourcePose);
+
+      return robotPose.nearest(aprilTagArray);
+
+ }
+    
+
+ 
+      
+      
+  }
+
+      
+
+
