@@ -141,7 +141,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotorSupplyCurrentStatusSignal = angleMotor.getSupplyCurrent();
     kickerMotorSupplyCurrentStatusSignal = kickerMotor.getSupplyCurrent();
 
-    kickerMotorVelocityReferenceStatusSignal = dunkerMotor.getClosedLoopReference();
+    kickerMotorVelocityReferenceStatusSignal = kickerMotor.getClosedLoopReference();
 
     configShootMotor(shootMotorTop, SHOOT_TOP_INVERTED);
     configShootMotor(shootMotorBottom, SHOOT_BOTTOM_INVERTED);
@@ -163,7 +163,11 @@ public class ShooterIOTalonFX implements ShooterIO {
         shootMotorTopSupplyCurrentStatusSignal,
         shootMotorBottomSupplyCurrentStatusSignal,
         dunkerMotorSupplyCurrentStatusSignal,
-        angleMotorSupplyCurrentStatusSignal);
+        angleMotorSupplyCurrentStatusSignal,
+        kickerMotorVelocityReferenceStatusSignal,
+        kickerMotorStatorCurrentStatusSignal,
+        kickerMotorSupplyCurrentStatusSignal,
+        kickerMotorVelocityStatusSignal);
 
     // Updates Top Shooter Motor Inputs
     shooterInputs.shootMotorTopStatorCurrentAmps =
