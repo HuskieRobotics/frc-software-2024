@@ -549,9 +549,8 @@ public class RobotContainer {
     oi.getLock180Button().onTrue(
       new DriveToPose(
         drivetrain, 
-        () -> Field2d.getInstance().getClosestChain(Drivetrain.Pose2d)
+        () -> Field2d.getInstance().getClosestChain(drivetrain.getPose())
       )
-      
       );  
 
     oi.getLock180Button().onTrue(

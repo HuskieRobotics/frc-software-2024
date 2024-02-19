@@ -262,21 +262,12 @@ public class Field2d {
       aprilTagArray.add(FieldConstants.BlueChainSourceCenter.blueChainSourcePose);
 
       return robotPose.nearest(aprilTagArray);
- } else {
+    } else {
       aprilTagArray.add(FieldConstants.RedChainAmpCenter.redChainAmpPose);
       aprilTagArray.add(FieldConstants.RedChainMiddleCenter.redChainMiddlePose);
       aprilTagArray.add(FieldConstants.RedChainSourceCenter.redChainSourcePose);
 
       return robotPose.nearest(aprilTagArray);
-
- }
-    
-
- 
-      
-      
+    }
   }
-
-      
-
-
+}
