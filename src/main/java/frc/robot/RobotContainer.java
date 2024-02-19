@@ -275,6 +275,7 @@ public class RobotContainer {
   private void createCTRESimSubsystems() {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
+    Climber climber = new Climber(new ClimberIOTalonFX() {});
 
     AprilTagFieldLayout layout;
     try {

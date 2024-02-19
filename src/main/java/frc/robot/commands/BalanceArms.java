@@ -10,8 +10,10 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.team3061.drivetrain.Drivetrain;
+import frc.lib.team6328.util.TunableNumber;
 import frc.robot.subsystems.climber.Climber;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -29,6 +31,10 @@ public class BalanceArms extends Command {
   private static final double MAX_VELOCITY_MPS = 0.0;
   private static final double CONSTANT_CLIMBER_CURRENT = 6.0;
 
+  TunableNumber autoKP = new TunableNumber("Climber/AutoBalanceKP", 0.0);
+  TunableNumber autoKI = new TunableNumber("Climber/AutoBalanceKI", 0.0);
+  TunableNumber autoKD = new TunableNumber("Climber/AutoBalanceKD", 0.0);
+
   private static double autoBalanceKP = 0.0;
   private static double autoBalanceKI = 0.0;
   private static double autoBalanceKD = 0.0;
@@ -44,18 +50,19 @@ public class BalanceArms extends Command {
   }
 
 
+
   /** Creates a new BalanceArms. */
   public BalanceArms(Climber climber, Drivetrain drivetrain) {
     this.climber = climber;
     this.drivetrain = drivetrain;
-    addRequirements(climber, drivetrain);
+    addRequirements(climber);
     this.pidController = new PIDController(autoBalanceKP, autoBalanceKD, autoBalanceKI);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-
+    pidController.reset();
     climber.setLeftMotorCurrent(CONSTANT_CLIMBER_CURRENT);
     climber.setRightMotorCurrent(CONSTANT_CLIMBER_CURRENT);
 
@@ -65,19 +72,19 @@ public class BalanceArms extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (drivetrain.getRoll() < THRESHOLD && drivetrain.getRoll() > -THRESHOLD) {
+    if (Math.abs(drivetrain.getRoll()) < THRESHOLD){
       climber.setLeftMotorCurrent(CONSTANT_CLIMBER_CURRENT);
       climber.setRightMotorCurrent(CONSTANT_CLIMBER_CURRENT);
     }
 
     else if (drivetrain.getRoll() > THRESHOLD) {
-      climber.setLeftMotorCurrent(pidController.calculate(drivetrain.getRoll(), 0));
-      climber.setRightMotorCurrent(0);
+      climber.setRightMotorCurrent(pidController.calculate(drivetrain.getRoll(), 0));
+      climber.setLeftMotorCurrent(0);
     }
 
     else if (drivetrain.getRoll() < THRESHOLD) {
-      climber.setRightMotorCurrent(pidController.calculate(drivetrain.getRoll(), 0));
-      climber.setLeftMotorCurrent(0);
+      climber.setLeftMotorCurrent(pidController.calculate(drivetrain.getRoll(), 0));
+      climber.setRightMotorCurrent(0);
     }
 
   }

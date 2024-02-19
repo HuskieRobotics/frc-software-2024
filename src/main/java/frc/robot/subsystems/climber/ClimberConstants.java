@@ -15,10 +15,10 @@ public class ClimberConstants {
   public static final int LEFT_MOTOR_CAN_ID = 16;
   public static final int RIGHT_MOTOR_CAN_ID = 17;
 
-  // FIXME: update gear ratio
   public static final double GEAR_RATIO = 25.0;
-  public static final double DRUM_CIRCUMFERENCE = 0.0254;
-  public static final boolean MOTOR_INVERTED = false;
+  public static final double DRUM_CIRCUMFERENCE_METERS = 0.0254;
+  public static final boolean LEFT_MOTOR_INVERTED = false;
+  public static final boolean RIGHT_MOTOR_INVERTED = true;
 
   public static final double KP = 0.0;
   public static final double KI = 0;
@@ -34,11 +34,12 @@ public class ClimberConstants {
   public static final double CONTINUOUS_CURRENT_LIMIT = 50;
   public static final double PEAK_CURRENT_LIMIT = 60;
   public static final double PEAK_CURRENT_DURATION = 0.5;
-  public static final double STATOR_CURRENT_LIMIT = 0; // FIXME: Update stator current limit. Software feature sheet is not updated
+  public static final double STATOR_CURRENT_LIMIT =
+      0; // FIXME: Update stator current limit. Software feature sheet is not updated
 
   public static final int TIMEOUT_MS = 30;
   public static final double LEFT_EXTEND_POSITION = 0;
-public static final double RIGHT_EXTEND_POSITION = 0;
-public static final double LEFT_CONTINUE_POSITION = 0;
-public static final double RIGHT_CONTINUE_POSITION = 0;
+  public static final double RIGHT_EXTEND_POSITION = 0;
+  public static final double LEFT_CONTINUE_POSITION = 0;
+  public static final double RIGHT_CONTINUE_POSITION = 0;
 }

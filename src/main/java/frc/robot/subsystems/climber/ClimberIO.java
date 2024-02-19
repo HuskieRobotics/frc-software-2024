@@ -27,7 +27,6 @@ public interface ClimberIO {
    * Set the motor position to the specified value in degrees.
    *
    * @param position the position to set the motor to in degrees
-   * @param arbitraryFeedForward the arbitrary feed forward as a percentage of maximum power
    */
   public default void setLeftMotorPosition(double position) {}
 
@@ -35,7 +34,7 @@ public interface ClimberIO {
 
   public default void setPositionZero() {}
 
-  public default void setLeftMotorPower(double current) {}
+  public default void setLeftMotorCurrent(double current) {}
 
-  public default void setRightMotorPower(double current) {}
+  public default void setRightMotorCurrent(double current) {}
 }
