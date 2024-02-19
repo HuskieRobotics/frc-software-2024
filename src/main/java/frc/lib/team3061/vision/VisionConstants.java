@@ -17,7 +17,7 @@ public final class VisionConstants {
   public static final String SUBSYSTEM_NAME = "Vision";
 
   // the pose ambiguity must be less than this value for the target to be considered valid
-  public static final double MAXIMUM_AMBIGUITY = 0.2;
+  public static final double MAXIMUM_AMBIGUITY = 0.15;
 
   // the maximum distance between the robot's pose derived from the target and the current robot's
   // estimated pose for the target to be used to update the robot's pose (essentially, always use a
