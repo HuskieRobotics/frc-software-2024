@@ -372,6 +372,39 @@ public class Drivetrain extends SubsystemBase {
   }
 
   /**
+   * Controls the drivetrain to move the robot with the desired velocities in the x and y
+   * directions, while keeping the robot aligned to the specified target rotation. The velocities
+   * must be specified from the field's frame of reference as field relative mode is assumed. In the
+   * field frame of reference, the origin of the field to the lower left corner (i.e., the corner of
+   * the field to the driver's right). Zero degrees is away from the driver and increases in the CCW
+   * direction.
+   *
+   * <p>If the translation slow mode feature is enabled, the corresponding velocities will be scaled
+   * to enable finer control.
+   *
+   * @param xVelocity the desired velocity in the x direction (m/s)
+   * @param yVelocity the desired velocity in the y direction (m/s)
+   * @param targetDirection the desired direction of the robot's orientation. Zero degrees is away
+   *     from the driver and increases in the CCW direction.
+   * @param isOpenLoop true for open-loop control; false for closed-loop control
+   */
+  public void driveFacingAngle(
+      double xVelocity, double yVelocity, Rotation2d targetDirection, boolean isOpenLoop) {
+
+    // get the slow-mode multiplier from the config
+    double slowModeMultiplier = RobotConfig.getInstance().getRobotSlowModeMultiplier();
+
+    // if translation or rotation is in slow mode, multiply the x and y velocities by the
+    // slow-mode multiplier
+    if (isTranslationSlowMode) {
+      xVelocity *= slowModeMultiplier;
+      yVelocity *= slowModeMultiplier;
+    }
+
+    this.io.driveFieldRelativeFacingAngle(xVelocity, yVelocity, targetDirection, isOpenLoop);
+  }
+
+  /**
    * Stops the motion of the robot. Since the motors are in break mode, the robot will stop soon
    * after this method is invoked.
    */
@@ -687,6 +720,205 @@ public class Drivetrain extends SubsystemBase {
     return this.isMoveToPoseEnabled;
   }
 
+  // method to convert swerve module number to location
+  private String getSwerveLocation(int swerveModuleNumber) {
+    switch (swerveModuleNumber) {
+      case 0:
+        return "FL";
+      case 1:
+        return "FR";
+      case 2:
+        return "BL";
+      case 3:
+        return "BR";
+      default:
+        return "UNKNOWN";
+    }
+  }
+
+  /*
+   * Checks the swerve module to see if its velocity and rotation are moving as expected
+   * @param swerveModuleNumber the swerve module number to check
+   */
+
+  private void checkSwerveModule(
+      int swerveModuleNumber,
+      double angleTarget,
+      double angleTolerance,
+      double velocityTarget,
+      double velocityTolerance) {
+
+    Boolean isOffset = false;
+
+    // Check to see if the direction is rotated properly
+    // steerAbsolutePositionDeg is a value that is between (-180, 180]
+
+    if (this.inputs.swerve[swerveModuleNumber].steerAbsolutePositionDeg
+            > angleTarget - angleTolerance
+        && this.inputs.swerve[swerveModuleNumber].steerAbsolutePositionDeg
+            < angleTarget + angleTolerance) {
+    }
+
+    // check if angle is in threshold +- 180
+    else if (this.inputs.swerve[swerveModuleNumber].steerAbsolutePositionDeg
+            > angleTarget - angleTolerance - 180
+        && this.inputs.swerve[swerveModuleNumber].steerAbsolutePositionDeg
+            < angleTarget + angleTolerance - 180) {
+      isOffset = true;
+    } else if (this.inputs.swerve[swerveModuleNumber].steerAbsolutePositionDeg
+            > angleTarget - angleTolerance + 180
+        && this.inputs.swerve[swerveModuleNumber].steerAbsolutePositionDeg
+            < angleTarget + angleTolerance + 180) {
+      isOffset = true;
+    }
+    // if not, add fault
+    else {
+      FaultReporter.getInstance()
+          .addFault(
+              SUBSYSTEM_NAME,
+              "[System Check] Swerve module "
+                  + getSwerveLocation(swerveModuleNumber)
+                  + " not rotating in the threshold as expected. Should be: "
+                  + angleTarget
+                  + " is: "
+                  + inputs.swerve[swerveModuleNumber].steerAbsolutePositionDeg);
+    }
+
+    // Checks the velocity of the swerve module depending on if there is an offset
+
+    if (!isOffset) {
+      if (inputs.swerve[swerveModuleNumber].driveVelocityMetersPerSec
+              > velocityTarget - velocityTolerance
+          && inputs.swerve[swerveModuleNumber].driveVelocityMetersPerSec
+              < velocityTarget + velocityTolerance) {
+      } else {
+        FaultReporter.getInstance()
+            .addFault(
+                SUBSYSTEM_NAME,
+                "[System Check] Swerve module "
+                    + getSwerveLocation(swerveModuleNumber)
+                    + " not moving as fast as expected. Should be: "
+                    + velocityTarget
+                    + " is: "
+                    + inputs.swerve[swerveModuleNumber].driveVelocityMetersPerSec);
+      }
+    } else { // if there is an offset, check the velocity in the opposite direction
+      if (inputs.swerve[swerveModuleNumber].driveVelocityMetersPerSec
+              < -(velocityTarget - velocityTolerance)
+          && inputs.swerve[swerveModuleNumber].driveVelocityMetersPerSec
+              > -(velocityTarget + velocityTolerance)) {
+      } else {
+        FaultReporter.getInstance()
+            .addFault(
+                SUBSYSTEM_NAME,
+                "[System Check] Swerve module "
+                    + getSwerveLocation(swerveModuleNumber)
+                    + " not moving as fast as expected. REVERSED Should be: "
+                    + velocityTarget
+                    + " is: "
+                    + inputs.swerve[swerveModuleNumber].driveVelocityMetersPerSec);
+      }
+    }
+  }
+
+  private Command getSwerveCheckCommand(SwerveCheckTypes type) {
+
+    double xVelocity;
+    double yVelocity;
+    double rotationalVelocity;
+
+    double angleTarget;
+    double velocityTarget;
+
+    switch (type) {
+      case LEFT:
+        xVelocity = 0;
+        yVelocity = 1;
+        rotationalVelocity = 0;
+        velocityTarget = 1;
+        angleTarget = 90;
+        break;
+      case RIGHT:
+        xVelocity = 0;
+        yVelocity = -1;
+        rotationalVelocity = 0;
+        velocityTarget = -1;
+        angleTarget = 90;
+        break;
+      case FORWARD:
+        xVelocity = 1;
+        yVelocity = 0;
+        rotationalVelocity = 0;
+        velocityTarget = 1;
+        angleTarget = 0;
+        break;
+      case BACKWARD:
+        xVelocity = -1;
+        yVelocity = 0;
+        rotationalVelocity = 0;
+        velocityTarget = -1;
+        angleTarget = 0;
+        break;
+      case CLOCKWISE:
+        return Commands.parallel(
+                Commands.run(
+                    () -> {
+                      this.drive(0, 0, -Math.PI, false, false);
+                    },
+                    this),
+                Commands.waitSeconds(1)
+                    .andThen(
+                        Commands.runOnce(
+                            () -> {
+                              checkSwerveModule(0, 135, 1, -0.38 * Math.PI, .1);
+                              checkSwerveModule(1, 45, 1, -0.38 * Math.PI, .1);
+                              checkSwerveModule(2, 45, 1, 0.38 * Math.PI, .1);
+                              checkSwerveModule(3, 135, 1, 0.38 * Math.PI, .1);
+                            })))
+            .withTimeout(1);
+      case COUNTERCLOCKWISE:
+        return Commands.parallel(
+                Commands.run(
+                    () -> {
+                      this.drive(0, 0, Math.PI, false, false);
+                    },
+                    this),
+                Commands.waitSeconds(1)
+                    .andThen(
+                        Commands.runOnce(
+                            () -> {
+                              checkSwerveModule(0, 135, 1, .38 * Math.PI, .1);
+                              checkSwerveModule(1, 45, 1, .38 * Math.PI, .1);
+                              checkSwerveModule(2, 45, 1, -.38 * Math.PI, .1);
+                              checkSwerveModule(3, 135, 1, -.38 * Math.PI, .1);
+                            })))
+            .withTimeout(1);
+      default:
+        xVelocity = 0;
+        yVelocity = 0;
+        rotationalVelocity = 0;
+        angleTarget = 0;
+        velocityTarget = 0;
+        break;
+    }
+
+    return Commands.parallel(
+            Commands.run(
+                () -> {
+                  this.drive(xVelocity, yVelocity, rotationalVelocity, false, false);
+                },
+                this),
+            Commands.waitSeconds(1)
+                .andThen(
+                    Commands.runOnce(
+                        () -> {
+                          for (int i = 0; i < this.inputs.swerve.length; i++) {
+                            checkSwerveModule(i, angleTarget, 1, velocityTarget, 0.1);
+                          }
+                        })))
+        .withTimeout(2);
+  }
+
   /**
    * This method should be invoked once the alliance color is known. Refer to the RobotContainer's
    * checkAllianceColor method for best practices on when to check the alliance's color. The
@@ -709,10 +941,19 @@ public class Drivetrain extends SubsystemBase {
     return this.alliance == Alliance.Red;
   }
 
-  private Command getSystemCheckCommand() {
-    return Commands.sequence(Commands.sequence(Commands.waitSeconds(0.25)))
+  public Command getSystemCheckCommand() {
+    return Commands.sequence(
+            Commands.runOnce(() -> this.disableFieldRelative(), this),
+            Commands.runOnce(() -> FaultReporter.getInstance().clearFaults(SUBSYSTEM_NAME)),
+            getSwerveCheckCommand(SwerveCheckTypes.LEFT),
+            getSwerveCheckCommand(SwerveCheckTypes.RIGHT),
+            getSwerveCheckCommand(SwerveCheckTypes.FORWARD),
+            getSwerveCheckCommand(SwerveCheckTypes.BACKWARD),
+            getSwerveCheckCommand(SwerveCheckTypes.CLOCKWISE),
+            getSwerveCheckCommand(SwerveCheckTypes.COUNTERCLOCKWISE))
         .until(() -> !FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).isEmpty())
-        .andThen(Commands.runOnce(() -> drive(0, 0, 0, true, false), this));
+        .andThen(Commands.runOnce(() -> this.drive(0, 0, 0, true, false), this))
+        .withName(SUBSYSTEM_NAME + "SystemCheck");
   }
 
   /**
@@ -748,5 +989,14 @@ public class Drivetrain extends SubsystemBase {
   private enum DriveMode {
     NORMAL,
     X
+  }
+
+  private enum SwerveCheckTypes {
+    LEFT,
+    RIGHT,
+    FORWARD,
+    BACKWARD,
+    CLOCKWISE,
+    COUNTERCLOCKWISE
   }
 }
