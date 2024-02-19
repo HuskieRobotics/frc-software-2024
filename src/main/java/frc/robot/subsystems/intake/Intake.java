@@ -6,6 +6,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.leds.LEDs.IntakeLEDState;
+
+import java.util.ArrayList;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
@@ -219,7 +222,50 @@ public class Intake extends SubsystemBase {
   }
 
   private Command getStatesCheckCommand() {
-    return null;
+    IntakeState[] desiredStateSequence = {
+      IntakeState.EMPTY,
+      IntakeState.NOTE_IN_INTAKE,
+      IntakeState.IN_BETWEEN_INTAKE_AND_DRUM,
+      IntakeState.NOTE_IN_DRUM,
+      IntakeState.IN_BETWEEN_DRUM_AND_KICKER,
+      IntakeState.NOTE_IN_KICKER
+    };
+    
+    ArrayList<IntakeState> actualStateSeqeunce = new ArrayList<>();
+
+    return Commands.parallel(
+      Commands.run(this::runIntakeStateMachine),
+      Commands.waitSeconds(1).andThen(
+        Commands.runOnce(() -> checkStateSequence(actualStateSeqeunce, desiredStateSequence))
+      )
+    );
+  }
+
+  private void checkStateSequence(ArrayList<IntakeState> actualStateSequence, IntakeState[] desiredStateSequence) {
+    actualStateSequence.add(IntakeState.EMPTY);
+    IntakeState mostRecentIntakeState = IntakeState.EMPTY;
+
+    boolean correct = actualStateSequence.get(0).equals(desiredStateSequence[0]);
+
+    while (correct) {
+      if (intakeState != mostRecentIntakeState) {
+        actualStateSequence.add(intakeState);
+        mostRecentIntakeState = intakeState;
+      }
+
+      for (int i = 0; i < actualStateSequence.size(); i++) {
+        if (!actualStateSequence.get(i).equals(desiredStateSequence[i])) {
+          correct = false;
+          FaultReporter.getInstance().addFault(
+            SUBSYSTEM_NAME,
+            "[System Check] Intake State Incorrect, "
+            + "Expected: " + desiredStateSequence[i] + ", "
+            + "Actual: " + actualStateSequence.get(i)
+          );
+        }
+      }
+    }
+
   }
 
   
