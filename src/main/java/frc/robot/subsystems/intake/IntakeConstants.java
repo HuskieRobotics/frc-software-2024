@@ -37,8 +37,8 @@ public class IntakeConstants {
 
   // velocities
 
-  public static final double INTAKE_VELOCITY_ROLLERS_RPS = 70.0;
-  public static final double REPEL_VELOCITY_ROLLERS_RPS = -70.0;
+  public static final double INTAKE_VELOCITY_ROLLERS_RPS = 40.0;
+  public static final double REPEL_VELOCITY_ROLLERS_RPS = -40.0;
   public static final double DRUM_VELOCITY_RPS = 8.0;
   public static final double KICKER_VELOCITY_RPS = 6.0;
 
