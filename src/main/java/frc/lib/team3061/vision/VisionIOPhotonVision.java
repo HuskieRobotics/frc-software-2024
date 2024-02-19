@@ -1,5 +1,7 @@
 package frc.lib.team3061.vision;
 
+import static frc.lib.team3061.vision.VisionConstants.*;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.lib.team6328.util.Alert;
@@ -9,6 +11,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 /**
  * PhotonVision-based implementation of the VisionIO interface.
@@ -56,21 +59,29 @@ public class VisionIOPhotonVision implements VisionIO {
 
     boolean newResult = Math.abs(latestTimestamp - this.lastTimestamp) > 1e-5;
     if (newResult) {
-      visionEstimate.ifPresent(
-          estimate -> {
-            inputs.estimatedCameraPose = estimate.estimatedPose;
-            inputs.estimatedCameraPoseTimestamp = estimate.timestampSeconds;
-            for (int i = 0; i < this.tagsSeen.length; i++) {
-              this.tagsSeen[i] = false;
-            }
-            for (int i = 0; i < estimate.targetsUsed.size(); i++) {
-              this.tagsSeen[estimate.targetsUsed.get(i).getFiducialId()] = true;
-            }
-            inputs.tagsSeen = this.tagsSeen;
-            inputs.lastCameraTimestamp = latestTimestamp;
-            this.lastTimestamp = latestTimestamp;
-            this.cyclesWithNoResults = 0;
-          });
+      double minAmbiguity = 10.0;
+      for (PhotonTrackedTarget target : camera.getLatestResult().getTargets()) {
+        if (target.getPoseAmbiguity() < minAmbiguity) {
+          minAmbiguity = target.getPoseAmbiguity();
+        }
+      }
+      if (minAmbiguity < MAXIMUM_AMBIGUITY) {
+        visionEstimate.ifPresent(
+            estimate -> {
+              inputs.estimatedCameraPose = estimate.estimatedPose;
+              inputs.estimatedCameraPoseTimestamp = estimate.timestampSeconds;
+              for (int i = 0; i < this.tagsSeen.length; i++) {
+                this.tagsSeen[i] = false;
+              }
+              for (int i = 0; i < estimate.targetsUsed.size(); i++) {
+                this.tagsSeen[estimate.targetsUsed.get(i).getFiducialId()] = true;
+              }
+              inputs.tagsSeen = this.tagsSeen;
+              inputs.lastCameraTimestamp = latestTimestamp;
+              this.lastTimestamp = latestTimestamp;
+              this.cyclesWithNoResults = 0;
+            });
+      }
     }
 
     // if no tags have been seen for the specified number of cycles, clear the array
