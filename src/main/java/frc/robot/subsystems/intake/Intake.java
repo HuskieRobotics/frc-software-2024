@@ -1,10 +1,10 @@
 package frc.robot.subsystems.intake;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.leds.LEDs;
-import frc.lib.team3061.leds.LEDsRIO;
 import frc.lib.team3061.leds.LEDs.IntakeLEDState;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
@@ -12,6 +12,8 @@ public class Intake extends SubsystemBase {
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
   private final LEDs leds;
+
+  private int intakeAndDrumTimeout;
 
   // Intakes, Drum, Kicker
   enum IntakeState {
@@ -34,12 +36,14 @@ public class Intake extends SubsystemBase {
   public Intake(IntakeIO io) {
     this.io = io;
     leds = LEDs.getInstance();
-    intakeState = IntakeState.EMPTY;    
+    intakeState = IntakeState.EMPTY;
 
     leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
     this.intakeGamePiece();
-  }
 
+    
+    FaultReporter.getInstance().registerSystemCheck("INTAKE", getSystemCheckCommand());
+  }
 
   @Override
   public void periodic() {
@@ -51,9 +55,6 @@ public class Intake extends SubsystemBase {
   }
 
   public void runIntakeStateMachine() {
-
-    // TODO: write state for in between intake and drum
-    // TODO: as soon as we detect one IR, repel the other one, then repel both when we get in the drum
 
     if (intakeState == IntakeState.EMPTY) {
       // if it is empty, then this is the only 1 possible next steps / situations
@@ -67,6 +68,9 @@ public class Intake extends SubsystemBase {
           this.repelGamePieceRight();
         }
         this.transitionGamePiece();
+      } else if (inputs.isKickerIRBlocked) {
+        intakeState = IntakeState.NOTE_IN_KICKER;
+        this.repelGamePiece();
       }
     } else if (intakeState == IntakeState.IN_BETWEEN_DRUM_AND_KICKER) {
       if (inputs.isKickerIRBlocked) {
@@ -79,22 +83,29 @@ public class Intake extends SubsystemBase {
       // robot
       //   1. we get both the drum and the intake to be sensed at the same time
       //   2. we have no sensors sensed as we are in between the intake and the drum
-      //   3. we are going in between intake and drum
       if (inputs.isDrumIRBlocked) {
         intakeState = IntakeState.NOTE_IN_INTAKE_AND_DRUM;
         this.transitionGamePiece();
       } else if (inputs.isLeftRollerIRBlocked || inputs.isRightRollerIRBlocked) {
         intakeState = IntakeState.NOTE_IN_INTAKE;
       } else {
-        // we are no in between intake and drum
+        // we are now in between intake and drum
         intakeState = IntakeState.IN_BETWEEN_INTAKE_AND_DRUM;
-        leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
+
+        // set the timeout here
+        intakeAndDrumTimeout = 0;
       }
     } else if (intakeState == IntakeState.IN_BETWEEN_INTAKE_AND_DRUM) {
       //  the only possible next step is that we are only in the drum
+      //  add a timeout so that if we are here for too long we go back to being empty
+      intakeAndDrumTimeout++;
+
       if (inputs.isDrumIRBlocked) {
         intakeState = IntakeState.NOTE_IN_DRUM;
         this.transitionGamePiece();
+      } else if (intakeAndDrumTimeout >= IntakeConstants.IN_BETWEEN_TIMEOUT_SECONDS * 50) {
+        intakeState = IntakeState.EMPTY;
+        leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       }
     } else if (intakeState == IntakeState.NOTE_IN_INTAKE_AND_DRUM) {
       // the only possible next step is that we are only in the drum
@@ -121,16 +132,8 @@ public class Intake extends SubsystemBase {
     }
   }
 
-  public boolean getRightRollerIRSensor() {
-    return inputs.isRightRollerIRBlocked;
-  }
-
-  public boolean getLeftRollerIRSensor() {
-    return inputs.isLeftRollerIRBlocked;
-  }
-
-  public boolean getDrumIRSensor() {
-    return inputs.isDrumIRBlocked;
+  public Command getSystemCheckCommand() {
+    return null;
   }
 
   public boolean manualOverrideEnabled() {

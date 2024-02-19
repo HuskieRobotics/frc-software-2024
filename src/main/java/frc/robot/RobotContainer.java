@@ -27,7 +27,6 @@ import frc.lib.team3061.drivetrain.swerve.SwerveModuleIOTalonFXPhoenix6;
 import frc.lib.team3061.gyro.GyroIO;
 import frc.lib.team3061.gyro.GyroIOPigeon2Phoenix6;
 import frc.lib.team3061.leds.LEDs;
-import frc.lib.team3061.leds.LEDsRIO;
 import frc.lib.team3061.leds.LEDs.IntakeLEDState;
 import frc.lib.team3061.pneumatics.Pneumatics;
 import frc.lib.team3061.pneumatics.PneumaticsIORev;
@@ -554,13 +553,13 @@ public class RobotContainer {
         .onTrue(
             Commands.either(
                 Commands.sequence(
-                  Commands.runOnce(() -> leds.setIntakeLEDState(IntakeLEDState.INTAKE_MANUALLY_TURNED_OFF), leds),
-                  Commands.runOnce(intake::turnIntakeOff, intake).withName("TurnIntakeOff")
-                ),
+                    Commands.runOnce(
+                        () -> leds.setIntakeLEDState(IntakeLEDState.INTAKE_MANUALLY_TURNED_OFF)),
+                    Commands.runOnce(intake::turnIntakeOff, intake).withName("TurnIntakeOff")),
                 Commands.sequence(
-                  Commands.runOnce(() -> leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE), leds),
-                  Commands.run(intake::intakeGamePiece, intake).withName("IntakeGamePiece")
-                ),
+                    Commands.runOnce(
+                        () -> leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE)),
+                    Commands.run(intake::intakeGamePiece, intake).withName("IntakeGamePiece")),
                 intake::runningManualIntake));
 
     oi.getManualIntakeRightOffButton()
@@ -578,17 +577,13 @@ public class RobotContainer {
                 Commands.runOnce(intake::turnLeftIntakeOff, intake).withName("TurnLeftIntakeOff"),
                 Commands.run(intake::intakeGamePieceLeft, intake).withName("IntakeGamePieceLeft"),
                 intake::runningManualIntake));
-    
+
     oi.getManualRepelAllButton()
         .and(intake::manualOverrideEnabled)
         .onTrue(
-          Commands.sequence(
-            Commands.runOnce(intake::repelGamePiece, intake).withName("RepelGamePiece"),
-            Commands.runOnce(() -> leds.setIntakeLEDState(IntakeLEDState.MANUAL_REPEL), leds)
-          )
-        );
-    
-    
+            Commands.sequence(
+                Commands.runOnce(intake::repelGamePiece, intake).withName("RepelGamePiece"),
+                Commands.runOnce(() -> leds.setIntakeLEDState(IntakeLEDState.MANUAL_REPEL))));
   }
 
   private void configureDrivetrainCommands() {
