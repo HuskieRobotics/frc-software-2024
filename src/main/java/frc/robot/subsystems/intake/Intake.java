@@ -264,6 +264,12 @@ public class Intake extends SubsystemBase {
           );
         }
       }
+
+      if (actualStateSequence.size() == desiredStateSequence.length) {
+        // does anything need to be done here to confirm that this worked?
+        // or should it just break with no message?
+        break;
+      }
     }
 
   }
