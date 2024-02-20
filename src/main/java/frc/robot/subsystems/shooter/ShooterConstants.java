@@ -56,7 +56,7 @@ public class ShooterConstants {
   public static final double MOTION_MAGIC_CRUISE_VELOCITY = 0;
   public static final double MOTION_MAGIC_ACCELERATION = 0;
   public static final double MOTION_MAGIC_JERK = 0;
-  public static final double ANGLE_MOTOR_GEAR_RATIO = 1;
+  public static final double ANGLE_MOTOR_GEAR_RATIO = 576.0;
   public static final boolean ANGLE_MOTOR_INVERTED = false;
 
   // Dunker Motor

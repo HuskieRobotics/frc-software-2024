@@ -19,6 +19,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import frc.lib.team3061.RobotConfig;
+import frc.lib.team3061.util.PositionSystemSim;
 import frc.lib.team3061.util.VelocitySystemSim;
 import frc.lib.team6328.util.TunableNumber;
 
@@ -63,6 +64,7 @@ public class ShooterIOTalonFX implements ShooterIO {
 
   private VelocitySystemSim shootMotorTopSim;
   private VelocitySystemSim shootMotorBottomSim;
+  private PositionSystemSim angleMotorSim;
 
   // Shoot PID Tunable Numbers
   private final TunableNumber shootMotorsKP =
@@ -177,12 +179,21 @@ public class ShooterIOTalonFX implements ShooterIO {
             0.02,
             0.001,
             ShooterConstants.SHOOT_MOTORS_GEAR_RATIO);
+    this.angleMotorSim =
+        new PositionSystemSim(
+            angleMotor,
+            angleEncoder,
+            ShooterConstants.ANGLE_MOTOR_INVERTED,
+            0.2,
+            0.01,
+            ShooterConstants.ANGLE_MOTOR_GEAR_RATIO);
   }
 
   @Override
   public void updateInputs(ShooterIOInputs shooterInputs) {
     this.shootMotorBottomSim.updateSim();
     this.shootMotorTopSim.updateSim();
+    this.angleMotorSim.updateSim();
 
     BaseStatusSignal.refreshAll(
         shootMotorTopVelocityStatusSignal,
