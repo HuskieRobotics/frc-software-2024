@@ -65,23 +65,23 @@ public class VisionIOPhotonVision implements VisionIO {
           minAmbiguity = target.getPoseAmbiguity();
         }
       }
-      if (minAmbiguity < MAXIMUM_AMBIGUITY) {
-        visionEstimate.ifPresent(
-            estimate -> {
-              inputs.estimatedCameraPose = estimate.estimatedPose;
-              inputs.estimatedCameraPoseTimestamp = estimate.timestampSeconds;
-              for (int i = 0; i < this.tagsSeen.length; i++) {
-                this.tagsSeen[i] = false;
-              }
-              for (int i = 0; i < estimate.targetsUsed.size(); i++) {
-                this.tagsSeen[estimate.targetsUsed.get(i).getFiducialId()] = true;
-              }
-              inputs.tagsSeen = this.tagsSeen;
-              inputs.lastCameraTimestamp = latestTimestamp;
-              this.lastTimestamp = latestTimestamp;
-              this.cyclesWithNoResults = 0;
-            });
-      }
+      inputs.minAmbiguity = minAmbiguity;
+
+      visionEstimate.ifPresent(
+          estimate -> {
+            inputs.estimatedCameraPose = estimate.estimatedPose;
+            inputs.estimatedCameraPoseTimestamp = estimate.timestampSeconds;
+            for (int i = 0; i < this.tagsSeen.length; i++) {
+              this.tagsSeen[i] = false;
+            }
+            for (int i = 0; i < estimate.targetsUsed.size(); i++) {
+              this.tagsSeen[estimate.targetsUsed.get(i).getFiducialId()] = true;
+            }
+            inputs.tagsSeen = this.tagsSeen;
+            inputs.lastCameraTimestamp = latestTimestamp;
+            this.lastTimestamp = latestTimestamp;
+            this.cyclesWithNoResults = 0;
+          });
     }
 
     // if no tags have been seen for the specified number of cycles, clear the array
