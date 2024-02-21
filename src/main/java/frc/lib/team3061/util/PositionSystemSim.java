@@ -20,6 +20,7 @@ public class PositionSystemSim {
   private CANcoderSimState encoderSimState;
   private LinearSystemSim<N2, N1, N1> systemSim;
   private double gearRatio;
+  private double prevPosition = 0.0;
 
   public PositionSystemSim(
       TalonFX motor,
@@ -69,9 +70,9 @@ public class PositionSystemSim {
     double mechanismRadians = this.systemSim.getOutput(0);
     double mechanismRotations = mechanismRadians / (2 * Math.PI);
     double motorRotations = mechanismRotations * this.gearRatio;
-    double mechanismRadiansPerSec = this.systemSim.getOutput(1);
-    double mechanismRPS = mechanismRadiansPerSec / (2 * Math.PI);
-    double motorRPS = mechanismRadiansPerSec * this.gearRatio;
+    double mechanismRPS = (mechanismRotations - this.prevPosition) / Constants.LOOP_PERIOD_SECS;
+    this.prevPosition = mechanismRotations;
+    double motorRPS = mechanismRPS * this.gearRatio;
     this.motorSimState.setRawRotorPosition(motorRotations);
     this.motorSimState.setRotorVelocity(motorRPS);
     this.encoderSimState.setRawPosition(mechanismRotations);
