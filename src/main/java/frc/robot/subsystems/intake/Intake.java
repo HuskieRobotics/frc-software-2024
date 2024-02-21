@@ -152,6 +152,10 @@ public class Intake extends SubsystemBase {
     }
   }
 
+  private void setIntakeState(IntakeState state) {
+    this.intakeState = state;
+  }
+
   public Command getSystemCheckCommand() {
     /*
      * Order of what will be tested
@@ -163,14 +167,20 @@ public class Intake extends SubsystemBase {
       getVelocitiesCheckCommand(),
       getStatesCheckCommand()
     ).until(() -> !FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).isEmpty())
-    .andThen(Commands.runOnce(this::turnIntakeOff))
+    .andThen(Commands.sequence(
+      Commands.runOnce(this::turnIntakeOff),
+      Commands.runOnce(this::turnTransitionOff)))
     .withName(SUBSYSTEM_NAME + "SystemCheck");
   }
 
 
   private Command getVelocitiesCheckCommand() {
     return Commands.parallel(
-      Commands.run(this::runIntakeStateMachine),
+      Commands.parallel(
+        Commands.runOnce(() -> this.setIntakeState(IntakeState.EMPTY)),
+        Commands.run(this::intakeGamePiece),
+        Commands.run(this::transitionGamePiece)
+      ),
       Commands.waitSeconds(1).andThen(
         Commands.runOnce(() -> {
           for (int i = 0; i < 4; i++) {
@@ -183,22 +193,38 @@ public class Intake extends SubsystemBase {
 
   private void checkMotorVelocity(IntakeMotor motor) {
     if (motor == IntakeMotor.RIGHT_ROLLER) {
-      if (inputs.rightRollerVelocityRotationsPerSecond 
-      - inputs.rightRollerReferenceVelocityRPS 
+      if (Math.abs(inputs.rightRollerVelocityRotationsPerSecond 
+      - inputs.rightRollerReferenceVelocityRPS) 
       > IntakeConstants.ROLLER_VELOCITY_TOLERANCE) {
-        FaultReporter.getInstance().addFault(
-          SUBSYSTEM_NAME,
-          "[System Check] Right Roller Too Slow"
-        );
+        if (Math.abs(inputs.rightRollerVelocityRotationsPerSecond) >
+        Math.abs(inputs.rightRollerReferenceVelocityRPS)) {
+          FaultReporter.getInstance().addFault(
+            SUBSYSTEM_NAME,
+            "[System Check] Right Roller Too Fast"
+          );
+        } else {
+          FaultReporter.getInstance().addFault(
+            SUBSYSTEM_NAME,
+            "[System Check] Right Roller Too Slow"
+          );
+        }
       }
     } else if (motor == IntakeMotor.LEFT_ROLLER) {
-      if (inputs.leftRollerVelocityRotationsPerSecond 
-      - inputs.leftRollerReferenceVelocityRPS 
+      if (Math.abs(inputs.leftRollerVelocityRotationsPerSecond 
+      - inputs.leftRollerReferenceVelocityRPS) 
       > IntakeConstants.ROLLER_VELOCITY_TOLERANCE) {
-        FaultReporter.getInstance().addFault(
-          SUBSYSTEM_NAME,
-          "[System Check] Left Roller Too Slow"
-        );
+        if (Math.abs(inputs.leftRollerVelocityRotationsPerSecond) >
+        Math.abs(inputs.leftRollerReferenceVelocityRPS)) {
+          FaultReporter.getInstance().addFault(
+            SUBSYSTEM_NAME,
+            "[System Check] Left Roller Too Fast"
+          );
+        } else {
+          FaultReporter.getInstance().addFault(
+            SUBSYSTEM_NAME,
+            "[System Check] Left Roller Too Slow"
+          );
+        }
       }
     } else if (motor == IntakeMotor.DRUM) {
       if (inputs.drumVelocityRotationsPerSecond 
@@ -309,7 +335,7 @@ public class Intake extends SubsystemBase {
 
   public void turnTransitionOff() {
     this.setDrumVelocity(0);
-    // Run kicker as well, integrate with shooter
+    this.setKickerVelocity(0);
   }
 
   public void turnRightIntakeOff() {
