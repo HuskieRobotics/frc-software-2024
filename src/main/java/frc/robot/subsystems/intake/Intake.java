@@ -48,8 +48,8 @@ public class Intake extends SubsystemBase {
   }
 
   private IntakeState intakeState;
-  // will update intake state in different areas / methods based on the sensors,
-  // but first just running through the logic of what we would do in these cases
+  private IntakeState mostRecentIntakeState;
+  private boolean checkComplete;
 
   private boolean manualOverrideEnabled;
 
@@ -57,6 +57,8 @@ public class Intake extends SubsystemBase {
     this.io = io;
     leds = LEDs.getInstance();
     intakeState = IntakeState.EMPTY;
+    mostRecentIntakeState = null;
+    checkComplete = false;
 
     leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
     this.intakeGamePiece();
@@ -72,6 +74,18 @@ public class Intake extends SubsystemBase {
     Logger.recordOutput("Intake/State", intakeState.toString());
 
     this.runIntakeStateMachine();
+  }
+
+  public void completeCheck() {
+    checkComplete = true;
+  }
+
+  public void setCheckIncomplete() {
+    checkComplete = false;
+  }
+
+  public boolean checkComplete() {
+    return checkComplete;
   }
 
   public void runIntakeStateMachine() {
@@ -164,12 +178,14 @@ public class Intake extends SubsystemBase {
      *
      */
     return Commands.sequence(
+      Commands.runOnce(this::setCheckIncomplete),
       getVelocitiesCheckCommand(),
       getStatesCheckCommand()
     ).until(() -> !FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).isEmpty())
     .andThen(Commands.sequence(
       Commands.runOnce(this::turnIntakeOff),
-      Commands.runOnce(this::turnTransitionOff)))
+      Commands.runOnce(this::turnTransitionOff),
+      Commands.runOnce(this::turnKickerOff)))
     .withName(SUBSYSTEM_NAME + "SystemCheck");
   }
 
@@ -257,45 +273,38 @@ public class Intake extends SubsystemBase {
       IntakeState.NOTE_IN_KICKER
     };
     
-    ArrayList<IntakeState> actualStateSeqeunce = new ArrayList<>();
+    ArrayList<IntakeState> actualStateSequence = new ArrayList<>();
 
     return Commands.parallel(
-      Commands.run(this::runIntakeStateMachine),
+      Commands.parallel(
+        Commands.run(() -> this.setIntakeState(IntakeState.EMPTY)),
+        Commands.run(this::intakeGamePiece)
+      ),
       Commands.waitSeconds(1).andThen(
-        Commands.runOnce(() -> checkStateSequence(actualStateSeqeunce, desiredStateSequence))
-      )
+        Commands.run(() -> checkStateSequence(actualStateSequence, desiredStateSequence))
+      ).until(this::checkComplete)
     );
   }
 
   private void checkStateSequence(ArrayList<IntakeState> actualStateSequence, IntakeState[] desiredStateSequence) {
-    actualStateSequence.add(IntakeState.EMPTY);
-    IntakeState mostRecentIntakeState = IntakeState.EMPTY;
+    if (intakeState != mostRecentIntakeState) {
+      actualStateSequence.add(intakeState);
+      mostRecentIntakeState = intakeState;
+    }
 
-    boolean correct = actualStateSequence.get(0).equals(desiredStateSequence[0]);
-
-    while (correct) {
-      if (intakeState != mostRecentIntakeState) {
-        actualStateSequence.add(intakeState);
-        mostRecentIntakeState = intakeState;
+    for (int i = 0; i < actualStateSequence.size(); i++) {
+      if (!actualStateSequence.get(i).equals(desiredStateSequence[i])) {
+        FaultReporter.getInstance().addFault(
+          SUBSYSTEM_NAME,
+          "[System Check] Intake State Incorrect, "
+          + "Expected: " + desiredStateSequence[i] + ", "
+          + "Actual: " + actualStateSequence.get(i)
+        );
       }
+    }
 
-      for (int i = 0; i < actualStateSequence.size(); i++) {
-        if (!actualStateSequence.get(i).equals(desiredStateSequence[i])) {
-          correct = false;
-          FaultReporter.getInstance().addFault(
-            SUBSYSTEM_NAME,
-            "[System Check] Intake State Incorrect, "
-            + "Expected: " + desiredStateSequence[i] + ", "
-            + "Actual: " + actualStateSequence.get(i)
-          );
-        }
-      }
-
-      if (actualStateSequence.size() == desiredStateSequence.length) {
-        // does anything need to be done here to confirm that this worked?
-        // or should it just break with no message?
-        break;
-      }
+    if (actualStateSequence.size() == desiredStateSequence.length) {
+      completeCheck();
     }
 
   }
@@ -335,7 +344,6 @@ public class Intake extends SubsystemBase {
 
   public void turnTransitionOff() {
     this.setDrumVelocity(0);
-    this.setKickerVelocity(0);
   }
 
   public void turnRightIntakeOff() {
