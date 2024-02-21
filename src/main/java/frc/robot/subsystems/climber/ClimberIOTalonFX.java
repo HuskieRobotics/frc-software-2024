@@ -162,12 +162,12 @@ public class ClimberIOTalonFX implements ClimberIO {
    */
   @Override
   public void setLeftMotorPosition(double position) {
-    leftMotor.setControl(leftPositionCurrentRequest.withPosition(position).withFeedForward(KG));
+    leftMotor.setControl(leftPositionCurrentRequest.withPosition(position / DRUM_CIRCUMFERENCE_METERS).withFeedForward(KG));
   }
 
   @Override
   public void setRightMotorPosition(double position) {
-    leftMotor.setControl(leftPositionCurrentRequest.withPosition(position).withFeedForward(KG));
+    leftMotor.setControl(leftPositionCurrentRequest.withPosition(position / DRUM_CIRCUMFERENCE_METERS).withFeedForward(KG));
   }
 
   @Override
@@ -182,8 +182,8 @@ public class ClimberIOTalonFX implements ClimberIO {
 
   @Override
   public void setPositionZero() {
-    leftEncoder.setPosition(0);
-    rightEncoder.setPosition(0);
+    leftMotor.setPosition(0);
+    rightMotor.setPosition(0);
   }
 
   private TalonFX configMotors(int canID, boolean isInverted, FaultReporter fault) {
