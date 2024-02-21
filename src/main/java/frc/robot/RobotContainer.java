@@ -494,11 +494,13 @@ public class RobotContainer {
 
     oi.getLock180Button()
         .whileTrue(
-            new TeleopSwerve(
-                drivetrain,
-                oi::getTranslateX,
-                oi::getTranslateY,
-                noteTargeting::getRotateVelocity));
+            Commands.parallel(
+                Commands.runOnce(drivetrain::disableFieldRelative),
+                new TeleopSwerve(
+                    drivetrain,
+                    oi::getTranslateX,
+                    oi::getTranslateY,
+                    noteTargeting::getRotateVelocity)));
 
     // field-relative toggle
     oi.getFieldRelativeButton()

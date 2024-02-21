@@ -3,7 +3,6 @@ package frc.robot.subsystems.noteTargeting;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.util.TunableNumber;
-
 import org.littletonrobotics.junction.Logger;
 
 public class NoteTargeting extends SubsystemBase {
@@ -24,6 +23,7 @@ public class NoteTargeting extends SubsystemBase {
     this.rightio = rightio;
     pid.reset();
     pid.setSetpoint(0.0);
+    pid.setTolerance(0.5);
   }
 
   // in case where both target are same size we will use the target we already have locked on
