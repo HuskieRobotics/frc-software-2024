@@ -485,6 +485,12 @@ public class RobotContainer {
     Command fourNoteTestSourceSide = new PathPlannerAuto("4 Note Test");
     autoChooser.addOption("4 Note Wing Source Side", fourNoteTestSourceSide);
 
+    Command twoNoteAmpSide = new PathPlannerAuto("2 Note Amp Side");
+    autoChooser.addOption("2 Note Amp Side", twoNoteAmpSide);
+
+    Command twoNoteSourceSide = new PathPlannerAuto("2 Note Source Side");
+    autoChooser.addOption("2 Note SOurce Side", twoNoteSourceSide);
+
     // 1 note Anywhere
 
     // Command test = Commands.runOnce(()->{System.out.println("hi");}, drivetrain);
