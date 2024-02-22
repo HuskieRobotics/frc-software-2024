@@ -167,8 +167,8 @@ public class Vision extends SubsystemBase {
             estimatedRobotPose2d, ios[i].estimatedCameraPoseTimestamp, stdDev);
         isVisionUpdating = true;
         Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/StdDevX", stdDev.get(0, 0));
-        Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/StdDevY", stdDev.get(0, 1));
-        Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/StdDevT", stdDev.get(0, 2));
+        Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/StdDevY", stdDev.get(1, 0));
+        Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/StdDevT", stdDev.get(2, 0));
       }
 
       Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/CameraPose3d", ios[i].estimatedCameraPose);
