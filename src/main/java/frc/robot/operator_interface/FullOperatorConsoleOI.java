@@ -111,4 +111,9 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   public Trigger getContinueClimberButton() {
     return translateJoystickButtons[2];
   }
+
+  @Override
+  public Trigger getLongArmsClimberButton() {
+    return operatorPanelButtons[3]; // FIXME: Update this to the correct button
+  }
 }

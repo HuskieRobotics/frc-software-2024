@@ -72,4 +72,8 @@ public interface OperatorInterface {
   public default Trigger getContinueClimberButton() {
     return new Trigger(() -> false);
   }
+
+  public default Trigger getLongArmsClimberButton() {
+    return new Trigger(() -> false);
+  }
 }

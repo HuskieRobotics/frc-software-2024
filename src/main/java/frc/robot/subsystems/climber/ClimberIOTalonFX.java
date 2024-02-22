@@ -11,8 +11,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.hardware.core.CoreCANcoder;
-import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
@@ -30,6 +28,8 @@ public class ClimberIOTalonFX implements ClimberIO {
 
   private MotionMagicExpoTorqueCurrentFOC rightPositionCurrentRequest;
   private TorqueCurrentFOC rightSupplyAmpsRequest;
+
+  private boolean longArms;
 
   private FaultReporter faultReporter;
 
@@ -81,6 +81,8 @@ public class ClimberIOTalonFX implements ClimberIO {
 
     leftSupplyAmpsRequest = new TorqueCurrentFOC(0.0);
     rightSupplyAmpsRequest = new TorqueCurrentFOC(0.0);
+
+    longArms = false;
   }
 
   /**
@@ -103,14 +105,15 @@ public class ClimberIOTalonFX implements ClimberIO {
         rightSupplyCurrentAmpsStatusSignal);
 
     inputs.leftVelocityRPS = leftVelocityRPSStatusSignal.getValueAsDouble();
-    inputs.leftPositionMeters =
+    inputs.leftPositionRotationsMeters =
         leftPositionRotationsStatusSignal.getValueAsDouble() * DRUM_CIRCUMFERENCE_METERS;
     inputs.leftStatorCurrentAmps = leftStatorCurrentAmpsStatusSignal.getValueAsDouble();
     inputs.leftSupplyCurrentAmps = leftSupplyCurrentAmpsStatusSignal.getValueAsDouble();
     inputs.leftSetpoint = leftSetpointStatusSignal.getValueAsDouble();
 
     inputs.rightVelocityRPS = rightVelocityRPSStatusSignal.getValueAsDouble();
-    inputs.rightPositionMeters = rightPositionRotationsStatusSignal.getValueAsDouble() * DRUM_CIRCUMFERENCE_METERS;
+    inputs.rightPositionRotationsMeters =
+        rightPositionRotationsStatusSignal.getValueAsDouble() * DRUM_CIRCUMFERENCE_METERS;
     inputs.rightStatorCurrentAmps = rightStatorCurrentAmpsStatusSignal.getValueAsDouble();
     inputs.rightSupplyCurrentAmps = rightSupplyCurrentAmpsStatusSignal.getValueAsDouble();
     inputs.rightSetpoint = rightSetpointStatusSignal.getValueAsDouble();
@@ -162,12 +165,18 @@ public class ClimberIOTalonFX implements ClimberIO {
    */
   @Override
   public void setLeftMotorPosition(double position) {
-    leftMotor.setControl(leftPositionCurrentRequest.withPosition(position / DRUM_CIRCUMFERENCE_METERS).withFeedForward(KG));
+    leftMotor.setControl(
+        leftPositionCurrentRequest
+            .withPosition(position / DRUM_CIRCUMFERENCE_METERS)
+            .withFeedForward(KG));
   }
 
   @Override
   public void setRightMotorPosition(double position) {
-    leftMotor.setControl(leftPositionCurrentRequest.withPosition(position / DRUM_CIRCUMFERENCE_METERS).withFeedForward(KG));
+    leftMotor.setControl(
+        rightPositionCurrentRequest
+            .withPosition(position / DRUM_CIRCUMFERENCE_METERS)
+            .withFeedForward(KG));
   }
 
   @Override
@@ -184,6 +193,21 @@ public class ClimberIOTalonFX implements ClimberIO {
   public void setPositionZero() {
     leftMotor.setPosition(0);
     rightMotor.setPosition(0);
+  }
+
+  @Override
+  public void enableLongArms() {
+    longArms = true;
+  }
+
+  @Override
+  public void disableLongArms() {
+    longArms = false;
+  }
+
+  @Override
+  public boolean getLongArms() {
+    return longArms;
   }
 
   private TalonFX configMotors(int canID, boolean isInverted, FaultReporter fault) {

@@ -52,7 +52,7 @@ public class BalanceArms extends Command {
 
 
   /** Creates a new BalanceArms. */
-  public BalanceArms(Climber climber, Drivetrain drivetrain) {
+  public BalanceArms(Climber climber, Drivetrain drivetrain, boolean isLongArms) {
     this.climber = climber;
     this.drivetrain = drivetrain;
     addRequirements(climber);

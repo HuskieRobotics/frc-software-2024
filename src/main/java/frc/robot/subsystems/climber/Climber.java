@@ -84,6 +84,18 @@ public class Climber extends SubsystemBase {
     io.setPositionZero();
   }
 
+  public void enableLongerArms() {
+    io.enableLongArms();
+  }
+
+  public void disableLongerArms() {
+    io.disableLongArms();
+  }
+
+  public boolean getLongerArms() {
+    return io.getLongArms();
+  }
+
   // FIXME: Needs a command check for the right motor. May need to change the commands that are
   // used.
   private Command getSystemCheckCommand() {

@@ -8,13 +8,13 @@ public interface ClimberIO {
   @AutoLog
   public static class ClimberIOInputs {
     double leftVelocityRPS = 0.0;
-    double leftPositionMeters = 0.0;
+    double leftPositionRotationsMeters = 0.0;
     double leftStatorCurrentAmps = 0.0;
     double leftSupplyCurrentAmps = 0.0;
     double leftSetpoint = 0.0;
 
     double rightVelocityRPS = 0.0;
-    double rightPositionMeters = 0.0;
+    double rightPositionRotationsMeters = 0.0;
     double rightStatorCurrentAmps = 0.0;
     double rightSupplyCurrentAmps = 0.0;
     double rightSetpoint = 0.0;
@@ -37,4 +37,12 @@ public interface ClimberIO {
   public default void setLeftMotorCurrent(double current) {}
 
   public default void setRightMotorCurrent(double current) {}
+
+  public default void enableLongArms()  {}
+
+  public default void disableLongArms()  {}
+
+  public default boolean getLongArms()  {
+    return false;
+  }
 }
