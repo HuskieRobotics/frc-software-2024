@@ -38,8 +38,13 @@ public class ClimberConstants {
       0; // FIXME: Update stator current limit. Software feature sheet is not updated
 
   public static final int TIMEOUT_MS = 30;
-  public static final double LEFT_EXTEND_POSITION = 0;
-  public static final double RIGHT_EXTEND_POSITION = 0;
-  public static final double LEFT_CONTINUE_POSITION = 0;
-  public static final double RIGHT_CONTINUE_POSITION = 0;
+  public static final double LEFT_EXTEND_POSITION_LONG_ARM = 0;
+  public static final double RIGHT_EXTEND_POSITION_LONG_ARM = 0;
+  public static final double LEFT_CONTINUE_POSITION_LONG_ARM = 0;
+  public static final double RIGHT_CONTINUE_POSITION_LONG_ARM = 0;
+
+  public static final double LEFT_EXTEND_POSITION_SHORT_ARM = 0;
+  public static final double RIGHT_EXTEND_POSITION_SHORT_ARM = 0;
+  public static final double LEFT_CONTINUE_POSITION_SHORT_ARM = 0;
+  public static final double RIGHT_CONTINUE_POSITION_SHORT_ARM = 0;
 }

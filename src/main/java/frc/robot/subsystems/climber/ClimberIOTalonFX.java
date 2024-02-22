@@ -29,8 +29,6 @@ public class ClimberIOTalonFX implements ClimberIO {
   private MotionMagicExpoTorqueCurrentFOC rightPositionCurrentRequest;
   private TorqueCurrentFOC rightSupplyAmpsRequest;
 
-  private boolean longArms;
-
   private FaultReporter faultReporter;
 
   private StatusSignal<Double> leftVelocityRPSStatusSignal;
@@ -81,8 +79,6 @@ public class ClimberIOTalonFX implements ClimberIO {
 
     leftSupplyAmpsRequest = new TorqueCurrentFOC(0.0);
     rightSupplyAmpsRequest = new TorqueCurrentFOC(0.0);
-
-    longArms = false;
   }
 
   /**
@@ -166,17 +162,13 @@ public class ClimberIOTalonFX implements ClimberIO {
   @Override
   public void setLeftMotorPosition(double position) {
     leftMotor.setControl(
-        leftPositionCurrentRequest
-            .withPosition(position / DRUM_CIRCUMFERENCE_METERS)
-            .withFeedForward(KG));
+        leftPositionCurrentRequest.withPosition(position / DRUM_CIRCUMFERENCE_METERS));
   }
 
   @Override
   public void setRightMotorPosition(double position) {
     leftMotor.setControl(
-        rightPositionCurrentRequest
-            .withPosition(position / DRUM_CIRCUMFERENCE_METERS)
-            .withFeedForward(KG));
+        rightPositionCurrentRequest.withPosition(position / DRUM_CIRCUMFERENCE_METERS));
   }
 
   @Override
@@ -193,21 +185,6 @@ public class ClimberIOTalonFX implements ClimberIO {
   public void setPositionZero() {
     leftMotor.setPosition(0);
     rightMotor.setPosition(0);
-  }
-
-  @Override
-  public void enableLongArms() {
-    longArms = true;
-  }
-
-  @Override
-  public void disableLongArms() {
-    longArms = false;
-  }
-
-  @Override
-  public boolean getLongArms() {
-    return longArms;
   }
 
   private TalonFX configMotors(int canID, boolean isInverted, FaultReporter fault) {

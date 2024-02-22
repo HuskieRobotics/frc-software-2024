@@ -18,6 +18,7 @@ public class Climber extends SubsystemBase {
 
   private ClimberIO io;
   private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
+  private boolean longArms = false;
 
   /**
    * Create a new climber with its associated hardware interface object.
@@ -85,15 +86,15 @@ public class Climber extends SubsystemBase {
   }
 
   public void enableLongerArms() {
-    io.enableLongArms();
+    longArms = true;
   }
 
   public void disableLongerArms() {
-    io.disableLongArms();
+    longArms = false;
   }
 
   public boolean getLongerArms() {
-    return io.getLongArms();
+    return longArms;
   }
 
   // FIXME: Needs a command check for the right motor. May need to change the commands that are

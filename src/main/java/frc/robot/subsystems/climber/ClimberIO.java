@@ -37,12 +37,4 @@ public interface ClimberIO {
   public default void setLeftMotorCurrent(double current) {}
 
   public default void setRightMotorCurrent(double current) {}
-
-  public default void enableLongArms()  {}
-
-  public default void disableLongArms()  {}
-
-  public default boolean getLongArms()  {
-    return false;
-  }
 }
