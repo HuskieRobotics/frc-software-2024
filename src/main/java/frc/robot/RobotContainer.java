@@ -606,38 +606,14 @@ public class RobotContainer {
     // climber.setRightMotorPosition(ClimberConstants.RIGHT_EXTEND_POSITION_LONG_ARM))));
 
     oi.getExtendClimberButton()
-        .onTrue(
-            Commands.either(
-                Commands.parallel(
-                    Commands.runOnce(
-                        () ->
-                            climber.setLeftMotorPosition(
-                                ClimberConstants.LEFT_EXTEND_POSITION_LONG_ARM)),
-                    Commands.runOnce(
-                        () ->
-                            climber.setRightMotorPosition(
-                                ClimberConstants.RIGHT_EXTEND_POSITION_LONG_ARM))),
-                Commands.parallel(
-                    Commands.runOnce(
-                        () ->
-                            climber.setLeftMotorPosition(
-                                ClimberConstants.LEFT_EXTEND_POSITION_SHORT_ARM)),
-                    Commands.runOnce(
-                        () ->
-                            climber.setRightMotorPosition(
-                                ClimberConstants.RIGHT_EXTEND_POSITION_SHORT_ARM))),
-                climber::getLongerArms));
+        .onTrue(Commands.runOnce(climber::deployClimber, climber));
 
     // Enable/disable long arms
     oi.getLongArmsClimberButton().onTrue(Commands.runOnce(climber::enableLongerArms, climber));
     oi.getLongArmsClimberButton().onFalse(Commands.runOnce(climber::disableLongerArms, climber));
 
     oi.getContinueClimberButton()
-        .onTrue(
-            Commands.either(
-                Commands.runOnce(() -> new BalanceArms(climber, drivetrain, true)),
-                Commands.runOnce(() -> new BalanceArms(climber, drivetrain, false)),
-                climber::getLongerArms));
+        .onTrue(Commands.runOnce(() -> new BalanceArms(climber, drivetrain)));
   }
 
   private void configureVisionCommands() {

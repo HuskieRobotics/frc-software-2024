@@ -97,6 +97,16 @@ public class Climber extends SubsystemBase {
     return longArms;
   }
 
+  public void deployClimber() {
+    if(longArms) {
+      setLeftMotorPosition(LEFT_EXTEND_POSITION_SHORT_ARM);
+      setRightMotorPosition(RIGHT_EXTEND_POSITION_SHORT_ARM);
+    } else {
+      setLeftMotorPosition(LEFT_EXTEND_POSITION_LONG_ARM);
+      setRightMotorPosition(RIGHT_EXTEND_POSITION_LONG_ARM);
+    }
+  }
+
   // FIXME: Needs a command check for the right motor. May need to change the commands that are
   // used.
   private Command getSystemCheckCommand() {

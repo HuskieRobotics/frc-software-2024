@@ -39,6 +39,8 @@ public class BalanceArms extends Command {
   private static double autoBalanceKI = 0.0;
   private static double autoBalanceKD = 0.0;
 
+  private boolean isLongArms = false;
+
   private Climber climber;
   private Drivetrain drivetrain;
   private PIDController pidController;
@@ -52,11 +54,12 @@ public class BalanceArms extends Command {
 
 
   /** Creates a new BalanceArms. */
-  public BalanceArms(Climber climber, Drivetrain drivetrain, boolean isLongArms) {
+  public BalanceArms(Climber climber, Drivetrain drivetrain) {
     this.climber = climber;
     this.drivetrain = drivetrain;
     addRequirements(climber);
     this.pidController = new PIDController(autoBalanceKP, autoBalanceKD, autoBalanceKI);
+    this.isLongArms = climber.getLongerArms();
   }
 
   // Called when the command is initially scheduled.
@@ -65,8 +68,6 @@ public class BalanceArms extends Command {
     pidController.reset();
     climber.setLeftMotorCurrent(CONSTANT_CLIMBER_CURRENT);
     climber.setRightMotorCurrent(CONSTANT_CLIMBER_CURRENT);
-
-    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
