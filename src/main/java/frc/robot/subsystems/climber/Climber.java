@@ -99,11 +99,11 @@ public class Climber extends SubsystemBase {
 
   public void deployClimber() {
     if(longArms) {
-      setLeftMotorPosition(LEFT_EXTEND_POSITION_SHORT_ARM);
-      setRightMotorPosition(RIGHT_EXTEND_POSITION_SHORT_ARM);
-    } else {
       setLeftMotorPosition(LEFT_EXTEND_POSITION_LONG_ARM);
       setRightMotorPosition(RIGHT_EXTEND_POSITION_LONG_ARM);
+    } else {
+      setLeftMotorPosition(LEFT_EXTEND_POSITION_SHORT_ARM);
+      setRightMotorPosition(RIGHT_EXTEND_POSITION_SHORT_ARM);
     }
   }
 
