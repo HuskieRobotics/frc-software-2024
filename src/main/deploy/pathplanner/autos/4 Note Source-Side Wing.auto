@@ -30,12 +30,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "4 Source Note 3 to Shoot"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Shoot"
