@@ -43,7 +43,6 @@ public class Shooter extends SubsystemBase {
     if (TESTING) {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
-      io.setDunkerMotorVelocity(dunkerWheelVelocity.get());
       io.setAngle(angle.get());
     } else {
       this.runAngleStateMachine();
@@ -79,10 +78,6 @@ public class Shooter extends SubsystemBase {
     // needs to utilize kicker
     io.setShooterWheelTopVelocity(topWheelVelocityRPS);
     io.setShooterWheelBottomVelocity(bottomWheelVelocityRPS);
-  }
-
-  public void setDunkerMotorVelocity(double velocityRPS) {
-    io.setDunkerMotorVelocity(velocityRPS);
   }
 
   public void setAngle(double angle) {

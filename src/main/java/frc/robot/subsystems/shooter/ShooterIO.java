@@ -24,18 +24,10 @@ public interface ShooterIO {
     double angleMotorSupplyCurrentAmps = 0.0;
     double angleMotorReferenceAngleDegrees = 0.0;
     double angleEncoderAngleDegrees = 0.0;
-
-    // Dunker Motor Inputs
-    double dunkerMotorStatorCurrentAmps = 0.0;
-    double dunkerMotorSupplyCurrentAmps = 0.0;
-    double dunkerMotorVelocityRPS = 0.0;
-    double dunkerMotorReferenceVelocityRPS = 0.0;
   }
 
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ShooterIOInputs inputs) {}
-
-  public default void setDunkerMotorVelocity(double rps) {}
 
   public default void setShooterWheelTopVelocity(double rps) {}
 

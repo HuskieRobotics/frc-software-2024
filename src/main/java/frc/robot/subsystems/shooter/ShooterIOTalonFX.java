@@ -26,31 +26,26 @@ public class ShooterIOTalonFX implements ShooterIO {
   // Using VelocityTorqueCurrentFOC to set the velocity of the motors
   private VelocityTorqueCurrentFOC shootMotorTopVelocityRequest;
   private VelocityTorqueCurrentFOC shootMotorBottomVelocityRequest;
-  private VelocityTorqueCurrentFOC dunkerMotorVelocityRequest;
   private MotionMagicExpoTorqueCurrentFOC angleMotorPositionRequest;
 
   // Using StatusSignal to get the stator current of the motors
   private StatusSignal<Double> shootMotorTopStatorCurrentStatusSignal;
   private StatusSignal<Double> shootMotorBottomStatorCurrentStatusSignal;
-  private StatusSignal<Double> dunkerMotorStatorCurrentStatusSignal;
   private StatusSignal<Double> angleMotorStatorCurrentStatusSignal;
 
   // Using StatusSignal to get the supply current of the motors
   private StatusSignal<Double> shootMotorTopSupplyCurrentStatusSignal;
   private StatusSignal<Double> shootMotorBottomSupplyCurrentStatusSignal;
-  private StatusSignal<Double> dunkerMotorSupplyCurrentStatusSignal;
   private StatusSignal<Double> angleMotorSupplyCurrentStatusSignal;
 
   // Using StatusSignal to get the velocity of the motors
   private StatusSignal<Double> shootMotorTopVelocityStatusSignal;
   private StatusSignal<Double> shootMotorBottomVelocityStatusSignal;
-  private StatusSignal<Double> dunkerMotorVelocityStatusSignal;
   private StatusSignal<Double> angleMotorPositionStatusSignal;
 
   private StatusSignal<Double> shootMotorTopReferenceVelocityStatusSignal;
   private StatusSignal<Double> shootMotorBottomReferenceVelocityStatusSignal;
-  private StatusSignal<Double> dunkerMotorReferenceVelocityStatusSignal;
-	private StatusSignal<Double> angleMotorReferencePositionStatusSignal;
+  private StatusSignal<Double> angleMotorReferencePositionStatusSignal;
 
   // Shoot PID Tunable Numbers
   private final TunableNumber shootMotorsKP =
@@ -83,14 +78,9 @@ public class ShooterIOTalonFX implements ShooterIO {
       new TunableNumber(
           "Shooter/ROTATION_PID_PEAK_OUTPUT", ShooterConstants.ROTATION_PID_PEAK_OUTPUT);
 
-  // Dunker PID Tunable Numbers
-  private final TunableNumber dunkerMotorKS =
-      new TunableNumber("Shooter/DUNKER_KS", ShooterConstants.DUNKER_KS);
-
   private TalonFX shootMotorTop;
   private TalonFX shootMotorBottom;
   private TalonFX angleMotor;
-  private TalonFX dunkerMotor;
   private CANcoder angleEncoder;
 
   public ShooterIOTalonFX() {
@@ -99,38 +89,31 @@ public class ShooterIOTalonFX implements ShooterIO {
     shootMotorBottom =
         new TalonFX(BOTTOM_SHOOTER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
     angleMotor = new TalonFX(ANGLE_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
-    dunkerMotor = new TalonFX(DUNKER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
     angleEncoder = new CANcoder(ANGLE_ENCODER_ID);
 
     shootMotorTopVelocityRequest = new VelocityTorqueCurrentFOC(0);
     shootMotorBottomVelocityRequest = new VelocityTorqueCurrentFOC(0);
-    dunkerMotorVelocityRequest = new VelocityTorqueCurrentFOC(0);
     angleMotorPositionRequest = new MotionMagicExpoTorqueCurrentFOC(0);
 
     shootMotorTopVelocityStatusSignal = shootMotorTop.getVelocity();
     shootMotorBottomVelocityStatusSignal = shootMotorBottom.getVelocity();
-    dunkerMotorVelocityStatusSignal = dunkerMotor.getVelocity();
     angleMotorPositionStatusSignal = angleMotor.getPosition();
 
     shootMotorTopStatorCurrentStatusSignal = shootMotorTop.getStatorCurrent();
     shootMotorBottomStatorCurrentStatusSignal = shootMotorBottom.getStatorCurrent();
-    dunkerMotorStatorCurrentStatusSignal = dunkerMotor.getStatorCurrent();
     angleMotorStatorCurrentStatusSignal = angleMotor.getStatorCurrent();
 
     shootMotorTopSupplyCurrentStatusSignal = shootMotorTop.getSupplyCurrent();
     shootMotorBottomSupplyCurrentStatusSignal = shootMotorBottom.getSupplyCurrent();
-    dunkerMotorSupplyCurrentStatusSignal = dunkerMotor.getSupplyCurrent();
     angleMotorSupplyCurrentStatusSignal = angleMotor.getSupplyCurrent();
 
-		shootMotorTopReferenceVelocityStatusSignal = shootMotorTop.getClosedLoopReference();
-		shootMotorBottomReferenceVelocityStatusSignal = shootMotorBottom.getClosedLoopReference();
-		dunkerMotorReferenceVelocityStatusSignal = dunkerMotor.getClosedLoopReference();
-		angleMotorReferencePositionStatusSignal = angleMotor.getClosedLoopReference();
+    shootMotorTopReferenceVelocityStatusSignal = shootMotorTop.getClosedLoopReference();
+    shootMotorBottomReferenceVelocityStatusSignal = shootMotorBottom.getClosedLoopReference();
+    angleMotorReferencePositionStatusSignal = angleMotor.getClosedLoopReference();
 
     configShootMotor(shootMotorTop, SHOOT_TOP_INVERTED);
     configShootMotor(shootMotorBottom, SHOOT_BOTTOM_INVERTED);
     configAngleMotor(angleMotor, angleEncoder);
-    configDunkerMotor(dunkerMotor);
   }
 
   @Override
@@ -138,14 +121,11 @@ public class ShooterIOTalonFX implements ShooterIO {
     BaseStatusSignal.refreshAll(
         shootMotorTopVelocityStatusSignal,
         shootMotorBottomVelocityStatusSignal,
-        dunkerMotorVelocityStatusSignal,
         shootMotorTopStatorCurrentStatusSignal,
         shootMotorBottomStatorCurrentStatusSignal,
-        dunkerMotorStatorCurrentStatusSignal,
         angleMotorStatorCurrentStatusSignal,
         shootMotorTopSupplyCurrentStatusSignal,
         shootMotorBottomSupplyCurrentStatusSignal,
-        dunkerMotorSupplyCurrentStatusSignal,
         angleMotorSupplyCurrentStatusSignal);
 
     // Updates Top Shooter Motor Inputs
@@ -154,8 +134,8 @@ public class ShooterIOTalonFX implements ShooterIO {
     shooterInputs.shootMotorTopSupplyCurrentAmps =
         shootMotorTopSupplyCurrentStatusSignal.getValueAsDouble();
     shooterInputs.shootMotorTopVelocityRPS = shootMotorTopVelocityStatusSignal.getValueAsDouble();
-		shooterInputs.shootMotorTopReferenceVelocityRPS = 
-				shootMotorTopReferenceVelocityStatusSignal.getValueAsDouble();
+    shooterInputs.shootMotorTopReferenceVelocityRPS =
+        shootMotorTopReferenceVelocityStatusSignal.getValueAsDouble();
     if (shootMotorsKD.hasChanged()
         || shootMotorsKI.hasChanged()
         || shootMotorsKP.hasChanged()
@@ -176,8 +156,8 @@ public class ShooterIOTalonFX implements ShooterIO {
         shootMotorBottomSupplyCurrentStatusSignal.getValueAsDouble();
     shooterInputs.shootMotorBottomVelocityRPS =
         shootMotorBottomVelocityStatusSignal.getValueAsDouble();
-		shooterInputs.shootMotorBottomReferenceVelocityRPS = 
-				shootMotorBottomReferenceVelocityStatusSignal.getValueAsDouble();
+    shooterInputs.shootMotorBottomReferenceVelocityRPS =
+        shootMotorBottomReferenceVelocityStatusSignal.getValueAsDouble();
     if (shootMotorsKD.hasChanged()
         || shootMotorsKI.hasChanged()
         || shootMotorsKP.hasChanged()
@@ -196,8 +176,8 @@ public class ShooterIOTalonFX implements ShooterIO {
     shooterInputs.angleMotorSupplyCurrentAmps =
         angleMotorSupplyCurrentStatusSignal.getValueAsDouble();
     shooterInputs.angleEncoderAngleDegrees = rotationsToDegrees(angleMotor.getPosition());
-		shooterInputs.angleMotorReferenceAngleDegrees = 
-				angleMotorReferencePositionStatusSignal.getValueAsDouble();
+    shooterInputs.angleMotorReferenceAngleDegrees =
+        angleMotorReferencePositionStatusSignal.getValueAsDouble();
     if (rotationMotorKP.hasChanged()
         || rotationMotorKI.hasChanged()
         || rotationMotorKD.hasChanged()
@@ -215,25 +195,6 @@ public class ShooterIOTalonFX implements ShooterIO {
       angleMotorConfig.kV = rotationMotorKV.get();
       angleMotor.getConfigurator().apply(angleMotorConfig);
     }
-
-    // Updates Dunker Motor Inputs
-    shooterInputs.dunkerMotorStatorCurrentAmps =
-        dunkerMotorStatorCurrentStatusSignal.getValueAsDouble();
-    shooterInputs.dunkerMotorSupplyCurrentAmps =
-        dunkerMotorSupplyCurrentStatusSignal.getValueAsDouble();
-    shooterInputs.dunkerMotorVelocityRPS = dunkerMotorVelocityStatusSignal.getValueAsDouble();
-		shooterInputs.dunkerMotorReferenceVelocityRPS = 
-				dunkerMotorReferenceVelocityStatusSignal.getValueAsDouble();
-    if (dunkerMotorKS.hasChanged()) {
-      Slot0Configs dunkerMotorConfig = new Slot0Configs();
-      dunkerMotorConfig.kS = dunkerMotorKS.get();
-      dunkerMotor.getConfigurator().apply(dunkerMotorConfig);
-    }
-  }
-
-  @Override
-  public void setDunkerMotorVelocity(double rps) {
-    dunkerMotor.setControl(dunkerMotorVelocityRequest.withVelocity(rps));
   }
 
   @Override
@@ -342,32 +303,4 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     angleMotor.setInverted(true);
   }
-
-  private void configDunkerMotor(TalonFX dunkerMotor) {
-    TalonFXConfiguration dunkerMotorConfig = new TalonFXConfiguration();
-    CurrentLimitsConfigs dunkerMotorCurrentLimits = new CurrentLimitsConfigs();
-
-    dunkerMotorCurrentLimits.SupplyCurrentLimit =
-        ShooterConstants.DUNKER_MOTOR_CONTINUOUS_CURRENT_LIMIT;
-    dunkerMotorCurrentLimits.SupplyCurrentThreshold =
-        ShooterConstants.DUNKER_MOTOR_PEAK_CURRENT_LIMIT;
-    dunkerMotorCurrentLimits.SupplyTimeThreshold =
-        ShooterConstants.DUNKER_MOTOR_PEAK_CURRENT_DURATION;
-    dunkerMotorCurrentLimits.SupplyCurrentLimitEnable = true;
-
-    dunkerMotorConfig.CurrentLimits = dunkerMotorCurrentLimits;
-
-    dunkerMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    dunkerMotorConfig.Slot0.kS = dunkerMotorKS.get();
-
-    dunkerMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.DUNKER_MOTOR_GEAR_RATIO;
-
-    dunkerMotorConfig.MotorOutput.Inverted =
-        ShooterConstants.DUNKER_MOTOR_INVERTED
-            ? InvertedValue.Clockwise_Positive
-            : InvertedValue.CounterClockwise_Positive;
-
-    dunkerMotor.getConfigurator().apply(dunkerMotorConfig);
-  }
 }
-
