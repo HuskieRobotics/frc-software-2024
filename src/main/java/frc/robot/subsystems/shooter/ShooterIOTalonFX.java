@@ -32,31 +32,23 @@ public class ShooterIOTalonFX implements ShooterIO {
   private VelocityTorqueCurrentFOC dunkerMotorVelocityRequest;
   private MotionMagicVoltage angleMotorPositionRequest;
 
-  // temporrary`
-  private VelocityTorqueCurrentFOC kickerMotorVelocityRequest;
-
   // Using StatusSignal to get the stator current of the motors
   private StatusSignal<Double> shootMotorTopStatorCurrentStatusSignal;
   private StatusSignal<Double> shootMotorBottomStatorCurrentStatusSignal;
   private StatusSignal<Double> dunkerMotorStatorCurrentStatusSignal;
   private StatusSignal<Double> angleMotorStatorCurrentStatusSignal;
-  private StatusSignal<Double> kickerMotorStatorCurrentStatusSignal;
 
   // Using StatusSignal to get the supply current of the motors
   private StatusSignal<Double> shootMotorTopSupplyCurrentStatusSignal;
   private StatusSignal<Double> shootMotorBottomSupplyCurrentStatusSignal;
   private StatusSignal<Double> dunkerMotorSupplyCurrentStatusSignal;
   private StatusSignal<Double> angleMotorSupplyCurrentStatusSignal;
-  private StatusSignal<Double> kickerMotorSupplyCurrentStatusSignal;
 
   // Using StatusSignal to get the velocity of the motors
   private StatusSignal<Double> shootMotorTopVelocityStatusSignal;
   private StatusSignal<Double> shootMotorBottomVelocityStatusSignal;
   private StatusSignal<Double> dunkerMotorVelocityStatusSignal;
   private StatusSignal<Double> angleMotorPositionStatusSignal;
-  private StatusSignal<Double> kickerMotorVelocityStatusSignal;
-
-  private StatusSignal<Double> kickerMotorVelocityReferenceStatusSignal;
 
   private StatusSignal<Double> shootMotorTopReferenceVelocityStatusSignal;
   private StatusSignal<Double> shootMotorBottomReferenceVelocityStatusSignal;
@@ -106,18 +98,11 @@ public class ShooterIOTalonFX implements ShooterIO {
   private final TunableNumber dunkerMotorKS =
       new TunableNumber("Shooter/DUNKER_KS", ShooterConstants.DUNKER_KS);
 
-  private final TunableNumber kickerMotorKP = new TunableNumber("Shooter/KICKER_KP", 10);
-
-  private final TunableNumber kickerMotorKS = new TunableNumber("Shooter/KICKER_KS", 30);
-
   private TalonFX shootMotorTop;
   private TalonFX shootMotorBottom;
   private TalonFX angleMotor;
   private TalonFX dunkerMotor;
   private CANcoder angleEncoder;
-
-  // temporary
-  private TalonFX kickerMotor;
 
   public ShooterIOTalonFX() {
 
@@ -128,36 +113,25 @@ public class ShooterIOTalonFX implements ShooterIO {
     dunkerMotor = new TalonFX(DUNKER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
     angleEncoder = new CANcoder(ANGLE_ENCODER_ID);
 
-    // temporary
-    kickerMotor = new TalonFX(21, RobotConfig.getInstance().getCANBusName());
-
     shootMotorTopVelocityRequest = new VelocityTorqueCurrentFOC(0);
     shootMotorBottomVelocityRequest = new VelocityTorqueCurrentFOC(0);
     dunkerMotorVelocityRequest = new VelocityTorqueCurrentFOC(0);
     angleMotorPositionRequest = new MotionMagicVoltage(0);
 
-    // temporary
-    kickerMotorVelocityRequest = new VelocityTorqueCurrentFOC(0);
-
     shootMotorTopVelocityStatusSignal = shootMotorTop.getVelocity();
     shootMotorBottomVelocityStatusSignal = shootMotorBottom.getVelocity();
     dunkerMotorVelocityStatusSignal = dunkerMotor.getVelocity();
     angleMotorPositionStatusSignal = angleMotor.getPosition();
-    kickerMotorVelocityStatusSignal = kickerMotor.getVelocity();
 
     shootMotorTopStatorCurrentStatusSignal = shootMotorTop.getStatorCurrent();
     shootMotorBottomStatorCurrentStatusSignal = shootMotorBottom.getStatorCurrent();
     dunkerMotorStatorCurrentStatusSignal = dunkerMotor.getStatorCurrent();
     angleMotorStatorCurrentStatusSignal = angleMotor.getStatorCurrent();
-    kickerMotorStatorCurrentStatusSignal = kickerMotor.getStatorCurrent();
 
     shootMotorTopSupplyCurrentStatusSignal = shootMotorTop.getSupplyCurrent();
     shootMotorBottomSupplyCurrentStatusSignal = shootMotorBottom.getSupplyCurrent();
     dunkerMotorSupplyCurrentStatusSignal = dunkerMotor.getSupplyCurrent();
     angleMotorSupplyCurrentStatusSignal = angleMotor.getSupplyCurrent();
-    kickerMotorSupplyCurrentStatusSignal = kickerMotor.getSupplyCurrent();
-
-    kickerMotorVelocityReferenceStatusSignal = kickerMotor.getClosedLoopReference();
 
     shootMotorTopReferenceVelocityStatusSignal = shootMotorTop.getClosedLoopReference();
     shootMotorBottomReferenceVelocityStatusSignal = shootMotorBottom.getClosedLoopReference();
@@ -168,7 +142,6 @@ public class ShooterIOTalonFX implements ShooterIO {
     configShootMotor(shootMotorBottom, SHOOT_BOTTOM_INVERTED);
     configAngleMotor(angleMotor, angleEncoder);
     configDunkerMotor(dunkerMotor);
-    configKickerMotor(kickerMotor);
 
     this.shootMotorBottomSim =
         new VelocitySystemSim(
@@ -214,11 +187,7 @@ public class ShooterIOTalonFX implements ShooterIO {
         shootMotorTopSupplyCurrentStatusSignal,
         shootMotorBottomSupplyCurrentStatusSignal,
         dunkerMotorSupplyCurrentStatusSignal,
-        angleMotorSupplyCurrentStatusSignal,
-        kickerMotorVelocityReferenceStatusSignal,
-        kickerMotorStatorCurrentStatusSignal,
-        kickerMotorSupplyCurrentStatusSignal,
-        kickerMotorVelocityStatusSignal);
+        angleMotorSupplyCurrentStatusSignal);
 
     // Updates Top Shooter Motor Inputs
     shooterInputs.shootMotorTopStatorCurrentAmps =
@@ -308,21 +277,6 @@ public class ShooterIOTalonFX implements ShooterIO {
       dunkerMotorConfig.kS = dunkerMotorKS.get();
       dunkerMotor.getConfigurator().apply(dunkerMotorConfig);
     }
-
-    // Updates Kicker Motor Inputs
-    shooterInputs.kickerMotorStatorCurrentAmps =
-        kickerMotorStatorCurrentStatusSignal.getValueAsDouble();
-    shooterInputs.kickerMotorSupplyCurrentAmps =
-        kickerMotorSupplyCurrentStatusSignal.getValueAsDouble();
-    shooterInputs.kickerMotorVelocityRPS = kickerMotorVelocityStatusSignal.getValueAsDouble();
-    shooterInputs.kickerMotorReferenceVelocityRPS =
-        kickerMotorVelocityReferenceStatusSignal.getValueAsDouble();
-    if (kickerMotorKP.hasChanged() || kickerMotorKS.hasChanged()) {
-      Slot0Configs kickerMotorConfig = new Slot0Configs();
-      kickerMotorConfig.kP = kickerMotorKP.get();
-      kickerMotorConfig.kS = kickerMotorKS.get();
-      kickerMotor.getConfigurator().apply(kickerMotorConfig);
-    }
   }
 
   @Override
@@ -343,12 +297,6 @@ public class ShooterIOTalonFX implements ShooterIO {
   @Override
   public void setAngle(double angle) {
     angleMotor.setControl(angleMotorPositionRequest.withPosition(degreesToRotations(angle)));
-  }
-
-  // temporary
-  @Override
-  public void setKickerVelocity(double rps) {
-    kickerMotor.setControl(kickerMotorVelocityRequest.withVelocity(rps));
   }
 
   private double degreesToRotations(double degrees) {
@@ -386,32 +334,6 @@ public class ShooterIOTalonFX implements ShooterIO {
         isInverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
 
     shootMotor.getConfigurator().apply(shootMotorsConfig);
-  }
-
-  private void configKickerMotor(TalonFX kickerMotor) {
-    TalonFXConfiguration kickerMotorConfig = new TalonFXConfiguration();
-    CurrentLimitsConfigs kickerMotorCurrentLimits = new CurrentLimitsConfigs();
-
-    kickerMotorCurrentLimits.SupplyCurrentLimit = 30;
-    kickerMotorCurrentLimits.SupplyCurrentThreshold = 40;
-    kickerMotorCurrentLimits.SupplyTimeThreshold =
-        ShooterConstants.SHOOT_MOTORS_PEAK_CURRENT_DURATION;
-    kickerMotorCurrentLimits.SupplyCurrentLimitEnable = true;
-
-    kickerMotorConfig.CurrentLimits = kickerMotorCurrentLimits;
-
-    kickerMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    kickerMotorConfig.Slot0.kP = kickerMotorKP.get();
-    kickerMotorConfig.Slot0.kI = 0;
-    kickerMotorConfig.Slot0.kD = 0;
-    kickerMotorConfig.Slot0.kS = kickerMotorKS.get();
-
-    kickerMotorConfig.Feedback.SensorToMechanismRatio = 1.0;
-
-    kickerMotorConfig.MotorOutput.Inverted =
-        false ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
-
-    kickerMotor.getConfigurator().apply(kickerMotorConfig);
   }
 
   private void configAngleMotor(TalonFX angleMotor, CANcoder angleEncoder) {
