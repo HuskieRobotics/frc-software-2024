@@ -15,7 +15,6 @@ public class ShooterConstants {
   public static final int TOP_SHOOTER_MOTOR_ID = 27;
   public static final int BOTTOM_SHOOTER_MOTOR_ID = 28;
   public static final int ANGLE_MOTOR_ID = 29;
-  public static final int DUNKER_MOTOR_ID = 30;
   public static final int ANGLE_ENCODER_ID = 9;
 
   // Shooter Velocity PID Constants
@@ -37,9 +36,6 @@ public class ShooterConstants {
   public static final double ROTATION_EXPO_KA = 24.0;
   public static final double ROTATION_PID_PEAK_OUTPUT = 1.0;
 
-  // Dunker PID Constants
-  public static final double DUNKER_KS = 0.0;
-
   // Shoot Motors
   public static final double SHOOT_MOTORS_CONTINUOUS_CURRENT_LIMIT = 20;
   public static final double SHOOT_MOTORS_PEAK_CURRENT_LIMIT = 30;
@@ -60,11 +56,4 @@ public class ShooterConstants {
   public static final boolean ANGLE_MOTOR_INVERTED = false;
   public static final double MAGNET_OFFSET = 0.0;
   public static final double SENSOR_TO_MECHANISM_RATIO = 4.0;
-
-  // Dunker Motor
-  public static final double DUNKER_MOTOR_CONTINUOUS_CURRENT_LIMIT = 15;
-  public static final double DUNKER_MOTOR_PEAK_CURRENT_LIMIT = 20;
-  public static final double DUNKER_MOTOR_PEAK_CURRENT_DURATION = 0.5;
-  public static final double DUNKER_MOTOR_GEAR_RATIO = 15;
-  public static final boolean DUNKER_MOTOR_INVERTED = false;
 }
