@@ -393,6 +393,9 @@ public class RobotContainer {
     Command fourNoteSourceSideWing = new PathPlannerAuto("4 Note Source-Side Wing");
     autoChooser.addOption("4 Note Source-Side Wing", fourNoteSourceSideWing);
 
+    Command twoNoteAmpSideWing = new PathPlannerAuto("2 Note Source Side");
+    autoChooser.addOption("2 Note Amp-Side Wing", twoNoteAmpSideWing);
+
     /************ Drive Velocity Tuning ************
      *
      * useful for tuning the drive velocity PID controller
