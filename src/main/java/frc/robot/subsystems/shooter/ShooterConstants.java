@@ -26,13 +26,13 @@ public class ShooterConstants {
   public static final double SHOOT_PID_PEAK_OUTPUT = 1.0;
 
   // Shooter Rotation PID Constants
-  public static final double ROTATION_KP = 0.0;
+  public static final double ROTATION_KP = 1.0;
   public static final double ROTATION_KI = 0.0;
   public static final double ROTATION_KD = 0.0;
   public static final double ROTATION_KS = 0.0;
-  public static final double ROTATION_KG = 0.0;
-  public static final double ROTATION_KA = 0.0;
-  public static final double ROTATION_KV = 0.0;
+  public static final double ROTATION_KG = 0.13;
+  public static final double ROTATION_KV = 10.86;
+  public static final double ROTATION_KA = 0.01;
   public static final double ROTATION_EXPO_KV = 24.0;
   public static final double ROTATION_EXPO_KA = 24.0;
   public static final double ROTATION_PID_PEAK_OUTPUT = 1.0;
@@ -55,11 +55,11 @@ public class ShooterConstants {
   public static final double ANGLE_MOTOR_STATOR_CURRENT_LIMIT = 30;
   public static final double ANGLE_MOTOR_STATOR_CURRENT_PEAK = 40;
   public static final double ANGLE_MOTOR_STATOR_CURRENT_LIMIT_TIME = 0.5;
-  public static final double MOTION_MAGIC_CRUISE_VELOCITY = 0;
-  public static final double ANGLE_MOTOR_GEAR_RATIO = 576.0;
+  public static final double MOTION_MAGIC_CRUISE_VELOCITY = 2.0;
+  public static final double ANGLE_MOTOR_GEAR_RATIO = 144.0;
   public static final boolean ANGLE_MOTOR_INVERTED = false;
   public static final double MAGNET_OFFSET = 0.0;
-  public static final double SENSOR_TO_MECHANISM_RATIO = 1;
+  public static final double SENSOR_TO_MECHANISM_RATIO = 4.0;
 
   // Dunker Motor
   public static final double DUNKER_MOTOR_CONTINUOUS_CURRENT_LIMIT = 15;

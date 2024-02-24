@@ -9,18 +9,18 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import edu.wpi.first.math.util.Units;
 import frc.lib.team3061.RobotConfig;
-import frc.lib.team3061.util.PositionSystemSim;
+import frc.lib.team3061.util.ArmSystemSim;
 import frc.lib.team3061.util.VelocitySystemSim;
 import frc.lib.team6328.util.TunableNumber;
 
@@ -30,7 +30,7 @@ public class ShooterIOTalonFX implements ShooterIO {
   private VelocityTorqueCurrentFOC shootMotorTopVelocityRequest;
   private VelocityTorqueCurrentFOC shootMotorBottomVelocityRequest;
   private VelocityTorqueCurrentFOC dunkerMotorVelocityRequest;
-  private MotionMagicExpoVoltage angleMotorPositionRequest;
+  private MotionMagicVoltage angleMotorPositionRequest;
 
   // temporrary`
   private VelocityTorqueCurrentFOC kickerMotorVelocityRequest;
@@ -65,7 +65,7 @@ public class ShooterIOTalonFX implements ShooterIO {
 
   private VelocitySystemSim shootMotorTopSim;
   private VelocitySystemSim shootMotorBottomSim;
-  private PositionSystemSim angleMotorSim;
+  private ArmSystemSim angleMotorSim;
 
   // Shoot PID Tunable Numbers
   private final TunableNumber shootMotorsKP =
@@ -134,7 +134,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     shootMotorTopVelocityRequest = new VelocityTorqueCurrentFOC(0);
     shootMotorBottomVelocityRequest = new VelocityTorqueCurrentFOC(0);
     dunkerMotorVelocityRequest = new VelocityTorqueCurrentFOC(0);
-    angleMotorPositionRequest = new MotionMagicExpoVoltage(0);
+    angleMotorPositionRequest = new MotionMagicVoltage(0);
 
     // temporary
     kickerMotorVelocityRequest = new VelocityTorqueCurrentFOC(0);
@@ -185,13 +185,16 @@ public class ShooterIOTalonFX implements ShooterIO {
             0.001,
             ShooterConstants.SHOOT_MOTORS_GEAR_RATIO);
     this.angleMotorSim =
-        new PositionSystemSim(
+        new ArmSystemSim(
             angleMotor,
             angleEncoder,
             ShooterConstants.ANGLE_MOTOR_INVERTED,
-            2.0,
-            0.01,
-            ShooterConstants.ANGLE_MOTOR_GEAR_RATIO);
+            ShooterConstants.ANGLE_MOTOR_GEAR_RATIO,
+            Units.inchesToMeters(20.0),
+            Units.lbsToKilograms(25.0),
+            Units.degreesToRadians(10.0),
+            Units.degreesToRadians(100.0),
+            Units.degreesToRadians(10.0));
   }
 
   @Override
@@ -441,8 +444,10 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     rotationMotionMagicConfig.MotionMagicCruiseVelocity =
         ShooterConstants.MOTION_MAGIC_CRUISE_VELOCITY; // unlimited cruise velocity
-    rotationMotionMagicConfig.MotionMagicExpo_kV = rotationMotorExpoKV.get();
-    rotationMotionMagicConfig.MotionMagicExpo_kA = rotationMotorExpoKA.get();
+    rotationMotionMagicConfig.MotionMagicAcceleration =
+        ShooterConstants.MOTION_MAGIC_CRUISE_VELOCITY * 2;
+    // rotationMotionMagicConfig.MotionMagicExpo_kV = rotationMotorExpoKV.get();
+    // rotationMotionMagicConfig.MotionMagicExpo_kA = rotationMotorExpoKA.get();
 
     angleMotorConfig.MotorOutput.Inverted =
         ShooterConstants.ANGLE_MOTOR_INVERTED
@@ -457,10 +462,12 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleCANCoderConfig.MagnetSensor.MagnetOffset = ShooterConstants.MAGNET_OFFSET;
     angleEncoder.getConfigurator().apply(angleCANCoderConfig);
 
-    angleMotorConfig.Feedback.FeedbackRemoteSensorID = angleEncoder.getDeviceID();
-    angleMotorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-    angleMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.SENSOR_TO_MECHANISM_RATIO;
-    angleMotorConfig.Feedback.RotorToSensorRatio = ShooterConstants.ANGLE_MOTOR_GEAR_RATIO;
+    // angleMotorConfig.Feedback.FeedbackRemoteSensorID = angleEncoder.getDeviceID();
+    // angleMotorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+    // angleMotorConfig.Feedback.SensorToMechanismRatio =
+    // ShooterConstants.SENSOR_TO_MECHANISM_RATIO;
+    // angleMotorConfig.Feedback.RotorToSensorRatio = ShooterConstants.ANGLE_MOTOR_GEAR_RATIO;
+    angleMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.ANGLE_MOTOR_GEAR_RATIO;
 
     angleMotor.getConfigurator().apply(angleMotorConfig);
   }
