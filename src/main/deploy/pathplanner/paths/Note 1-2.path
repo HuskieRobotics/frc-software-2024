@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.92,
-        "y": 6.8
+        "x": 0.49941118064054313,
+        "y": 5.2614127046435915
       },
       "isLocked": false,
       "linkedName": null
@@ -28,13 +28,7 @@
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": -179.59069203758452,
-      "rotateFast": true
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -51,7 +45,7 @@
   "reversed": false,
   "folder": "4 Note Amp-Side Wing",
   "previewStartingState": {
-    "rotation": -91.63645243807998,
+    "rotation": 179.23830928476622,
     "velocity": 0
   },
   "useDefaultConstraints": false
