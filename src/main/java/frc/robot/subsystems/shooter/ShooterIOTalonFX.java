@@ -365,7 +365,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotorConfig.Slot0.kV = rotationMotorKV.get();
 
     rotationMotionMagicConfig.MotionMagicCruiseVelocity =
-        ShooterConstants.MOTION_MAGIC_CRUISE_VELOCITY; // unlimited cruise velocity
+        ShooterConstants.MOTION_MAGIC_CRUISE_VELOCITY;
     rotationMotionMagicConfig.MotionMagicAcceleration =
         ShooterConstants.MOTION_MAGIC_CRUISE_VELOCITY * 2;
     // rotationMotionMagicConfig.MotionMagicExpo_kV = rotationMotorExpoKV.get();

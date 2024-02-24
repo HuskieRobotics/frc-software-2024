@@ -541,7 +541,7 @@ public class RobotContainer {
   }
 
   private void configureShooterCommands() {
-    oi.getShootButton().onTrue(Commands.runOnce(() -> shooter.shoot(0.0), shooter));
+    oi.getShootButton().onTrue(Commands.runOnce(() -> shooter.shoot(0.0, 0.0)));
   }
 
   /**
