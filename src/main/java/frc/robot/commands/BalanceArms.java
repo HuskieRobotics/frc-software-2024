@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.team3061.drivetrain.Drivetrain;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.subsystems.climber.Climber;
-
+import frc.robot.subsystems.climber.ClimberConstants;
 import edu.wpi.first.math.controller.PIDController;
 
 /**
@@ -101,6 +101,9 @@ public class BalanceArms extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    if(climber.getLeftSpoolLength() >= (ClimberConstants.SPOOL_LENGTH - 1) || climber.getRightSpoolLength() >= (ClimberConstants.SPOOL_LENGTH - 1)){
+      return false;
+    }
+    return true;
   }
 }

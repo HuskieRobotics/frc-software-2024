@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
+import frc.robot.subsystems.climber.ClimberIO.ClimberIOInputs;
+
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -18,6 +20,7 @@ public class Climber extends SubsystemBase {
 
   private ClimberIO io;
   private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
+  private final ClimberIOInputs outputs = new ClimberIOInputs();
   private boolean longArms = false;
 
   /**
@@ -95,6 +98,14 @@ public class Climber extends SubsystemBase {
 
   public boolean getLongerArms() {
     return longArms;
+  }
+
+  public double getLeftSpoolLength() {
+    return inputs.leftPositionRotationsMeters;
+  }
+
+  public double getRightSpoolLength() {
+    return inputs.rightPositionRotationsMeters;
   }
 
   public void deployClimber() {

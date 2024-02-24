@@ -17,6 +17,7 @@ public class ClimberConstants {
 
   public static final double GEAR_RATIO = 25.0;
   public static final double DRUM_CIRCUMFERENCE_METERS = 0.0254;
+  public static final double SPOOL_LENGTH = 0.0; // FIXME: Update spool length
   public static final boolean LEFT_MOTOR_INVERTED = false;
   public static final boolean RIGHT_MOTOR_INVERTED = true;
 
