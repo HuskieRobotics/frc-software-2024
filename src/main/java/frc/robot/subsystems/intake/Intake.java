@@ -21,30 +21,24 @@ public class Intake extends SubsystemBase {
 
   private final IntakeMotor[] intakeMotors = { 
     IntakeMotor.RIGHT_ROLLER, 
-    IntakeMotor.LEFT_ROLLER,
-    IntakeMotor.DRUM,
     IntakeMotor.KICKER,
   };
 
   enum IntakeMotor {
     RIGHT_ROLLER,
-    LEFT_ROLLER,
-    DRUM,
     KICKER
   }
 
-  private int intakeAndDrumTimeout;
+  private int intakeAndKickerTimeout;
 
-  // Intakes, Drum, Kicker
+  // Intakes, Kicker, and Shooter (the second kicker IR sensor)
   enum IntakeState {
-    EMPTY, // 0, 0, 0
-    IN_BETWEEN_DRUM_AND_KICKER,
-    IN_BETWEEN_INTAKE_AND_DRUM,
-    NOTE_IN_KICKER, // 0, 0, 1
-    NOTE_IN_DRUM, // 0, 1, 0
-    NOTE_IN_INTAKE, // 1, 0, 0
-    NOTE_IN_INTAKE_AND_DRUM, // 1, 1, 0
-    EMERGENCY, // 0, 1, 1 or 1, 0, 1 or 1, 1, 1
+    EMPTY,
+    NOTE_IN_INTAKE,
+    NOTE_IN_INTAKE_AND_KICKER,
+    NOTE_IN_KICKER,
+    NOTE_IN_KICKER_AND_SHOOTER,
+    NOTE_IN_SHOOTER
   }
 
   private IntakeState intakeState;
@@ -62,9 +56,8 @@ public class Intake extends SubsystemBase {
 
     leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
     this.intakeGamePiece();
-
     
-    FaultReporter.getInstance().registerSystemCheck("INTAKE", getSystemCheckCommand());
+    FaultReporter.getInstance().registerSystemCheck(SUBSYSTEM_NAME, getSystemCheckCommand());
   }
 
   @Override
@@ -74,6 +67,60 @@ public class Intake extends SubsystemBase {
     Logger.recordOutput("Intake/State", intakeState.toString());
 
     this.runIntakeStateMachine();
+  }
+
+  public void runIntakeStateMachine() {
+
+    if (intakeState == IntakeState.EMPTY) {
+      // if it is empty, then this is the only 1 possible next steps / situations
+      //   1. we are truly empty, and waiting for a game piece
+      if (inputs.isRollerIRBlocked) {
+        intakeState = IntakeState.NOTE_IN_INTAKE;
+        leds.setIntakeLEDState(IntakeLEDState.HAS_GAME_PIECE);
+        this.transitionGamePiece();
+      } else if (inputs.isShooterIRBlocked) {
+        intakeState = IntakeState.NOTE_IN_KICKER;
+        this.repelGamePiece();
+      }
+    } else if (intakeState == IntakeState.NOTE_IN_INTAKE) {
+      if (inputs.isKickerIRBlocked) {
+        intakeState = IntakeState.NOTE_IN_INTAKE_AND_KICKER;
+        intakeAndKickerTimeout = 0;
+        this.transitionGamePiece();
+      }
+    } else if (intakeState == IntakeState.NOTE_IN_INTAKE_AND_KICKER) {
+      intakeAndKickerTimeout++;
+
+      if (!inputs.isRollerIRBlocked) {
+        intakeState = IntakeState.NOTE_IN_KICKER;
+        this.transitionGamePiece();
+        this.repelGamePiece();
+      } else if (intakeAndKickerTimeout > IntakeConstants.IN_BETWEEN_TIMEOUT_SECONDS * 50) {
+        intakeState = IntakeState.EMPTY;
+        leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
+      }
+    } else if (intakeState == IntakeState.NOTE_IN_KICKER) {
+      if (inputs.isShooterIRBlocked) {
+        intakeState = IntakeState.NOTE_IN_KICKER_AND_SHOOTER;
+        this.turnKickerOff();
+      }
+    } else if (intakeState == IntakeState.NOTE_IN_KICKER_AND_SHOOTER) {
+      // the only possible next step is that we become empty after shooting
+      if (!inputs.isKickerIRBlocked) {
+        intakeState = IntakeState.NOTE_IN_SHOOTER;
+      }
+    } else if (intakeState == IntakeState.NOTE_IN_SHOOTER) {
+      // TODO: Set up access of shooter angle
+      if (!inputs.isShooterIRBlocked) {
+        intakeState = IntakeState.EMPTY;
+        leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
+        this.intakeGamePiece();
+      }
+    }
+  }
+
+  private void setIntakeState(IntakeState state) {
+    this.intakeState = state;
   }
 
   public void completeCheck() {
@@ -86,88 +133,6 @@ public class Intake extends SubsystemBase {
 
   public boolean checkComplete() {
     return checkComplete;
-  }
-
-  public void runIntakeStateMachine() {
-
-    if (intakeState == IntakeState.EMPTY) {
-      // if it is empty, then this is the only 1 possible next steps / situations
-      //   1. we are truly empty, and waiting for a game piece
-      if (inputs.isRightRollerIRBlocked || inputs.isLeftRollerIRBlocked) {
-        intakeState = IntakeState.NOTE_IN_INTAKE;
-        leds.setIntakeLEDState(IntakeLEDState.HAS_GAME_PIECE);
-        if (inputs.isRightRollerIRBlocked) {
-          this.repelGamePieceLeft();
-        } else {
-          this.repelGamePieceRight();
-        }
-        this.transitionGamePiece();
-      } else if (inputs.isKickerIRBlocked) {
-        intakeState = IntakeState.NOTE_IN_KICKER;
-        this.repelGamePiece();
-      }
-    } else if (intakeState == IntakeState.IN_BETWEEN_DRUM_AND_KICKER) {
-      if (inputs.isKickerIRBlocked) {
-        intakeState = IntakeState.NOTE_IN_KICKER;
-        this.turnTransitionOff();
-        this.turnKickerOff();
-      }
-    } else if (intakeState == IntakeState.NOTE_IN_INTAKE) {
-      // if there is a note in the intake, then there are two possible next steps depending on the
-      // robot
-      //   1. we get both the drum and the intake to be sensed at the same time
-      //   2. we have no sensors sensed as we are in between the intake and the drum
-      if (inputs.isDrumIRBlocked) {
-        intakeState = IntakeState.NOTE_IN_INTAKE_AND_DRUM;
-        this.transitionGamePiece();
-      } else if (inputs.isLeftRollerIRBlocked || inputs.isRightRollerIRBlocked) {
-        intakeState = IntakeState.NOTE_IN_INTAKE;
-      } else {
-        // we are now in between intake and drum
-        intakeState = IntakeState.IN_BETWEEN_INTAKE_AND_DRUM;
-
-        // set the timeout here
-        intakeAndDrumTimeout = 0;
-      }
-    } else if (intakeState == IntakeState.IN_BETWEEN_INTAKE_AND_DRUM) {
-      //  the only possible next step is that we are only in the drum
-      //  add a timeout so that if we are here for too long we go back to being empty
-      intakeAndDrumTimeout++;
-
-      if (inputs.isDrumIRBlocked) {
-        intakeState = IntakeState.NOTE_IN_DRUM;
-        this.transitionGamePiece();
-      } else if (intakeAndDrumTimeout >= IntakeConstants.IN_BETWEEN_TIMEOUT_SECONDS * 50) {
-        intakeState = IntakeState.EMPTY;
-        leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
-      }
-    } else if (intakeState == IntakeState.NOTE_IN_INTAKE_AND_DRUM) {
-      // the only possible next step is that we are only in the drum
-      //    1. this is when the intake IR stops being detected
-      // assuming that we do not need to call transitionGamePiece() again because we already called
-      if (!(inputs.isLeftRollerIRBlocked || inputs.isRightRollerIRBlocked)) {
-        intakeState = IntakeState.NOTE_IN_DRUM;
-        this.repelGamePiece();
-      }
-    } else if (intakeState == IntakeState.NOTE_IN_DRUM) {
-      // the only possible next step is becoming empty between the drum and the kicker
-      if (!inputs.isDrumIRBlocked) {
-        intakeState = IntakeState.IN_BETWEEN_DRUM_AND_KICKER;
-        this.turnTransitionOff();
-        this.repelGamePiece();
-      }
-    } else if (intakeState == IntakeState.NOTE_IN_KICKER) {
-      // the only possible next step is that we become empty after shooting
-      if (!inputs.isKickerIRBlocked) {
-        intakeState = IntakeState.EMPTY;
-        leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
-        this.intakeGamePiece();
-      }
-    }
-  }
-
-  private void setIntakeState(IntakeState state) {
-    this.intakeState = state;
   }
 
   public Command getSystemCheckCommand() {
@@ -184,7 +149,6 @@ public class Intake extends SubsystemBase {
     ).until(() -> !FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).isEmpty())
     .andThen(Commands.sequence(
       Commands.runOnce(this::turnIntakeOff),
-      Commands.runOnce(this::turnTransitionOff),
       Commands.runOnce(this::turnKickerOff)))
     .withName(SUBSYSTEM_NAME + "SystemCheck");
   }
@@ -209,50 +173,24 @@ public class Intake extends SubsystemBase {
 
   private void checkMotorVelocity(IntakeMotor motor) {
     if (motor == IntakeMotor.RIGHT_ROLLER) {
-      if (Math.abs(inputs.rightRollerVelocityRotationsPerSecond 
-      - inputs.rightRollerReferenceVelocityRPS) 
+      if (Math.abs(inputs.rollerVelocityRPS 
+      - inputs.rollerReferenceVelocityRPS) 
       > IntakeConstants.ROLLER_VELOCITY_TOLERANCE) {
-        if (Math.abs(inputs.rightRollerVelocityRotationsPerSecond) >
-        Math.abs(inputs.rightRollerReferenceVelocityRPS)) {
+        if (Math.abs(inputs.rollerVelocityRPS) >
+        Math.abs(inputs.rollerReferenceVelocityRPS)) {
           FaultReporter.getInstance().addFault(
             SUBSYSTEM_NAME,
-            "[System Check] Right Roller Too Fast"
+            "[System Check] RRoller Too Fast"
           );
         } else {
           FaultReporter.getInstance().addFault(
             SUBSYSTEM_NAME,
-            "[System Check] Right Roller Too Slow"
+            "[System Check] Roller Too Slow"
           );
         }
-      }
-    } else if (motor == IntakeMotor.LEFT_ROLLER) {
-      if (Math.abs(inputs.leftRollerVelocityRotationsPerSecond 
-      - inputs.leftRollerReferenceVelocityRPS) 
-      > IntakeConstants.ROLLER_VELOCITY_TOLERANCE) {
-        if (Math.abs(inputs.leftRollerVelocityRotationsPerSecond) >
-        Math.abs(inputs.leftRollerReferenceVelocityRPS)) {
-          FaultReporter.getInstance().addFault(
-            SUBSYSTEM_NAME,
-            "[System Check] Left Roller Too Fast"
-          );
-        } else {
-          FaultReporter.getInstance().addFault(
-            SUBSYSTEM_NAME,
-            "[System Check] Left Roller Too Slow"
-          );
-        }
-      }
-    } else if (motor == IntakeMotor.DRUM) {
-      if (inputs.drumVelocityRotationsPerSecond 
-      - inputs.drumReferenceVelocityRPS 
-      > IntakeConstants.DRUM_VELOCITY_TOLERANCE) {
-        FaultReporter.getInstance().addFault(
-          SUBSYSTEM_NAME,
-          "[System Check] Drum Too Slow"
-        );
       }
     } else if (motor == IntakeMotor.KICKER) {
-      if (inputs.kickerVelocityRotationsPerSecond 
+      if (inputs.kickerVelocityRPS 
       - inputs.kickerReferenceVelocityRPS 
       > IntakeConstants.KICKER_VELOCITY_TOLERANCE) {
         FaultReporter.getInstance().addFault(
@@ -267,10 +205,10 @@ public class Intake extends SubsystemBase {
     IntakeState[] desiredStateSequence = {
       IntakeState.EMPTY,
       IntakeState.NOTE_IN_INTAKE,
-      IntakeState.IN_BETWEEN_INTAKE_AND_DRUM,
-      IntakeState.NOTE_IN_DRUM,
-      IntakeState.IN_BETWEEN_DRUM_AND_KICKER,
-      IntakeState.NOTE_IN_KICKER
+      IntakeState.NOTE_IN_INTAKE_AND_KICKER,
+      IntakeState.NOTE_IN_KICKER,
+      IntakeState.NOTE_IN_KICKER_AND_SHOOTER,
+      IntakeState.NOTE_IN_SHOOTER
     };
     
     ArrayList<IntakeState> actualStateSequence = new ArrayList<>();
@@ -317,8 +255,7 @@ public class Intake extends SubsystemBase {
 
   public boolean runningManualIntake() {
     return manualOverrideEnabled
-        && (inputs.leftRollerReferenceVelocityRPS > 0
-            || inputs.rightRollerReferenceVelocityRPS > 0);
+        && Math.abs(inputs.rollerReferenceVelocityRPS) > 0;
   }
 
   public void enableManualOverride() {
@@ -330,37 +267,14 @@ public class Intake extends SubsystemBase {
   }
 
   public void intakeGamePiece() {
-    this.intakeGamePieceRight();
-    this.intakeGamePieceLeft();
-  }
-
-  public void intakeGamePieceRight() {
-    this.setRightRollerVelocity(IntakeConstants.INTAKE_VELOCITY_ROLLERS_RPS);
-  }
-
-  public void intakeGamePieceLeft() {
-    this.setLeftRollerVelocity(IntakeConstants.INTAKE_VELOCITY_ROLLERS_RPS);
-  }
-
-  public void turnTransitionOff() {
-    this.setDrumVelocity(0);
-  }
-
-  public void turnRightIntakeOff() {
-    this.setRightRollerVelocity(0);
-  }
-
-  public void turnLeftIntakeOff() {
-    this.setLeftRollerVelocity(0);
+    io.setRollerVelocity(IntakeConstants.INTAKE_VELOCITY_ROLLERS_RPS);
   }
 
   public void turnIntakeOff() {
-    this.turnRightIntakeOff();
-    this.turnLeftIntakeOff();
+   io.setRollerVelocity(0);
   }
 
   public void transitionGamePiece() {
-    this.setDrumVelocity(IntakeConstants.DRUM_VELOCITY_RPS);
     this.setKickerVelocity(IntakeConstants.KICKER_VELOCITY_RPS);
   }
 
@@ -369,28 +283,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void repelGamePiece() {
-    this.setRightRollerVelocity(IntakeConstants.REPEL_VELOCITY_ROLLERS_RPS);
-    this.setLeftRollerVelocity(IntakeConstants.REPEL_VELOCITY_ROLLERS_RPS);
-  }
-
-  public void repelGamePieceRight() {
-    this.setRightRollerVelocity(IntakeConstants.REPEL_VELOCITY_ROLLERS_RPS);
-  }
-
-  public void repelGamePieceLeft() {
-    this.setLeftRollerVelocity(IntakeConstants.REPEL_VELOCITY_ROLLERS_RPS);
-  }
-
-  public void setRightRollerVelocity(double rps) {
-    io.setRightRollerVelocity(rps);
-  }
-
-  public void setLeftRollerVelocity(double rps) {
-    io.setLeftRollerVelocity(rps);
-  }
-
-  public void setDrumVelocity(double rps) {
-    io.setDrumVelocity(rps);
+    io.setRollerVelocity(IntakeConstants.REPEL_VELOCITY_ROLLERS_RPS);
   }
 
   public void setKickerVelocity(double rps) {

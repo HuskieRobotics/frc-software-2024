@@ -8,15 +8,12 @@ public class IntakeConstants {
     throw new IllegalStateException(CONSTRUCTOR_EXCEPTION);
   }
 
-  public static final int INTAKE_RIGHT_ROLLER_MOTOR_ID = 18;
-  public static final int INTAKE_LEFT_ROLLER_MOTOR_ID = 19;
-  public static final int INTAKE_DRUM_MOTOR_ID = 20;
+  public static final int INTAKE_ROLLER_MOTOR_ID = 18;
   public static final int INTAKE_KICKER_MOTOR_ID = 21;
 
   public static final int INTAKE_RIGHT_ROLLER_IR_SENSOR_ID = 0;
-  public static final int INTAKE_LEFT_ROLLER_IR_SENSOR_ID = 1;
-  public static final int INTAKE_DRUM_IR_SENSOR_ID = 2;
-  public static final int INTAKE_KICKER_IR_SENSOR_ID = 3;
+  public static final int INTAKE_KICKER_IR_SENSOR_ID = 1;
+  public static final int INTAKE_SHOOTER_IR_SENSOR_ID = 2;
 
   // add all current limiting
 
@@ -39,11 +36,9 @@ public class IntakeConstants {
 
   public static final double INTAKE_VELOCITY_ROLLERS_RPS = 40.0;
   public static final double REPEL_VELOCITY_ROLLERS_RPS = -40.0;
-  public static final double DRUM_VELOCITY_RPS = 8.0;
   public static final double KICKER_VELOCITY_RPS = 6.0;
 
   public static final double ROLLER_VELOCITY_TOLERANCE = 1.0;
-  public static final double DRUM_VELOCITY_TOLERANCE = 0.5;
   public static final double KICKER_VELOCITY_TOLERANCE = 0.5;
 
   // current limits
@@ -53,17 +48,12 @@ public class IntakeConstants {
   public static final double ROLLERS_PEAK_CURRENT_DURATION = 0.1;
   public static final boolean ROLLERS_MOTOR_INVERTED = false;
 
-  public static final double DRUM_CONTINUOUS_CURRENT_LIMIT = 15.0;
-  public static final double DRUM_PEAK_CURRENT_LIMIT = 20.0;
-  public static final double DRUM_PEAK_CURRENT_DURATION = 0.1;
-
   public static final double KICKER_CONTINUOUS_CURRENT_LIMIT = 15.0;
   public static final double KICKER_PEAK_CURRENT_LIMIT = 20.0;
   public static final double KICKER_PEAK_CURRENT_DURATION = 0.1;
 
   public static final boolean RIGHT_ROLLER_MOTOR_INVERTED = true;
   public static final boolean LEFT_ROLLER_MOTOR_INVERTED = true;
-  public static final boolean DRUM_MOTOR_INVERTED = false;
   public static final boolean KICKER_MOTOR_INVERTED = false;
 
   public static final double ROLLERS_SENSOR_TO_MECHANISM_RATIO = 5.0 / 4.0;

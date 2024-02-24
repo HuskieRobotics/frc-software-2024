@@ -18,44 +18,29 @@ import frc.lib.team3061.util.VelocitySystemSim;
 import frc.lib.team6328.util.TunableNumber;
 
 public class IntakeIOTalonFX implements IntakeIO {
-  private TalonFX rightRollerMotor;
-  private TalonFX leftRollerMotor;
-  private TalonFX drumMotor;
+  private TalonFX rollerMotor;
   private TalonFX kickerMotor;
-  private final DigitalInput rightRollerIRSensor;
-  private final DigitalInput leftRollerIRSensor;
-  private final DigitalInput drumIRSensor;
+  private final DigitalInput rollerIRSensor;
   private final DigitalInput kickerIRSensor;
+  private final DigitalInput shooterIRSensor;
 
-  private VelocityTorqueCurrentFOC rightRollerVelocityRequest;
-  private VelocityTorqueCurrentFOC leftRollerVelocityRequest;
-  private VelocityTorqueCurrentFOC drumVelocityRequest;
+  private VelocityTorqueCurrentFOC rollerVelocityRequest;
   private VelocityTorqueCurrentFOC kickerVelocityRequest;
 
-  private StatusSignal<Double> rightRollerVelocityStatusSignal;
-  private StatusSignal<Double> leftRollerVelocityStatusSignal;
-  private StatusSignal<Double> drumVelocityStatusSignal;
+  private StatusSignal<Double> rollerVelocityStatusSignal;
   private StatusSignal<Double> kickerVelocityStatusSignal;
   // status signals for stator current
-  private StatusSignal<Double> rightRollerStatorCurrentStatusSignal;
-  private StatusSignal<Double> leftRollerStatorCurrentStatusSignal;
-  private StatusSignal<Double> drumStatorCurrentStatusSignal;
+  private StatusSignal<Double> rollerStatorCurrentStatusSignal;
   private StatusSignal<Double> kickerStatorCurrentStatusSignal;
 
-  private StatusSignal<Double> rightRollerSupplyCurrentStatusSignal;
-  private StatusSignal<Double> leftRollerSupplyCurrentStatusSignal;
-  private StatusSignal<Double> drumSupplyCurrentStatusSignal;
+  private StatusSignal<Double> rollerSupplyCurrentStatusSignal;
   private StatusSignal<Double> kickerSupplyCurrentStatusSignal;
 
-  private StatusSignal<Double> rightRollerReferenceVelocityStatusSignal;
-  private StatusSignal<Double> leftRollerReferenceVelocityStatusSignal;
-  private StatusSignal<Double> drumReferenceVelocityStatusSignal;
+  private StatusSignal<Double> rollerReferenceVelocityStatusSignal;
   private StatusSignal<Double> kickerReferenceVelocityStatusSignal;
 
   // simulation related
-  private VelocitySystemSim rightRollerSim;
-  private VelocitySystemSim leftRollerSim;
-  private VelocitySystemSim drumMotorSim;
+  private VelocitySystemSim rollerMotorSim;
   private VelocitySystemSim kickerMotorSim;
 
   // tunable numbers for roller and drum pid
@@ -71,16 +56,6 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final TunableNumber rollerMotorsKS =
       new TunableNumber("Intake/rollerMotorsKS", IntakeConstants.INTAKE_ROLLER_MOTORS_KS);
 
-  private final TunableNumber drumMotorKP =
-      new TunableNumber("Intake/drumMotorKP", IntakeConstants.INTAKE_DRUM_MOTOR_KP);
-  private final TunableNumber drumMotorKI =
-      new TunableNumber("Intake/drumMotorKI", IntakeConstants.INTAKE_DRUM_MOTOR_KI);
-  private final TunableNumber drumMotorKD =
-      new TunableNumber("Intake/drumMotorKD", IntakeConstants.INTAKE_DRUM_MOTOR_KD);
-
-  private final TunableNumber drumMotorKS =
-      new TunableNumber("Intake/drumMotorKS", IntakeConstants.INTAKE_DRUM_MOTOR_KS);
-
   private final TunableNumber kickerMotorKP =
       new TunableNumber("Intake/kickerMotorKP", IntakeConstants.INTAKE_KICKER_MOTOR_KP);
 
@@ -94,159 +69,102 @@ public class IntakeIOTalonFX implements IntakeIO {
       new TunableNumber("Intake/kickerMotorKS", IntakeConstants.INTAKE_KICKER_MOTOR_KS);
 
   public IntakeIOTalonFX() {
-    rightRollerIRSensor = new DigitalInput(IntakeConstants.INTAKE_RIGHT_ROLLER_IR_SENSOR_ID);
-    leftRollerIRSensor = new DigitalInput(IntakeConstants.INTAKE_LEFT_ROLLER_IR_SENSOR_ID);
-    drumIRSensor = new DigitalInput(IntakeConstants.INTAKE_DRUM_IR_SENSOR_ID);
+    rollerIRSensor = new DigitalInput(IntakeConstants.INTAKE_RIGHT_ROLLER_IR_SENSOR_ID);
     kickerIRSensor = new DigitalInput(IntakeConstants.INTAKE_KICKER_IR_SENSOR_ID);
+    shooterIRSensor = new DigitalInput(IntakeConstants.INTAKE_SHOOTER_IR_SENSOR_ID);
 
     // torque current FOC control mode is not support in simulation yet
 
-    rightRollerMotor =
+    rollerMotor =
         new TalonFX(
-            IntakeConstants.INTAKE_RIGHT_ROLLER_MOTOR_ID,
+            IntakeConstants.INTAKE_ROLLER_MOTOR_ID,
             RobotConfig.getInstance().getCANBusName());
-    leftRollerMotor =
+   kickerMotor =
         new TalonFX(
-            IntakeConstants.INTAKE_LEFT_ROLLER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
-    drumMotor =
-        new TalonFX(
-            IntakeConstants.INTAKE_DRUM_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
-    kickerMotor =
-        new TalonFX(
-            IntakeConstants.INTAKE_KICKER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
+            IntakeConstants.INTAKE_KICKER_MOTOR_ID, 
+            RobotConfig.getInstance().getCANBusName());
 
-    configureIntakeRollerMotor(rightRollerMotor, true);
-    configureIntakeRollerMotor(leftRollerMotor, false);
-    configureIntakeDrumMotor(drumMotor);
+    configureIntakeRollerMotor(rollerMotor);
     configureIntakeKickerMotor(kickerMotor);
 
-    rightRollerVelocityRequest = new VelocityTorqueCurrentFOC(0);
-    leftRollerVelocityRequest = new VelocityTorqueCurrentFOC(0);
-    drumVelocityRequest = new VelocityTorqueCurrentFOC(0);
+    rollerVelocityRequest = new VelocityTorqueCurrentFOC(0);
     kickerVelocityRequest = new VelocityTorqueCurrentFOC(0);
 
-    rightRollerVelocityStatusSignal = rightRollerMotor.getVelocity();
-    leftRollerVelocityStatusSignal = leftRollerMotor.getVelocity();
-    drumVelocityStatusSignal = drumMotor.getVelocity();
+    rollerVelocityStatusSignal = rollerMotor.getVelocity();
     kickerVelocityStatusSignal = kickerMotor.getVelocity();
 
-    rightRollerStatorCurrentStatusSignal = rightRollerMotor.getStatorCurrent();
-    leftRollerStatorCurrentStatusSignal = leftRollerMotor.getStatorCurrent();
-    drumStatorCurrentStatusSignal = drumMotor.getStatorCurrent();
+    rollerStatorCurrentStatusSignal = rollerMotor.getStatorCurrent();
     kickerStatorCurrentStatusSignal = kickerMotor.getStatorCurrent();
 
-    rightRollerSupplyCurrentStatusSignal = rightRollerMotor.getSupplyCurrent();
-    leftRollerSupplyCurrentStatusSignal = leftRollerMotor.getSupplyCurrent();
-    drumSupplyCurrentStatusSignal = drumMotor.getSupplyCurrent();
+    rollerSupplyCurrentStatusSignal = rollerMotor.getSupplyCurrent();
     kickerSupplyCurrentStatusSignal = kickerMotor.getSupplyCurrent();
 
-    rightRollerReferenceVelocityStatusSignal = rightRollerMotor.getClosedLoopReference();
-    leftRollerReferenceVelocityStatusSignal = leftRollerMotor.getClosedLoopReference();
-    drumReferenceVelocityStatusSignal = drumMotor.getClosedLoopReference();
+    rollerReferenceVelocityStatusSignal = rollerMotor.getClosedLoopReference();
     kickerReferenceVelocityStatusSignal = kickerMotor.getClosedLoopReference();
 
-    this.rightRollerSim =
+    this.rollerMotorSim =
         new VelocitySystemSim(
-            rightRollerMotor,
+            rollerMotor,
             IntakeConstants.ROLLERS_MOTOR_INVERTED,
             0.02,
             0.001,
             ROLLERS_SENSOR_TO_MECHANISM_RATIO);
-    this.leftRollerSim =
-        new VelocitySystemSim(
-            leftRollerMotor,
-            IntakeConstants.ROLLERS_MOTOR_INVERTED,
-            0.02,
-            0.001,
-            ROLLERS_SENSOR_TO_MECHANISM_RATIO);
-    this.drumMotorSim =
-        new VelocitySystemSim(drumMotor, IntakeConstants.DRUM_MOTOR_INVERTED, 1.0, 0.3, 5.0 / 2.0);
     this.kickerMotorSim =
-        new VelocitySystemSim(kickerMotor, IntakeConstants.KICKER_MOTOR_INVERTED, 1.0, 0.3, 1.0);
+        new VelocitySystemSim(kickerMotor, 
+        IntakeConstants.KICKER_MOTOR_INVERTED, 
+        1.0, 
+        0.3, 
+        1.0);
   }
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    this.rightRollerSim.updateSim();
-    this.leftRollerSim.updateSim();
-    this.drumMotorSim.updateSim();
+    this.rollerMotorSim.updateSim();
     this.kickerMotorSim.updateSim();
 
     BaseStatusSignal.refreshAll(
-        rightRollerVelocityStatusSignal,
-        leftRollerVelocityStatusSignal,
-        drumVelocityStatusSignal,
-        rightRollerStatorCurrentStatusSignal,
-        leftRollerStatorCurrentStatusSignal,
-        drumStatorCurrentStatusSignal,
-        rightRollerSupplyCurrentStatusSignal,
-        leftRollerSupplyCurrentStatusSignal,
-        drumSupplyCurrentStatusSignal,
+        rollerVelocityStatusSignal,
+        rollerStatorCurrentStatusSignal,
+        rollerSupplyCurrentStatusSignal,
+        rollerReferenceVelocityStatusSignal,
         kickerSupplyCurrentStatusSignal,
         kickerStatorCurrentStatusSignal,
         kickerVelocityStatusSignal,
-        rightRollerReferenceVelocityStatusSignal,
-        leftRollerReferenceVelocityStatusSignal,
-        drumReferenceVelocityStatusSignal,
         kickerReferenceVelocityStatusSignal);
 
-    // FIXME: TEMPORARILY added ! to the IRSensor.get() as it was contradictory on the actual intake
-    inputs.isRightRollerIRBlocked = !rightRollerIRSensor.get();
-    inputs.isLeftRollerIRBlocked = !leftRollerIRSensor.get();
-    inputs.isDrumIRBlocked = !drumIRSensor.get();
+    inputs.isRollerIRBlocked = !rollerIRSensor.get();
     inputs.isKickerIRBlocked = !kickerIRSensor.get();
+    inputs.isShooterIRBlocked = !shooterIRSensor.get();
 
-    inputs.rightRollerStatorCurrentAmps = rightRollerStatorCurrentStatusSignal.getValueAsDouble();
-    inputs.leftRollerStatorCurrentAmps = leftRollerStatorCurrentStatusSignal.getValueAsDouble();
-    inputs.drumStatorCurrentAmps = drumStatorCurrentStatusSignal.getValueAsDouble();
+    inputs.rollerStatorCurrentAmps = rollerStatorCurrentStatusSignal.getValueAsDouble();
     inputs.kickerStatorCurrentAmps = kickerStatorCurrentStatusSignal.getValueAsDouble();
 
-    inputs.rightRollerSupplyCurrentAmps = rightRollerSupplyCurrentStatusSignal.getValueAsDouble();
-    inputs.leftRollerSupplyCurrentAmps = leftRollerSupplyCurrentStatusSignal.getValueAsDouble();
-    inputs.drumSupplyCurrentAmps = drumSupplyCurrentStatusSignal.getValueAsDouble();
+    inputs.rollerSupplyCurrentAmps = rollerSupplyCurrentStatusSignal.getValueAsDouble();
     inputs.kickerSupplyCurrentAmps = kickerSupplyCurrentStatusSignal.getValueAsDouble();
 
-    inputs.rightRollerVelocityRotationsPerSecond =
-        rightRollerVelocityStatusSignal.getValueAsDouble();
-    inputs.leftRollerVelocityRotationsPerSecond = leftRollerVelocityStatusSignal.getValueAsDouble();
-    inputs.drumVelocityRotationsPerSecond = drumVelocityStatusSignal.getValueAsDouble();
-    inputs.kickerVelocityRotationsPerSecond = kickerVelocityStatusSignal.getValueAsDouble();
+    inputs.rollerVelocityRPS =
+        rollerVelocityStatusSignal.getValueAsDouble();
+    inputs.kickerVelocityRPS = 
+        kickerVelocityStatusSignal.getValueAsDouble();
 
-    inputs.rightRollerReferenceVelocityRPS =
-        leftRollerReferenceVelocityStatusSignal.getValueAsDouble();
-    inputs.leftRollerReferenceVelocityRPS =
-        leftRollerReferenceVelocityStatusSignal.getValueAsDouble();
-    inputs.drumReferenceVelocityRPS = drumReferenceVelocityStatusSignal.getValueAsDouble();
-    inputs.kickerReferenceVelocityRPS = kickerReferenceVelocityStatusSignal.getValueAsDouble();
+    inputs.rollerReferenceVelocityRPS =
+        rollerReferenceVelocityStatusSignal.getValueAsDouble();
+    inputs.kickerReferenceVelocityRPS = 
+        kickerReferenceVelocityStatusSignal.getValueAsDouble();
 
     if (rollerMotorsKP.hasChanged()
         || rollerMotorsKI.hasChanged()
         || rollerMotorsKD.hasChanged()
         || rollerMotorsKS.hasChanged()) {
-      for (TalonFX motor : new TalonFX[] {rightRollerMotor, leftRollerMotor}) {
-        Slot0Configs slot0Configs = new Slot0Configs();
-        motor.getConfigurator().refresh(slot0Configs);
-        slot0Configs.kP = rollerMotorsKP.get();
-        slot0Configs.kI = rollerMotorsKI.get();
-        slot0Configs.kD = rollerMotorsKD.get();
-        slot0Configs.kS = rollerMotorsKS.get();
-
-        motor.getConfigurator().apply(slot0Configs);
-      }
-    }
-
-    if (drumMotorKP.hasChanged()
-        || drumMotorKI.hasChanged()
-        || drumMotorKD.hasChanged()
-        || drumMotorKS.hasChanged()) {
+      
       Slot0Configs slot0Configs = new Slot0Configs();
-      drumMotor.getConfigurator().refresh(slot0Configs);
+      rollerMotor.getConfigurator().refresh(slot0Configs);
       slot0Configs.kP = rollerMotorsKP.get();
       slot0Configs.kI = rollerMotorsKI.get();
       slot0Configs.kD = rollerMotorsKD.get();
       slot0Configs.kS = rollerMotorsKS.get();
 
-      drumMotor.getConfigurator().apply(slot0Configs);
+      rollerMotor.getConfigurator().apply(slot0Configs);
     }
 
     if (kickerMotorKP.hasChanged()
@@ -265,18 +183,8 @@ public class IntakeIOTalonFX implements IntakeIO {
   }
 
   @Override
-  public void setRightRollerVelocity(double rps) {
-    rightRollerMotor.setControl(rightRollerVelocityRequest.withVelocity(rps));
-  }
-
-  @Override
-  public void setLeftRollerVelocity(double rps) {
-    leftRollerMotor.setControl(leftRollerVelocityRequest.withVelocity(rps));
-  }
-
-  @Override
-  public void setDrumVelocity(double rps) {
-    drumMotor.setControl(drumVelocityRequest.withVelocity(rps));
+  public void setRollerVelocity(double rps) {
+    rollerMotor.setControl(rollerVelocityRequest.withVelocity(rps));
   }
 
   @Override
@@ -284,7 +192,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     kickerMotor.setControl(kickerVelocityRequest.withVelocity(rps));
   }
 
-  private void configureIntakeRollerMotor(TalonFX rollerMotor, boolean isRight) {
+  private void configureIntakeRollerMotor(TalonFX rollerMotor) {
     TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
     CurrentLimitsConfigs rollerCurrentLimits = new CurrentLimitsConfigs();
 
@@ -302,54 +210,17 @@ public class IntakeIOTalonFX implements IntakeIO {
     rollerConfig.Slot0.kD = rollerMotorsKD.get();
     rollerConfig.Slot0.kS = rollerMotorsKS.get();
 
-    if (isRight) {
-      rollerConfig.MotorOutput.Inverted =
-          IntakeConstants.RIGHT_ROLLER_MOTOR_INVERTED
-              ? InvertedValue.Clockwise_Positive
-              : InvertedValue.CounterClockwise_Positive;
-    } else {
-      rollerConfig.MotorOutput.Inverted =
-          IntakeConstants.LEFT_ROLLER_MOTOR_INVERTED
-              ? InvertedValue.Clockwise_Positive
-              : InvertedValue.CounterClockwise_Positive;
-    }
+    rollerConfig.MotorOutput.Inverted =
+        IntakeConstants.RIGHT_ROLLER_MOTOR_INVERTED
+            ? InvertedValue.Clockwise_Positive
+            : InvertedValue.CounterClockwise_Positive;
 
     rollerConfig.Feedback.SensorToMechanismRatio =
         IntakeConstants.ROLLERS_SENSOR_TO_MECHANISM_RATIO;
 
     rollerMotor.getConfigurator().apply(rollerConfig);
 
-    if (isRight) {
-      FaultReporter.getInstance().registerHardware("INTAKE", "IntakeRightRoller", rollerMotor);
-    } else {
-      FaultReporter.getInstance().registerHardware("INTAKE", "IntakeLeftRoller", rollerMotor);
-    }
-  }
-
-  private void configureIntakeDrumMotor(TalonFX drumMotor) {
-    TalonFXConfiguration drumConfig = new TalonFXConfiguration();
-    CurrentLimitsConfigs drumCurrentLimits = new CurrentLimitsConfigs();
-
-    drumCurrentLimits.SupplyCurrentLimit = IntakeConstants.DRUM_CONTINUOUS_CURRENT_LIMIT;
-    drumCurrentLimits.SupplyCurrentThreshold = IntakeConstants.DRUM_PEAK_CURRENT_LIMIT;
-    drumCurrentLimits.SupplyTimeThreshold = IntakeConstants.DRUM_PEAK_CURRENT_DURATION;
-    drumCurrentLimits.SupplyCurrentLimitEnable = true;
-
-    drumConfig.CurrentLimits = drumCurrentLimits;
-
-    drumConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
-    drumConfig.Slot0.kP = drumMotorKP.get();
-    drumConfig.Slot0.kI = drumMotorKI.get();
-    drumConfig.Slot0.kD = drumMotorKD.get();
-    drumConfig.Slot0.kS = drumMotorKS.get();
-
-    drumConfig.MotorOutput.Inverted =
-        IntakeConstants.DRUM_MOTOR_INVERTED
-            ? InvertedValue.Clockwise_Positive
-            : InvertedValue.CounterClockwise_Positive;
-
-    drumMotor.getConfigurator().apply(drumConfig);
+    FaultReporter.getInstance().registerHardware("INTAKE", "IntakeRightRoller", rollerMotor);
   }
 
   private void configureIntakeKickerMotor(TalonFX kickerMotor) {
@@ -357,8 +228,8 @@ public class IntakeIOTalonFX implements IntakeIO {
     CurrentLimitsConfigs kickerCurrentLimits = new CurrentLimitsConfigs();
 
     kickerCurrentLimits.SupplyCurrentLimit = IntakeConstants.KICKER_CONTINUOUS_CURRENT_LIMIT;
-    kickerCurrentLimits.SupplyCurrentThreshold = IntakeConstants.DRUM_PEAK_CURRENT_LIMIT;
-    kickerCurrentLimits.SupplyTimeThreshold = IntakeConstants.DRUM_PEAK_CURRENT_DURATION;
+    kickerCurrentLimits.SupplyCurrentThreshold = IntakeConstants.KICKER_PEAK_CURRENT_LIMIT;
+    kickerCurrentLimits.SupplyTimeThreshold = IntakeConstants.KICKER_PEAK_CURRENT_DURATION;
     kickerCurrentLimits.SupplyCurrentLimitEnable = true;
 
     kickerConfig.CurrentLimits = kickerCurrentLimits;
