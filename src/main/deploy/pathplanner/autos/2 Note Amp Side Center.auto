@@ -1,0 +1,31 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7233010829632895,
+      "y": 6.6793820860383475
+    },
+    "rotation": -121.39026810393015
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2 Note Amp Side Center Start - Note 5 "
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2 Note Amp Side Center Note 5 -End"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
