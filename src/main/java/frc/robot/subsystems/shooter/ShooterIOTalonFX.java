@@ -147,15 +147,15 @@ public class ShooterIOTalonFX implements ShooterIO {
         new VelocitySystemSim(
             shootMotorBottom,
             ShooterConstants.SHOOT_BOTTOM_INVERTED,
-            0.02,
-            0.001,
+            0.05,
+            0.01,
             ShooterConstants.SHOOT_MOTORS_GEAR_RATIO);
     this.shootMotorTopSim =
         new VelocitySystemSim(
             shootMotorTop,
             ShooterConstants.SHOOT_TOP_INVERTED,
-            0.02,
-            0.001,
+            0.05,
+            0.01,
             ShooterConstants.SHOOT_MOTORS_GEAR_RATIO);
     this.angleMotorSim =
         new ArmSystemSim(
@@ -187,7 +187,11 @@ public class ShooterIOTalonFX implements ShooterIO {
         shootMotorTopSupplyCurrentStatusSignal,
         shootMotorBottomSupplyCurrentStatusSignal,
         dunkerMotorSupplyCurrentStatusSignal,
-        angleMotorSupplyCurrentStatusSignal);
+        angleMotorSupplyCurrentStatusSignal,
+        shootMotorTopReferenceVelocityStatusSignal,
+        shootMotorBottomReferenceVelocityStatusSignal,
+        dunkerMotorReferenceVelocityStatusSignal,
+        angleMotorReferencePositionStatusSignal);
 
     // Updates Top Shooter Motor Inputs
     shooterInputs.shootMotorTopStatorCurrentAmps =
@@ -197,18 +201,6 @@ public class ShooterIOTalonFX implements ShooterIO {
     shooterInputs.shootMotorTopVelocityRPS = shootMotorTopVelocityStatusSignal.getValueAsDouble();
     shooterInputs.shootMotorTopReferenceVelocityRPS =
         shootMotorTopReferenceVelocityStatusSignal.getValueAsDouble();
-    if (shootMotorsKD.hasChanged()
-        || shootMotorsKI.hasChanged()
-        || shootMotorsKP.hasChanged()
-        || shootMotorsKS.hasChanged()) {
-      Slot0Configs topShootMotorConfig = new Slot0Configs();
-      topShootMotorConfig.kP = shootMotorsKP.get();
-      topShootMotorConfig.kI = shootMotorsKI.get();
-      topShootMotorConfig.kD = shootMotorsKD.get();
-      topShootMotorConfig.kS = shootMotorsKS.get();
-
-      shootMotorTop.getConfigurator().apply(topShootMotorConfig);
-    }
 
     // Updates Bottom Shooter Motor Inputs
     shooterInputs.shootMotorBottomStatorCurrentAmps =
@@ -219,16 +211,19 @@ public class ShooterIOTalonFX implements ShooterIO {
         shootMotorBottomVelocityStatusSignal.getValueAsDouble();
     shooterInputs.shootMotorBottomReferenceVelocityRPS =
         shootMotorBottomReferenceVelocityStatusSignal.getValueAsDouble();
+
+    // check if the tunable numbers have changed for the top and bottom shooter motors
     if (shootMotorsKD.hasChanged()
         || shootMotorsKI.hasChanged()
         || shootMotorsKP.hasChanged()
         || shootMotorsKS.hasChanged()) {
-      Slot0Configs bottomShootMotorConfig = new Slot0Configs();
-      bottomShootMotorConfig.kP = shootMotorsKP.get();
-      bottomShootMotorConfig.kI = shootMotorsKI.get();
-      bottomShootMotorConfig.kD = shootMotorsKD.get();
-      bottomShootMotorConfig.kS = shootMotorsKS.get();
-      shootMotorBottom.getConfigurator().apply(bottomShootMotorConfig);
+      Slot0Configs shootMotorConfig = new Slot0Configs();
+      shootMotorConfig.kP = shootMotorsKP.get();
+      shootMotorConfig.kI = shootMotorsKI.get();
+      shootMotorConfig.kD = shootMotorsKD.get();
+      shootMotorConfig.kS = shootMotorsKS.get();
+      shootMotorTop.getConfigurator().apply(shootMotorConfig);
+      shootMotorBottom.getConfigurator().apply(shootMotorConfig);
     }
 
     // Updates Angle Motor Inputs
