@@ -12,10 +12,10 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants;
+import org.littletonrobotics.junction.Logger;
 
 public class ArmSystemSim {
 
@@ -26,6 +26,7 @@ public class ArmSystemSim {
   private SingleJointedArmSim systemSim;
   private double sensorToMechanismRatio;
   private double rotorToSensorRatio;
+  private String subsystemName;
 
   // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
   private Mechanism2d mech2d;
@@ -43,15 +44,16 @@ public class ArmSystemSim {
       double mass,
       double minAngle,
       double maxAngle,
-      double startingAngle) {
+      double startingAngle,
+      String subsystemName) {
+    if (Constants.getMode() != Constants.Mode.SIM) {
+      return;
+    }
+
     this.motor = motor;
     this.encoder = encoder;
     this.sensorToMechanismRatio = sensorToMechanismRatio;
     this.rotorToSensorRatio = rotorToSensorRatio;
-
-    if (Constants.getMode() != Constants.Mode.SIM) {
-      return;
-    }
 
     this.motorSimState = this.motor.getSimState();
     this.motorSimState.Orientation =
@@ -81,10 +83,9 @@ public class ArmSystemSim {
     this.arm =
         armPivot.append(
             new MechanismLigament2d("Arm", length, startingAngle, 6, new Color8Bit(Color.kYellow)));
+    this.armTower.setColor(new Color8Bit(Color.kBlue));
 
-    // Put Mechanism 2d to SmartDashboard
-    SmartDashboard.putData("Arm Sim", mech2d);
-    armTower.setColor(new Color8Bit(Color.kBlue));
+    this.subsystemName = subsystemName;
   }
 
   public void updateSim() {
@@ -119,5 +120,6 @@ public class ArmSystemSim {
 
     // Update the Mechanism Arm angle based on the simulated arm angle
     arm.setAngle(Units.radiansToDegrees(mechanismRadians));
+    Logger.recordOutput(subsystemName + "/ArmSim", mech2d);
   }
 }
