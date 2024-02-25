@@ -18,7 +18,7 @@ public class Shooter extends SubsystemBase {
   private final TunableNumber topWheelVelocity = new TunableNumber("Shooter/Top Wheel Velocity", 0);
   private final TunableNumber bottomWheelVelocity =
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
-  private final TunableNumber angle = new TunableNumber("Shooter/Angle", 0);
+  private final TunableNumber angle = new TunableNumber("Shooter/Angle", 10.0);
 
   private ShooterIO io;
   private Alliance alliance = Alliance.Red;
