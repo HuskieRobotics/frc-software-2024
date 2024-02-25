@@ -152,7 +152,8 @@ public class ShooterIOTalonFX implements ShooterIO {
             Units.lbsToKilograms(20.0),
             Units.degreesToRadians(10.0),
             Units.degreesToRadians(100.0),
-            Units.degreesToRadians(10.0));
+            Units.degreesToRadians(10.0),
+            SUBSYSTEM_NAME);
   }
 
   @Override
