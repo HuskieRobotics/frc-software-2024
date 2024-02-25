@@ -14,6 +14,7 @@ import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -145,9 +146,10 @@ public class ShooterIOTalonFX implements ShooterIO {
             angleMotor,
             angleEncoder,
             ShooterConstants.ANGLE_MOTOR_INVERTED,
+            ShooterConstants.SENSOR_TO_MECHANISM_RATIO,
             ShooterConstants.ANGLE_MOTOR_GEAR_RATIO,
             Units.inchesToMeters(20.0),
-            Units.lbsToKilograms(25.0),
+            Units.lbsToKilograms(20.0),
             Units.degreesToRadians(10.0),
             Units.degreesToRadians(100.0),
             Units.degreesToRadians(10.0));
@@ -209,6 +211,7 @@ public class ShooterIOTalonFX implements ShooterIO {
         angleMotorStatorCurrentStatusSignal.getValueAsDouble();
     shooterInputs.angleMotorSupplyCurrentAmps =
         angleMotorSupplyCurrentStatusSignal.getValueAsDouble();
+    shooterInputs.angleMotorVoltage = angleMotor.getMotorVoltage().getValue();
     shooterInputs.angleEncoderAngleDegrees = rotationsToDegrees(angleMotor.getPosition());
     shooterInputs.angleMotorReferenceAngleDegrees =
         angleMotorReferencePositionStatusSignal.getValueAsDouble();
@@ -234,8 +237,13 @@ public class ShooterIOTalonFX implements ShooterIO {
       MotionMagicConfigs rotationMotionMagicConfig = new MotionMagicConfigs();
       rotationMotionMagicConfig.MotionMagicExpo_kV = rotationMotorExpoKV.get();
       rotationMotionMagicConfig.MotionMagicExpo_kA = rotationMotorExpoKA.get();
+      rotationMotionMagicConfig.MotionMagicCruiseVelocity =
+          ShooterConstants.MOTION_MAGIC_CRUISE_VELOCITY;
+      rotationMotionMagicConfig.MotionMagicAcceleration =
+          ShooterConstants.MOTION_MAGIC_CRUISE_VELOCITY * 2;
       angleMotor.getConfigurator().apply(rotationMotionMagicConfig);
     }
+  }
 
   @Override
   public void setShooterWheelTopVelocity(double rps) {
@@ -337,12 +345,11 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleCANCoderConfig.MagnetSensor.MagnetOffset = ShooterConstants.MAGNET_OFFSET;
     angleEncoder.getConfigurator().apply(angleCANCoderConfig);
 
-    // angleMotorConfig.Feedback.FeedbackRemoteSensorID = angleEncoder.getDeviceID();
-    // angleMotorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-    // angleMotorConfig.Feedback.SensorToMechanismRatio =
-    // ShooterConstants.SENSOR_TO_MECHANISM_RATIO;
-    // angleMotorConfig.Feedback.RotorToSensorRatio = ShooterConstants.ANGLE_MOTOR_GEAR_RATIO;
-    angleMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.ANGLE_MOTOR_GEAR_RATIO;
+    angleMotorConfig.Feedback.FeedbackRemoteSensorID = angleEncoder.getDeviceID();
+    angleMotorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+    angleMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.SENSOR_TO_MECHANISM_RATIO;
+    angleMotorConfig.Feedback.RotorToSensorRatio = ShooterConstants.ANGLE_MOTOR_GEAR_RATIO;
+    // angleMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.ANGLE_MOTOR_GEAR_RATIO;
 
     angleMotor.getConfigurator().apply(angleMotorConfig);
   }

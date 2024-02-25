@@ -22,6 +22,7 @@ public interface ShooterIO {
     // Angle Motor Inputs
     double angleMotorStatorCurrentAmps = 0.0;
     double angleMotorSupplyCurrentAmps = 0.0;
+    double angleMotorVoltage = 0.0;
     double angleMotorReferenceAngleDegrees = 0.0;
     double angleEncoderAngleDegrees = 0.0;
   }
