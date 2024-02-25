@@ -6,8 +6,15 @@ import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants;
 
 public class ArmSystemSim {
@@ -19,6 +26,12 @@ public class ArmSystemSim {
   private SingleJointedArmSim systemSim;
   private double sensorToMechanismRatio;
   private double rotorToSensorRatio;
+
+  // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
+  private Mechanism2d mech2d;
+  private MechanismRoot2d armPivot;
+  private MechanismLigament2d armTower;
+  private MechanismLigament2d arm;
 
   public ArmSystemSim(
       TalonFX motor,
@@ -61,6 +74,17 @@ public class ArmSystemSim {
             maxAngle,
             true,
             startingAngle);
+
+    this.mech2d = new Mechanism2d(1, 1);
+    this.armPivot = mech2d.getRoot("ArmPivot", 0.5, 0.5);
+    this.armTower = armPivot.append(new MechanismLigament2d("ArmTower", .3, -90));
+    this.arm =
+        armPivot.append(
+            new MechanismLigament2d("Arm", length, startingAngle, 6, new Color8Bit(Color.kYellow)));
+
+    // Put Mechanism 2d to SmartDashboard
+    SmartDashboard.putData("Arm Sim", mech2d);
+    armTower.setColor(new Color8Bit(Color.kBlue));
   }
 
   public void updateSim() {
@@ -92,5 +116,8 @@ public class ArmSystemSim {
     this.motorSimState.setRotorVelocity(motorRPS);
     this.encoderSimState.setRawPosition(sensorRotations);
     this.encoderSimState.setVelocity(encoderRPS);
+
+    // Update the Mechanism Arm angle based on the simulated arm angle
+    arm.setAngle(Units.radiansToDegrees(mechanismRadians));
   }
 }
