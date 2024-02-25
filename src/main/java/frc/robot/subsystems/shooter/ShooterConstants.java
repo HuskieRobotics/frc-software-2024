@@ -25,12 +25,12 @@ public class ShooterConstants {
   public static final double SHOOT_PID_PEAK_OUTPUT = 1.0;
 
   // Shooter Rotation PID Constants
-  public static final double ROTATION_KP = 1.0;
+  public static final double ROTATION_KP = 40.0;
   public static final double ROTATION_KI = 0.0;
-  public static final double ROTATION_KD = 0.0;
-  public static final double ROTATION_KS = 0.0;
-  public static final double ROTATION_KG = 0.13;
-  public static final double ROTATION_KV = 10.86;
+  public static final double ROTATION_KD = 1.0;
+  public static final double ROTATION_KS = 1.0;
+  public static final double ROTATION_KG = 0.08;
+  public static final double ROTATION_KV = 1.0;
   public static final double ROTATION_KA = 0.01;
   public static final double ROTATION_EXPO_KV = 24.0;
   public static final double ROTATION_EXPO_KA = 24.0;
