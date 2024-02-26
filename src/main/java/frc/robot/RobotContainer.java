@@ -34,6 +34,7 @@ import frc.lib.team3061.vision.VisionConstants;
 import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.lib.team3061.vision.VisionIOSim;
+import frc.lib.team6328.util.NoteVisualizer;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.configs.DefaultRobotConfig;
@@ -259,6 +260,7 @@ public class RobotContainer {
   private void createCTRESimSubsystems() {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
+    shooter = new Shooter(new ShooterIOTalonFX() {});
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
 
     // FIXME: create the hardware-specific subsystem class
@@ -540,7 +542,11 @@ public class RobotContainer {
   }
 
   private void configureShooterCommands() {
-    oi.getShootButton().onTrue(Commands.runOnce(() -> shooter.shoot(0.0, 0.0)));
+    NoteVisualizer.setRobotPoseSupplier(this.drivetrain::getPose);
+    oi.getShootButton()
+        .onTrue(
+            Commands.parallel(
+                Commands.runOnce(() -> shooter.shoot(0.0, 0.0)), NoteVisualizer.shoot()));
   }
 
   /**

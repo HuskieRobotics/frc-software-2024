@@ -9,7 +9,7 @@ public class ShooterConstants {
   }
 
   public static final boolean DEBUGGING = false;
-  public static final boolean TESTING = false;
+  public static final boolean TESTING = true;
   public static final String SUBSYSTEM_NAME = "Shooter";
 
   public static final int TOP_SHOOTER_MOTOR_ID = 27;
@@ -25,13 +25,15 @@ public class ShooterConstants {
   public static final double SHOOT_PID_PEAK_OUTPUT = 1.0;
 
   // Shooter Rotation PID Constants
-  public static final double ROTATION_KP = 0.0;
+  public static final double ROTATION_KP = 40.0;
   public static final double ROTATION_KI = 0.0;
-  public static final double ROTATION_KD = 0.0;
-  public static final double ROTATION_KS = 0.0;
-  public static final double ROTATION_KG = 0.0;
-  public static final double ROTATION_KA = 0.0;
-  public static final double ROTATION_KV = 0.0;
+  public static final double ROTATION_KD = 1.0;
+  public static final double ROTATION_KS = 1.0;
+  public static final double ROTATION_KG = 0.08;
+  public static final double ROTATION_KV = 1.0;
+  public static final double ROTATION_KA = 0.01;
+  public static final double ROTATION_EXPO_KV = 24.0;
+  public static final double ROTATION_EXPO_KA = 24.0;
   public static final double ROTATION_PID_PEAK_OUTPUT = 1.0;
 
   // Shoot Motors
@@ -49,16 +51,9 @@ public class ShooterConstants {
   public static final double ANGLE_MOTOR_STATOR_CURRENT_LIMIT = 30;
   public static final double ANGLE_MOTOR_STATOR_CURRENT_PEAK = 40;
   public static final double ANGLE_MOTOR_STATOR_CURRENT_LIMIT_TIME = 0.5;
-  public static final double MOTION_MAGIC_CRUISE_VELOCITY = 0;
-  public static final double MOTION_MAGIC_ACCELERATION = 0;
-  public static final double MOTION_MAGIC_JERK = 0;
-  public static final double ANGLE_MOTOR_GEAR_RATIO = 1;
+  public static final double MOTION_MAGIC_CRUISE_VELOCITY = 2.0;
+  public static final double ANGLE_MOTOR_GEAR_RATIO = 144.0;
   public static final boolean ANGLE_MOTOR_INVERTED = false;
-
-  // Feed Forward Constants (More Need to be added)
-  public static final double POSITION_FEEDFORWARD = 0.0;
-
   public static final double MAGNET_OFFSET = 0.0;
-  public static final double SENSOR_TO_MECHANISM_RATIO = 1;
-  public static final double ROTOR_TO_SENSOR_RATIO = 100;
+  public static final double SENSOR_TO_MECHANISM_RATIO = 4.0;
 }
