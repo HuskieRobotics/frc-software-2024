@@ -535,18 +535,9 @@ public class RobotContainer {
   }
 
   private void configureIntakeCommands() {
-    // intake.setDefaultCommand(new IntakeControl(intake));
-
-    // oi.getIntakeManualButton().onTrue(
-    //   Commands.either(
-    //     Commands.runOnce(intake::disableEStop, intake),
-    //     new IntakeEmergencyStop(intake),
-    //     intake::getEStopEnabled
-    //   ));
-
-    // should disable the default command and only run the intake control based off of the
-    // controller input
     oi.getIntakeManualOverrideSwitch().onTrue(Commands.run(intake::enableManualOverride, intake));
+
+    oi.getIntakeManualOverrideSwitch().onFalse(Commands.run(intake::disableManualOverride, intake));
 
     oi.getManualRunIntakeButton()
         .and(intake::manualOverrideEnabled)
@@ -562,20 +553,12 @@ public class RobotContainer {
                     Commands.run(intake::intakeGamePiece, intake).withName("IntakeGamePiece")),
                 intake::runningManualIntake));
 
-    oi.getManualIntakeRightOffButton()
+    oi.getManualTurnIntakeOffButton()
         .and(intake::manualOverrideEnabled)
         .onTrue(
             Commands.either(
-                Commands.runOnce(intake::turnRightIntakeOff, intake).withName("TurnRightIntakeOff"),
-                Commands.run(intake::intakeGamePieceRight, intake).withName("IntakeGamePieceRight"),
-                intake::runningManualIntake));
-
-    oi.getManualIntakeLeftOffButton()
-        .and(intake::manualOverrideEnabled)
-        .onTrue(
-            Commands.either(
-                Commands.runOnce(intake::turnLeftIntakeOff, intake).withName("TurnLeftIntakeOff"),
-                Commands.run(intake::intakeGamePieceLeft, intake).withName("IntakeGamePieceLeft"),
+                Commands.runOnce(intake::turnIntakeOff, intake).withName("TurnRightIntakeOff"),
+                Commands.run(intake::intakeGamePiece, intake).withName("IntakeGamePieceRight"),
                 intake::runningManualIntake));
 
     oi.getManualRepelAllButton()

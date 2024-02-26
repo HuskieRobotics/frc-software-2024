@@ -28,9 +28,6 @@ public class Intake extends SubsystemBase {
     RIGHT_ROLLER,
     KICKER
   }
-
-  private int intakeAndKickerTimeout;
-
   // Intakes, Kicker, and Shooter (the second kicker IR sensor)
   enum IntakeState {
     EMPTY,
@@ -80,24 +77,23 @@ public class Intake extends SubsystemBase {
         this.transitionGamePiece();
       } else if (inputs.isShooterIRBlocked) {
         intakeState = IntakeState.NOTE_IN_KICKER;
+        leds.setIntakeLEDState(IntakeLEDState.HAS_GAME_PIECE);
         this.repelGamePiece();
       }
     } else if (intakeState == IntakeState.NOTE_IN_INTAKE) {
       if (inputs.isKickerIRBlocked) {
         intakeState = IntakeState.NOTE_IN_INTAKE_AND_KICKER;
-        intakeAndKickerTimeout = 0;
         this.transitionGamePiece();
+      } else if (!inputs.isRollerIRBlocked) {
+        intakeState = IntakeState.EMPTY;
+        leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
+        this.intakeGamePiece();
       }
     } else if (intakeState == IntakeState.NOTE_IN_INTAKE_AND_KICKER) {
-      intakeAndKickerTimeout++;
-
-      if (!inputs.isRollerIRBlocked) {
+      if (!inputs.isRollerIRBlocked) { 
         intakeState = IntakeState.NOTE_IN_KICKER;
         this.transitionGamePiece();
         this.repelGamePiece();
-      } else if (intakeAndKickerTimeout > IntakeConstants.IN_BETWEEN_TIMEOUT_SECONDS * 50) {
-        intakeState = IntakeState.EMPTY;
-        leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       }
     } else if (intakeState == IntakeState.NOTE_IN_KICKER) {
       if (inputs.isShooterIRBlocked) {
@@ -163,7 +159,7 @@ public class Intake extends SubsystemBase {
       ),
       Commands.waitSeconds(1).andThen(
         Commands.runOnce(() -> {
-          for (int i = 0; i < 4; i++) {
+          for (int i = 0; i < intakeMotors.length; i++) {
             checkMotorVelocity(intakeMotors[i]);
           }
         })
@@ -255,7 +251,7 @@ public class Intake extends SubsystemBase {
 
   public boolean runningManualIntake() {
     return manualOverrideEnabled
-        && Math.abs(inputs.rollerReferenceVelocityRPS) > 0;
+        && Math.abs(inputs.rollerReferenceVelocityRPS) > 0.01;
   }
 
   public void enableManualOverride() {

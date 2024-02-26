@@ -33,11 +33,7 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getManualIntakeRightOffButton() {
-    return new Trigger(() -> false);
-  }
-
-  public default Trigger getManualIntakeLeftOffButton() {
+  public default Trigger getManualTurnIntakeOffButton() {
     return new Trigger(() -> false);
   }
 

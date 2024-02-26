@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import static frc.robot.subsystems.intake.IntakeConstants.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -15,6 +16,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.util.VelocitySystemSim;
+import frc.lib.team6328.util.Alert;
+import frc.lib.team6328.util.Alert.AlertType;
 import frc.lib.team6328.util.TunableNumber;
 
 public class IntakeIOTalonFX implements IntakeIO {
@@ -24,12 +27,15 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final DigitalInput kickerIRSensor;
   private final DigitalInput shooterIRSensor;
 
+  private Alert configAlert =
+      new Alert("Failed to apply configuration for subsystem.", AlertType.ERROR);
+
   private VelocityTorqueCurrentFOC rollerVelocityRequest;
   private VelocityTorqueCurrentFOC kickerVelocityRequest;
 
   private StatusSignal<Double> rollerVelocityStatusSignal;
   private StatusSignal<Double> kickerVelocityStatusSignal;
-  // status signals for stator current
+
   private StatusSignal<Double> rollerStatorCurrentStatusSignal;
   private StatusSignal<Double> kickerStatorCurrentStatusSignal;
 
@@ -38,6 +44,9 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   private StatusSignal<Double> rollerReferenceVelocityStatusSignal;
   private StatusSignal<Double> kickerReferenceVelocityStatusSignal;
+
+  private StatusSignal<Double> rollerTemperatureStatusSignal;
+  private StatusSignal<Double> kickerTemperatureStatusSignal;
 
   // simulation related
   private VelocitySystemSim rollerMotorSim;
@@ -69,7 +78,7 @@ public class IntakeIOTalonFX implements IntakeIO {
       new TunableNumber("Intake/kickerMotorKS", IntakeConstants.INTAKE_KICKER_MOTOR_KS);
 
   public IntakeIOTalonFX() {
-    rollerIRSensor = new DigitalInput(IntakeConstants.INTAKE_RIGHT_ROLLER_IR_SENSOR_ID);
+    rollerIRSensor = new DigitalInput(IntakeConstants.INTAKE_ROLLER_IR_SENSOR_ID);
     kickerIRSensor = new DigitalInput(IntakeConstants.INTAKE_KICKER_IR_SENSOR_ID);
     shooterIRSensor = new DigitalInput(IntakeConstants.INTAKE_SHOOTER_IR_SENSOR_ID);
 
@@ -102,19 +111,22 @@ public class IntakeIOTalonFX implements IntakeIO {
     rollerReferenceVelocityStatusSignal = rollerMotor.getClosedLoopReference();
     kickerReferenceVelocityStatusSignal = kickerMotor.getClosedLoopReference();
 
+    rollerTemperatureStatusSignal = rollerMotor.getDeviceTemp();
+    kickerTemperatureStatusSignal = kickerMotor.getDeviceTemp();
+
     this.rollerMotorSim =
         new VelocitySystemSim(
             rollerMotor,
-            IntakeConstants.ROLLERS_MOTOR_INVERTED,
+            IntakeConstants.ROLLER_MOTOR_INVERTED,
             0.02,
             0.001,
             ROLLERS_SENSOR_TO_MECHANISM_RATIO);
     this.kickerMotorSim =
         new VelocitySystemSim(kickerMotor, 
-        IntakeConstants.KICKER_MOTOR_INVERTED, 
-        1.0, 
-        0.3, 
-        1.0);
+            IntakeConstants.KICKER_MOTOR_INVERTED, 
+            1.0, 
+            0.3, 
+            1.0);
   }
 
   @Override
@@ -130,7 +142,9 @@ public class IntakeIOTalonFX implements IntakeIO {
         kickerSupplyCurrentStatusSignal,
         kickerStatorCurrentStatusSignal,
         kickerVelocityStatusSignal,
-        kickerReferenceVelocityStatusSignal);
+        kickerReferenceVelocityStatusSignal,
+        rollerTemperatureStatusSignal,
+        kickerTemperatureStatusSignal);
 
     inputs.isRollerIRBlocked = !rollerIRSensor.get();
     inputs.isKickerIRBlocked = !kickerIRSensor.get();
@@ -151,6 +165,9 @@ public class IntakeIOTalonFX implements IntakeIO {
         rollerReferenceVelocityStatusSignal.getValueAsDouble();
     inputs.kickerReferenceVelocityRPS = 
         kickerReferenceVelocityStatusSignal.getValueAsDouble();
+
+    inputs.rollerTempCelcius = rollerTemperatureStatusSignal.getValueAsDouble();
+    inputs.kickerTempCelcius = kickerTemperatureStatusSignal.getValueAsDouble();
 
     if (rollerMotorsKP.hasChanged()
         || rollerMotorsKI.hasChanged()
@@ -196,10 +213,14 @@ public class IntakeIOTalonFX implements IntakeIO {
     TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
     CurrentLimitsConfigs rollerCurrentLimits = new CurrentLimitsConfigs();
 
-    rollerCurrentLimits.SupplyCurrentLimit = IntakeConstants.ROLLERS_CONTINUOUS_CURRENT_LIMIT;
-    rollerCurrentLimits.SupplyCurrentThreshold = IntakeConstants.ROLLERS_PEAK_CURRENT_LIMIT;
-    rollerCurrentLimits.SupplyTimeThreshold = IntakeConstants.ROLLERS_PEAK_CURRENT_DURATION;
+    rollerCurrentLimits.SupplyCurrentLimit = IntakeConstants.ROLLERS_CONTINUOUS_SUPPLY_CURRENT_LIMIT;
+    rollerCurrentLimits.SupplyCurrentThreshold = IntakeConstants.ROLLERS_PEAK_SUPPLY_CURRENT_LIMIT;
+    rollerCurrentLimits.SupplyTimeThreshold = IntakeConstants.ROLLERS_PEAK_SUPPLY_CURRENT_DURATION;
+
+    rollerCurrentLimits.StatorCurrentLimit = IntakeConstants.ROLLERS_CONTINUOUS_STATOR_CURRENT_LIMIT;
+
     rollerCurrentLimits.SupplyCurrentLimitEnable = true;
+    rollerCurrentLimits.StatorCurrentLimitEnable = true;
 
     rollerConfig.CurrentLimits = rollerCurrentLimits;
 
@@ -211,25 +232,39 @@ public class IntakeIOTalonFX implements IntakeIO {
     rollerConfig.Slot0.kS = rollerMotorsKS.get();
 
     rollerConfig.MotorOutput.Inverted =
-        IntakeConstants.RIGHT_ROLLER_MOTOR_INVERTED
+        IntakeConstants.ROLLER_MOTOR_INVERTED
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
 
     rollerConfig.Feedback.SensorToMechanismRatio =
         IntakeConstants.ROLLERS_SENSOR_TO_MECHANISM_RATIO;
 
-    rollerMotor.getConfigurator().apply(rollerConfig);
+    StatusCode status = StatusCode.StatusCodeNotInitialized;
+    status = rollerMotor.getConfigurator().apply(rollerConfig);
 
-    FaultReporter.getInstance().registerHardware("INTAKE", "IntakeRightRoller", rollerMotor);
+    if (status != StatusCode.OK) {
+      configAlert.set(false);
+    }
+
+    if (!status.isOK()) {
+        configAlert.set(true);
+        configAlert.setText(status.toString());
+    }
+
+    FaultReporter.getInstance().registerHardware("INTAKE", "IntakeRoller", rollerMotor);
   }
 
   private void configureIntakeKickerMotor(TalonFX kickerMotor) {
     TalonFXConfiguration kickerConfig = new TalonFXConfiguration();
     CurrentLimitsConfigs kickerCurrentLimits = new CurrentLimitsConfigs();
 
-    kickerCurrentLimits.SupplyCurrentLimit = IntakeConstants.KICKER_CONTINUOUS_CURRENT_LIMIT;
-    kickerCurrentLimits.SupplyCurrentThreshold = IntakeConstants.KICKER_PEAK_CURRENT_LIMIT;
-    kickerCurrentLimits.SupplyTimeThreshold = IntakeConstants.KICKER_PEAK_CURRENT_DURATION;
+    kickerCurrentLimits.SupplyCurrentLimit = IntakeConstants.KICKER_CONTINUOUS_SUPPLY_CURRENT_LIMIT;
+    kickerCurrentLimits.SupplyCurrentThreshold = IntakeConstants.KICKER_PEAK_SUPPLY_CURRENT_LIMIT;
+    kickerCurrentLimits.SupplyTimeThreshold = IntakeConstants.KICKER_PEAK_SUPPLY_CURRENT_DURATION;
+
+    kickerCurrentLimits.StatorCurrentLimit = IntakeConstants.KICKER_CONTINUOUS_STATOR_CURRENT_LIMIT;
+
+    kickerCurrentLimits.StatorCurrentLimitEnable = true;
     kickerCurrentLimits.SupplyCurrentLimitEnable = true;
 
     kickerConfig.CurrentLimits = kickerCurrentLimits;
@@ -246,5 +281,19 @@ public class IntakeIOTalonFX implements IntakeIO {
             : InvertedValue.CounterClockwise_Positive;
 
     kickerMotor.getConfigurator().apply(kickerConfig);
+
+    StatusCode status = StatusCode.StatusCodeNotInitialized;
+    status = rollerMotor.getConfigurator().apply(kickerConfig);
+
+    if (status != StatusCode.OK) {
+      configAlert.set(false);
+    }
+
+    if (!status.isOK()) {
+        configAlert.set(true);
+        configAlert.setText(status.toString());
+    }
+
+    FaultReporter.getInstance().registerHardware("INTAKE", "IntakeKicker", kickerMotor);
   }
 }

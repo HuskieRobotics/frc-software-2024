@@ -107,12 +107,7 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getManualIntakeRightOffButton() {
-    return new Trigger(() -> operatorController.getRightTriggerAxis() > 0.5);
-  }
-
-  @Override
-  public Trigger getManualIntakeLeftOffButton() {
+  public Trigger getManualTurnIntakeOffButton() {
     return new Trigger(() -> operatorController.getLeftTriggerAxis() > 0.5);
   }
 
