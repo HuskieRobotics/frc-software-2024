@@ -1,0 +1,55 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.4229570277322372,
+      "y": 6.28
+    },
+    "rotation": 179.34477450273
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 Note Amp Side Start - 5"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 Note Amp Side 5-1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 Note Amp Side 1-2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 Note Amp Side 2-3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 Note Amp Side 3-End"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

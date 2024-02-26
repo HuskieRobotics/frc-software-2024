@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.512803934698777,
-        "y": 5.578590066271041
+        "x": 1.4229570277322372,
+        "y": 6.28
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.796314683538458,
-        "y": 6.716697069757776
+        "x": 3.792458494007897,
+        "y": 6.156972313944628
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.745814764356801,
-        "y": 6.399519708130326
+        "x": 4.594730644006742,
+        "y": 6.595423372664927
       },
       "prevControl": {
-        "x": 4.91238489239267,
-        "y": 6.757823390312772
+        "x": 3.6991710347057056,
+        "y": 6.595423372664927
       },
       "nextControl": {
-        "x": 2.4397903341261227,
-        "y": 5.998383633130903
+        "x": 5.826690355603398,
+        "y": 6.595423372664927
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.2177246172674163,
-        "y": 6.726025815687995
+        "x": 7.738518022490591,
+        "y": 5.793151222666083
       },
       "prevControl": {
-        "x": 1.7401343893596877,
-        "y": 6.754012053478653
+        "x": 7.029533331793936,
+        "y": 5.92375366568915
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,29 +46,29 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1.25,
-      "rotationDegrees": -90.0,
+      "waypointRelativePos": 0.7,
+      "rotationDegrees": 179.9156174720765,
       "rotateFast": true
     }
   ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
+    "maxVelocity": 3.88,
     "maxAcceleration": 11.805,
     "maxAngularVelocity": 537.0,
     "maxAngularAcceleration": 2303.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -120.41108126712534,
+    "rotation": 178.78112476486874,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "2 Note Amp Side Center",
+  "folder": "5 Note Amp Side",
   "previewStartingState": {
-    "rotation": -90.17415726246145,
+    "rotation": -179.7435078772501,
     "velocity": 0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

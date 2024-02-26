@@ -1,6 +1,12 @@
 {
   "version": 1.0,
-  "startingPose": null,
+  "startingPose": {
+    "position": {
+      "x": 1.4229570277322372,
+      "y": 6.28
+    },
+    "rotation": -179.4059407241947
+  },
   "command": {
     "type": "sequential",
     "data": {
@@ -8,13 +14,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "2 Note Amp Side Center Start - Note 5 "
+            "pathName": "5 Note Amp Side Start - 5"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "2 Note Amp Side Center Note 5 -End"
+            "pathName": "5 Note Amp Side 5-1"
           }
         }
       ]
