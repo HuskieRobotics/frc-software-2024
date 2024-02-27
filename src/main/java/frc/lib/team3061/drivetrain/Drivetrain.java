@@ -104,7 +104,7 @@ public class Drivetrain extends SubsystemBase {
 
     this.autoThetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-    this.isFieldRelative = false;
+    this.isFieldRelative = true;
 
     // based on testing we can drive in turbo mode all the time
     this.isTurbo = true;
