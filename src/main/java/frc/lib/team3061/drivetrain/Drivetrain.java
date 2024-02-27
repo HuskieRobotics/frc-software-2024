@@ -104,7 +104,7 @@ public class Drivetrain extends SubsystemBase {
 
     this.autoThetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-    this.isFieldRelative = false;
+    this.isFieldRelative = true;
 
     // based on testing we can drive in turbo mode all the time
     this.isTurbo = true;
@@ -400,8 +400,12 @@ public class Drivetrain extends SubsystemBase {
       xVelocity *= slowModeMultiplier;
       yVelocity *= slowModeMultiplier;
     }
-
-    this.io.driveFieldRelativeFacingAngle(xVelocity, yVelocity, targetDirection, isOpenLoop);
+    int allianceMultiplier = this.alliance == Alliance.Blue ? 1 : -1;
+    this.io.driveFieldRelativeFacingAngle(
+        xVelocity * allianceMultiplier,
+        yVelocity * allianceMultiplier,
+        targetDirection,
+        isOpenLoop);
   }
 
   /**
