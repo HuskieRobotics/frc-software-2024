@@ -35,8 +35,6 @@ import frc.lib.team3061.vision.VisionConstants;
 import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.robot.Constants.Mode;
-import frc.robot.commands.FeedForwardCharacterization;
-import frc.robot.commands.FeedForwardCharacterization.FeedForwardCharacterizationData;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.configs.DefaultRobotConfig;
 import frc.robot.configs.NovaCTRERobotConfig;
@@ -249,14 +247,6 @@ public class RobotContainer {
   private void createCTRESimSubsystems() {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
-
-    AprilTagFieldLayout layout;
-    try {
-      layout = new AprilTagFieldLayout(VisionConstants.APRILTAG_FIELD_LAYOUT_PATH);
-    } catch (IOException e) {
-      layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
-    }
-    // FIXME: Restore vision
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
 
     // FIXME: create the hardware-specific subsystem class
@@ -348,27 +338,12 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "disableXStance", Commands.runOnce(drivetrain::disableXstance, drivetrain));
     NamedCommands.registerCommand("wait5Seconds", Commands.waitSeconds(5.0));
+    NamedCommands.registerCommand("Shoot", Commands.waitSeconds(1.0));
 
     // build auto path commands
 
     // add commands to the auto chooser
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
-
-    /************ Test Path ************
-     *
-     * demonstration of PathPlanner auto with event markers
-     *
-     */
-    Command autoTest = new PathPlannerAuto("TestAuto");
-    autoChooser.addOption("Test Auto", autoTest);
-
-    /************ Choreo Test Path ************
-     *
-     * demonstration of PathPlanner hosted Choreo path
-     *
-     */
-    Command choreoAutoTest = new PathPlannerAuto("ChoreoTest");
-    autoChooser.addOption("Choreo Auto", choreoAutoTest);
 
     /************ Start Point ************
      *
@@ -383,36 +358,6 @@ public class RobotContainer {
                     PathPlannerPath.fromPathFile("StartPoint").getPreviewStartingHolonomicPose()),
             drivetrain);
     autoChooser.addOption("Start Point", startPoint);
-
-    /************ Drive Characterization ************
-     *
-     * useful for characterizing the swerve modules for driving (i.e, determining kS and kV)
-     *
-     */
-    autoChooser.addOption(
-        "Swerve Drive Characterization",
-        new FeedForwardCharacterization(
-            drivetrain,
-            true,
-            new FeedForwardCharacterizationData("drive"),
-            drivetrain::runDriveCharacterizationVolts,
-            drivetrain::getDriveCharacterizationVelocity,
-            drivetrain::getDriveCharacterizationAcceleration));
-
-    /************ Swerve Rotate Characterization ************
-     *
-     * useful for characterizing the swerve modules for rotating (i.e, determining kS and kV)
-     *
-     */
-    autoChooser.addOption(
-        "Swerve Rotate Characterization",
-        new FeedForwardCharacterization(
-            drivetrain,
-            true,
-            new FeedForwardCharacterizationData("rotate"),
-            drivetrain::runRotateCharacterizationVolts,
-            drivetrain::getRotateCharacterizationVelocity,
-            drivetrain::getRotateCharacterizationAcceleration));
 
     /************ Distance Test ************
      *
@@ -429,6 +374,17 @@ public class RobotContainer {
      */
     Command tuningCommand = new PathPlannerAuto("Tuning");
     autoChooser.addOption("Auto Tuning", tuningCommand);
+
+    /************ 4 Note ************
+     *
+     * used for testing the 6 note autonomous (Still Testing)
+     *
+     */
+    Command fourNoteAmpSideWing = new PathPlannerAuto("4 Note Amp-Side Wing");
+    autoChooser.addOption("4 Note Amp-Side Wing", fourNoteAmpSideWing);
+
+    Command fourNoteSourceSideWing = new PathPlannerAuto("4 Note Source-Side Wing");
+    autoChooser.addOption("4 Note Source-Side Wing", fourNoteSourceSideWing);
 
     /************ Drive Velocity Tuning ************
      *

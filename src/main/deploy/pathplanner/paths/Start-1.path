@@ -3,49 +3,55 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 4.4
+        "x": 0.7543128599770712,
+        "y": 6.637696878997361
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.118033988749895,
-        "y": 4.4
+        "x": 2.8713498868439173,
+        "y": 7.007485005961003
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.0,
-        "y": 4.4
+        "x": 2.92,
+        "y": 7.0
       },
       "prevControl": {
-        "x": 4.479309367425445,
-        "y": 4.4
+        "x": 2.917573402714373,
+        "y": 7.007485005961003
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": -90.13432821490345,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 1.0,
-    "maxAcceleration": 1.5,
-    "maxAngularVelocity": 561.96,
-    "maxAngularAcceleration": 2066.2
+    "maxAcceleration": 8.269,
+    "maxAngularVelocity": 537.5,
+    "maxAngularAcceleration": 2390.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0,
+    "rotation": -88.39050291199906,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Tuning",
+  "folder": "4 Note Amp-Side Wing",
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": -120.52970589993416,
     "velocity": 0
   },
   "useDefaultConstraints": false

@@ -87,6 +87,5 @@
     "WPILOG",
     "Xstance",
     "YUYV"
-  ],
-  "java.debug.settings.onBuildFailureProceed": true
+  ]
 }
