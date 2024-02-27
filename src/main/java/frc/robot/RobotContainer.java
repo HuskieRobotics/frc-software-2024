@@ -221,12 +221,6 @@ public class RobotContainer {
     }
 
     if (Constants.getRobot() == Constants.RobotType.ROBOT_SIMBOT) {
-      AprilTagFieldLayout layout;
-      try {
-        layout = new AprilTagFieldLayout(VisionConstants.APRILTAG_FIELD_LAYOUT_PATH);
-      } catch (IOException e) {
-        layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
-      }
       vision = new Vision(new VisionIO[] {new VisionIO() {}});
     } else {
       String[] cameraNames = config.getCameraNames();
@@ -464,17 +458,17 @@ public class RobotContainer {
         new TeleopSwerve(drivetrain, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
 
     // lock rotation to the nearest 180° while driving
-    // oi.getLock180Button()
-    //     .whileTrue(
-    //         new TeleopSwerve(
-    //             drivetrain,
-    //             oi::getTranslateX,
-    //             oi::getTranslateY,
-    //             () ->
-    //                 (drivetrain.getPose().getRotation().getDegrees() > -90
-    //                         && drivetrain.getPose().getRotation().getDegrees() < 90)
-    //                     ? Rotation2d.fromDegrees(0.0)
-    //                     : Rotation2d.fromDegrees(180.0)));
+    oi.getLock180Button()
+        .whileTrue(
+            new TeleopSwerve(
+                drivetrain,
+                oi::getTranslateX,
+                oi::getTranslateY,
+                () ->
+                    (drivetrain.getPose().getRotation().getDegrees() > -90
+                            && drivetrain.getPose().getRotation().getDegrees() < 90)
+                        ? Rotation2d.fromDegrees(0.0)
+                        : Rotation2d.fromDegrees(180.0)));
 
     oi.getLockToSpeakerButton()
         .whileTrue(
@@ -483,9 +477,6 @@ public class RobotContainer {
                 oi::getTranslateX,
                 oi::getTranslateY,
                 () -> {
-                  // Transform2d rotation =
-                  // drivetrain.getPose().minus(FieldConstants.Speaker.centerSpeakerOpening).inverse();
-                  // return Math.atan2(rotation.getY(), rotation.getX());
                   Transform2d translation =
                       new Transform2d(
                           Field2d.getInstance().getAllianceSpeakerCenter().getX()
@@ -494,8 +485,6 @@ public class RobotContainer {
                               - drivetrain.getPose().getY(),
                           new Rotation2d());
                   return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
-                  // Try return translation.getRotation();
-                  // It might work but I'm not quite sure if the range of values goes from -pi to pi
                 }));
 
     // field-relative toggle
