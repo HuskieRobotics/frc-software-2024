@@ -37,8 +37,9 @@ public class NameRobotConfig extends RobotConfig {
 
   private static final double TRACKWIDTH_METERS = 0.57785; // 22.75
   private static final double WHEELBASE_METERS = 0.57785; // 22.75
-  private static final double WHEEL_DIAMETER_METERS = 0.09659072671;
-  private static final double ROBOT_WIDTH_WITH_BUMPERS = 0.88265; // meters //34.75 in , measure the actual bumpers
+  private static final double WHEEL_DIAMETER_METERS = 0.09659072671; // FIXME: measure and update
+  private static final double ROBOT_WIDTH_WITH_BUMPERS =
+      0.88265; // meters //34.75 in , measure the actual bumpers
   private static final double ROBOT_LENGTH_WITH_BUMPERS = 0.88265; // meters // 34.75 in same above
 
   /* Angle Motor PID Values */
@@ -46,26 +47,36 @@ public class NameRobotConfig extends RobotConfig {
   private static final double ANGLE_KI = 0.0; // FIXME: Values taken from nova, need to be updated
   private static final double ANGLE_KD = 0.05; // FIXME: Values taken from nova, need to be updated
 
-  private static final double ANGLE_KS = 0.1891233333; // FIXME: Values taken from nova, need to be updated
+  private static final double ANGLE_KS =
+      0.1891233333; // FIXME: Values taken from nova, need to be updated
   private static final double ANGLE_KV = // FIXME: Values taken from nova, need to be updated
-      0.4399866667 * 2 * Math.PI; // convert from V/(radians/s) to V/(rotations/s) // FIXME: Values taken from nova, need to be updated
-  private static final double ANGLE_KA = 0.001663333333; // FIXME: Values taken from nova, need to be updated
+      0.4399866667
+          * 2
+          * Math.PI; // convert from V/(radians/s) to V/(rotations/s) // FIXME: Values taken from
+  // nova, need to be updated
+  private static final double ANGLE_KA =
+      0.001663333333; // FIXME: Values taken from nova, need to be updated
 
   /* Drive Motor PID Values */
-  private static final double DRIVE_KP = 0.3; // FIXME: Values taken from nova, need to be updated
+  private static final double DRIVE_KP = 8.0; // FIXME: Values taken from nova, need to be updated
   private static final double DRIVE_KI = 0.0; // FIXME: Values taken from nova, need to be updated
   private static final double DRIVE_KD = 0.0; // FIXME: Values taken from nova, need to be updated
 
-  private static final double DRIVE_KS = 0.4004375; // FIXME: Values taken from nova, need to be updated
-  private static final double DRIVE_KV = 2.7637325; // FIXME: Values taken from nova, need to be updated
-  private static final double DRIVE_KA = 0.0139575; // FIXME: Values taken from nova, need to be updated
+  private static final double DRIVE_KS = 5.0; // FIXME: Values taken from nova, need to be updated
+  private static final double DRIVE_KV = 0.0; // FIXME: Values taken from nova, need to be updated
+  private static final double DRIVE_KA = 0.0; // FIXME: Values taken from nova, need to be updated
 
-  private static final double MAX_VELOCITY_METERS_PER_SECOND = 3.5; // FIXME: Values taken from nova, need to be updated
-  private static final double MAX_COAST_VELOCITY_METERS_PER_SECOND = 0.05; // FIXME: Values taken from nova, need to be updated
-  private static final double SLOW_MODE_MULTIPLIER = 0.75; // FIXME: Values taken from nova, need to be updated
+  private static final double MAX_VELOCITY_METERS_PER_SECOND =
+      3.5; // FIXME: Values taken from nova, need to be updated
+  private static final double MAX_COAST_VELOCITY_METERS_PER_SECOND =
+      0.05; // FIXME: Values taken from nova, need to be updated
+  private static final double SLOW_MODE_MULTIPLIER =
+      0.75; // FIXME: Values taken from nova, need to be updated
 
-  private static final double MAX_DRIVE_ACCELERATION_METERS_PER_SECOND_SQUARED = 11.365; // FIXME: Values taken from nova, need to be updated
-  private static final double MAX_TURN_ACCELERATION_RADIANS_PER_SECOND_SQUARED = 36.0; // FIXME: Values taken from nova, need to be updated
+  private static final double MAX_DRIVE_ACCELERATION_METERS_PER_SECOND_SQUARED =
+      11.365; // FIXME: Values taken from nova, need to be updated
+  private static final double MAX_TURN_ACCELERATION_RADIANS_PER_SECOND_SQUARED =
+      36.0; // FIXME: Values taken from nova, need to be updated
 
   private static final String CAN_BUS_NAME = "canbus1";
 
@@ -80,9 +91,7 @@ public class NameRobotConfig extends RobotConfig {
   private static final Transform3d ROBOT_TO_CAMERA_0 =
       new Transform3d(
           new Translation3d(
-            Units.inchesToMeters(0),
-            Units.inchesToMeters(0),
-            Units.inchesToMeters(0)),
+              Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(0)),
           new Rotation3d(0, Units.degreesToRadians(0), Units.degreesToRadians(90)));
   // pitch 45 degrees
 
@@ -90,27 +99,21 @@ public class NameRobotConfig extends RobotConfig {
   private static final Transform3d ROBOT_TO_CAMERA_1 =
       new Transform3d(
           new Translation3d(
-            Units.inchesToMeters(0),
-            Units.inchesToMeters(0),
-            Units.inchesToMeters(0)),
+              Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(0)),
           new Rotation3d(0, Units.degreesToRadians(0), Units.degreesToRadians(0)));
 
   // Front left camera
   private static final Transform3d ROBOT_TO_CAMERA_2 =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(0),
-              Units.inchesToMeters(0),
-              Units.inchesToMeters(0)),
+              Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(0)),
           new Rotation3d(0, Units.degreesToRadians(0), Units.degreesToRadians(-90)));
 
   // Back left camera
   private static final Transform3d ROBOT_TO_CAMERA_3 =
       new Transform3d(
           new Translation3d(
-            Units.inchesToMeters(0),
-            Units.inchesToMeters(0),
-            Units.inchesToMeters(0)),
+              Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(0)),
           new Rotation3d(0, Units.degreesToRadians(0), Units.degreesToRadians(-180)));
 
   private static final double AUTO_MAX_SPEED_METERS_PER_SECOND = 3.5;
@@ -134,7 +137,7 @@ public class NameRobotConfig extends RobotConfig {
   private static final double SQUARING_SPEED_METERS_PER_SECOND = 1.0;
 
   // Drive Facing Angle constants
-  private static final double DRIVE_FACING_ANGLE_KP = 2.0;
+  private static final double DRIVE_FACING_ANGLE_KP = 6.0;
   private static final double DRIVE_FACING_ANGLE_KD = 0.1;
   private static final double DRIVE_FACING_ANGLE_KI = 0.0;
 
@@ -207,7 +210,7 @@ public class NameRobotConfig extends RobotConfig {
 
   @Override
   public SwerveConstants getSwerveConstants() {
-    return SwerveConstants.MK4I_L3_CONSTANTS;
+    return SwerveConstants.MK4I_L3_PLUS_CONSTANTS;
   }
 
   @Override
@@ -282,7 +285,9 @@ public class NameRobotConfig extends RobotConfig {
 
   @Override
   public Transform3d[] getRobotToCameraTransforms() {
-    return new Transform3d[] {ROBOT_TO_CAMERA_0, ROBOT_TO_CAMERA_1, ROBOT_TO_CAMERA_2, ROBOT_TO_CAMERA_3};
+    return new Transform3d[] {
+      ROBOT_TO_CAMERA_0, ROBOT_TO_CAMERA_1, ROBOT_TO_CAMERA_2, ROBOT_TO_CAMERA_3
+    };
   }
 
   @Override
