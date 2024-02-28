@@ -401,6 +401,10 @@ public class RobotContainer {
     Command twoNoteSourceSide = new PathPlannerAuto("2 Note Source Side");
     autoChooser.addOption("2 Note Source Side", twoNoteSourceSide);
 
+    Command twoNoteAmpSideShort = new PathPlannerAuto("2 Note Amp Side Short");
+    autoChooser.addOption("2 Note Amp Side", twoNoteAmpSideShort);
+
+
     Command sixNoteAmpSide = new PathPlannerAuto("6 Note Amp Side");
     autoChooser.addOption("6 Note Amp Side", sixNoteAmpSide);
 
