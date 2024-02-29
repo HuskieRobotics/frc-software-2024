@@ -7,6 +7,7 @@ import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.leds.LEDs.IntakeLEDState;
 import java.util.ArrayList;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
@@ -39,17 +40,17 @@ public class Intake extends SubsystemBase {
   private IntakeState mostRecentIntakeState;
   private boolean checkComplete;
   private boolean automationEnabled;
-  private boolean shooterAngleReady;
   private boolean hasNote;
+  private BooleanSupplier isShooterAngleReady;
 
-  public Intake(IntakeIO io) {
+  public Intake(IntakeIO io, BooleanSupplier isShooterAngleReady) {
     this.io = io;
     leds = LEDs.getInstance();
     intakeState = IntakeState.EMPTY;
     mostRecentIntakeState = null;
     checkComplete = false;
-    shooterAngleReady = true; // FIXME: call shooter method
     automationEnabled = true;
+    this.isShooterAngleReady = isShooterAngleReady;
 
     leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
     this.intakeGamePiece();
@@ -71,9 +72,8 @@ public class Intake extends SubsystemBase {
   public void runIntakeStateMachine() {
 
     if (intakeState == IntakeState.EMPTY) {
-      // shooterAngleReady = *ACCESS SHOOTER ANGLE*
 
-      if (shooterAngleReady) {
+      if (isShooterAngleReady.getAsBoolean()) {
         this.intakeGamePiece();
       } else {
         this.repelGamePiece();

@@ -128,7 +128,7 @@ public class RobotContainer {
 
     } else {
       drivetrain = new Drivetrain(new DrivetrainIO() {});
-      intake = new Intake(new IntakeIO() {});
+      intake = new Intake(new IntakeIO() {}, () -> true);
 
       String[] cameraNames = config.getCameraNames();
       VisionIO[] visionIOs = new VisionIO[cameraNames.length];
@@ -179,7 +179,7 @@ public class RobotContainer {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
 
-    intake = new Intake(new IntakeIOTalonFX());
+    intake = new Intake(new IntakeIOTalonFX(), () -> true);
 
     // String[] cameraNames = config.getCameraNames();
     // Transform3d[] robotToCameraTransforms = config.getRobotToCameraTransforms();
@@ -235,7 +235,7 @@ public class RobotContainer {
     drivetrain = new Drivetrain(drivetrainIO);
 
     IntakeIO intakeIO = new IntakeIOTalonFX();
-    intake = new Intake(intakeIO);
+    intake = new Intake(intakeIO, () -> true);
 
     // FIXME: create the hardware-specific subsystem class
     subsystem = new Subsystem(new SubsystemIO() {});
@@ -280,7 +280,7 @@ public class RobotContainer {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
 
-    intake = new Intake(new IntakeIOTalonFX());
+    intake = new Intake(new IntakeIOTalonFX(), () -> true);
 
     AprilTagFieldLayout layout;
     try {
