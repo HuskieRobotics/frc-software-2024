@@ -88,6 +88,8 @@ public class Drivetrain extends SubsystemBase {
 
   private Alert noPoseAlert =
       new Alert("Attempted to reset pose from vision, but no pose was found.", AlertType.WARNING);
+  private static final String SYSTEM_CHECK_PREFIX = "[System Check] Swerve module ";
+  private static final String IS_LITERAL = " is: ";
 
   private ChassisSpeeds prevSpeeds = new ChassisSpeeds();
   private double[] prevSteerVelocitiesRevPerMin = new double[4];
@@ -752,74 +754,59 @@ public class Drivetrain extends SubsystemBase {
       double velocityTarget,
       double velocityTolerance) {
 
-    Boolean isOffset = false;
+    boolean isOffset = false;
 
     // Check to see if the direction is rotated properly
     // steerAbsolutePositionDeg is a value that is between (-180, 180]
-
-    if (this.inputs.swerve[swerveModuleNumber].steerAbsolutePositionDeg
-            > angleTarget - angleTolerance
-        && this.inputs.swerve[swerveModuleNumber].steerAbsolutePositionDeg
-            < angleTarget + angleTolerance) {
-    }
-
-    // check if angle is in threshold +- 180
-    else if (this.inputs.swerve[swerveModuleNumber].steerAbsolutePositionDeg
-            > angleTarget - angleTolerance - 180
-        && this.inputs.swerve[swerveModuleNumber].steerAbsolutePositionDeg
-            < angleTarget + angleTolerance - 180) {
+    if (Math.abs(
+            this.inputs.swerve[swerveModuleNumber].steerAbsolutePositionDeg - (angleTarget - 180))
+        < angleTolerance) {
       isOffset = true;
-    } else if (this.inputs.swerve[swerveModuleNumber].steerAbsolutePositionDeg
-            > angleTarget - angleTolerance + 180
-        && this.inputs.swerve[swerveModuleNumber].steerAbsolutePositionDeg
-            < angleTarget + angleTolerance + 180) {
+    } else if (Math.abs(
+            this.inputs.swerve[swerveModuleNumber].steerAbsolutePositionDeg - (angleTarget + 180))
+        < angleTolerance) {
       isOffset = true;
     }
     // if not, add fault
-    else {
+    else if (Math.abs(this.inputs.swerve[swerveModuleNumber].steerAbsolutePositionDeg - angleTarget)
+        > angleTolerance) {
       FaultReporter.getInstance()
           .addFault(
               SUBSYSTEM_NAME,
-              "[System Check] Swerve module "
+              SYSTEM_CHECK_PREFIX
                   + getSwerveLocation(swerveModuleNumber)
                   + " not rotating in the threshold as expected. Should be: "
                   + angleTarget
-                  + " is: "
+                  + IS_LITERAL
                   + inputs.swerve[swerveModuleNumber].steerAbsolutePositionDeg);
     }
 
     // Checks the velocity of the swerve module depending on if there is an offset
 
     if (!isOffset) {
-      if (inputs.swerve[swerveModuleNumber].driveVelocityMetersPerSec
-              > velocityTarget - velocityTolerance
-          && inputs.swerve[swerveModuleNumber].driveVelocityMetersPerSec
-              < velocityTarget + velocityTolerance) {
-      } else {
+      if (Math.abs(inputs.swerve[swerveModuleNumber].driveVelocityMetersPerSec - velocityTarget)
+          > velocityTolerance) {
         FaultReporter.getInstance()
             .addFault(
                 SUBSYSTEM_NAME,
-                "[System Check] Swerve module "
+                SYSTEM_CHECK_PREFIX
                     + getSwerveLocation(swerveModuleNumber)
                     + " not moving as fast as expected. Should be: "
                     + velocityTarget
-                    + " is: "
+                    + IS_LITERAL
                     + inputs.swerve[swerveModuleNumber].driveVelocityMetersPerSec);
       }
     } else { // if there is an offset, check the velocity in the opposite direction
-      if (inputs.swerve[swerveModuleNumber].driveVelocityMetersPerSec
-              < -(velocityTarget - velocityTolerance)
-          && inputs.swerve[swerveModuleNumber].driveVelocityMetersPerSec
-              > -(velocityTarget + velocityTolerance)) {
-      } else {
+      if (Math.abs(inputs.swerve[swerveModuleNumber].driveVelocityMetersPerSec + velocityTarget)
+          > velocityTolerance) {
         FaultReporter.getInstance()
             .addFault(
                 SUBSYSTEM_NAME,
-                "[System Check] Swerve module "
+                SYSTEM_CHECK_PREFIX
                     + getSwerveLocation(swerveModuleNumber)
                     + " not moving as fast as expected. REVERSED Should be: "
                     + velocityTarget
-                    + " is: "
+                    + IS_LITERAL
                     + inputs.swerve[swerveModuleNumber].driveVelocityMetersPerSec);
       }
     }
@@ -865,11 +852,7 @@ public class Drivetrain extends SubsystemBase {
         break;
       case CLOCKWISE:
         return Commands.parallel(
-                Commands.run(
-                    () -> {
-                      this.drive(0, 0, -Math.PI, false, false);
-                    },
-                    this),
+                Commands.run(() -> this.drive(0, 0, -Math.PI, false, false), this),
                 Commands.waitSeconds(1)
                     .andThen(
                         Commands.runOnce(
@@ -882,11 +865,7 @@ public class Drivetrain extends SubsystemBase {
             .withTimeout(1);
       case COUNTERCLOCKWISE:
         return Commands.parallel(
-                Commands.run(
-                    () -> {
-                      this.drive(0, 0, Math.PI, false, false);
-                    },
-                    this),
+                Commands.run(() -> this.drive(0, 0, Math.PI, false, false), this),
                 Commands.waitSeconds(1)
                     .andThen(
                         Commands.runOnce(
@@ -908,10 +887,7 @@ public class Drivetrain extends SubsystemBase {
 
     return Commands.parallel(
             Commands.run(
-                () -> {
-                  this.drive(xVelocity, yVelocity, rotationalVelocity, false, false);
-                },
-                this),
+                () -> this.drive(xVelocity, yVelocity, rotationalVelocity, false, false), this),
             Commands.waitSeconds(1)
                 .andThen(
                     Commands.runOnce(
@@ -947,7 +923,7 @@ public class Drivetrain extends SubsystemBase {
 
   public Command getSystemCheckCommand() {
     return Commands.sequence(
-            Commands.runOnce(() -> this.disableFieldRelative(), this),
+            Commands.runOnce(this::disableFieldRelative, this),
             Commands.runOnce(() -> FaultReporter.getInstance().clearFaults(SUBSYSTEM_NAME)),
             getSwerveCheckCommand(SwerveCheckTypes.LEFT),
             getSwerveCheckCommand(SwerveCheckTypes.RIGHT),
