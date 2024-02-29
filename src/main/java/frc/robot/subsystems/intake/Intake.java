@@ -6,9 +6,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.leds.LEDs.IntakeLEDState;
-
 import java.util.ArrayList;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
@@ -19,9 +17,8 @@ public class Intake extends SubsystemBase {
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
   private final LEDs leds;
 
-  private final IntakeMotor[] intakeMotors = { 
-    IntakeMotor.RIGHT_ROLLER, 
-    IntakeMotor.KICKER,
+  private final IntakeMotor[] intakeMotors = {
+    IntakeMotor.RIGHT_ROLLER, IntakeMotor.KICKER,
   };
 
   enum IntakeMotor {
@@ -56,7 +53,7 @@ public class Intake extends SubsystemBase {
 
     leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
     this.intakeGamePiece();
-    
+
     FaultReporter.getInstance().registerSystemCheck(SUBSYSTEM_NAME, getSystemCheckCommand());
   }
 
@@ -81,7 +78,7 @@ public class Intake extends SubsystemBase {
       } else {
         this.repelGamePiece();
       }
-      
+
       if (inputs.isRollerIRBlocked) {
         intakeState = IntakeState.NOTE_IN_INTAKE;
         leds.setIntakeLEDState(IntakeLEDState.HAS_GAME_PIECE);
@@ -104,7 +101,7 @@ public class Intake extends SubsystemBase {
         hasNote = false;
       }
     } else if (intakeState == IntakeState.NOTE_IN_INTAKE_AND_KICKER) {
-      if (!inputs.isRollerIRBlocked) { 
+      if (!inputs.isRollerIRBlocked) {
         intakeState = IntakeState.NOTE_IN_KICKER;
         this.transitionGamePiece();
         this.repelGamePiece();
@@ -154,64 +151,50 @@ public class Intake extends SubsystemBase {
     /*
      * Order of what will be tested
      * 1. make sure everything works at right velocities
-     * 2. then check that all the states it goes through when it gets a note are correct  
+     * 2. then check that all the states it goes through when it gets a note are correct
      *
      */
     return Commands.sequence(
-      Commands.runOnce(this::setCheckIncomplete),
-      getVelocitiesCheckCommand(),
-      getStatesCheckCommand()
-    ).until(() -> !FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).isEmpty())
-    .andThen(Commands.sequence(
-      Commands.runOnce(this::turnIntakeOff),
-      Commands.runOnce(this::turnKickerOff)))
-    .withName(SUBSYSTEM_NAME + "SystemCheck");
+            Commands.runOnce(this::setCheckIncomplete),
+            getVelocitiesCheckCommand(),
+            getStatesCheckCommand())
+        .until(() -> !FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).isEmpty())
+        .andThen(
+            Commands.sequence(
+                Commands.runOnce(this::turnIntakeOff), Commands.runOnce(this::turnKickerOff)))
+        .withName(SUBSYSTEM_NAME + "SystemCheck");
   }
-
 
   private Command getVelocitiesCheckCommand() {
     return Commands.parallel(
-      Commands.parallel(
-        Commands.runOnce(() -> this.setIntakeState(IntakeState.EMPTY)),
-        Commands.run(this::intakeGamePiece),
-        Commands.run(this::transitionGamePiece)
-      ),
-      Commands.waitSeconds(1).andThen(
-        Commands.runOnce(() -> {
-          for (int i = 0; i < intakeMotors.length; i++) {
-            checkMotorVelocity(intakeMotors[i]);
-          }
-        })
-      )
-    );
+        Commands.parallel(
+            Commands.runOnce(() -> this.setIntakeState(IntakeState.EMPTY)),
+            Commands.run(this::intakeGamePiece),
+            Commands.run(this::transitionGamePiece)),
+        Commands.waitSeconds(1)
+            .andThen(
+                Commands.runOnce(
+                    () -> {
+                      for (int i = 0; i < intakeMotors.length; i++) {
+                        checkMotorVelocity(intakeMotors[i]);
+                      }
+                    })));
   }
 
   private void checkMotorVelocity(IntakeMotor motor) {
     if (motor == IntakeMotor.RIGHT_ROLLER) {
-      if (Math.abs(inputs.rollerVelocityRPS 
-      - inputs.rollerReferenceVelocityRPS) 
-      > IntakeConstants.ROLLER_VELOCITY_TOLERANCE) {
-        if (Math.abs(inputs.rollerVelocityRPS) >
-        Math.abs(inputs.rollerReferenceVelocityRPS)) {
-          FaultReporter.getInstance().addFault(
-            SUBSYSTEM_NAME,
-            "[System Check] RRoller Too Fast"
-          );
+      if (Math.abs(inputs.rollerVelocityRPS - inputs.rollerReferenceVelocityRPS)
+          > IntakeConstants.ROLLER_VELOCITY_TOLERANCE) {
+        if (Math.abs(inputs.rollerVelocityRPS) > Math.abs(inputs.rollerReferenceVelocityRPS)) {
+          FaultReporter.getInstance().addFault(SUBSYSTEM_NAME, "[System Check] RRoller Too Fast");
         } else {
-          FaultReporter.getInstance().addFault(
-            SUBSYSTEM_NAME,
-            "[System Check] Roller Too Slow"
-          );
+          FaultReporter.getInstance().addFault(SUBSYSTEM_NAME, "[System Check] Roller Too Slow");
         }
       }
     } else if (motor == IntakeMotor.KICKER) {
-      if (inputs.kickerVelocityRPS 
-      - inputs.kickerReferenceVelocityRPS 
-      > IntakeConstants.KICKER_VELOCITY_TOLERANCE) {
-        FaultReporter.getInstance().addFault(
-          SUBSYSTEM_NAME,
-          "[System Check] Kicker Too Slow"
-        );
+      if (inputs.kickerVelocityRPS - inputs.kickerReferenceVelocityRPS
+          > IntakeConstants.KICKER_VELOCITY_TOLERANCE) {
+        FaultReporter.getInstance().addFault(SUBSYSTEM_NAME, "[System Check] Kicker Too Slow");
       }
     }
   }
@@ -225,21 +208,21 @@ public class Intake extends SubsystemBase {
       IntakeState.NOTE_IN_KICKER_AND_SHOOTER,
       IntakeState.NOTE_IN_SHOOTER
     };
-    
+
     ArrayList<IntakeState> actualStateSequence = new ArrayList<>();
 
     return Commands.parallel(
-      Commands.parallel(
-        Commands.run(() -> this.setIntakeState(IntakeState.EMPTY)),
-        Commands.run(this::intakeGamePiece)
-      ),
-      Commands.waitSeconds(1).andThen(
-        Commands.run(() -> checkStateSequence(actualStateSequence, desiredStateSequence))
-      ).until(this::checkComplete)
-    );
+        Commands.parallel(
+            Commands.run(() -> this.setIntakeState(IntakeState.EMPTY)),
+            Commands.run(this::intakeGamePiece)),
+        Commands.waitSeconds(1)
+            .andThen(
+                Commands.run(() -> checkStateSequence(actualStateSequence, desiredStateSequence)))
+            .until(this::checkComplete));
   }
 
-  private void checkStateSequence(ArrayList<IntakeState> actualStateSequence, IntakeState[] desiredStateSequence) {
+  private void checkStateSequence(
+      ArrayList<IntakeState> actualStateSequence, IntakeState[] desiredStateSequence) {
     if (intakeState != mostRecentIntakeState) {
       actualStateSequence.add(intakeState);
       mostRecentIntakeState = intakeState;
@@ -247,30 +230,29 @@ public class Intake extends SubsystemBase {
 
     for (int i = 0; i < actualStateSequence.size(); i++) {
       if (!actualStateSequence.get(i).equals(desiredStateSequence[i])) {
-        FaultReporter.getInstance().addFault(
-          SUBSYSTEM_NAME,
-          "[System Check] Intake State Incorrect, "
-          + "Expected: " + desiredStateSequence[i] + ", "
-          + "Actual: " + actualStateSequence.get(i)
-        );
+        FaultReporter.getInstance()
+            .addFault(
+                SUBSYSTEM_NAME,
+                "[System Check] Intake State Incorrect, "
+                    + "Expected: "
+                    + desiredStateSequence[i]
+                    + ", "
+                    + "Actual: "
+                    + actualStateSequence.get(i));
       }
     }
 
     if (actualStateSequence.size() == desiredStateSequence.length) {
       completeCheck();
     }
-
   }
-
-  
 
   public boolean manualOverrideEnabled() {
     return manualOverrideEnabled;
   }
 
   public boolean runningManualIntake() {
-    return manualOverrideEnabled
-        && Math.abs(inputs.rollerReferenceVelocityRPS) > 0.01;
+    return manualOverrideEnabled && Math.abs(inputs.rollerReferenceVelocityRPS) > 0.01;
   }
 
   public void enableManualOverride() {
@@ -286,7 +268,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void turnIntakeOff() {
-   io.setRollerVelocity(0);
+    io.setRollerVelocity(0);
   }
 
   public void transitionGamePiece() {
@@ -308,7 +290,6 @@ public class Intake extends SubsystemBase {
 
   public void outtakeKicker() {
     this.setKickerVelocity(-IntakeConstants.KICKER_VELOCITY_RPS);
-
   }
 
   public void setKickerVelocity(double rps) {

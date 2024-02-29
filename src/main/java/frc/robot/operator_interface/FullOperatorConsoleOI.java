@@ -101,7 +101,6 @@ public class FullOperatorConsoleOI implements OperatorInterface {
     return new Trigger(operatorController::getStartButton);
   }
 
-
   // Operator Panel
 
   @Override
@@ -118,6 +117,4 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   public Trigger getIntakeAutomationSwitch() {
     return operatorPanelButtons[12];
   }
-
-
 }

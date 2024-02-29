@@ -27,7 +27,6 @@ import frc.lib.team3061.drivetrain.swerve.SwerveModuleIOTalonFXPhoenix6;
 import frc.lib.team3061.gyro.GyroIO;
 import frc.lib.team3061.gyro.GyroIOPigeon2Phoenix6;
 import frc.lib.team3061.leds.LEDs;
-import frc.lib.team3061.leds.LEDs.IntakeLEDState;
 import frc.lib.team3061.pneumatics.Pneumatics;
 import frc.lib.team3061.pneumatics.PneumaticsIORev;
 import frc.lib.team3061.vision.Vision;
@@ -540,24 +539,20 @@ public class RobotContainer {
     oi.getIntakeAutomationSwitch().onFalse(Commands.runOnce(intake::enableManualOverride, intake));
 
     oi.getRunIntakeButton()
-      .and(intake::manualOverrideEnabled)
-      .whileTrue(
-        Commands.parallel(
-          Commands.run(intake::intakeGamePiece),
-          Commands.run(intake::transitionGamePiece)
-        ).withName("TurnIntakeOn"));
+        .and(intake::manualOverrideEnabled)
+        .whileTrue(
+            Commands.parallel(
+                    Commands.run(intake::intakeGamePiece),
+                    Commands.run(intake::transitionGamePiece))
+                .withName("TurnIntakeOn"));
 
     oi.getOuttakeAllButton()
         .and(intake::manualOverrideEnabled)
-        .whileTrue(
-          Commands.run(intake::outtakeAll)
-          .withName("TurnIntakeOff"));
-    
+        .whileTrue(Commands.run(intake::outtakeAll).withName("TurnIntakeOff"));
+
     if (!intake.runningManualIntake()) {
       Commands.sequence(
-        Commands.runOnce(intake::turnIntakeOff),
-        Commands.runOnce(intake::transitionGamePiece)
-      );
+          Commands.runOnce(intake::turnIntakeOff), Commands.runOnce(intake::transitionGamePiece));
     }
   }
 

@@ -86,12 +86,10 @@ public class IntakeIOTalonFX implements IntakeIO {
 
     rollerMotor =
         new TalonFX(
-            IntakeConstants.INTAKE_ROLLER_MOTOR_ID,
-            RobotConfig.getInstance().getCANBusName());
-   kickerMotor =
+            IntakeConstants.INTAKE_ROLLER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
+    kickerMotor =
         new TalonFX(
-            IntakeConstants.INTAKE_KICKER_MOTOR_ID, 
-            RobotConfig.getInstance().getCANBusName());
+            IntakeConstants.INTAKE_KICKER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
 
     configureIntakeRollerMotor(rollerMotor);
     configureIntakeKickerMotor(kickerMotor);
@@ -122,11 +120,7 @@ public class IntakeIOTalonFX implements IntakeIO {
             0.001,
             ROLLERS_SENSOR_TO_MECHANISM_RATIO);
     this.kickerMotorSim =
-        new VelocitySystemSim(kickerMotor, 
-            IntakeConstants.KICKER_MOTOR_INVERTED, 
-            1.0, 
-            0.3, 
-            1.0);
+        new VelocitySystemSim(kickerMotor, IntakeConstants.KICKER_MOTOR_INVERTED, 1.0, 0.3, 1.0);
   }
 
   @Override
@@ -156,15 +150,11 @@ public class IntakeIOTalonFX implements IntakeIO {
     inputs.rollerSupplyCurrentAmps = rollerSupplyCurrentStatusSignal.getValueAsDouble();
     inputs.kickerSupplyCurrentAmps = kickerSupplyCurrentStatusSignal.getValueAsDouble();
 
-    inputs.rollerVelocityRPS =
-        rollerVelocityStatusSignal.getValueAsDouble();
-    inputs.kickerVelocityRPS = 
-        kickerVelocityStatusSignal.getValueAsDouble();
+    inputs.rollerVelocityRPS = rollerVelocityStatusSignal.getValueAsDouble();
+    inputs.kickerVelocityRPS = kickerVelocityStatusSignal.getValueAsDouble();
 
-    inputs.rollerReferenceVelocityRPS =
-        rollerReferenceVelocityStatusSignal.getValueAsDouble();
-    inputs.kickerReferenceVelocityRPS = 
-        kickerReferenceVelocityStatusSignal.getValueAsDouble();
+    inputs.rollerReferenceVelocityRPS = rollerReferenceVelocityStatusSignal.getValueAsDouble();
+    inputs.kickerReferenceVelocityRPS = kickerReferenceVelocityStatusSignal.getValueAsDouble();
 
     inputs.rollerTempCelcius = rollerTemperatureStatusSignal.getValueAsDouble();
     inputs.kickerTempCelcius = kickerTemperatureStatusSignal.getValueAsDouble();
@@ -173,7 +163,7 @@ public class IntakeIOTalonFX implements IntakeIO {
         || rollerMotorsKI.hasChanged()
         || rollerMotorsKD.hasChanged()
         || rollerMotorsKS.hasChanged()) {
-      
+
       Slot0Configs slot0Configs = new Slot0Configs();
       rollerMotor.getConfigurator().refresh(slot0Configs);
       slot0Configs.kP = rollerMotorsKP.get();
@@ -213,11 +203,13 @@ public class IntakeIOTalonFX implements IntakeIO {
     TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
     CurrentLimitsConfigs rollerCurrentLimits = new CurrentLimitsConfigs();
 
-    rollerCurrentLimits.SupplyCurrentLimit = IntakeConstants.ROLLERS_CONTINUOUS_SUPPLY_CURRENT_LIMIT;
+    rollerCurrentLimits.SupplyCurrentLimit =
+        IntakeConstants.ROLLERS_CONTINUOUS_SUPPLY_CURRENT_LIMIT;
     rollerCurrentLimits.SupplyCurrentThreshold = IntakeConstants.ROLLERS_PEAK_SUPPLY_CURRENT_LIMIT;
     rollerCurrentLimits.SupplyTimeThreshold = IntakeConstants.ROLLERS_PEAK_SUPPLY_CURRENT_DURATION;
 
-    rollerCurrentLimits.StatorCurrentLimit = IntakeConstants.ROLLERS_CONTINUOUS_STATOR_CURRENT_LIMIT;
+    rollerCurrentLimits.StatorCurrentLimit =
+        IntakeConstants.ROLLERS_CONTINUOUS_STATOR_CURRENT_LIMIT;
 
     rollerCurrentLimits.SupplyCurrentLimitEnable = true;
     rollerCurrentLimits.StatorCurrentLimitEnable = true;
@@ -247,8 +239,8 @@ public class IntakeIOTalonFX implements IntakeIO {
     }
 
     if (!status.isOK()) {
-        configAlert.set(true);
-        configAlert.setText(status.toString());
+      configAlert.set(true);
+      configAlert.setText(status.toString());
     }
 
     FaultReporter.getInstance().registerHardware("INTAKE", "IntakeRoller", rollerMotor);
@@ -290,8 +282,8 @@ public class IntakeIOTalonFX implements IntakeIO {
     }
 
     if (!status.isOK()) {
-        configAlert.set(true);
-        configAlert.setText(status.toString());
+      configAlert.set(true);
+      configAlert.setText(status.toString());
     }
 
     FaultReporter.getInstance().registerHardware("INTAKE", "IntakeKicker", kickerMotor);
