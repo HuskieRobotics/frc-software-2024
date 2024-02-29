@@ -34,6 +34,7 @@ import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
+import frc.robot.commands.WheelRadiusCharacterization;
 import frc.robot.configs.GenericDrivetrainRobotConfig;
 import frc.robot.configs.PracticeRobotConfig;
 import frc.robot.operator_interface.OISelector;
@@ -401,6 +402,23 @@ public class RobotContainer {
                     Commands.waitSeconds(0.5),
                     Commands.run(
                         () -> drivetrain.drive(0.1, -0.1, 0.0, true, false), drivetrain)))));
+
+    /************ Drive Wheel Radius Characterization ************
+     *
+     * useful for characterizing the drive wheel radius
+     *
+     */
+    autoChooser.addOption( // start by driving slowing in a circle to align wheels
+        "Drive Wheel Radius Characterization",
+        Commands.sequence(
+            Commands.deadline(
+                Commands.waitSeconds(0.5),
+                Commands.run(() -> drivetrain.drive(0.0, 0.0, 0.1, true, false), drivetrain)),
+            Commands.deadline(
+                Commands.waitSeconds(0.25),
+                Commands.run(() -> drivetrain.drive(0.0, 0.0, 0.0, true, false), drivetrain)),
+            new WheelRadiusCharacterization(drivetrain)
+                .withName("Drive Wheel Radius Characterization")));
 
     Shuffleboard.getTab("MAIN").add(autoChooser.getSendableChooser());
   }
