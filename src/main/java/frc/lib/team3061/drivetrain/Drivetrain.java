@@ -709,7 +709,7 @@ public class Drivetrain extends SubsystemBase {
 
   /** Runs in a circle at omega. */
   public void runWheelDiameterCharacterization(double omegaSpeed) {
-    this.io.driveRobotRelative(0.0, 0.0, omegaSpeed, false);
+    this.io.driveRobotRelative(0.0, 0.0, omegaSpeed, true);
   }
 
   /** Get the position of all drive wheels in radians. */
