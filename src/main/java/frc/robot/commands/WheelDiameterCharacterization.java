@@ -9,7 +9,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.Drivetrain;
@@ -18,9 +17,9 @@ import frc.lib.team6328.util.TunableNumber;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
-public class WheelRadiusCharacterization extends Command {
+public class WheelDiameterCharacterization extends Command {
   private static final TunableNumber characterizationSpeed =
-      new TunableNumber("WheelRadiusCharacterization/SpeedRadsPerSec", 0.1);
+      new TunableNumber("WheelDiameterCharacterization/SpeedRadsPerSec", 0.1);
   private static final double DRIVE_RADIUS =
       Math.hypot(
           RobotConfig.getInstance().getTrackwidth() / 2.0,
@@ -38,7 +37,7 @@ public class WheelRadiusCharacterization extends Command {
 
   private double currentEffectiveWheelRadius = 0.0;
 
-  public WheelRadiusCharacterization(Drivetrain drivetrain) {
+  public WheelDiameterCharacterization(Drivetrain drivetrain) {
     this.drivetrain = drivetrain;
     addRequirements(drivetrain);
   }
@@ -49,7 +48,7 @@ public class WheelRadiusCharacterization extends Command {
     lastGyroYawRads = gyroYawRadsSupplier.getAsDouble();
     accumulatedGyroYawRads = 0.0;
 
-    startWheelPositions = drivetrain.getWheelRadiusCharacterizationPosition();
+    startWheelPositions = drivetrain.getWheelDiameterCharacterizationPosition();
 
     omegaLimiter.reset(0);
   }
@@ -57,26 +56,27 @@ public class WheelRadiusCharacterization extends Command {
   @Override
   public void execute() {
     // Run drive at velocity
-    drivetrain.runWheelRadiusCharacterization(omegaLimiter.calculate(characterizationSpeed.get()));
+    drivetrain.runWheelDiameterCharacterization(
+        omegaLimiter.calculate(characterizationSpeed.get()));
 
     // Get yaw and wheel positions
     accumulatedGyroYawRads +=
         MathUtil.angleModulus(gyroYawRadsSupplier.getAsDouble() - lastGyroYawRads);
     lastGyroYawRads = gyroYawRadsSupplier.getAsDouble();
     double averageWheelPosition = 0.0;
-    double[] wheelPositions = drivetrain.getWheelRadiusCharacterizationPosition();
+    double[] wheelPositions = drivetrain.getWheelDiameterCharacterizationPosition();
     for (int i = 0; i < 4; i++) {
       averageWheelPosition += Math.abs(wheelPositions[i] - startWheelPositions[i]);
     }
     averageWheelPosition /= 4.0;
 
     currentEffectiveWheelRadius = (accumulatedGyroYawRads * DRIVE_RADIUS) / averageWheelPosition;
-    Logger.recordOutput("Drive/RadiusCharacterization/DrivePosition", averageWheelPosition);
+    Logger.recordOutput("WheelDiameterCharacterization/DrivePosition", averageWheelPosition);
     Logger.recordOutput(
-        "Drive/RadiusCharacterization/AccumulatedGyroYawRads", accumulatedGyroYawRads);
+        "WheelDiameterCharacterization/AccumulatedGyroYawRads", accumulatedGyroYawRads);
     Logger.recordOutput(
-        "Drive/RadiusCharacterization/CurrentWheelRadiusInches",
-        Units.metersToInches(currentEffectiveWheelRadius));
+        "WheelDiameterCharacterization/CurrentWheelDiameterMeters",
+        currentEffectiveWheelRadius * 2.0);
   }
 
   @Override
@@ -85,9 +85,7 @@ public class WheelRadiusCharacterization extends Command {
       System.out.println("Not enough data for characterization");
     } else {
       System.out.println(
-          "Effective Wheel Radius: "
-              + Units.metersToInches(currentEffectiveWheelRadius)
-              + " inches");
+          "Effective Wheel Diameter: " + currentEffectiveWheelRadius * 2.0 + " meters");
     }
   }
 }

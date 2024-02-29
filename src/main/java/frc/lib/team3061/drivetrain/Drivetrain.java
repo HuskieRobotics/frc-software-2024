@@ -708,12 +708,12 @@ public class Drivetrain extends SubsystemBase {
   }
 
   /** Runs in a circle at omega. */
-  public void runWheelRadiusCharacterization(double omegaSpeed) {
+  public void runWheelDiameterCharacterization(double omegaSpeed) {
     this.io.driveRobotRelative(0.0, 0.0, omegaSpeed, false);
   }
 
   /** Get the position of all drive wheels in radians. */
-  public double[] getWheelRadiusCharacterizationPosition() {
+  public double[] getWheelDiameterCharacterizationPosition() {
     double[] positions = new double[inputs.swerve.length];
     for (int i = 0; i < inputs.swerve.length; i++) {
       positions[i] =
