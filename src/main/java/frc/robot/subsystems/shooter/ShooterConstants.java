@@ -41,8 +41,10 @@ public class ShooterConstants {
   public static final double SHOOT_MOTORS_PEAK_CURRENT_LIMIT = 30;
   public static final double SHOOT_MOTORS_PEAK_CURRENT_DURATION = 0.1;
   public static final double SHOOT_MOTORS_GEAR_RATIO = 2;
+  public static final double SHOOTER_IDLE_VELOCITY = 0.0;
   public static final boolean SHOOT_TOP_INVERTED = false;
   public static final boolean SHOOT_BOTTOM_INVERTED = false;
+  public static final double VELOCITY_TOLERANCE = 0.1;
 
   // Angle Motor
   public static final double ANGLE_MOTOR_CONTINUOUS_CURRENT_LIMIT = 15;
@@ -56,4 +58,12 @@ public class ShooterConstants {
   public static final boolean ANGLE_MOTOR_INVERTED = false;
   public static final double MAGNET_OFFSET = 0.0;
   public static final double SENSOR_TO_MECHANISM_RATIO = 4.0;
+  public static final double ANGLE_TOLERANCE = 0.5;
+
+  // Shooter Presets
+  public static final double SUBWOOFER_VELOCITY = 10.0;
+  public static final double SUBWOOFER_ANGLE = 0.0;
+  public static final double PODIUM_VELOCITY = 10.0;
+  public static final double PODIUM_ANGLE = 0.0;
+
 }
