@@ -64,11 +64,6 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getManualRepelAllButton() {
-    return translateJoystickButtons[3];
-  }
-
-  @Override
   public Trigger getResetGyroButton() {
     return translateJoystickButtons[4];
   }
@@ -96,7 +91,7 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getManualRunIntakeButton() {
+  public Trigger getRunIntakeButton() {
     return rotateJoystickButtons[4];
   }
 
@@ -106,12 +101,13 @@ public class FullOperatorConsoleOI implements OperatorInterface {
     return new Trigger(operatorController::getStartButton);
   }
 
-  @Override
-  public Trigger getManualTurnIntakeOffButton() {
-    return new Trigger(() -> operatorController.getLeftTriggerAxis() > 0.5);
-  }
 
   // Operator Panel
+
+  @Override
+  public Trigger getOuttakeAllButton() {
+    return operatorPanelButtons[9];
+  }
 
   @Override
   public Trigger getVisionIsEnabledSwitch() {
@@ -119,7 +115,9 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getIntakeManualOverrideSwitch() {
+  public Trigger getIntakeAutomationSwitch() {
     return operatorPanelButtons[12];
   }
+
+
 }

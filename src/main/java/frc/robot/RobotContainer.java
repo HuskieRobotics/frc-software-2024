@@ -535,38 +535,30 @@ public class RobotContainer {
   }
 
   private void configureIntakeCommands() {
-    oi.getIntakeManualOverrideSwitch().onTrue(Commands.run(intake::enableManualOverride, intake));
+    oi.getIntakeAutomationSwitch().onTrue(Commands.runOnce(intake::disableManualOverride, intake));
 
-    oi.getIntakeManualOverrideSwitch().onFalse(Commands.run(intake::disableManualOverride, intake));
+    oi.getIntakeAutomationSwitch().onFalse(Commands.runOnce(intake::enableManualOverride, intake));
 
-    oi.getManualRunIntakeButton()
+    oi.getRunIntakeButton()
+      .and(intake::manualOverrideEnabled)
+      .whileTrue(
+        Commands.parallel(
+          Commands.run(intake::intakeGamePiece),
+          Commands.run(intake::transitionGamePiece)
+        ).withName("TurnIntakeOn"));
+
+    oi.getOuttakeAllButton()
         .and(intake::manualOverrideEnabled)
-        .onTrue(
-            Commands.either(
-                Commands.sequence(
-                    Commands.runOnce(
-                        () -> leds.setIntakeLEDState(IntakeLEDState.INTAKE_MANUALLY_TURNED_OFF)),
-                    Commands.runOnce(intake::turnIntakeOff, intake).withName("TurnIntakeOff")),
-                Commands.sequence(
-                    Commands.runOnce(
-                        () -> leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE)),
-                    Commands.run(intake::intakeGamePiece, intake).withName("IntakeGamePiece")),
-                intake::runningManualIntake));
-
-    oi.getManualTurnIntakeOffButton()
-        .and(intake::manualOverrideEnabled)
-        .onTrue(
-            Commands.either(
-                Commands.runOnce(intake::turnIntakeOff, intake).withName("TurnRightIntakeOff"),
-                Commands.run(intake::intakeGamePiece, intake).withName("IntakeGamePieceRight"),
-                intake::runningManualIntake));
-
-    oi.getManualRepelAllButton()
-        .and(intake::manualOverrideEnabled)
-        .onTrue(
-            Commands.sequence(
-                Commands.runOnce(intake::repelGamePiece, intake).withName("RepelGamePiece"),
-                Commands.runOnce(() -> leds.setIntakeLEDState(IntakeLEDState.MANUAL_REPEL))));
+        .whileTrue(
+          Commands.run(intake::outtakeAll)
+          .withName("TurnIntakeOff"));
+    
+    if (!intake.runningManualIntake()) {
+      Commands.sequence(
+        Commands.runOnce(intake::turnIntakeOff),
+        Commands.runOnce(intake::transitionGamePiece)
+      );
+    }
   }
 
   private void configureDrivetrainCommands() {
