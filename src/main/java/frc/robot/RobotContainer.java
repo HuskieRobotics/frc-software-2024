@@ -411,14 +411,14 @@ public class RobotContainer {
     autoChooser.addOption( // start by driving slowing in a circle to align wheels
         "Drive Wheel Diameter Characterization",
         Commands.sequence(
-            Commands.deadline(
-                Commands.waitSeconds(0.5),
-                Commands.run(() -> drivetrain.drive(0.0, 0.0, 0.1, true, false), drivetrain)),
-            Commands.deadline(
-                Commands.waitSeconds(0.25),
-                Commands.run(() -> drivetrain.drive(0.0, 0.0, 0.0, true, false), drivetrain)),
-            new WheelDiameterCharacterization(drivetrain)
-                .withName("Drive Wheel Diameter Characterization")));
+                Commands.deadline(
+                    Commands.waitSeconds(0.5),
+                    Commands.run(() -> drivetrain.drive(0.0, 0.0, 0.1, true, false), drivetrain)),
+                Commands.deadline(
+                    Commands.waitSeconds(0.25),
+                    Commands.run(() -> drivetrain.drive(0.0, 0.0, 0.0, true, false), drivetrain)),
+                new WheelDiameterCharacterization(drivetrain))
+            .withName("Drive Wheel Diameter Characterization"));
 
     Shuffleboard.getTab("MAIN").add(autoChooser.getSendableChooser());
   }
