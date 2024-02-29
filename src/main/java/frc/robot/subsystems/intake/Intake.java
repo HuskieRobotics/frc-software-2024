@@ -38,7 +38,7 @@ public class Intake extends SubsystemBase {
   private IntakeState intakeState;
   private IntakeState mostRecentIntakeState;
   private boolean checkComplete;
-  private boolean manualOverrideEnabled;
+  private boolean automationEnabled;
   private boolean shooterAngleReady;
   private boolean hasNote;
 
@@ -48,8 +48,8 @@ public class Intake extends SubsystemBase {
     intakeState = IntakeState.EMPTY;
     mostRecentIntakeState = null;
     checkComplete = false;
-    shooterAngleReady = false;
-    manualOverrideEnabled = false;
+    shooterAngleReady = true; // FIXME: call shooter method
+    automationEnabled = true;
 
     leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
     this.intakeGamePiece();
@@ -63,7 +63,7 @@ public class Intake extends SubsystemBase {
     Logger.processInputs("Intake", inputs);
     Logger.recordOutput("Intake/State", intakeState.toString());
 
-    if (!manualOverrideEnabled) {
+    if (automationEnabled) {
       this.runIntakeStateMachine();
     }
   }
@@ -247,20 +247,20 @@ public class Intake extends SubsystemBase {
     }
   }
 
-  public boolean manualOverrideEnabled() {
-    return manualOverrideEnabled;
+  public boolean automationEnabled() {
+    return automationEnabled;
   }
 
   public boolean runningManualIntake() {
-    return manualOverrideEnabled && Math.abs(inputs.rollerReferenceVelocityRPS) > 0.01;
+    return !automationEnabled && Math.abs(inputs.rollerReferenceVelocityRPS) > 0.01;
   }
 
-  public void enableManualOverride() {
-    manualOverrideEnabled = true;
+  public void enableAutomation() {
+    automationEnabled = true;
   }
 
-  public void disableManualOverride() {
-    manualOverrideEnabled = false;
+  public void disableAutomation() {
+    automationEnabled = false;
   }
 
   public void intakeGamePiece() {

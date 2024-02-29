@@ -534,26 +534,42 @@ public class RobotContainer {
   }
 
   private void configureIntakeCommands() {
-    oi.getIntakeAutomationSwitch().onTrue(Commands.runOnce(intake::disableManualOverride, intake));
+    oi.getIntakeAutomationSwitch().onTrue(Commands.runOnce(intake::enableAutomation, intake));
 
-    oi.getIntakeAutomationSwitch().onFalse(Commands.runOnce(intake::enableManualOverride, intake));
+    oi.getIntakeAutomationSwitch()
+        .onFalse(
+            Commands.parallel(
+                Commands.runOnce(intake::disableAutomation, intake),
+                Commands.runOnce(intake::turnIntakeOff),
+                Commands.runOnce(intake::turnKickerOff)));
 
     oi.getRunIntakeButton()
-        .and(intake::manualOverrideEnabled)
+        .and(() -> !intake.automationEnabled())
         .whileTrue(
             Commands.parallel(
                     Commands.run(intake::intakeGamePiece),
                     Commands.run(intake::transitionGamePiece))
                 .withName("TurnIntakeOn"));
 
+    oi.getRunIntakeButton()
+        .and(() -> !intake.automationEnabled())
+        .onFalse(
+            Commands.sequence(
+                    Commands.runOnce(intake::turnIntakeOff),
+                    Commands.runOnce(intake::turnKickerOff))
+                .withName("TurnIntakeOff"));
+
     oi.getOuttakeAllButton()
-        .and(intake::manualOverrideEnabled)
+        .and(() -> !intake.automationEnabled())
         .whileTrue(Commands.run(intake::outtakeAll).withName("TurnIntakeOff"));
 
-    if (!intake.runningManualIntake()) {
-      Commands.sequence(
-          Commands.runOnce(intake::turnIntakeOff), Commands.runOnce(intake::transitionGamePiece));
-    }
+    oi.getOuttakeAllButton()
+        .and(() -> !intake.automationEnabled())
+        .onFalse(
+            Commands.sequence(
+                    Commands.runOnce(intake::turnIntakeOff),
+                    Commands.runOnce(intake::turnKickerOff))
+                .withName("TurnOutakeOff"));
   }
 
   private void configureDrivetrainCommands() {
