@@ -22,8 +22,8 @@ public interface IntakeIO {
     double rollerReferenceVelocityRPS = 0;
     double kickerReferenceVelocityRPS = 0;
 
-    double rollerTempCelcius = 0;
-    double kickerTempCelcius = 0;
+    double rollerTempCelsius = 0;
+    double kickerTempCelsius = 0;
 
     double rollerVoltage = 0;
     double kickerVoltage = 0;

@@ -169,8 +169,8 @@ public class IntakeIOTalonFX implements IntakeIO {
     inputs.rollerReferenceVelocityRPS = rollerReferenceVelocityStatusSignal.getValueAsDouble();
     inputs.kickerReferenceVelocityRPS = kickerReferenceVelocityStatusSignal.getValueAsDouble();
 
-    inputs.rollerTempCelcius = rollerTemperatureStatusSignal.getValueAsDouble();
-    inputs.kickerTempCelcius = kickerTemperatureStatusSignal.getValueAsDouble();
+    inputs.rollerTempCelsius = rollerTemperatureStatusSignal.getValueAsDouble();
+    inputs.kickerTempCelsius = kickerTemperatureStatusSignal.getValueAsDouble();
 
     inputs.rollerVoltage = rollerVoltageStatusSignal.getValueAsDouble();
     inputs.kickerVoltage = kickerVoltageStatusSignal.getValueAsDouble();
