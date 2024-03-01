@@ -31,7 +31,6 @@ import frc.lib.team3061.vision.Vision;
 import frc.lib.team3061.vision.VisionConstants;
 import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
-import frc.lib.team3061.vision.VisionIOSim;
 import frc.lib.team6328.util.NoteVisualizer;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
@@ -40,13 +39,11 @@ import frc.robot.configs.PracticeBoardConfig;
 import frc.robot.configs.PracticeRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
-import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterIOTalonFX;
-import frc.robot.subsystems.subsystem.Subsystem;
-import frc.robot.subsystems.subsystem.SubsystemIO;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -171,7 +168,7 @@ public class RobotContainer {
 
     // FIXME: connect to shooter's boolean supplier
     intake = new Intake(new IntakeIOTalonFX(), () -> true);
-    shooter = new Shooter(new ShooterIOTalonFX() {});
+    shooter = new Shooter(new ShooterIOTalonFX() {}, drivetrain);
 
     String[] cameraNames = config.getCameraNames();
     VisionIO[] visionIOs = new VisionIO[cameraNames.length];
