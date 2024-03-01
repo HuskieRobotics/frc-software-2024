@@ -240,8 +240,11 @@ public class RobotContainer {
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
   }
 
-  private void createPracticeBoardSubsystem(){
-    
+  private void createPracticeBoardSubsystem() {
+    // change the following to connect the subsystem being tested to actual hardware
+    drivetrain = new Drivetrain(new DrivetrainIO() {});
+    intake = new Intake(new IntakeIO() {}, () -> true);
+    vision = new Vision(new VisionIO[] {new VisionIO() {}});
   }
 
   /**
