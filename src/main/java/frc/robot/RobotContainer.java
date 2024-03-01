@@ -35,6 +35,7 @@ import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.configs.GenericDrivetrainRobotConfig;
+import frc.robot.configs.PracticeBoardConfig;
 import frc.robot.configs.PracticeRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
@@ -86,6 +87,11 @@ public class RobotContainer {
     if (Constants.getMode() != Mode.REPLAY) {
 
       switch (Constants.getRobot()) {
+        case ROBOT_PRACTICE_BOARD:
+          {
+            createPracticeBoardSubsystem();
+            break;
+          }
         case ROBOT_PRACTICE:
         case ROBOT_COMPETITION:
           {
@@ -142,6 +148,8 @@ public class RobotContainer {
       case ROBOT_COMPETITION:
         config = new PracticeRobotConfig();
         break;
+      case ROBOT_PRACTICE_BOARD:
+        config = new PracticeBoardConfig();
     }
   }
 
@@ -211,6 +219,10 @@ public class RobotContainer {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
+  }
+
+  private void createPracticeBoardSubsystem(){
+    
   }
 
   /**
