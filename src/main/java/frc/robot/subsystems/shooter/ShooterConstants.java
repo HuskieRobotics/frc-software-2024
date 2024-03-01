@@ -17,6 +17,8 @@ public class ShooterConstants {
   public static final int ANGLE_MOTOR_ID = 29;
   public static final int ANGLE_ENCODER_ID = 9;
 
+  public static final int SETPOINTCOUNT = 5;
+
   // Shooter Velocity PID Constants
   public static final double SHOOT_KP = 40.0;
   public static final double SHOOT_KI = 0.0;
@@ -59,11 +61,13 @@ public class ShooterConstants {
   public static final double MAGNET_OFFSET = 0.0;
   public static final double SENSOR_TO_MECHANISM_RATIO = 4.0;
   public static final double ANGLE_TOLERANCE = 0.5;
+  public static final double SHOOTER_STORAGE_ANGLE = 0.0;
 
   // Shooter Presets
   public static final double SUBWOOFER_VELOCITY = 10.0;
   public static final double SUBWOOFER_ANGLE = 0.0;
   public static final double PODIUM_VELOCITY = 10.0;
   public static final double PODIUM_ANGLE = 0.0;
-
+  public static final double AMP_VELOCITY = 10.0;
+  public static final double AMP_ANGLE = 0.0;
 }

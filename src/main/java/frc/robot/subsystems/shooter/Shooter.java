@@ -2,6 +2,8 @@ package frc.robot.subsystems.shooter;
 
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -12,7 +14,6 @@ import frc.lib.team3061.drivetrain.Drivetrain;
 import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Field2d;
-import frc.robot.subsystems.shooter.ShooterIO.ShooterIOInputs;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -21,6 +22,7 @@ public class Shooter extends SubsystemBase {
   private ShooterIO io;
   private Alliance alliance = Alliance.Red;
   private InterpolatingDoubleTreeMap angleTreeMap;
+  private InterpolatingDoubleTreeMap veloTreeMap;
   private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
   
   private final TunableNumber topWheelVelocity = new TunableNumber("Shooter/Top Wheel Velocity", 0);
@@ -28,25 +30,34 @@ public class Shooter extends SubsystemBase {
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber angle = new TunableNumber("Shooter/Angle", 10.0);
 
-  private boolean manualMode = false;
+  public BooleanSupplier inStorage = () -> false;
+
+  private boolean autoShooter = false;
   private boolean hasNote = false;
   private boolean isAimed = false;
   private boolean aiming = false;
+  private boolean scoringAmp = false;
+  private boolean scoringSubwoofer = false;
+  private boolean scoringPodium = false;
 
   private int topAtSetpointIterationCount = 0;
   private int bottomAtSetpointIterationCount = 0;
   private int angleAtSetpointIterationCount = 0;
-  private static final int SETPOINTCOUNT = 0;
-
 
 
   public Shooter(ShooterIO io, Drivetrain drivetrain) { // TODO: Add intake reference
     this.io = io;
     this.angleTreeMap = new InterpolatingDoubleTreeMap();
-    this.manualMode = false;
+    this.veloTreeMap = new InterpolatingDoubleTreeMap();
+
+    this.autoShooter = false;
     this.hasNote = false;
     this.isAimed = false;
     this.aiming = false;
+    this.scoringAmp = false;
+    this.scoringSubwoofer = false;
+    this.scoringPodium = false;
+    this.inStorage = () -> false;
 
     if (TESTING) {
       ShuffleboardTab tab = Shuffleboard.getTab(SUBSYSTEM_NAME);
@@ -58,6 +69,7 @@ public class Shooter extends SubsystemBase {
   public void periodic() {
     io.updateInputs(shooterInputs);
     Logger.processInputs(SUBSYSTEM_NAME, shooterInputs);
+    this.inStorage = () -> (Math.abs(shooterInputs.angleEncoderAngleDegrees) < ShooterConstants.ANGLE_TOLERANCE);
     // this.hasNote = intake.hasNote();
 
     if (TESTING) {
@@ -65,7 +77,7 @@ public class Shooter extends SubsystemBase {
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
       io.setAngle(angle.get());
     }
-    else if (manualMode == true)
+    else if (autoShooter == false)
     {
       io.setShooterWheelBottomVelocity(SHOOTER_IDLE_VELOCITY);
       io.setShooterWheelTopVelocity(SHOOTER_IDLE_VELOCITY);
@@ -89,29 +101,42 @@ public class Shooter extends SubsystemBase {
             .getTranslation()
             .getNorm();       
     if(hasNote == true){
-        if(aiming == false){
-            if (RobotOdometry.getInstance().getEstimatedPosition().getX() >= Units.inchesToMeters(421.02)
-                && this.alliance == Alliance.Blue) {
-                io.setAngle(angleTreeMap.get(test));
-                io.setShooterWheelBottomVelocity(ShooterConstants.SHOOTER_IDLE_VELOCITY);
-                io.setShooterWheelTopVelocity(ShooterConstants.SHOOTER_IDLE_VELOCITY);
-            } 
-            else if (RobotOdometry.getInstance().getEstimatedPosition().getX()
-                <= Units.inchesToMeters(230.2)
-                && this.alliance == Alliance.Red) {
-                io.setAngle(angleTreeMap.get(RobotOdometry.getInstance().getEstimatedPosition().getX()));
-                io.setShooterWheelBottomVelocity(ShooterConstants.SHOOTER_IDLE_VELOCITY);
-                io.setShooterWheelTopVelocity(ShooterConstants.SHOOTER_IDLE_VELOCITY);
-            } 
-            else {
-                io.setAngle(0);
-            }
+      if(this.inRange() == true){
+        if(scoringPodium == true){
+          io.setShooterWheelBottomVelocity(ShooterConstants.PODIUM_VELOCITY);
+          io.setShooterWheelTopVelocity(ShooterConstants.PODIUM_VELOCITY);
+          io.setAngle(ShooterConstants.PODIUM_ANGLE);
+          }
+        else if(scoringSubwoofer == true){
+          io.setShooterWheelBottomVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
+          io.setShooterWheelTopVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
+          io.setAngle(ShooterConstants.SUBWOOFER_ANGLE);
+          }
+        else if(scoringAmp == true){
+          io.setShooterWheelBottomVelocity(ShooterConstants.AMP_VELOCITY);
+          io.setShooterWheelTopVelocity(ShooterConstants.AMP_VELOCITY);
+          io.setAngle(ShooterConstants.AMP_ANGLE);
+          }
+        else if(aiming == true){
+          io.setShooterWheelBottomVelocity(veloTreeMap.get(RobotOdometry.getInstance().getEstimatedPosition().getX()));
+          io.setShooterWheelTopVelocity(veloTreeMap.get(RobotOdometry.getInstance().getEstimatedPosition().getX()));
+          io.setAngle(angleTreeMap.get(RobotOdometry.getInstance().getEstimatedPosition().getX()));
+          }
+        else{ // not aiming
+          io.setShooterWheelBottomVelocity(ShooterConstants.SHOOTER_IDLE_VELOCITY);
+          io.setShooterWheelTopVelocity(ShooterConstants.SHOOTER_IDLE_VELOCITY);
+          io.setAngle(angleTreeMap.get(test));
+          }
         }
-    }    
-    else{
-      io.setAngle(0);
-    }
-
+      else{ // not in range
+        io.setShooterWheelBottomVelocity(ShooterConstants.SHOOTER_IDLE_VELOCITY);
+        io.setShooterWheelTopVelocity(ShooterConstants.SHOOTER_IDLE_VELOCITY);
+        io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
+        }
+      } 
+    else{ // no note
+      io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
+      }
     this.goToConstantVelocity();
   }
 
@@ -132,16 +157,39 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean readyToShoot() {
-    if(isTopShootAtSetpoint() && isBottomShootAtSetpoint() && isAngleAtSetpoint() && isAimed) {
-      return true;
+    if(autoShooter == false){
+      if(isTopShootAtSetpoint() && isBottomShootAtSetpoint() && isAimed) {
+        return true;
+      }
+      return false;
+    }
+    else{
+      if(isTopShootAtSetpoint() && isBottomShootAtSetpoint() && isAngleAtSetpoint() && isAimed) {
+        return true;
+      }
+      return false;    
+    }
+  }
+
+  public boolean inRange() {
+    if (RobotOdometry.getInstance().getEstimatedPosition().getX() >= Units.inchesToMeters(421.02)
+                && this.alliance == Alliance.Blue) {
+                  return true;
+    }
+    else if (RobotOdometry.getInstance().getEstimatedPosition().getX()
+                <= Units.inchesToMeters(230.2)
+                && this.alliance == Alliance.Red) {
+                  return true;
     }
     return false;
+
+    
   }
 
   public boolean isTopShootAtSetpoint() {
     if (Math.abs(shooterInputs.shootMotorTopVelocityRPS - shooterInputs.shootMotorBottomReferenceVelocityRPS) < VELOCITY_TOLERANCE) {
       topAtSetpointIterationCount++;
-      if (topAtSetpointIterationCount >= SETPOINTCOUNT) {
+      if (topAtSetpointIterationCount >= ShooterConstants.SETPOINTCOUNT) {
         return true;
       }
     } else {
@@ -153,7 +201,7 @@ public class Shooter extends SubsystemBase {
   public boolean isBottomShootAtSetpoint() {
     if (Math.abs(shooterInputs.shootMotorBottomVelocityRPS - shooterInputs.shootMotorBottomReferenceVelocityRPS) < VELOCITY_TOLERANCE) {
       bottomAtSetpointIterationCount++;
-      if (bottomAtSetpointIterationCount >= SETPOINTCOUNT) {
+      if (bottomAtSetpointIterationCount >= ShooterConstants.SETPOINTCOUNT) {
         return true;
       }
     } else {
@@ -165,7 +213,7 @@ public class Shooter extends SubsystemBase {
   public boolean isAngleAtSetpoint() {
     if (Math.abs(shooterInputs.angleMotorReferenceAngleDegrees - shooterInputs.angleEncoderAngleDegrees) < ANGLE_TOLERANCE) {
       angleAtSetpointIterationCount++;
-      if (angleAtSetpointIterationCount >= SETPOINTCOUNT) {
+      if (angleAtSetpointIterationCount >= ShooterConstants.SETPOINTCOUNT) {
         return true;
       }
     } else {
