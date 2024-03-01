@@ -12,12 +12,14 @@ import frc.lib.team3061.drivetrain.Drivetrain;
 import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Field2d;
+import frc.robot.subsystems.intake.Intake;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
 
   private ShooterIO io;
+  private Intake intake;
   private Alliance alliance = Alliance.Red;
   private InterpolatingDoubleTreeMap angleTreeMap;
   private InterpolatingDoubleTreeMap veloTreeMap;
@@ -42,8 +44,9 @@ public class Shooter extends SubsystemBase {
   private int bottomAtSetpointIterationCount = 0;
   private int angleAtSetpointIterationCount = 0;
 
-  public Shooter(ShooterIO io, Drivetrain drivetrain) { // TODO: Add intake reference
+  public Shooter(ShooterIO io, Drivetrain drivetrain, Intake intake) {
     this.io = io;
+    this.intake = intake;
     this.angleTreeMap = new InterpolatingDoubleTreeMap();
     this.veloTreeMap = new InterpolatingDoubleTreeMap();
 

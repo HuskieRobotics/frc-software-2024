@@ -43,6 +43,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -125,6 +126,7 @@ public class RobotContainer {
 
       // FIXME: connect to shooter's boolean supplier
       intake = new Intake(new IntakeIO() {}, () -> true);
+      shooter = new Shooter(new ShooterIO() {}, drivetrain, intake);
 
       String[] cameraNames = config.getCameraNames();
       VisionIO[] visionIOs = new VisionIO[cameraNames.length];
@@ -168,7 +170,7 @@ public class RobotContainer {
 
     // FIXME: connect to shooter's boolean supplier
     intake = new Intake(new IntakeIOTalonFX(), () -> true);
-    shooter = new Shooter(new ShooterIOTalonFX() {}, drivetrain);
+    shooter = new Shooter(new ShooterIOTalonFX(), drivetrain, intake);
 
     String[] cameraNames = config.getCameraNames();
     VisionIO[] visionIOs = new VisionIO[cameraNames.length];
@@ -216,6 +218,7 @@ public class RobotContainer {
 
     // FIXME: connect to shooter's boolean supplier
     intake = new Intake(new IntakeIOTalonFX(), () -> true);
+    shooter = new Shooter(new ShooterIOTalonFX(), drivetrain, intake);
 
     if (Constants.getRobot() == Constants.RobotType.ROBOT_SIMBOT) {
       vision = new Vision(new VisionIO[] {new VisionIO() {}});
@@ -241,6 +244,7 @@ public class RobotContainer {
 
     // FIXME: connect to shooter's boolean supplier
     intake = new Intake(new IntakeIOTalonFX(), () -> true);
+    shooter = new Shooter(new ShooterIOTalonFX(), drivetrain, intake);
 
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
   }
@@ -249,6 +253,7 @@ public class RobotContainer {
     // change the following to connect the subsystem being tested to actual hardware
     drivetrain = new Drivetrain(new DrivetrainIO() {});
     intake = new Intake(new IntakeIO() {}, () -> true);
+    shooter = new Shooter(new ShooterIO() {}, drivetrain, intake);
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
   }
 
