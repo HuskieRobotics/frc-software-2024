@@ -15,15 +15,25 @@ public class Intake extends SubsystemBase {
   private static final String SUBSYSTEM_NAME = "INTAKE";
 
   private final IntakeIO io;
+  private final BooleanSupplier isShooterAngleReady;
+
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
   private final LEDs leds;
 
   private final IntakeMotor[] intakeMotors = {
-    IntakeMotor.RIGHT_ROLLER, IntakeMotor.KICKER,
+    IntakeMotor.ROLLER, IntakeMotor.KICKER,
   };
 
+  private IntakeState intakeState;
+  private boolean automationEnabled;
+  private boolean hasNote;
+
+  // system tests
+  private IntakeState mostRecentIntakeState;
+  private boolean checkComplete;
+
   enum IntakeMotor {
-    RIGHT_ROLLER,
+    ROLLER,
     KICKER
   }
 
@@ -36,21 +46,16 @@ public class Intake extends SubsystemBase {
     NOTE_IN_SHOOTER
   }
 
-  private IntakeState intakeState;
-  private IntakeState mostRecentIntakeState;
-  private boolean checkComplete;
-  private boolean automationEnabled;
-  private boolean hasNote;
-  private BooleanSupplier isShooterAngleReady;
-
   public Intake(IntakeIO io, BooleanSupplier isShooterAngleReady) {
     this.io = io;
+    this.isShooterAngleReady = isShooterAngleReady;
+
     leds = LEDs.getInstance();
     intakeState = IntakeState.EMPTY;
+    automationEnabled = true;
+
     mostRecentIntakeState = null;
     checkComplete = false;
-    automationEnabled = true;
-    this.isShooterAngleReady = isShooterAngleReady;
 
     leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
     this.intakeGamePiece();
@@ -139,11 +144,11 @@ public class Intake extends SubsystemBase {
     checkComplete = true;
   }
 
-  public void setCheckIncomplete() {
+  private void setCheckIncomplete() {
     checkComplete = false;
   }
 
-  public boolean checkComplete() {
+  private boolean checkComplete() {
     return checkComplete;
   }
 
@@ -182,7 +187,7 @@ public class Intake extends SubsystemBase {
   }
 
   private void checkMotorVelocity(IntakeMotor motor) {
-    if (motor == IntakeMotor.RIGHT_ROLLER) {
+    if (motor == IntakeMotor.ROLLER) {
       if (Math.abs(inputs.rollerVelocityRPS - inputs.rollerReferenceVelocityRPS)
           > IntakeConstants.ROLLER_VELOCITY_TOLERANCE) {
         if (Math.abs(inputs.rollerVelocityRPS) > Math.abs(inputs.rollerReferenceVelocityRPS)) {
@@ -249,10 +254,6 @@ public class Intake extends SubsystemBase {
 
   public boolean automationEnabled() {
     return automationEnabled;
-  }
-
-  public boolean runningManualIntake() {
-    return !automationEnabled && Math.abs(inputs.rollerReferenceVelocityRPS) > 0.01;
   }
 
   public void enableAutomation() {
