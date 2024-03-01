@@ -50,7 +50,7 @@ public class IntakeConstants {
 
   public static final double KICKER_CONTINUOUS_STATOR_CURRENT_LIMIT = 30.0;
 
-  public static final boolean ROLLER_MOTOR_INVERTED = true;
+  public static final boolean ROLLER_MOTOR_INVERTED = false;
   public static final boolean KICKER_MOTOR_INVERTED = false;
 
   public static final double ROLLERS_SENSOR_TO_MECHANISM_RATIO = 5.0 / 4.0;
