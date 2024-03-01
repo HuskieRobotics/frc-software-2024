@@ -15,8 +15,6 @@ public class IntakeConstants {
   public static final int INTAKE_KICKER_IR_SENSOR_ID = 1;
   public static final int INTAKE_SHOOTER_IR_SENSOR_ID = 2;
 
-  // add all current limiting
-
   public static final double INTAKE_ROLLER_MOTORS_KP = 10.0;
   public static final double INTAKE_ROLLER_MOTORS_KI = 0.0;
   public static final double INTAKE_ROLLER_MOTORS_KD = 0.0;
@@ -29,6 +27,7 @@ public class IntakeConstants {
 
   // velocities
 
+  // FIXME: match linear speed of intake and kicker
   public static final double INTAKE_VELOCITY_ROLLERS_RPS = 40.0;
   public static final double REPEL_VELOCITY_ROLLERS_RPS = -40.0;
   public static final double KICKER_VELOCITY_RPS = 6.0;
@@ -53,5 +52,9 @@ public class IntakeConstants {
   public static final boolean ROLLER_MOTOR_INVERTED = false;
   public static final boolean KICKER_MOTOR_INVERTED = false;
 
+  // FIXME: check if this has changed
   public static final double ROLLERS_SENSOR_TO_MECHANISM_RATIO = 5.0 / 4.0;
+
+  // FIXME: check gear ratio
+  public static final double KICKER_SENSOR_TO_MECHANISM_RATIO = 1.0;
 }
