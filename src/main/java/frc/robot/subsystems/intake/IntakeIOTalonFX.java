@@ -48,6 +48,9 @@ public class IntakeIOTalonFX implements IntakeIO {
   private StatusSignal<Double> rollerTemperatureStatusSignal;
   private StatusSignal<Double> kickerTemperatureStatusSignal;
 
+  private StatusSignal<Double> rollerVoltageStatusSignal;
+  private StatusSignal<Double> kickerVoltageStatusSignal;
+
   // simulation related
   private VelocitySystemSim rollerMotorSim;
   private VelocitySystemSim kickerMotorSim;
@@ -112,6 +115,9 @@ public class IntakeIOTalonFX implements IntakeIO {
     rollerTemperatureStatusSignal = rollerMotor.getDeviceTemp();
     kickerTemperatureStatusSignal = kickerMotor.getDeviceTemp();
 
+    rollerVoltageStatusSignal = rollerMotor.getMotorVoltage();
+    kickerVoltageStatusSignal = kickerMotor.getMotorVoltage();
+
     this.rollerMotorSim =
         new VelocitySystemSim(
             rollerMotor,
@@ -120,7 +126,12 @@ public class IntakeIOTalonFX implements IntakeIO {
             0.001,
             ROLLERS_SENSOR_TO_MECHANISM_RATIO);
     this.kickerMotorSim =
-        new VelocitySystemSim(kickerMotor, IntakeConstants.KICKER_MOTOR_INVERTED, 1.0, 0.3, 1.0);
+        new VelocitySystemSim(
+            kickerMotor,
+            IntakeConstants.KICKER_MOTOR_INVERTED,
+            1.0,
+            0.3,
+            KICKER_SENSOR_TO_MECHANISM_RATIO);
   }
 
   @Override
@@ -138,7 +149,9 @@ public class IntakeIOTalonFX implements IntakeIO {
         kickerVelocityStatusSignal,
         kickerReferenceVelocityStatusSignal,
         rollerTemperatureStatusSignal,
-        kickerTemperatureStatusSignal);
+        kickerTemperatureStatusSignal,
+        rollerVoltageStatusSignal,
+        kickerVoltageStatusSignal);
 
     inputs.isRollerIRBlocked = !rollerIRSensor.get();
     inputs.isKickerIRBlocked = !kickerIRSensor.get();
@@ -158,6 +171,9 @@ public class IntakeIOTalonFX implements IntakeIO {
 
     inputs.rollerTempCelcius = rollerTemperatureStatusSignal.getValueAsDouble();
     inputs.kickerTempCelcius = kickerTemperatureStatusSignal.getValueAsDouble();
+
+    inputs.rollerVoltage = rollerVoltageStatusSignal.getValueAsDouble();
+    inputs.kickerVoltage = kickerVoltageStatusSignal.getValueAsDouble();
 
     if (rollerMotorsKP.hasChanged()
         || rollerMotorsKI.hasChanged()
@@ -232,12 +248,10 @@ public class IntakeIOTalonFX implements IntakeIO {
         IntakeConstants.ROLLERS_SENSOR_TO_MECHANISM_RATIO;
 
     StatusCode status = StatusCode.StatusCodeNotInitialized;
-    status = rollerMotor.getConfigurator().apply(rollerConfig);
-
-    if (status != StatusCode.OK) {
-      configAlert.set(false);
+    for (int i = 0; i < 5; ++i) {
+      status = rollerMotor.getConfigurator().apply(rollerConfig);
+      if (status.isOK()) break;
     }
-
     if (!status.isOK()) {
       configAlert.set(true);
       configAlert.setText(status.toString());
@@ -272,15 +286,13 @@ public class IntakeIOTalonFX implements IntakeIO {
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
 
-    kickerMotor.getConfigurator().apply(kickerConfig);
+    kickerConfig.Feedback.SensorToMechanismRatio = IntakeConstants.KICKER_SENSOR_TO_MECHANISM_RATIO;
 
     StatusCode status = StatusCode.StatusCodeNotInitialized;
-    status = rollerMotor.getConfigurator().apply(kickerConfig);
-
-    if (status != StatusCode.OK) {
-      configAlert.set(false);
+    for (int i = 0; i < 5; ++i) {
+      status = kickerMotor.getConfigurator().apply(kickerConfig);
+      if (status.isOK()) break;
     }
-
     if (!status.isOK()) {
       configAlert.set(true);
       configAlert.setText(status.toString());
