@@ -11,12 +11,12 @@ import frc.lib.team3061.drivetrain.swerve.SwerveConstants;
  * Refer to the README for how to represent your robot's configuration. For more information on
  * these methods, refer to the documentation in the RobotConfig class.
  */
-public class NovaCTRERobotConfig extends RobotConfig {
+public class GenericDrivetrainRobotConfig extends RobotConfig {
 
   private static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 13;
   private static final int FRONT_LEFT_MODULE_STEER_MOTOR = 12;
   private static final int FRONT_LEFT_MODULE_STEER_ENCODER = 14;
-  private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = -0.22591;
+  private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = 0.27409;
 
   private static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 16;
   private static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 15;
@@ -26,7 +26,7 @@ public class NovaCTRERobotConfig extends RobotConfig {
   private static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 7;
   private static final int BACK_LEFT_MODULE_STEER_MOTOR = 6;
   private static final int BACK_LEFT_MODULE_STEER_ENCODER = 8;
-  private static final double BACK_LEFT_MODULE_STEER_OFFSET_ROT = 0.327393;
+  private static final double BACK_LEFT_MODULE_STEER_OFFSET_ROT = 0.827393;
 
   private static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 10;
   private static final int BACK_RIGHT_MODULE_STEER_MOTOR = 9;
@@ -52,7 +52,7 @@ public class NovaCTRERobotConfig extends RobotConfig {
   private static final double ANGLE_KA = 0.001663333333;
 
   /* Drive Motor PID Values */
-  private static final double DRIVE_KP = 0.3;
+  private static final double DRIVE_KP = 0.005;
   private static final double DRIVE_KI = 0.0;
   private static final double DRIVE_KD = 0.0;
 
@@ -108,6 +108,11 @@ public class NovaCTRERobotConfig extends RobotConfig {
   private static final double DRIVE_TO_POSE_THETA_TOLERANCE_RADIANS = 0.008;
 
   private static final double SQUARING_SPEED_METERS_PER_SECOND = 1.0;
+
+  // Drive Facing Angle constants
+  private static final double DRIVE_FACING_ANGLE_KP = 7.0;
+  private static final double DRIVE_FACING_ANGLE_KD = 0.1;
+  private static final double DRIVE_FACING_ANGLE_KI = 0.0;
 
   private static final int LED_COUNT = 85;
 
@@ -168,9 +173,7 @@ public class NovaCTRERobotConfig extends RobotConfig {
 
   @Override
   public double getDriveKV() {
-    return DRIVE_KV
-        / (getSwerveConstants().getDriveGearRatio()
-            / (getWheelDiameterMeters() * Math.PI)); // convert from V/(m/s) to V/(rotations/s)
+    return DRIVE_KV;
   }
 
   @Override
@@ -401,8 +404,18 @@ public class NovaCTRERobotConfig extends RobotConfig {
   }
 
   @Override
-  public double getOdometryUpdateFrequency() {
-    return 250.0;
+  public double getDriveFacingAngleThetaKP() {
+    return DRIVE_FACING_ANGLE_KP;
+  }
+
+  @Override
+  public double getDriveFacingAngleThetaKI() {
+    return DRIVE_FACING_ANGLE_KI;
+  }
+
+  @Override
+  public double getDriveFacingAngleThetaKD() {
+    return DRIVE_FACING_ANGLE_KD;
   }
 
   @Override
@@ -413,15 +426,5 @@ public class NovaCTRERobotConfig extends RobotConfig {
   @Override
   public int getLEDCount() {
     return LED_COUNT;
-  }
-
-  @Override
-  public SWERVE_CONTROL_MODE getSwerveSteerControlMode() {
-    return SWERVE_CONTROL_MODE.VOLTAGE;
-  }
-
-  @Override
-  public SWERVE_CONTROL_MODE getSwerveDriveControlMode() {
-    return SWERVE_CONTROL_MODE.VOLTAGE;
   }
 }

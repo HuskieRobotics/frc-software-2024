@@ -101,6 +101,39 @@ public abstract class SwerveConstants {
         }
       };
 
+  public static final SwerveConstants MK4I_L3_PLUS_CONSTANTS =
+      new SwerveConstants() {
+        @Override
+        public double getDriveGearRatio() {
+          return MK4I_L3_PLUS_DRIVE_GEAR_RATIO;
+        }
+
+        @Override
+        public boolean isDriveMotorInverted() {
+          return MK4I_L3_DRIVE_MOTOR_INVERTED;
+        }
+
+        @Override
+        public double getAngleGearRatio() {
+          return MK4I_L3_ANGLE_GEAR_RATIO;
+        }
+
+        @Override
+        public boolean isAngleMotorInverted() {
+          return MK4I_L3_ANGLE_MOTOR_INVERTED;
+        }
+
+        @Override
+        public boolean isCanCoderInverted() {
+          return MK4I_L3_CAN_CODER_INVERTED;
+        }
+      };
+
+  /* MK4i L3 */
+
+  private static final double MK4I_L3_PLUS_DRIVE_GEAR_RATIO =
+      1 / ((16.0 / 50.0) * (28.0 / 16.0) * (15.0 / 45.0));
+
   /* MK4i L3 */
 
   private static final double MK4I_L3_DRIVE_GEAR_RATIO =

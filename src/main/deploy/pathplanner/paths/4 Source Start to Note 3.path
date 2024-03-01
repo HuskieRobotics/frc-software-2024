@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.07,
-        "y": 0.35
+        "x": 0.7543128599770712,
+        "y": 4.465191633085969
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.032598742489299,
-        "y": 1.5003928289753987
+        "x": 1.891411350390268,
+        "y": 4.123137615644601
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.09,
-        "y": 5.12
+        "x": 1.921224533861004,
+        "y": 4.118285254401658
       },
       "prevControl": {
-        "x": 7.9145159926757644,
-        "y": 5.128956505191789
+        "x": 1.8174537249975398,
+        "y": 4.123137615644601
       },
       "nextControl": {
-        "x": 6.171790774137104,
-        "y": 5.110025729310719
+        "x": 2.0722860710450406,
+        "y": 4.111221561284497
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.07,
-        "y": 0.35
+        "x": 2.630987604317551,
+        "y": 4.118285254401658
       },
       "prevControl": {
-        "x": 8.03418141452981,
-        "y": 1.4990666646784665
+        "x": 2.108876873960719,
+        "y": 4.129853230594379
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,27 +47,17 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 1.0,
-      "rotationDegrees": -90.0,
-      "rotateFast": true
-    },
-    {
-      "waypointRelativePos": 0,
       "rotationDegrees": 90.0,
       "rotateFast": false
-    },
-    {
-      "waypointRelativePos": 2.0,
-      "rotationDegrees": 90.0,
-      "rotateFast": true
     }
   ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
-    "maxAcceleration": 10.0,
-    "maxAngularVelocity": 561.96,
-    "maxAngularAcceleration": 2066.2
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
@@ -75,9 +65,9 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Tuning",
+  "folder": "4 Note Source-Side Wing",
   "previewStartingState": {
-    "rotation": 90.0,
+    "rotation": 120.34324888423957,
     "velocity": 0
   },
   "useDefaultConstraints": false
