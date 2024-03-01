@@ -9,6 +9,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -24,11 +25,8 @@ import frc.lib.team3061.drivetrain.DrivetrainIOCTRE;
 import frc.lib.team3061.drivetrain.DrivetrainIOGeneric;
 import frc.lib.team3061.drivetrain.swerve.SwerveModuleIO;
 import frc.lib.team3061.drivetrain.swerve.SwerveModuleIOTalonFXPhoenix6;
-import frc.lib.team3061.gyro.GyroIO;
 import frc.lib.team3061.gyro.GyroIOPigeon2Phoenix6;
 import frc.lib.team3061.leds.LEDs;
-import frc.lib.team3061.pneumatics.Pneumatics;
-import frc.lib.team3061.pneumatics.PneumaticsIORev;
 import frc.lib.team3061.vision.Vision;
 import frc.lib.team3061.vision.VisionConstants;
 import frc.lib.team3061.vision.VisionIO;
@@ -37,10 +35,8 @@ import frc.lib.team3061.vision.VisionIOSim;
 import frc.lib.team6328.util.NoteVisualizer;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
-import frc.robot.configs.DefaultRobotConfig;
-import frc.robot.configs.NovaCTRERobotConfig;
-import frc.robot.configs.NovaCTRETCFRobotConfig;
-import frc.robot.configs.NovaRobotConfig;
+import frc.robot.configs.GenericDrivetrainRobotConfig;
+import frc.robot.configs.PracticeBoardConfig;
 import frc.robot.configs.PracticeRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
@@ -48,6 +44,9 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 import frc.robot.subsystems.subsystem.Subsystem;
 import frc.robot.subsystems.subsystem.SubsystemIO;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -66,8 +65,8 @@ public class RobotContainer {
   private Drivetrain drivetrain;
   private Alliance lastAlliance = DriverStation.Alliance.Red;
   private Vision vision;
-  private Subsystem subsystem;
   private Shooter shooter;
+  private Intake intake;
 
   // use AdvantageKit's LoggedDashboardChooser instead of SendableChooser to ensure accurate logging
   private final LoggedDashboardChooser<Command> autoChooser =
@@ -98,15 +97,17 @@ public class RobotContainer {
     if (Constants.getMode() != Mode.REPLAY) {
 
       switch (Constants.getRobot()) {
-        case ROBOT_2023_NOVA_CTRE:
-        case ROBOT_2023_NOVA_CTRE_FOC:
+        case ROBOT_PRACTICE_BOARD:
+          {
+            createPracticeBoardSubsystem();
+            break;
+          }
         case ROBOT_PRACTICE:
+        case ROBOT_COMPETITION:
           {
             createCTRESubsystems();
             break;
           }
-        case ROBOT_DEFAULT:
-        case ROBOT_2023_NOVA:
         case ROBOT_SIMBOT:
           {
             createSubsystems();
@@ -125,13 +126,15 @@ public class RobotContainer {
     } else {
       drivetrain = new Drivetrain(new DrivetrainIO() {});
 
+      // FIXME: connect to shooter's boolean supplier
+      intake = new Intake(new IntakeIO() {}, () -> true);
+
       String[] cameraNames = config.getCameraNames();
       VisionIO[] visionIOs = new VisionIO[cameraNames.length];
       for (int i = 0; i < visionIOs.length; i++) {
         visionIOs[i] = new VisionIO() {};
       }
       vision = new Vision(visionIOs);
-      subsystem = new Subsystem(new SubsystemIO() {});
     }
 
     // disable all telemetry in the LiveWindow to reduce the processing during each iteration
@@ -150,29 +153,25 @@ public class RobotContainer {
    */
   private void createRobotConfig() {
     switch (Constants.getRobot()) {
-      case ROBOT_DEFAULT:
-        config = new DefaultRobotConfig();
-        break;
-      case ROBOT_2023_NOVA_CTRE:
-      case ROBOT_SIMBOT_CTRE:
-        config = new NovaCTRERobotConfig();
-        break;
-      case ROBOT_2023_NOVA_CTRE_FOC:
-        config = new NovaCTRETCFRobotConfig();
-        break;
-      case ROBOT_2023_NOVA:
       case ROBOT_SIMBOT:
-        config = new NovaRobotConfig();
+        config = new GenericDrivetrainRobotConfig();
         break;
+      case ROBOT_SIMBOT_CTRE:
       case ROBOT_PRACTICE:
+      case ROBOT_COMPETITION:
         config = new PracticeRobotConfig();
         break;
+      case ROBOT_PRACTICE_BOARD:
+        config = new PracticeBoardConfig();
     }
   }
 
   private void createCTRESubsystems() {
-    DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
-    drivetrain = new Drivetrain(drivetrainIO);
+    drivetrain = new Drivetrain(new DrivetrainIOCTRE());
+
+    // FIXME: connect to shooter's boolean supplier
+    intake = new Intake(new IntakeIOTalonFX(), () -> true);
+    shooter = new Shooter(new ShooterIOTalonFX() {});
 
     String[] cameraNames = config.getCameraNames();
     VisionIO[] visionIOs = new VisionIO[cameraNames.length];
@@ -186,11 +185,6 @@ public class RobotContainer {
       visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout);
     }
     vision = new Vision(visionIOs);
-
-    // shooter = new Shooter(new ShooterIOTalonFX() {});
-
-    // FIXME: create the hardware-specific subsystem class
-    subsystem = new Subsystem(new SubsystemIO() {});
   }
 
   private void createSubsystems() {
@@ -214,33 +208,20 @@ public class RobotContainer {
         new SwerveModuleIOTalonFXPhoenix6(
             3, driveMotorCANIDs[3], steerMotorCANDIDs[3], steerEncoderCANDIDs[3], steerOffsets[3]);
 
-    GyroIO gyro = new GyroIOPigeon2Phoenix6(config.getGyroCANID());
-    DrivetrainIO drivetrainIO =
-        new DrivetrainIOGeneric(gyro, flModule, frModule, blModule, brModule);
-    drivetrain = new Drivetrain(drivetrainIO);
+    drivetrain =
+        new Drivetrain(
+            new DrivetrainIOGeneric(
+                new GyroIOPigeon2Phoenix6(config.getGyroCANID()),
+                flModule,
+                frModule,
+                blModule,
+                brModule));
 
-    // FIXME: create the hardware-specific subsystem class
-    subsystem = new Subsystem(new SubsystemIO() {});
-
-    if (Constants.getRobot() == Constants.RobotType.ROBOT_DEFAULT) {
-      new Pneumatics(new PneumaticsIORev());
-    }
+    // FIXME: connect to shooter's boolean supplier
+    intake = new Intake(new IntakeIOTalonFX(), () -> true);
 
     if (Constants.getRobot() == Constants.RobotType.ROBOT_SIMBOT) {
-      AprilTagFieldLayout layout;
-      try {
-        layout = new AprilTagFieldLayout(VisionConstants.APRILTAG_FIELD_LAYOUT_PATH);
-      } catch (IOException e) {
-        layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
-      }
-      vision =
-          new Vision(
-              new VisionIO[] {
-                new VisionIOSim(
-                    layout,
-                    drivetrain::getPose,
-                    RobotConfig.getInstance().getRobotToCameraTransforms()[0])
-              });
+      vision = new Vision(new VisionIO[] {new VisionIO() {}});
     } else {
       String[] cameraNames = config.getCameraNames();
       VisionIO[] visionIOs = new VisionIO[cameraNames.length];
@@ -260,17 +241,23 @@ public class RobotContainer {
   private void createCTRESimSubsystems() {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
-    // shooter = new Shooter(new ShooterIOTalonFX() {});
-    vision = new Vision(new VisionIO[] {new VisionIO() {}});
 
-    // FIXME: create the hardware-specific subsystem class
+    // FIXME: connect to shooter's boolean supplier
+    intake = new Intake(new IntakeIOTalonFX(), () -> true);
+
+    vision = new Vision(new VisionIO[] {new VisionIO() {}});
+  }
+
+  private void createPracticeBoardSubsystem() {
+    // change the following to connect the subsystem being tested to actual hardware
+    drivetrain = new Drivetrain(new DrivetrainIO() {});
+    intake = new Intake(new IntakeIO() {}, () -> true);
+    vision = new Vision(new VisionIO[] {new VisionIO() {}});
   }
 
   /**
    * Creates the field from the defined regions and transition points from one region to its
    * neighbor. The field is used to generate paths.
-   *
-   * <p>FIXME: update for 2024 regions
    */
   private void constructField() {
     Field2d.getInstance().setRegions(new Region2d[] {});
@@ -304,7 +291,7 @@ public class RobotContainer {
 
     configureDrivetrainCommands();
 
-    configureSubsystemCommands();
+    configureIntakeCommands();
 
     configureVisionCommands();
 
@@ -340,7 +327,6 @@ public class RobotContainer {
         .onTrue(
             Commands.parallel(
                 Commands.runOnce(drivetrain::disableXstance),
-                Commands.runOnce(() -> subsystem.setMotorPower(0)),
                 new TeleopSwerve(drivetrain, oi::getTranslateX, oi::getTranslateY, oi::getRotate)));
   }
 
@@ -465,6 +451,45 @@ public class RobotContainer {
     Shuffleboard.getTab("MAIN").add(autoChooser.getSendableChooser());
   }
 
+  private void configureIntakeCommands() {
+    oi.getIntakeAutomationSwitch().onTrue(Commands.runOnce(intake::enableAutomation, intake));
+
+    oi.getIntakeAutomationSwitch()
+        .onFalse(
+            Commands.parallel(
+                Commands.runOnce(intake::disableAutomation, intake),
+                Commands.runOnce(intake::turnIntakeOff),
+                Commands.runOnce(intake::turnKickerOff)));
+
+    oi.getRunIntakeButton()
+        .and(() -> !intake.automationEnabled())
+        .whileTrue(
+            Commands.parallel(
+                    Commands.run(intake::intakeGamePiece),
+                    Commands.run(intake::transitionGamePiece))
+                .withName("ManualIntakeOn"));
+
+    oi.getRunIntakeButton()
+        .and(() -> !intake.automationEnabled())
+        .onFalse(
+            Commands.sequence(
+                    Commands.runOnce(intake::turnIntakeOff),
+                    Commands.runOnce(intake::turnKickerOff))
+                .withName("ManualIntakeOff"));
+
+    oi.getOuttakeAllButton()
+        .and(() -> !intake.automationEnabled())
+        .whileTrue(Commands.run(intake::outtakeAll).withName("ManualOuttakeOn"));
+
+    oi.getOuttakeAllButton()
+        .and(() -> !intake.automationEnabled())
+        .onFalse(
+            Commands.sequence(
+                    Commands.runOnce(intake::turnIntakeOff),
+                    Commands.runOnce(intake::turnKickerOff))
+                .withName("ManualOuttakeOff"));
+  }
+
   private void configureDrivetrainCommands() {
     /*
      * Set up the default command for the drivetrain. The joysticks' values map to percentage of the
@@ -491,6 +516,23 @@ public class RobotContainer {
                             && drivetrain.getPose().getRotation().getDegrees() < 90)
                         ? Rotation2d.fromDegrees(0.0)
                         : Rotation2d.fromDegrees(180.0)));
+
+    oi.getLockToSpeakerButton()
+        .whileTrue(
+            new TeleopSwerve(
+                drivetrain,
+                oi::getTranslateX,
+                oi::getTranslateY,
+                () -> {
+                  Transform2d translation =
+                      new Transform2d(
+                          Field2d.getInstance().getAllianceSpeakerCenter().getX()
+                              - drivetrain.getPose().getX(),
+                          Field2d.getInstance().getAllianceSpeakerCenter().getY()
+                              - drivetrain.getPose().getY(),
+                          new Rotation2d());
+                  return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
+                }));
 
     // field-relative toggle
     oi.getFieldRelativeButton()
@@ -525,10 +567,6 @@ public class RobotContainer {
     // turbo
     oi.getTurboButton().onTrue(Commands.runOnce(drivetrain::enableTurbo, drivetrain));
     oi.getTurboButton().onFalse(Commands.runOnce(drivetrain::disableTurbo, drivetrain));
-  }
-
-  private void configureSubsystemCommands() {
-    // FIXME: add commands for the subsystem
   }
 
   private void configureVisionCommands() {

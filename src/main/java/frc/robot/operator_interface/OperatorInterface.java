@@ -25,6 +25,18 @@ public interface OperatorInterface {
     return 0.0;
   }
 
+  public default Trigger getIntakeAutomationSwitch() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getRunIntakeButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getOuttakeAllButton() {
+    return new Trigger(() -> false);
+  }
+
   public default Trigger getFieldRelativeButton() {
     return new Trigger(() -> false);
   }
@@ -66,6 +78,10 @@ public interface OperatorInterface {
   }
 
   public default Trigger getShootButton() {
+    return new Trigger(() -> false);
+  }
+  
+  public default Trigger getLockToSpeakerButton() {
     return new Trigger(() -> false);
   }
 }
