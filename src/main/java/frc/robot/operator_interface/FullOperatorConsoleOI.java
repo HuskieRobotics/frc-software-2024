@@ -122,7 +122,7 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   public Trigger getShootButton() {
     return new Trigger(operatorController::getAButton);
   }
-  
+
   public Trigger getIntakeAutomationSwitch() {
     return operatorPanelButtons[12];
   }
