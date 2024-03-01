@@ -24,6 +24,9 @@ public interface IntakeIO {
 
     double rollerTempCelcius = 0;
     double kickerTempCelcius = 0;
+
+    double rollerVoltage = 0;
+    double kickerVoltage = 0;
   }
 
   public default void updateInputs(IntakeIOInputs inputs) {}
