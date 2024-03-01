@@ -59,7 +59,6 @@ public class RobotContainer {
   private Alliance lastAlliance = DriverStation.Alliance.Red;
   private Vision vision;
   private Intake intake;
-  private LEDs leds;
 
   // use AdvantageKit's LoggedDashboardChooser instead of SendableChooser to ensure accurate logging
   private final LoggedDashboardChooser<Command> autoChooser =
@@ -84,7 +83,7 @@ public class RobotContainer {
      */
     createRobotConfig();
 
-    leds = LEDs.getInstance();
+    LEDs.getInstance();
 
     // create real, simulated, or replay subsystems based on the mode and robot specified
     if (Constants.getMode() != Mode.REPLAY) {
@@ -443,7 +442,7 @@ public class RobotContainer {
             Commands.parallel(
                     Commands.run(intake::intakeGamePiece),
                     Commands.run(intake::transitionGamePiece))
-                .withName("TurnIntakeOn"));
+                .withName("ManualIntakeOn"));
 
     oi.getRunIntakeButton()
         .and(() -> !intake.automationEnabled())
@@ -451,11 +450,11 @@ public class RobotContainer {
             Commands.sequence(
                     Commands.runOnce(intake::turnIntakeOff),
                     Commands.runOnce(intake::turnKickerOff))
-                .withName("TurnIntakeOff"));
+                .withName("ManualIntakeOff"));
 
     oi.getOuttakeAllButton()
         .and(() -> !intake.automationEnabled())
-        .whileTrue(Commands.run(intake::outtakeAll).withName("TurnIntakeOff"));
+        .whileTrue(Commands.run(intake::outtakeAll).withName("ManualOuttakeOn"));
 
     oi.getOuttakeAllButton()
         .and(() -> !intake.automationEnabled())
@@ -463,7 +462,7 @@ public class RobotContainer {
             Commands.sequence(
                     Commands.runOnce(intake::turnIntakeOff),
                     Commands.runOnce(intake::turnKickerOff))
-                .withName("TurnOutakeOff"));
+                .withName("ManualOuttakeOff"));
   }
 
   private void configureDrivetrainCommands() {
