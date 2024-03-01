@@ -15,7 +15,6 @@ public class Intake extends SubsystemBase {
   private static final String SUBSYSTEM_NAME = "INTAKE";
 
   private final IntakeIO io;
-  private final BooleanSupplier isShooterAngleReady;
 
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
   private final LEDs leds;
@@ -23,6 +22,8 @@ public class Intake extends SubsystemBase {
   private final IntakeMotor[] intakeMotors = {
     IntakeMotor.ROLLER, IntakeMotor.KICKER,
   };
+
+  private BooleanSupplier isShooterAngleReady;
 
   private IntakeState intakeState;
   private boolean automationEnabled;
@@ -46,9 +47,8 @@ public class Intake extends SubsystemBase {
     NOTE_IN_SHOOTER
   }
 
-  public Intake(IntakeIO io, BooleanSupplier isShooterAngleReady) {
+  public Intake(IntakeIO io) {
     this.io = io;
-    this.isShooterAngleReady = isShooterAngleReady;
 
     leds = LEDs.getInstance();
     intakeState = IntakeState.EMPTY;
@@ -61,6 +61,10 @@ public class Intake extends SubsystemBase {
     this.intakeGamePiece();
 
     FaultReporter.getInstance().registerSystemCheck(SUBSYSTEM_NAME, getSystemCheckCommand());
+  }
+
+  public void setShooterAngleReady(BooleanSupplier isShooterAngleReady) {
+    this.isShooterAngleReady = isShooterAngleReady;
   }
 
   @Override
@@ -145,7 +149,6 @@ public class Intake extends SubsystemBase {
   }
 
   private void runNoteInShooterState() {
-    // TODO: Set up access of shooter angle
     if (!inputs.isShooterIRBlocked) {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);

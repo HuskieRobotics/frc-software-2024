@@ -124,9 +124,9 @@ public class RobotContainer {
     } else {
       drivetrain = new Drivetrain(new DrivetrainIO() {});
 
-      // FIXME: connect to shooter's boolean supplier
-      intake = new Intake(new IntakeIO() {}, () -> true);
+      intake = new Intake(new IntakeIO() {});
       shooter = new Shooter(new ShooterIO() {}, drivetrain, intake);
+      intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
       String[] cameraNames = config.getCameraNames();
       VisionIO[] visionIOs = new VisionIO[cameraNames.length];
@@ -168,9 +168,9 @@ public class RobotContainer {
   private void createCTRESubsystems() {
     drivetrain = new Drivetrain(new DrivetrainIOCTRE());
 
-    // FIXME: connect to shooter's boolean supplier
-    intake = new Intake(new IntakeIOTalonFX(), () -> true);
+    intake = new Intake(new IntakeIOTalonFX());
     shooter = new Shooter(new ShooterIOTalonFX(), drivetrain, intake);
+    intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
     String[] cameraNames = config.getCameraNames();
     VisionIO[] visionIOs = new VisionIO[cameraNames.length];
@@ -216,9 +216,9 @@ public class RobotContainer {
                 blModule,
                 brModule));
 
-    // FIXME: connect to shooter's boolean supplier
-    intake = new Intake(new IntakeIOTalonFX(), () -> true);
+    intake = new Intake(new IntakeIOTalonFX());
     shooter = new Shooter(new ShooterIOTalonFX(), drivetrain, intake);
+    intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
     if (Constants.getRobot() == Constants.RobotType.ROBOT_SIMBOT) {
       vision = new Vision(new VisionIO[] {new VisionIO() {}});
@@ -242,9 +242,9 @@ public class RobotContainer {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
 
-    // FIXME: connect to shooter's boolean supplier
-    intake = new Intake(new IntakeIOTalonFX(), () -> true);
+    intake = new Intake(new IntakeIOTalonFX());
     shooter = new Shooter(new ShooterIOTalonFX(), drivetrain, intake);
+    intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
   }
@@ -252,8 +252,9 @@ public class RobotContainer {
   private void createPracticeBoardSubsystem() {
     // change the following to connect the subsystem being tested to actual hardware
     drivetrain = new Drivetrain(new DrivetrainIO() {});
-    intake = new Intake(new IntakeIO() {}, () -> true);
+    intake = new Intake(new IntakeIO() {});
     shooter = new Shooter(new ShooterIO() {}, drivetrain, intake);
+    intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
   }
 

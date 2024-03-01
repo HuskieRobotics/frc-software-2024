@@ -149,6 +149,10 @@ public class Shooter extends SubsystemBase {
     io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
   }
 
+  public BooleanSupplier getShooterAngleReadySupplier() {
+    return () -> this.isAngleAtSetpoint();
+  }
+
   public boolean readyToShoot() {
     if (autoShooter == false) {
       if (isTopShootAtSetpoint() && isBottomShootAtSetpoint() && isAimed) {
