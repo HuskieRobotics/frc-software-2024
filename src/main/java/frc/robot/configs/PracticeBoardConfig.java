@@ -12,11 +12,113 @@ import frc.lib.team3061.drivetrain.swerve.SwerveConstants;
  * these methods, refer to the documentation in the RobotConfig class.
  */
 public class PracticeBoardConfig extends RobotConfig {
- 
 
-  private static final String CAN_BUS_NAME = "";
+  private static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 13;
+  private static final int FRONT_LEFT_MODULE_STEER_MOTOR = 12;
+  private static final int FRONT_LEFT_MODULE_STEER_ENCODER = 14;
+  private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = -0.013428 + 0.5;
 
-  
+  private static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 16;
+  private static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 15;
+  private static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 17;
+  private static final double FRONT_RIGHT_MODULE_STEER_OFFSET_ROT = -0.342773;
+
+  private static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 7;
+  private static final int BACK_LEFT_MODULE_STEER_MOTOR = 6;
+  private static final int BACK_LEFT_MODULE_STEER_ENCODER = 8;
+  private static final double BACK_LEFT_MODULE_STEER_OFFSET_ROT = 0.263184 + 0.5;
+
+  private static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 10;
+  private static final int BACK_RIGHT_MODULE_STEER_MOTOR = 9;
+  private static final int BACK_RIGHT_MODULE_STEER_ENCODER = 11;
+  private static final double BACK_RIGHT_MODULE_STEER_OFFSET_ROT = 0.117188;
+
+  private static final int GYRO_ID = 3;
+
+  private static final double TRACKWIDTH_METERS = 0.57785; // 22.75
+  private static final double WHEELBASE_METERS = 0.57785; // 22.75
+  private static final double WHEEL_DIAMETER_METERS = 0.09659072671;
+  private static final double ROBOT_WIDTH_WITH_BUMPERS =
+      0.88265; // meters //34.75 in , measure the actual bumpers
+  private static final double ROBOT_LENGTH_WITH_BUMPERS = 0.88265; // meters // 34.75 in same above
+
+  /* Angle Motor PID Values */
+  private static final double ANGLE_KP = 100.0;
+  private static final double ANGLE_KI = 0.0;
+  private static final double ANGLE_KD = 0.05;
+
+  private static final double ANGLE_KS = 0.1891233333;
+  private static final double ANGLE_KV =
+      0.4399866667 * 2 * Math.PI; // convert from V/(radians/s) to V/(rotations/s)
+  private static final double ANGLE_KA = 0.001663333333;
+
+  /* Drive Motor PID Values */
+  private static final double DRIVE_KP = 8.0;
+  private static final double DRIVE_KI = 0.0;
+  private static final double DRIVE_KD = 0.0;
+
+  private static final double DRIVE_KS = 5.0;
+  private static final double DRIVE_KV = 0.0;
+  private static final double DRIVE_KA = 0.0;
+
+  private static final double MAX_VELOCITY_METERS_PER_SECOND = 3.5;
+  private static final double MAX_COAST_VELOCITY_METERS_PER_SECOND = 0.05;
+  private static final double SLOW_MODE_MULTIPLIER = 0.75;
+
+  private static final double MAX_DRIVE_ACCELERATION_METERS_PER_SECOND_SQUARED = 11.365;
+  private static final double MAX_TURN_ACCELERATION_RADIANS_PER_SECOND_SQUARED = 36.0;
+
+  private static final String CAN_BUS_NAME = "canbus1";
+
+  private static final String CAMERA_NAME_0 = "OV2311L";
+  private static final String CAMERA_NAME_1 = "OV2311F";
+
+  // left camera
+  private static final Transform3d ROBOT_TO_CAMERA_0 =
+      new Transform3d(
+          new Translation3d(
+              Units.inchesToMeters(5.500),
+              Units.inchesToMeters(10.329),
+              Units.inchesToMeters(18.387)),
+          new Rotation3d(0, Units.degreesToRadians(-35), Units.degreesToRadians(90)));
+  // pitch 45 degrees
+
+  // left camera
+  private static final Transform3d ROBOT_TO_CAMERA_1 =
+      new Transform3d(
+          new Translation3d(
+              Units.inchesToMeters(7.329),
+              Units.inchesToMeters(-8.500),
+              Units.inchesToMeters(18.387)),
+          new Rotation3d(0, Units.degreesToRadians(-35), Units.degreesToRadians(0)));
+
+  private static final double AUTO_MAX_SPEED_METERS_PER_SECOND = 3.5;
+  private static final double AUTO_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 10;
+  private static final double AUTO_DRIVE_P_CONTROLLER = 5.0;
+  private static final double AUTO_DRIVE_I_CONTROLLER = 0.0;
+  private static final double AUTO_DRIVE_D_CONTROLLER = 0.0;
+  private static final double AUTO_TURN_P_CONTROLLER = 5.0;
+  private static final double AUTO_TURN_I_CONTROLLER = 0.0;
+  private static final double AUTO_TURN_D_CONTROLLER = 0.0;
+
+  // Drive to Pose constants
+  private static final double DRIVE_TO_POSE_DRIVE_KP = 2.5;
+  private static final double DRIVE_TO_POSE_DRIVE_KD = 0.0;
+  private static final double DRIVE_TO_POSE_THETA_KP = 18.0;
+  private static final double DRIVE_TO_POSE_THETA_KI = 10.0;
+  private static final double DRIVE_TO_POSE_THETA_KD = 0.0;
+  private static final double DRIVE_TO_POSE_DRIVE_TOLERANCE_METERS = 0.08;
+  private static final double DRIVE_TO_POSE_THETA_TOLERANCE_RADIANS = 0.008;
+
+  private static final double SQUARING_SPEED_METERS_PER_SECOND = 1.0;
+
+  // Drive Facing Angle constants
+  private static final double DRIVE_FACING_ANGLE_KP = 2.0;
+  private static final double DRIVE_FACING_ANGLE_KD = 0.1;
+  private static final double DRIVE_FACING_ANGLE_KI = 0.0;
+
+  private static final int LED_COUNT = 85;
+
   @Override
   public boolean getPhoenix6Licensed() {
     return true;
@@ -24,196 +126,207 @@ public class PracticeBoardConfig extends RobotConfig {
 
   @Override
   public double getSwerveAngleKP() {
-    return 0;
+    return ANGLE_KP;
   }
 
   @Override
   public double getSwerveAngleKI() {
-    return 0;
+    return ANGLE_KI;
   }
 
   @Override
   public double getSwerveAngleKD() {
-    return 0;
+    return ANGLE_KD;
   }
 
   @Override
   public double getSwerveAngleKS() {
-    return 0;
+    return ANGLE_KS;
   }
 
   @Override
   public double getSwerveAngleKV() {
-    return 0;
+    return ANGLE_KV;
   }
 
   @Override
   public double getSwerveAngleKA() {
-    return 0;
+    return ANGLE_KA;
   }
 
   @Override
   public double getSwerveDriveKP() {
-    return 0;
+    return DRIVE_KP;
   }
 
   @Override
   public double getSwerveDriveKI() {
-    return 0;
+    return DRIVE_KI;
   }
 
   @Override
   public double getSwerveDriveKD() {
-    return 0;
+    return DRIVE_KD;
   }
 
   @Override
   public double getDriveKS() {
-    return 0;
+    return DRIVE_KS;
   }
 
   @Override
   public double getDriveKV() {
-    return 0;
+    return DRIVE_KV;
   }
 
   @Override
   public double getDriveKA() {
-    return 0;
+    return DRIVE_KA;
   }
 
   @Override
   public SwerveConstants getSwerveConstants() {
-    return SwerveConstants.MK4I_L3_PLUS_CONSTANTS;
+    return SwerveConstants.MK4I_L3_CONSTANTS;
   }
 
   @Override
   public int[] getSwerveDriveMotorCANIDs() {
     return new int[] {
+      FRONT_LEFT_MODULE_DRIVE_MOTOR,
+      FRONT_RIGHT_MODULE_DRIVE_MOTOR,
+      BACK_LEFT_MODULE_DRIVE_MOTOR,
+      BACK_RIGHT_MODULE_DRIVE_MOTOR
     };
   }
 
   @Override
   public int[] getSwerveSteerMotorCANIDs() {
     return new int[] {
-      
+      FRONT_LEFT_MODULE_STEER_MOTOR,
+      FRONT_RIGHT_MODULE_STEER_MOTOR,
+      BACK_LEFT_MODULE_STEER_MOTOR,
+      BACK_RIGHT_MODULE_STEER_MOTOR
     };
   }
 
   @Override
   public int[] getSwerveSteerEncoderCANIDs() {
     return new int[] {
-      
+      FRONT_LEFT_MODULE_STEER_ENCODER,
+      FRONT_RIGHT_MODULE_STEER_ENCODER,
+      BACK_LEFT_MODULE_STEER_ENCODER,
+      BACK_RIGHT_MODULE_STEER_ENCODER
     };
   }
 
   @Override
   public double[] getSwerveSteerOffsets() {
     return new double[] {
-      
+      FRONT_LEFT_MODULE_STEER_OFFSET_ROT,
+      FRONT_RIGHT_MODULE_STEER_OFFSET_ROT,
+      BACK_LEFT_MODULE_STEER_OFFSET_ROT,
+      BACK_RIGHT_MODULE_STEER_OFFSET_ROT
     };
   }
 
   @Override
   public int getGyroCANID() {
-    return 0;
+    return GYRO_ID;
   }
 
   @Override
   public double getTrackwidth() {
-    return 0;
+    return TRACKWIDTH_METERS;
   }
 
   @Override
   public double getWheelbase() {
-    return 0;
+    return WHEELBASE_METERS;
   }
 
   @Override
   public double getWheelDiameterMeters() {
-    return 0;
+    return WHEEL_DIAMETER_METERS;
   }
 
   @Override
   public double getRobotWidthWithBumpers() {
-    return 0;
+    return ROBOT_WIDTH_WITH_BUMPERS;
   }
 
   @Override
   public double getRobotLengthWithBumpers() {
-    return 0;
+    return ROBOT_LENGTH_WITH_BUMPERS;
   }
 
   @Override
   public Transform3d[] getRobotToCameraTransforms() {
-    return new Transform3d[] {
-      
-    };
+    return new Transform3d[] {ROBOT_TO_CAMERA_0, ROBOT_TO_CAMERA_1};
   }
 
   @Override
   public double getRobotMaxVelocity() {
-    return 0;
+    return MAX_VELOCITY_METERS_PER_SECOND;
   }
 
   @Override
   public double getRobotMaxDriveAcceleration() {
-    return 0;
+    return MAX_DRIVE_ACCELERATION_METERS_PER_SECOND_SQUARED;
   }
 
   @Override
   public double getRobotMaxTurnAcceleration() {
-    return 0;
+    return MAX_TURN_ACCELERATION_RADIANS_PER_SECOND_SQUARED;
   }
 
   @Override
   public double getRobotSlowModeMultiplier() {
-    return 0;
+    return SLOW_MODE_MULTIPLIER;
   }
 
   @Override
   public double getRobotMaxCoastVelocity() {
-    return 0;
+    return MAX_COAST_VELOCITY_METERS_PER_SECOND;
   }
 
   @Override
   public double getAutoMaxSpeed() {
-    return 0;
+    return AUTO_MAX_SPEED_METERS_PER_SECOND;
   }
 
   @Override
   public double getAutoMaxAcceleration() {
-    return 0;
+    return AUTO_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
   }
 
   @Override
   public double getAutoDriveKP() {
-    return 0;
+    return AUTO_DRIVE_P_CONTROLLER;
   }
 
   @Override
   public double getAutoDriveKI() {
-    return 0;
+    return AUTO_DRIVE_I_CONTROLLER;
   }
 
   @Override
   public double getAutoDriveKD() {
-    return 0;
+    return AUTO_DRIVE_D_CONTROLLER;
   }
 
   @Override
   public double getAutoTurnKP() {
-    return 0;
+    return AUTO_TURN_P_CONTROLLER;
   }
 
   @Override
   public double getAutoTurnKI() {
-    return 0;
+    return AUTO_TURN_I_CONTROLLER;
   }
 
   @Override
   public double getAutoTurnKD() {
-    return 0;
+    return AUTO_TURN_D_CONTROLLER;
   }
 
   @Override
@@ -223,32 +336,32 @@ public class PracticeBoardConfig extends RobotConfig {
 
   @Override
   public String[] getCameraNames() {
-    return new String[] {};
+    return new String[] {CAMERA_NAME_0, CAMERA_NAME_1};
   }
 
   @Override
   public double getDriveToPoseDriveKP() {
-    return 0;
+    return DRIVE_TO_POSE_DRIVE_KP;
   }
 
   @Override
   public double getDriveToPoseDriveKD() {
-    return 0;
+    return DRIVE_TO_POSE_DRIVE_KD;
   }
 
   @Override
   public double getDriveToPoseThetaKI() {
-    return 0;
+    return DRIVE_TO_POSE_THETA_KI;
   }
 
   @Override
   public double getDriveToPoseThetaKP() {
-    return 0;
+    return DRIVE_TO_POSE_THETA_KP;
   }
 
   @Override
   public double getDriveToPoseThetaKD() {
-    return 0;
+    return DRIVE_TO_POSE_THETA_KD;
   }
 
   @Override
@@ -275,12 +388,12 @@ public class PracticeBoardConfig extends RobotConfig {
 
   @Override
   public double getDriveToPoseDriveTolerance() {
-    return 0;
+    return DRIVE_TO_POSE_DRIVE_TOLERANCE_METERS;
   }
 
   @Override
   public double getDriveToPoseThetaTolerance() {
-    return 0;
+    return DRIVE_TO_POSE_THETA_TOLERANCE_RADIANS;
   }
 
   @Override
@@ -290,22 +403,22 @@ public class PracticeBoardConfig extends RobotConfig {
 
   @Override
   public double getMoveToPathFinalVelocity() {
-    return 0;
+    return SQUARING_SPEED_METERS_PER_SECOND;
   }
 
   @Override
   public double getDriveFacingAngleThetaKP() {
-    return 0;
+    return DRIVE_FACING_ANGLE_KP;
   }
 
   @Override
   public double getDriveFacingAngleThetaKI() {
-    return 0;
+    return DRIVE_FACING_ANGLE_KI;
   }
 
   @Override
   public double getDriveFacingAngleThetaKD() {
-    return 0;
+    return DRIVE_FACING_ANGLE_KD;
   }
 
   @Override
@@ -320,7 +433,7 @@ public class PracticeBoardConfig extends RobotConfig {
 
   @Override
   public int getLEDCount() {
-    return 0;
+    return LED_COUNT;
   }
 
   @Override
