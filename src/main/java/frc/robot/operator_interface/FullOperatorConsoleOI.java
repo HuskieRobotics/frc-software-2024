@@ -57,6 +57,7 @@ public class FullOperatorConsoleOI implements OperatorInterface {
     return -translateJoystick.getX();
   }
 
+  // temporary replacement as it was in the spot of repel all
   @Override
   public Trigger getLock180Button() {
     return translateJoystickButtons[2];
@@ -73,6 +74,11 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
+  public Trigger getXStanceButton() {
+    return translateJoystickButtons[5];
+  }
+
+  @Override
   public Trigger getFieldRelativeButton() {
     return translateJoystickButtons[9];
   }
@@ -85,13 +91,13 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getXStanceButton() {
-    return rotateJoystickButtons[4];
+  public Trigger getResetPoseToVisionButton() {
+    return rotateJoystickButtons[5];
   }
 
   @Override
-  public Trigger getResetPoseToVisionButton() {
-    return rotateJoystickButtons[5];
+  public Trigger getRunIntakeButton() {
+    return rotateJoystickButtons[4];
   }
 
   // Operator Controller
@@ -103,7 +109,17 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   // Operator Panel
 
   @Override
+  public Trigger getOuttakeAllButton() {
+    return operatorPanelButtons[9];
+  }
+
+  @Override
   public Trigger getVisionIsEnabledSwitch() {
     return operatorPanelButtons[10];
+  }
+
+  @Override
+  public Trigger getIntakeAutomationSwitch() {
+    return operatorPanelButtons[12];
   }
 }
