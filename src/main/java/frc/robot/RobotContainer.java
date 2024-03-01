@@ -25,7 +25,6 @@ import frc.lib.team3061.drivetrain.DrivetrainIOCTRE;
 import frc.lib.team3061.drivetrain.DrivetrainIOGeneric;
 import frc.lib.team3061.drivetrain.swerve.SwerveModuleIO;
 import frc.lib.team3061.drivetrain.swerve.SwerveModuleIOTalonFXPhoenix6;
-import frc.lib.team3061.gyro.GyroIO;
 import frc.lib.team3061.gyro.GyroIOPigeon2Phoenix6;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.vision.Vision;
@@ -39,6 +38,9 @@ import frc.robot.configs.PracticeBoardConfig;
 import frc.robot.configs.PracticeRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -57,6 +59,7 @@ public class RobotContainer {
   private Drivetrain drivetrain;
   private Alliance lastAlliance = DriverStation.Alliance.Red;
   private Vision vision;
+  private Intake intake;
 
   // use AdvantageKit's LoggedDashboardChooser instead of SendableChooser to ensure accurate logging
   private final LoggedDashboardChooser<Command> autoChooser =
@@ -116,6 +119,9 @@ public class RobotContainer {
     } else {
       drivetrain = new Drivetrain(new DrivetrainIO() {});
 
+      // FIXME: connect to shooter's boolean supplier
+      intake = new Intake(new IntakeIO() {}, () -> true);
+
       String[] cameraNames = config.getCameraNames();
       VisionIO[] visionIOs = new VisionIO[cameraNames.length];
       for (int i = 0; i < visionIOs.length; i++) {
@@ -154,8 +160,10 @@ public class RobotContainer {
   }
 
   private void createCTRESubsystems() {
-    DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
-    drivetrain = new Drivetrain(drivetrainIO);
+    drivetrain = new Drivetrain(new DrivetrainIOCTRE());
+
+    // FIXME: connect to shooter's boolean supplier
+    intake = new Intake(new IntakeIOTalonFX(), () -> true);
 
     String[] cameraNames = config.getCameraNames();
     VisionIO[] visionIOs = new VisionIO[cameraNames.length];
@@ -192,10 +200,17 @@ public class RobotContainer {
         new SwerveModuleIOTalonFXPhoenix6(
             3, driveMotorCANIDs[3], steerMotorCANDIDs[3], steerEncoderCANDIDs[3], steerOffsets[3]);
 
-    GyroIO gyro = new GyroIOPigeon2Phoenix6(config.getGyroCANID());
-    DrivetrainIO drivetrainIO =
-        new DrivetrainIOGeneric(gyro, flModule, frModule, blModule, brModule);
-    drivetrain = new Drivetrain(drivetrainIO);
+    drivetrain =
+        new Drivetrain(
+            new DrivetrainIOGeneric(
+                new GyroIOPigeon2Phoenix6(config.getGyroCANID()),
+                flModule,
+                frModule,
+                blModule,
+                brModule));
+
+    // FIXME: connect to shooter's boolean supplier
+    intake = new Intake(new IntakeIOTalonFX(), () -> true);
 
     if (Constants.getRobot() == Constants.RobotType.ROBOT_SIMBOT) {
       vision = new Vision(new VisionIO[] {new VisionIO() {}});
@@ -218,6 +233,10 @@ public class RobotContainer {
   private void createCTRESimSubsystems() {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
+
+    // FIXME: connect to shooter's boolean supplier
+    intake = new Intake(new IntakeIOTalonFX(), () -> true);
+
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
   }
 
@@ -260,6 +279,8 @@ public class RobotContainer {
   private void configureButtonBindings() {
 
     configureDrivetrainCommands();
+
+    configureIntakeCommands();
 
     configureVisionCommands();
 
@@ -415,6 +436,45 @@ public class RobotContainer {
                         () -> drivetrain.drive(0.1, -0.1, 0.0, true, false), drivetrain)))));
 
     Shuffleboard.getTab("MAIN").add(autoChooser.getSendableChooser());
+  }
+
+  private void configureIntakeCommands() {
+    oi.getIntakeAutomationSwitch().onTrue(Commands.runOnce(intake::enableAutomation, intake));
+
+    oi.getIntakeAutomationSwitch()
+        .onFalse(
+            Commands.parallel(
+                Commands.runOnce(intake::disableAutomation, intake),
+                Commands.runOnce(intake::turnIntakeOff),
+                Commands.runOnce(intake::turnKickerOff)));
+
+    oi.getRunIntakeButton()
+        .and(() -> !intake.automationEnabled())
+        .whileTrue(
+            Commands.parallel(
+                    Commands.run(intake::intakeGamePiece),
+                    Commands.run(intake::transitionGamePiece))
+                .withName("ManualIntakeOn"));
+
+    oi.getRunIntakeButton()
+        .and(() -> !intake.automationEnabled())
+        .onFalse(
+            Commands.sequence(
+                    Commands.runOnce(intake::turnIntakeOff),
+                    Commands.runOnce(intake::turnKickerOff))
+                .withName("ManualIntakeOff"));
+
+    oi.getOuttakeAllButton()
+        .and(() -> !intake.automationEnabled())
+        .whileTrue(Commands.run(intake::outtakeAll).withName("ManualOuttakeOn"));
+
+    oi.getOuttakeAllButton()
+        .and(() -> !intake.automationEnabled())
+        .onFalse(
+            Commands.sequence(
+                    Commands.runOnce(intake::turnIntakeOff),
+                    Commands.runOnce(intake::turnKickerOff))
+                .withName("ManualOuttakeOff"));
   }
 
   private void configureDrivetrainCommands() {
