@@ -25,7 +25,6 @@ import frc.lib.team3061.drivetrain.DrivetrainIOCTRE;
 import frc.lib.team3061.drivetrain.DrivetrainIOGeneric;
 import frc.lib.team3061.drivetrain.swerve.SwerveModuleIO;
 import frc.lib.team3061.drivetrain.swerve.SwerveModuleIOTalonFXPhoenix6;
-import frc.lib.team3061.gyro.GyroIO;
 import frc.lib.team3061.gyro.GyroIOPigeon2Phoenix6;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.vision.Vision;
@@ -114,6 +113,8 @@ public class RobotContainer {
 
     } else {
       drivetrain = new Drivetrain(new DrivetrainIO() {});
+
+      // FIXME: connect to shooter's boolean supplier
       intake = new Intake(new IntakeIO() {}, () -> true);
 
       String[] cameraNames = config.getCameraNames();
@@ -152,7 +153,9 @@ public class RobotContainer {
   }
 
   private void createCTRESubsystems() {
-    drivetrain = new Drivetrain(drivetrainIO = new DrivetrainIOCTRE());
+    drivetrain = new Drivetrain(new DrivetrainIOCTRE());
+
+    // FIXME: connect to shooter's boolean supplier
     intake = new Intake(new IntakeIOTalonFX(), () -> true);
 
     String[] cameraNames = config.getCameraNames();
@@ -190,8 +193,16 @@ public class RobotContainer {
         new SwerveModuleIOTalonFXPhoenix6(
             3, driveMotorCANIDs[3], steerMotorCANDIDs[3], steerEncoderCANDIDs[3], steerOffsets[3]);
 
-    drivetrain = new Drivetrain(new DrivetrainIOGeneric(new GyroIOPigeon2Phoenix6(config.getGyroCANID()), flModule, frModule, blModule, brModule));
+    drivetrain =
+        new Drivetrain(
+            new DrivetrainIOGeneric(
+                new GyroIOPigeon2Phoenix6(config.getGyroCANID()),
+                flModule,
+                frModule,
+                blModule,
+                brModule));
 
+    // FIXME: connect to shooter's boolean supplier
     intake = new Intake(new IntakeIOTalonFX(), () -> true);
 
     if (Constants.getRobot() == Constants.RobotType.ROBOT_SIMBOT) {
@@ -216,6 +227,7 @@ public class RobotContainer {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
 
+    // FIXME: connect to shooter's boolean supplier
     intake = new Intake(new IntakeIOTalonFX(), () -> true);
 
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
