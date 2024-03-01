@@ -27,10 +27,11 @@ public class IntakeConstants {
 
   // velocities
 
-  // FIXME: match linear speed of intake and kicker
-  public static final double INTAKE_VELOCITY_ROLLERS_RPS = 40.0;
-  public static final double REPEL_VELOCITY_ROLLERS_RPS = -40.0;
-  public static final double KICKER_VELOCITY_RPS = 6.0;
+  public static final double INTAKE_VELOCITY_ROLLERS_RPS = 30.0;
+  public static final double REPEL_VELOCITY_ROLLERS_RPS = -30.0;
+
+  // match the linear speed of the kicker wheel to that of the intake rollers
+  public static final double KICKER_VELOCITY_RPS = INTAKE_VELOCITY_ROLLERS_RPS / 2.25;
 
   public static final double ROLLER_VELOCITY_TOLERANCE = 1.0;
   public static final double KICKER_VELOCITY_TOLERANCE = 0.5;
@@ -52,9 +53,6 @@ public class IntakeConstants {
   public static final boolean ROLLER_MOTOR_INVERTED = false;
   public static final boolean KICKER_MOTOR_INVERTED = false;
 
-  // FIXME: check if this has changed
-  public static final double ROLLERS_SENSOR_TO_MECHANISM_RATIO = 5.0 / 4.0;
-
-  // FIXME: check gear ratio
+  public static final double ROLLERS_SENSOR_TO_MECHANISM_RATIO = 15.0 / 12.0;
   public static final double KICKER_SENSOR_TO_MECHANISM_RATIO = 1.0;
 }
