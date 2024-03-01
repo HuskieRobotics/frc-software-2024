@@ -34,6 +34,7 @@ import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.configs.GenericDrivetrainRobotConfig;
+import frc.robot.configs.PracticeBoardConfig;
 import frc.robot.configs.PracticeRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
@@ -89,6 +90,11 @@ public class RobotContainer {
     if (Constants.getMode() != Mode.REPLAY) {
 
       switch (Constants.getRobot()) {
+        case ROBOT_PRACTICE_BOARD:
+          {
+            createPracticeBoardSubsystem();
+            break;
+          }
         case ROBOT_PRACTICE:
         case ROBOT_COMPETITION:
           {
@@ -148,6 +154,8 @@ public class RobotContainer {
       case ROBOT_COMPETITION:
         config = new PracticeRobotConfig();
         break;
+      case ROBOT_PRACTICE_BOARD:
+        config = new PracticeBoardConfig();
     }
   }
 
@@ -229,6 +237,13 @@ public class RobotContainer {
     // FIXME: connect to shooter's boolean supplier
     intake = new Intake(new IntakeIOTalonFX(), () -> true);
 
+    vision = new Vision(new VisionIO[] {new VisionIO() {}});
+  }
+
+  private void createPracticeBoardSubsystem() {
+    // change the following to connect the subsystem being tested to actual hardware
+    drivetrain = new Drivetrain(new DrivetrainIO() {});
+    intake = new Intake(new IntakeIO() {}, () -> true);
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
   }
 
