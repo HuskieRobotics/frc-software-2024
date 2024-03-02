@@ -49,6 +49,8 @@ public abstract class LEDs extends SubsystemBase {
   private double lastEnabledTime = 0.0;
   private boolean estopped = false;
 
+  private IntakeLEDState intakeLEDState;
+
   // LED IO
   private final Notifier loadingNotifier;
 
@@ -171,6 +173,18 @@ public abstract class LEDs extends SubsystemBase {
       strobe(Section.SHOULDER, Color.kWhite, STROBE_FAST_DURATION);
     } else if (endgameAlert) {
       strobe(Section.SHOULDER, Color.kBlue, STROBE_SLOW_DURATION);
+    } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
+      // Waiting for game piece
+      wave(Section.FULL, Color.kBlue, Color.kWhite, WAVE_SLOW_CYCLE_LENGTH, WAVE_SLOW_DURATION);
+    } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
+      // Has game piece
+      strobe(Section.FULL, Color.kOrange, STROBE_FAST_DURATION);
+    } else if (intakeLEDState == IntakeLEDState.MANUAL_REPEL) {
+      // Manual repel
+      strobe(Section.FULL, Color.kDeepPink, STROBE_FAST_DURATION);
+    } else if (intakeLEDState == IntakeLEDState.INTAKE_MANUALLY_TURNED_OFF) {
+      // Intake manually turned off
+      solid(Section.FULL, Color.kYellow);
     }
   }
 
@@ -293,6 +307,18 @@ public abstract class LEDs extends SubsystemBase {
 
   public void setDemoMode(boolean demoMode) {
     this.demoMode = demoMode;
+  }
+
+  public enum IntakeLEDState {
+    WAITING_FOR_GAME_PIECE,
+    HAS_GAME_PIECE,
+    MANUAL_REPEL,
+    INTAKE_MANUALLY_TURNED_OFF,
+    // TODO: add implementation for ready to shoot after talking with Jake and Mr. Schmit
+  }
+
+  public void setIntakeLEDState(IntakeLEDState state) {
+    this.intakeLEDState = state;
   }
 
   protected abstract void updateLEDs();

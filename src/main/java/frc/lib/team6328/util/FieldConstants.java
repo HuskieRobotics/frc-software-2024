@@ -8,9 +8,6 @@
 package frc.lib.team6328.util;
 
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 
 @java.lang.SuppressWarnings({"java:S1118", "java:S115", "java:S2386"})
@@ -118,6 +115,18 @@ public class FieldConstants {
         FieldConstants.flipForRedSide(BlueSpeaker.blueBottomLeftSpeaker);
     public static final Translation3d redBottomLeftSpeaker =
         FieldConstants.flipForRedSide(BlueSpeaker.blueBottomRightSpeaker);
+  }
+
+  public static class RedSource {
+    public static final Translation2d redSourceCenter =
+        new Translation2d(Units.inchesToMeters(35.6247), Units.inchesToMeters(21.9704));
+    public static final Pose2d redSourcePose =
+        new Pose2d(redSourceCenter, new Rotation2d(2.8163 - (Math.PI) / 2));
+  }
+
+  public static class BlueSource {
+    public static final Translation2d blueSourceCenter = flipForRedSide(RedSource.redSourceCenter);
+    public static final Pose2d blueSourcePose = flipForRedSide(RedSource.redSourcePose);
   }
 
   public static final double aprilTagWidth = Units.inchesToMeters(6.50);

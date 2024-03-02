@@ -11,7 +11,7 @@ import frc.lib.team3061.drivetrain.swerve.SwerveConstants;
  * Refer to the README for how to represent your robot's configuration. For more information on
  * these methods, refer to the documentation in the RobotConfig class.
  */
-public class NovaRobotConfig extends RobotConfig {
+public class GenericDrivetrainRobotConfig extends RobotConfig {
 
   private static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 13;
   private static final int FRONT_LEFT_MODULE_STEER_MOTOR = 12;

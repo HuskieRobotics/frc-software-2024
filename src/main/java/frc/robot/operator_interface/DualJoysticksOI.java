@@ -30,6 +30,21 @@ public class DualJoysticksOI implements OperatorInterface {
   }
 
   @Override
+  public Trigger getIntakeAutomationSwitch() {
+    return translateJoystickButtons[1];
+  }
+
+  @Override
+  public Trigger getRunIntakeButton() {
+    return translateJoystickButtons[2];
+  }
+
+  @Override
+  public Trigger getOuttakeAllButton() {
+    return translateJoystickButtons[3];
+  }
+
+  @Override
   public double getTranslateX() {
     return -translateJoystick.getY();
   }
@@ -46,7 +61,7 @@ public class DualJoysticksOI implements OperatorInterface {
 
   @Override
   public Trigger getFieldRelativeButton() {
-    return translateJoystickButtons[3];
+    return translateJoystickButtons[4];
   }
 
   @Override
@@ -56,6 +71,11 @@ public class DualJoysticksOI implements OperatorInterface {
 
   @Override
   public Trigger getLock180Button() {
+    return new Trigger(() -> false);
+  }
+
+  @Override
+  public Trigger getLockToSpeakerButton() {
     return rotateJoystickButtons[2];
   }
 
