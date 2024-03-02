@@ -31,7 +31,8 @@ public class IntakeConstants {
   public static final double REPEL_VELOCITY_ROLLERS_RPS = -30.0;
 
   // match the linear speed of the kicker wheel to that of the intake rollers
-  public static final double KICKER_VELOCITY_RPS = INTAKE_VELOCITY_ROLLERS_RPS / 2.25;
+  public static final double KICKER_INTAKING_VELOCITY_RPS = INTAKE_VELOCITY_ROLLERS_RPS / 2.25;
+  public static final double KICKER_SHOOTING_VELOCITY_RPS = 40.0;
 
   public static final double ROLLER_VELOCITY_TOLERANCE = 1.0;
   public static final double KICKER_VELOCITY_TOLERANCE = 0.5;
