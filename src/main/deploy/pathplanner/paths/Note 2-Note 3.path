@@ -32,7 +32,7 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.0,
+    "maxVelocity": 1.5,
     "maxAcceleration": 8.269,
     "maxAngularVelocity": 537.5,
     "maxAngularAcceleration": 2390.0
@@ -45,7 +45,7 @@
   "reversed": false,
   "folder": "4 Note Amp-Side Wing",
   "previewStartingState": {
-    "rotation": -178.89370480840986,
+    "rotation": 141.3841024878661,
     "velocity": 0
   },
   "useDefaultConstraints": false

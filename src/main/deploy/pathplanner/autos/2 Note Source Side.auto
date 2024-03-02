@@ -2,7 +2,7 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7167669684840067,
+      "x": 1.5937736136123908,
       "y": 4.414985377759629
     },
     "rotation": 121.66075109663659
@@ -14,7 +14,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "2 Note Source Side"
+            "pathName": "2 Note Source 7-End"
           }
         }
       ]
