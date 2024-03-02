@@ -47,7 +47,6 @@ public class Shooter extends SubsystemBase {
   private int bottomAtSetpointIterationCount = 0;
   private int angleAtSetpointIterationCount = 0;
 
-
   public Shooter(ShooterIO io, Drivetrain drivetrain, Intake intake) {
     this.io = io;
     this.intake = intake;
@@ -139,7 +138,6 @@ public class Shooter extends SubsystemBase {
   }
 
   public void shoot(double topWheelVelocityRPS, double bottomWheelVelocityRPS) {
-    // needs to utilize kicker
     io.setShooterWheelTopVelocity(topWheelVelocityRPS);
     io.setShooterWheelBottomVelocity(bottomWheelVelocityRPS);
   }
@@ -236,75 +234,101 @@ public class Shooter extends SubsystemBase {
 
   public Command getSystemCheckCommand() {
     return Commands.sequence(
-            getVelocitiesCheckCommand(),
+            getVelocityCheckCommand(topWheelVelocity.get()),
+            getVelocityCheckCommand(SUBWOOFER_VELOCITY),
+            getVelocityCheckCommand(PODIUM_VELOCITY),
             getPositionCheckCommand())
         .until(() -> !FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).isEmpty())
-        .andThen(Commands.runOnce(
-            () -> {
-              io.setShooterWheelBottomVelocity(SHOOTER_IDLE_VELOCITY);
-              io.setShooterWheelTopVelocity(SHOOTER_IDLE_VELOCITY);
-              io.setAngle(SHOOTER_STORAGE_ANGLE);
-            }
-        ))
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  io.setShooterWheelBottomVelocity(SHOOTER_IDLE_VELOCITY);
+                  io.setShooterWheelTopVelocity(SHOOTER_IDLE_VELOCITY);
+                  io.setAngle(SHOOTER_STORAGE_ANGLE);
+                }))
         .withName(SUBSYSTEM_NAME + "SystemCheck");
   }
 
   private Command getPositionCheckCommand() {
     return Commands.sequence(
-        Commands.runOnce(() -> this.setAngle(10)),
-        Commands.waitSeconds(1).andThen(
-            Commands.runOnce(() -> this.checkMotorPositions(10))
-        ),
+        Commands.runOnce(() -> this.setAngle(SUBWOOFER_ANGLE)),
+        Commands.waitSeconds(1)
+            .andThen(Commands.runOnce(() -> this.checkMotorPositions(SUBWOOFER_ANGLE))),
         Commands.runOnce(() -> this.setAngle(45)),
-        Commands.waitSeconds(1).andThen(
-            Commands.runOnce(() -> this.checkMotorPositions(45))
-        ),
-        Commands.runOnce(() -> this.setAngle(90)),
-        Commands.waitSeconds(1).andThen(
-            Commands.runOnce(() -> this.checkMotorPositions(90))
-        )
-        );
-
+        Commands.waitSeconds(1).andThen(Commands.runOnce(() -> this.checkMotorPositions(45))),
+        Commands.runOnce(() -> this.setAngle(PODIUM_ANGLE)),
+        Commands.waitSeconds(1)
+            .andThen(Commands.runOnce(() -> this.checkMotorPositions(PODIUM_ANGLE))));
   }
 
   private void checkMotorPositions(double degrees) {
     if (Math.abs(this.shooterInputs.angleEncoderAngleDegrees - degrees) > ANGLE_TOLERANCE) {
       if (Math.abs(degrees) - Math.abs(this.shooterInputs.angleEncoderAngleDegrees) > 0) {
-        FaultReporter.getInstance().addFault(SUBSYSTEM_NAME, "Shooter angle is too low");
-      }
-      else {
-        FaultReporter.getInstance().addFault(SUBSYSTEM_NAME, "Shooter angle is too high");
+        FaultReporter.getInstance()
+            .addFault(
+                SUBSYSTEM_NAME,
+                "Shooter angle is too low, should be "
+                    + degrees
+                    + " but is "
+                    + this.shooterInputs.angleEncoderAngleDegrees);
+      } else {
+        FaultReporter.getInstance()
+            .addFault(
+                SUBSYSTEM_NAME,
+                "Shooter angle is too high, should be "
+                    + degrees
+                    + " but is "
+                    + this.shooterInputs.angleEncoderAngleDegrees);
       }
     }
   }
 
-  private Command getVelocitiesCheckCommand(){
+  private Command getVelocityCheckCommand(double velocity) {
     return Commands.sequence(
-      Commands.runOnce(this::goToConstantVelocity),
-      Commands.waitSeconds(1).andThen(
-        Commands.runOnce(this::checkMotorVelocities)
-      ));
+        Commands.runOnce(this::goToConstantVelocity),
+        Commands.waitSeconds(1).andThen(Commands.runOnce(() -> this.checkMotorVelocity(velocity))));
   }
 
-  private void checkMotorVelocities() {
-    if (Math.abs(this.shooterInputs.shootMotorBottomVelocityRPS - this.bottomWheelVelocity.get()) > VELOCITY_TOLERANCE) {
-      if (Math.abs(this.shooterInputs.shootMotorBottomVelocityRPS) - Math.abs(this.bottomWheelVelocity.get()) < 0) {
-        FaultReporter.getInstance().addFault(SUBSYSTEM_NAME, "Bottom shooter wheel velocity is too low");
-      }
-      else {
-        FaultReporter.getInstance().addFault(SUBSYSTEM_NAME, "Bottom shooter wheel velocity is too high");
+  private void checkMotorVelocity(double velocity) {
+    // check bottom motor
+    if (Math.abs(this.shooterInputs.shootMotorBottomVelocityRPS - velocity) > VELOCITY_TOLERANCE) {
+      if (Math.abs(this.shooterInputs.shootMotorBottomVelocityRPS) - Math.abs(velocity) < 0) {
+        FaultReporter.getInstance()
+            .addFault(
+                SUBSYSTEM_NAME,
+                "Bottom shooter wheel velocity is too low, should be "
+                    + velocity
+                    + " but is "
+                    + this.shooterInputs.shootMotorBottomVelocityRPS);
+      } else {
+        FaultReporter.getInstance()
+            .addFault(
+                SUBSYSTEM_NAME,
+                "Bottom shooter wheel velocity is too high, should be "
+                    + velocity
+                    + " but is "
+                    + this.shooterInputs.shootMotorBottomVelocityRPS);
       }
     }
-    if (Math.abs(this.shooterInputs.shootMotorTopVelocityRPS - this.topWheelVelocity.get()) > VELOCITY_TOLERANCE) {
-      if (Math.abs(this.shooterInputs.shootMotorTopVelocityRPS) - Math.abs(this.topWheelVelocity.get()) < 0) {
-        FaultReporter.getInstance().addFault(SUBSYSTEM_NAME, "Top shooter wheel velocity is too low");
-      }
-      else {
-        FaultReporter.getInstance().addFault(SUBSYSTEM_NAME, "Top shooter wheel velocity is too high");
+    // check top motor
+    if (Math.abs(this.shooterInputs.shootMotorTopVelocityRPS - velocity) > VELOCITY_TOLERANCE) {
+      if (Math.abs(this.shooterInputs.shootMotorTopVelocityRPS) - Math.abs(velocity) < 0) {
+        FaultReporter.getInstance()
+            .addFault(
+                SUBSYSTEM_NAME,
+                "Top shooter wheel velocity is too low, should be "
+                    + velocity
+                    + " but is "
+                    + this.shooterInputs.shootMotorTopVelocityRPS);
+      } else {
+        FaultReporter.getInstance()
+            .addFault(
+                SUBSYSTEM_NAME,
+                "Top shooter wheel velocity is too high, should be "
+                    + velocity
+                    + " but is "
+                    + this.shooterInputs.shootMotorTopVelocityRPS);
       }
     }
   }
-
-
-
 }
