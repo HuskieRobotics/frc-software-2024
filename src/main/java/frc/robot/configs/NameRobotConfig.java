@@ -91,7 +91,9 @@ public class NameRobotConfig extends RobotConfig {
   private static final Transform3d ROBOT_TO_CAMERA_0 =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(0)),
+              Units.inchesToMeters(11.064),
+              Units.inchesToMeters(-10.778),
+              Units.inchesToMeters(8.189)),
           new Rotation3d(0, Units.degreesToRadians(0), Units.degreesToRadians(90)));
   // pitch 45 degrees
 
@@ -99,21 +101,27 @@ public class NameRobotConfig extends RobotConfig {
   private static final Transform3d ROBOT_TO_CAMERA_1 =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(0)),
+              Units.inchesToMeters(-10.778),
+              Units.inchesToMeters(-11.064),
+              Units.inchesToMeters(9.189)),
           new Rotation3d(0, Units.degreesToRadians(0), Units.degreesToRadians(0)));
 
   // Front left camera
   private static final Transform3d ROBOT_TO_CAMERA_2 =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(0)),
+              Units.inchesToMeters(10.778),
+              Units.inchesToMeters(11.064),
+              Units.inchesToMeters(8.189)),
           new Rotation3d(0, Units.degreesToRadians(0), Units.degreesToRadians(-90)));
 
   // Back left camera
   private static final Transform3d ROBOT_TO_CAMERA_3 =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(0)),
+              Units.inchesToMeters(-11.064),
+              Units.inchesToMeters(10.778),
+              Units.inchesToMeters(8.189)),
           new Rotation3d(0, Units.degreesToRadians(0), Units.degreesToRadians(-180)));
 
   private static final double AUTO_MAX_SPEED_METERS_PER_SECOND = 3.5;
