@@ -55,6 +55,12 @@ public class ShooterIOTalonFX implements ShooterIO {
   private StatusSignal<Double> shootMotorBottomTemperatureStatusSignal;
   private StatusSignal<Double> angleMotorTemperatureStatusSignal;
 
+  private StatusSignal<Double> shootMotorTopVoltageStatusSignal;
+  private StatusSignal<Double> shootMotorBottomVoltageStatusSignal;
+  private StatusSignal<Double> angleMotorVoltageStatusSignal;
+
+  private StatusSignal<Double> angleMotorClosedLoopReferenceSlopeStatusSignal;
+
   private VelocitySystemSim shootMotorTopSim;
   private VelocitySystemSim shootMotorBottomSim;
   private ArmSystemSim angleMotorSim;
@@ -68,8 +74,6 @@ public class ShooterIOTalonFX implements ShooterIO {
       new TunableNumber("Shooter/SHOOT_KD", ShooterConstants.SHOOT_KD);
   private final TunableNumber shootMotorsKS =
       new TunableNumber("Shooter/SHOOT_KS", ShooterConstants.SHOOT_KS);
-  private final TunableNumber shootMotorsPeakOutput =
-      new TunableNumber("Shooter/SHOOT_PID_PEAK_OUTPUT", ShooterConstants.SHOOT_PID_PEAK_OUTPUT);
 
   // Angle PID Tunable Numbers
   private final TunableNumber rotationMotorKP =
@@ -90,9 +94,6 @@ public class ShooterIOTalonFX implements ShooterIO {
       new TunableNumber("Shooter/ROTATION_EXPO_KV", ShooterConstants.ROTATION_EXPO_KV);
   private final TunableNumber rotationMotorExpoKA =
       new TunableNumber("Shooter/ROTATION_EXPO_KA", ShooterConstants.ROTATION_EXPO_KA);
-  private final TunableNumber rotationMotorPeakOutput =
-      new TunableNumber(
-          "Shooter/ROTATION_PID_PEAK_OUTPUT", ShooterConstants.ROTATION_PID_PEAK_OUTPUT);
 
   private TalonFX shootMotorTop;
   private TalonFX shootMotorBottom;
@@ -105,7 +106,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     shootMotorBottom =
         new TalonFX(BOTTOM_SHOOTER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
     angleMotor = new TalonFX(ANGLE_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
-    angleEncoder = new CANcoder(ANGLE_ENCODER_ID);
+    angleEncoder = new CANcoder(ANGLE_ENCODER_ID, RobotConfig.getInstance().getCANBusName());
 
     shootMotorTopVelocityRequest = new VelocityTorqueCurrentFOC(0);
     shootMotorBottomVelocityRequest = new VelocityTorqueCurrentFOC(0);
@@ -130,6 +131,12 @@ public class ShooterIOTalonFX implements ShooterIO {
     shootMotorTopTemperatureStatusSignal = shootMotorTop.getDeviceTemp();
     shootMotorBottomTemperatureStatusSignal = shootMotorBottom.getDeviceTemp();
     angleMotorTemperatureStatusSignal = angleMotor.getDeviceTemp();
+
+    shootMotorTopVoltageStatusSignal = shootMotorTop.getMotorVoltage();
+    shootMotorBottomVoltageStatusSignal = shootMotorBottom.getMotorVoltage();
+    angleMotorVoltageStatusSignal = angleMotor.getMotorVoltage();
+
+    angleMotorClosedLoopReferenceSlopeStatusSignal = angleMotor.getClosedLoopReferenceSlope();
 
     configShootMotor(shootMotorTop, SHOOT_TOP_INVERTED);
     configShootMotor(shootMotorBottom, SHOOT_BOTTOM_INVERTED);
@@ -184,7 +191,11 @@ public class ShooterIOTalonFX implements ShooterIO {
         angleMotorReferencePositionStatusSignal,
         shootMotorTopTemperatureStatusSignal,
         shootMotorBottomTemperatureStatusSignal,
-        angleMotorTemperatureStatusSignal);
+        angleMotorTemperatureStatusSignal,
+        shootMotorTopVoltageStatusSignal,
+        shootMotorBottomVoltageStatusSignal,
+        angleMotorVoltageStatusSignal,
+        angleMotorClosedLoopReferenceSlopeStatusSignal);
 
     // Updates Top Shooter Motor Inputs
     shooterInputs.shootMotorTopStatorCurrentAmps =
@@ -194,8 +205,9 @@ public class ShooterIOTalonFX implements ShooterIO {
     shooterInputs.shootMotorTopVelocityRPS = shootMotorTopVelocityStatusSignal.getValueAsDouble();
     shooterInputs.shootMotorTopReferenceVelocityRPS =
         shootMotorTopReferenceVelocityStatusSignal.getValueAsDouble();
-    shooterInputs.shootMotorTopTemperature =
+    shooterInputs.shootMotorTopTemperatureCelsius =
         shootMotorTopTemperatureStatusSignal.getValueAsDouble();
+    shooterInputs.shootMotorTopVoltage = shootMotorTopVoltageStatusSignal.getValueAsDouble();
 
     // Updates Bottom Shooter Motor Inputs
     shooterInputs.shootMotorBottomStatorCurrentAmps =
@@ -206,8 +218,9 @@ public class ShooterIOTalonFX implements ShooterIO {
         shootMotorBottomVelocityStatusSignal.getValueAsDouble();
     shooterInputs.shootMotorBottomReferenceVelocityRPS =
         shootMotorBottomReferenceVelocityStatusSignal.getValueAsDouble();
-    shooterInputs.shootMotorBottomTemperature =
+    shooterInputs.shootMotorBottomTemperatureCelsius =
         shootMotorBottomTemperatureStatusSignal.getValueAsDouble();
+    shooterInputs.shootMotorBottomVoltage = shootMotorBottomVoltageStatusSignal.getValueAsDouble();
 
     // check if the tunable numbers have changed for the top and bottom shooter motors
     if (shootMotorsKD.hasChanged()
@@ -229,10 +242,13 @@ public class ShooterIOTalonFX implements ShooterIO {
     shooterInputs.angleMotorSupplyCurrentAmps =
         angleMotorSupplyCurrentStatusSignal.getValueAsDouble();
     shooterInputs.angleMotorVoltage = angleMotor.getMotorVoltage().getValue();
-    shooterInputs.angleEncoderAngleDegrees = rotationsToDegrees(angleMotor.getPosition());
+    shooterInputs.angleEncoderAngleDegrees =
+        Units.rotationsToDegrees(angleMotor.getPosition().getValueAsDouble());
     shooterInputs.angleMotorReferenceAngleDegrees =
-        angleMotorReferencePositionStatusSignal.getValueAsDouble();
-    shooterInputs.angleMotorTemperature = angleMotorTemperatureStatusSignal.getValueAsDouble();
+        rotationsToDegrees(angleMotorReferencePositionStatusSignal.getValueAsDouble());
+    shooterInputs.angleMotorTemperatureCelsius = angleMotorTemperatureStatusSignal.getValueAsDouble();
+    shooterInputs.angleMotorClosedLoopReferenceSlope =
+        angleMotorClosedLoopReferenceSlopeStatusSignal.getValueAsDouble();
     if (rotationMotorKP.hasChanged()
         || rotationMotorKI.hasChanged()
         || rotationMotorKD.hasChanged()
@@ -257,8 +273,6 @@ public class ShooterIOTalonFX implements ShooterIO {
       rotationMotionMagicConfig.MotionMagicExpo_kA = rotationMotorExpoKA.get();
       rotationMotionMagicConfig.MotionMagicCruiseVelocity =
           ShooterConstants.MOTION_MAGIC_CRUISE_VELOCITY;
-      rotationMotionMagicConfig.MotionMagicAcceleration =
-          ShooterConstants.MOTION_MAGIC_CRUISE_VELOCITY * 2;
       angleMotor.getConfigurator().apply(rotationMotionMagicConfig);
     }
   }
@@ -275,15 +289,11 @@ public class ShooterIOTalonFX implements ShooterIO {
 
   @Override
   public void setAngle(double angle) {
-    angleMotor.setControl(angleMotorPositionRequest.withPosition(degreesToRotations(angle)));
+    angleMotor.setControl(angleMotorPositionRequest.withPosition(Units.degreesToRotations(angle)));
   }
 
-  private double degreesToRotations(double degrees) {
-    return degrees / 360;
-  }
-
-  private double rotationsToDegrees(StatusSignal<Double> statusSignal) {
-    return statusSignal.getValueAsDouble() * 360;
+  private double rotationsToDegrees(double rotations) {
+    return rotations * 360;
   }
 
   private void configShootMotor(TalonFX shootMotor, boolean isInverted) {
@@ -328,9 +338,6 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotorCurrentLimits.SupplyTimeThreshold =
         ShooterConstants.ANGLE_MOTOR_PEAK_CURRENT_DURATION;
     angleMotorCurrentLimits.SupplyCurrentLimitEnable = true;
-
-    angleMotorCurrentLimits.StatorCurrentLimit = ShooterConstants.ANGLE_MOTOR_STATOR_CURRENT_LIMIT;
-
     angleMotorConfig.CurrentLimits = angleMotorCurrentLimits;
 
     angleMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -345,8 +352,6 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     rotationMotionMagicConfig.MotionMagicCruiseVelocity =
         ShooterConstants.MOTION_MAGIC_CRUISE_VELOCITY;
-    rotationMotionMagicConfig.MotionMagicAcceleration =
-        ShooterConstants.MOTION_MAGIC_CRUISE_VELOCITY * 2;
     rotationMotionMagicConfig.MotionMagicExpo_kV = rotationMotorExpoKV.get();
     rotationMotionMagicConfig.MotionMagicExpo_kA = rotationMotorExpoKA.get();
 

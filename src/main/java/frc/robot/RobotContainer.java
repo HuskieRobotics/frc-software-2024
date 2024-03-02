@@ -125,7 +125,7 @@ public class RobotContainer {
       drivetrain = new Drivetrain(new DrivetrainIO() {});
 
       intake = new Intake(new IntakeIO() {});
-      shooter = new Shooter(new ShooterIO() {}, drivetrain, intake);
+      shooter = new Shooter(new ShooterIO() {}, intake);
       intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
       String[] cameraNames = config.getCameraNames();
@@ -169,7 +169,7 @@ public class RobotContainer {
     drivetrain = new Drivetrain(new DrivetrainIOCTRE());
 
     intake = new Intake(new IntakeIOTalonFX());
-    shooter = new Shooter(new ShooterIOTalonFX(), drivetrain, intake);
+    shooter = new Shooter(new ShooterIOTalonFX(), intake);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
     String[] cameraNames = config.getCameraNames();
@@ -217,7 +217,7 @@ public class RobotContainer {
                 brModule));
 
     intake = new Intake(new IntakeIOTalonFX());
-    shooter = new Shooter(new ShooterIOTalonFX(), drivetrain, intake);
+    shooter = new Shooter(new ShooterIOTalonFX(), intake);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
     if (Constants.getRobot() == Constants.RobotType.ROBOT_SIMBOT) {
@@ -243,7 +243,7 @@ public class RobotContainer {
     drivetrain = new Drivetrain(drivetrainIO);
 
     intake = new Intake(new IntakeIOTalonFX());
-    shooter = new Shooter(new ShooterIOTalonFX(), drivetrain, intake);
+    shooter = new Shooter(new ShooterIOTalonFX(), intake);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
@@ -253,7 +253,7 @@ public class RobotContainer {
     // change the following to connect the subsystem being tested to actual hardware
     drivetrain = new Drivetrain(new DrivetrainIO() {});
     intake = new Intake(new IntakeIO() {});
-    shooter = new Shooter(new ShooterIO() {}, drivetrain, intake);
+    shooter = new Shooter(new ShooterIO() {}, intake);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
   }
@@ -581,13 +581,13 @@ public class RobotContainer {
                 Commands.runOnce(() -> vision.enable(false), vision),
                 Commands.runOnce(drivetrain::resetPoseRotationToGyro)));
   }
-
+  //FIXME: command nees a rework for state machine
   private void configureShooterCommands() {
-    NoteVisualizer.setRobotPoseSupplier(this.drivetrain::getPose);
-    oi.getShootButton()
-        .onTrue(
-            Commands.parallel(
-                Commands.runOnce(() -> shooter.shoot(0.0, 0.0)), NoteVisualizer.shoot()));
+  //   NoteVisualizer.setRobotPoseSupplier(this.drivetrain::getPose);
+  //   oi.getShootButton()
+  //       .onTrue(
+  //           Commands.parallel(
+  //               Commands.runOnce(() -> shooter.shoot(0.0, 0.0)), NoteVisualizer.shoot()));
   }
 
   /**
@@ -608,7 +608,6 @@ public class RobotContainer {
     if (alliance.isPresent() && alliance.get() != lastAlliance) {
       this.lastAlliance = alliance.get();
       this.drivetrain.updateAlliance(this.lastAlliance);
-      this.shooter.updateAlliance(this.lastAlliance);
       Field2d.getInstance().updateAlliance(this.lastAlliance);
     }
   }

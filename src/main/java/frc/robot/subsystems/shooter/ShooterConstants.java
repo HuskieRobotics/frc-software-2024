@@ -17,7 +17,7 @@ public class ShooterConstants {
   public static final int ANGLE_MOTOR_ID = 29;
   public static final int ANGLE_ENCODER_ID = 9;
 
-  public static final int SETPOINTCOUNT = 5;
+  public static final int SET_POINT_COUNT = 5;
 
   // Shooter Velocity PID Constants
   public static final double SHOOT_KP = 40.0;
@@ -34,7 +34,7 @@ public class ShooterConstants {
   public static final double ROTATION_KG = 0.08;
   public static final double ROTATION_KV = 1.0;
   public static final double ROTATION_KA = 0.01;
-  public static final double ROTATION_EXPO_KV = 24.0;
+  public static final double ROTATION_EXPO_KV = 80.0;
   public static final double ROTATION_EXPO_KA = 24.0;
   public static final double ROTATION_PID_PEAK_OUTPUT = 1.0;
 
@@ -42,32 +42,33 @@ public class ShooterConstants {
   public static final double SHOOT_MOTORS_CONTINUOUS_CURRENT_LIMIT = 20;
   public static final double SHOOT_MOTORS_PEAK_CURRENT_LIMIT = 30;
   public static final double SHOOT_MOTORS_PEAK_CURRENT_DURATION = 0.1;
-  public static final double SHOOT_MOTORS_GEAR_RATIO = 2;
-  public static final double SHOOTER_IDLE_VELOCITY = 0.0;
+  public static final double SHOOT_MOTORS_GEAR_RATIO = 0.5;
+  public static final double SHOOTER_IDLE_VELOCITY = 10.0; //FIXME tune with real robot
   public static final boolean SHOOT_TOP_INVERTED = false;
   public static final boolean SHOOT_BOTTOM_INVERTED = false;
   public static final double VELOCITY_TOLERANCE = 0.1;
+  public static final double CLOSE_VELOCITY = 20;
+  public static final double FAR_VELOCITY = 50;
+  public static final double VELOCITY_ZONE_SWITCH = 0.0; //FIXME: Should be halfway between the subwoofer and podium
 
   // Angle Motor
   public static final double ANGLE_MOTOR_CONTINUOUS_CURRENT_LIMIT = 15;
   public static final double ANGLE_MOTOR_PEAK_CURRENT_LIMIT = 20;
   public static final double ANGLE_MOTOR_PEAK_CURRENT_DURATION = 0.1;
-  public static final double ANGLE_MOTOR_STATOR_CURRENT_LIMIT = 30;
-  public static final double ANGLE_MOTOR_STATOR_CURRENT_PEAK = 40;
   public static final double ANGLE_MOTOR_STATOR_CURRENT_LIMIT_TIME = 0.5;
-  public static final double MOTION_MAGIC_CRUISE_VELOCITY = 2.0;
-  public static final double ANGLE_MOTOR_GEAR_RATIO = 144.0;
+  public static final double MOTION_MAGIC_CRUISE_VELOCITY = 0;
+  public static final double ANGLE_MOTOR_GEAR_RATIO = 45.0;
   public static final boolean ANGLE_MOTOR_INVERTED = false;
   public static final double MAGNET_OFFSET = 0.0;
   public static final double SENSOR_TO_MECHANISM_RATIO = 4.0;
-  public static final double ANGLE_TOLERANCE = 0.5;
-  public static final double SHOOTER_STORAGE_ANGLE = 0.0;
+  public static final double ANGLE_TOLERANCE_DEGREES = 0.5; //FIXME tune with real robot
+  public static final double SHOOTER_STORAGE_ANGLE = 0.0; //FIXME tune with real robot
 
   // Shooter Presets
-  public static final double SUBWOOFER_VELOCITY = 10.0;
-  public static final double SUBWOOFER_ANGLE = 0.0;
-  public static final double PODIUM_VELOCITY = 10.0;
-  public static final double PODIUM_ANGLE = 0.0;
-  public static final double AMP_VELOCITY = 10.0;
-  public static final double AMP_ANGLE = 0.0;
+  public static final double SUBWOOFER_VELOCITY = 10.0; //FIXME tune with real robot
+  public static final double SUBWOOFER_ANGLE = 0.0; //FIXME tune with real robot
+  public static final double PODIUM_VELOCITY = 10.0; //FIXME tune with real robot
+  public static final double PODIUM_ANGLE = 0.0; //FIXME tune with real robot
+  public static final double AMP_VELOCITY = 10.0; //FIXME tune with real robot
+  public static final double AMP_ANGLE = 0.0; //FIXME tune with real robot
 }
