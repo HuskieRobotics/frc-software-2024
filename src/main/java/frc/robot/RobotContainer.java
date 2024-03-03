@@ -36,6 +36,7 @@ import frc.robot.commands.TeleopSwerve;
 import frc.robot.configs.GenericDrivetrainRobotConfig;
 import frc.robot.configs.NameRobotConfig;
 import frc.robot.configs.PracticeBoardConfig;
+import frc.robot.configs.PracticeRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.intake.Intake;
@@ -149,8 +150,10 @@ public class RobotContainer {
       case ROBOT_SIMBOT:
         config = new GenericDrivetrainRobotConfig();
         break;
-      case ROBOT_SIMBOT_CTRE:
       case ROBOT_PRACTICE:
+        config = new PracticeRobotConfig();
+        break;
+      case ROBOT_SIMBOT_CTRE:
       case ROBOT_COMPETITION:
         config = new NameRobotConfig();
         break;
