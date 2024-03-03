@@ -80,13 +80,11 @@ public class NameRobotConfig extends RobotConfig {
 
   private static final String CAN_BUS_NAME = "canbus1";
 
-  // FIXME: Update camera names
-  private static final String CAMERA_NAME_0 = "OV2311L";
-  private static final String CAMERA_NAME_1 = "OV2311F";
-  private static final String CAMERA_NAME_2 = "OV2311R";
+  private static final String CAMERA_NAME_0 = "OV2311F";
+  private static final String CAMERA_NAME_1 = "OV2311R";
+  private static final String CAMERA_NAME_2 = "OV2311L";
   private static final String CAMERA_NAME_3 = "OV2311B";
 
-  // FIXME: Update camera transforms
   // Front right camera
   private static final Transform3d ROBOT_TO_CAMERA_0 =
       new Transform3d(
@@ -103,7 +101,7 @@ public class NameRobotConfig extends RobotConfig {
           new Translation3d(
               Units.inchesToMeters(-10.778),
               Units.inchesToMeters(-11.064),
-              Units.inchesToMeters(9.189)),
+              Units.inchesToMeters(8.189)),
           new Rotation3d(0, Units.degreesToRadians(-30), Units.degreesToRadians(-90)));
 
   // Front left camera
