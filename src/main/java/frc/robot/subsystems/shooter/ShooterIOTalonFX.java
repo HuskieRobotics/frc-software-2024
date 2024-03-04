@@ -80,7 +80,7 @@ public class ShooterIOTalonFX implements ShooterIO {
       new TunableNumber("Shooter/SHOOT_TOP_KD", ShooterConstants.TOP_SHOOT_KD);
   private final TunableNumber shootMotorTopKS =
       new TunableNumber("Shooter/SHOOT_TOP_KS", ShooterConstants.TOP_SHOOT_KS);
-      
+
   private final TunableNumber shootMotorBottomKP =
       new TunableNumber("Shooter/SHOOT_BOTTOM_KP", ShooterConstants.BOTTOM_SHOOT_KP);
   private final TunableNumber shootMotorBottomKI =
@@ -89,8 +89,6 @@ public class ShooterIOTalonFX implements ShooterIO {
       new TunableNumber("Shooter/SHOOT_BOTTOM_KD", ShooterConstants.BOTTOM_SHOOT_KD);
   private final TunableNumber shootMotorBottomKS =
       new TunableNumber("Shooter/SHOOT_BOTTOM_KS", ShooterConstants.BOTTOM_SHOOT_KS);
-
-
 
   // Angle PID Tunable Numbers
   private final TunableNumber rotationMotorKP =
@@ -155,7 +153,7 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     angleMotorClosedLoopReferenceSlopeStatusSignal = angleMotor.getClosedLoopReferenceSlope();
 
-    configShootMotor(shootMotorTop, SHOOT_TOP_INVERTED,true);
+    configShootMotor(shootMotorTop, SHOOT_TOP_INVERTED, true);
     configShootMotor(shootMotorBottom, SHOOT_BOTTOM_INVERTED, false);
     configAngleMotor(angleMotor, angleEncoder);
 
@@ -332,57 +330,56 @@ public class ShooterIOTalonFX implements ShooterIO {
     TalonFXConfiguration shootMotorsConfig = new TalonFXConfiguration();
     CurrentLimitsConfigs shootMotorsCurrentLimits = new CurrentLimitsConfigs();
 
-    if (isTopMotor){
-    shootMotorsCurrentLimits.SupplyCurrentLimit =
-        ShooterConstants.SHOOT_MOTOR_TOP_CONTINUOUS_CURRENT_LIMIT;
-    shootMotorsCurrentLimits.SupplyCurrentThreshold =
-        ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_LIMIT;
-    shootMotorsCurrentLimits.SupplyTimeThreshold =
-        ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_DURATION;
-    shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
+    if (isTopMotor) {
+      shootMotorsCurrentLimits.SupplyCurrentLimit =
+          ShooterConstants.SHOOT_MOTOR_TOP_CONTINUOUS_CURRENT_LIMIT;
+      shootMotorsCurrentLimits.SupplyCurrentThreshold =
+          ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_LIMIT;
+      shootMotorsCurrentLimits.SupplyTimeThreshold =
+          ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_DURATION;
+      shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
     } else {
-    shootMotorsCurrentLimits.SupplyCurrentLimit =
-        ShooterConstants.SHOOT_MOTOR_BOTTOM_CONTINUOUS_CURRENT_LIMIT;
-    shootMotorsCurrentLimits.SupplyCurrentThreshold =
-        ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_LIMIT;
-    shootMotorsCurrentLimits.SupplyTimeThreshold =
-        ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_DURATION;
-    shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
+      shootMotorsCurrentLimits.SupplyCurrentLimit =
+          ShooterConstants.SHOOT_MOTOR_BOTTOM_CONTINUOUS_CURRENT_LIMIT;
+      shootMotorsCurrentLimits.SupplyCurrentThreshold =
+          ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_LIMIT;
+      shootMotorsCurrentLimits.SupplyTimeThreshold =
+          ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_DURATION;
+      shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
     }
 
     shootMotorsConfig.CurrentLimits = shootMotorsCurrentLimits;
 
+    if (isTopMotor) {
+      shootMotorsCurrentLimits.SupplyCurrentLimit =
+          ShooterConstants.SHOOT_MOTOR_TOP_CONTINUOUS_CURRENT_LIMIT;
+      shootMotorsCurrentLimits.SupplyCurrentThreshold =
+          ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_LIMIT;
+      shootMotorsCurrentLimits.SupplyTimeThreshold =
+          ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_DURATION;
 
-    if (isTopMotor){
-        shootMotorsCurrentLimits.SupplyCurrentLimit =
-            ShooterConstants.SHOOT_MOTOR_TOP_CONTINUOUS_CURRENT_LIMIT;
-        shootMotorsCurrentLimits.SupplyCurrentThreshold =
-            ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_LIMIT;
-        shootMotorsCurrentLimits.SupplyTimeThreshold =
-            ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_DURATION;
-            
-        shootMotorsConfig.Slot0.kP = shootMotorTopKP.get();
-        shootMotorsConfig.Slot0.kI = shootMotorTopKI.get();
-        shootMotorsConfig.Slot0.kD = shootMotorTopKD.get();
-        shootMotorsConfig.Slot0.kS = shootMotorTopKS.get();
+      shootMotorsConfig.Slot0.kP = shootMotorTopKP.get();
+      shootMotorsConfig.Slot0.kI = shootMotorTopKI.get();
+      shootMotorsConfig.Slot0.kD = shootMotorTopKD.get();
+      shootMotorsConfig.Slot0.kS = shootMotorTopKS.get();
 
     } else {
-        shootMotorsCurrentLimits.SupplyCurrentLimit =
-            ShooterConstants.SHOOT_MOTOR_BOTTOM_CONTINUOUS_CURRENT_LIMIT;
-        shootMotorsCurrentLimits.SupplyCurrentThreshold =
-            ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_LIMIT;
-        shootMotorsCurrentLimits.SupplyTimeThreshold =
-            ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_DURATION;
-        shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
+      shootMotorsCurrentLimits.SupplyCurrentLimit =
+          ShooterConstants.SHOOT_MOTOR_BOTTOM_CONTINUOUS_CURRENT_LIMIT;
+      shootMotorsCurrentLimits.SupplyCurrentThreshold =
+          ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_LIMIT;
+      shootMotorsCurrentLimits.SupplyTimeThreshold =
+          ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_DURATION;
+      shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
 
-        shootMotorsConfig.Slot0.kP = shootMotorBottomKP.get();
-        shootMotorsConfig.Slot0.kI = shootMotorBottomKI.get();
-        shootMotorsConfig.Slot0.kD = shootMotorBottomKD.get();
-        shootMotorsConfig.Slot0.kS = shootMotorBottomKS.get();
-        }
+      shootMotorsConfig.Slot0.kP = shootMotorBottomKP.get();
+      shootMotorsConfig.Slot0.kI = shootMotorBottomKI.get();
+      shootMotorsConfig.Slot0.kD = shootMotorBottomKD.get();
+      shootMotorsConfig.Slot0.kS = shootMotorBottomKS.get();
+    }
 
-        shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
-        shootMotorsConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
+    shootMotorsConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     shootMotorsConfig.Feedback.SensorToMechanismRatio = ShooterConstants.SHOOT_MOTORS_GEAR_RATIO;
 

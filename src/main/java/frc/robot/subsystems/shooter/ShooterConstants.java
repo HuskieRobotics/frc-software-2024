@@ -49,7 +49,7 @@ public class ShooterConstants {
   public static final double SHOOT_MOTOR_TOP_CONTINUOUS_CURRENT_LIMIT = 20;
   public static final double SHOOT_MOTOR_TOP_PEAK_CURRENT_LIMIT = 30;
   public static final double SHOOT_MOTOR_TOP_PEAK_CURRENT_DURATION = 0.1;
-  
+
   public static final double SHOOT_MOTOR_BOTTOM_CONTINUOUS_CURRENT_LIMIT = 20;
   public static final double SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_LIMIT = 30;
   public static final double SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_DURATION = 0.1;
