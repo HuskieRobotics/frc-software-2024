@@ -34,6 +34,7 @@ import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.configs.GenericDrivetrainRobotConfig;
+import frc.robot.configs.NameRobotConfig;
 import frc.robot.configs.PracticeBoardConfig;
 import frc.robot.configs.PracticeRobotConfig;
 import frc.robot.operator_interface.OISelector;
@@ -149,10 +150,12 @@ public class RobotContainer {
       case ROBOT_SIMBOT:
         config = new GenericDrivetrainRobotConfig();
         break;
-      case ROBOT_SIMBOT_CTRE:
       case ROBOT_PRACTICE:
-      case ROBOT_COMPETITION:
         config = new PracticeRobotConfig();
+        break;
+      case ROBOT_SIMBOT_CTRE:
+      case ROBOT_COMPETITION:
+        config = new NameRobotConfig();
         break;
       case ROBOT_PRACTICE_BOARD:
         config = new PracticeBoardConfig();
@@ -525,21 +528,27 @@ public class RobotContainer {
                         : Rotation2d.fromDegrees(180.0)));
 
     oi.getLockToSpeakerButton()
-        .whileTrue(
-            new TeleopSwerve(
-                drivetrain,
-                oi::getTranslateX,
-                oi::getTranslateY,
-                () -> {
-                  Transform2d translation =
-                      new Transform2d(
-                          Field2d.getInstance().getAllianceSpeakerCenter().getX()
-                              - drivetrain.getPose().getX(),
-                          Field2d.getInstance().getAllianceSpeakerCenter().getY()
-                              - drivetrain.getPose().getY(),
-                          new Rotation2d());
-                  return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
-                }));
+        .toggleOnTrue(
+            Commands.either(
+                Commands.runOnce(drivetrain::disableLockToSpeaker),
+                Commands.parallel(
+                    // FIXME: set the shooter wheel velocity
+                    Commands.runOnce(drivetrain::enableLockToSpeaker),
+                    new TeleopSwerve(
+                        drivetrain,
+                        oi::getTranslateX,
+                        oi::getTranslateY,
+                        () -> {
+                          Transform2d translation =
+                              new Transform2d(
+                                  Field2d.getInstance().getAllianceSpeakerCenter().getX()
+                                      - drivetrain.getPose().getX(),
+                                  Field2d.getInstance().getAllianceSpeakerCenter().getY()
+                                      - drivetrain.getPose().getY(),
+                                  new Rotation2d());
+                          return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
+                        })),
+                drivetrain::isLockToSpeakerEnabled));
 
     // field-relative toggle
     oi.getFieldRelativeButton()
