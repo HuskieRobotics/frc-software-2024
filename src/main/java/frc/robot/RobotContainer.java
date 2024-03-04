@@ -31,7 +31,6 @@ import frc.lib.team3061.vision.Vision;
 import frc.lib.team3061.vision.VisionConstants;
 import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
-import frc.lib.team6328.util.NoteVisualizer;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.configs.GenericDrivetrainRobotConfig;
@@ -590,13 +589,13 @@ public class RobotContainer {
                 Commands.runOnce(() -> vision.enable(false), vision),
                 Commands.runOnce(drivetrain::resetPoseRotationToGyro)));
   }
-  //FIXME: command nees a rework for state machine
+  // FIXME: command nees a rework for state machine
   private void configureShooterCommands() {
-  //   NoteVisualizer.setRobotPoseSupplier(this.drivetrain::getPose);
-  //   oi.getShootButton()
-  //       .onTrue(
-  //           Commands.parallel(
-  //               Commands.runOnce(() -> shooter.shoot(0.0, 0.0)), NoteVisualizer.shoot()));
+    //   NoteVisualizer.setRobotPoseSupplier(this.drivetrain::getPose);
+    //   oi.getShootButton()
+    //       .onTrue(
+    //           Commands.parallel(
+    //               Commands.runOnce(() -> shooter.shoot(0.0, 0.0)), NoteVisualizer.shoot()));
   }
 
   /**

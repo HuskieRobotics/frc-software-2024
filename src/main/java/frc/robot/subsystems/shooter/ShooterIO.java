@@ -31,7 +31,6 @@ public interface ShooterIO {
     double angleEncoderAngleDegrees = 0.0;
     double angleMotorTemperatureCelsius = 0.0;
     double angleMotorClosedLoopReferenceSlope = 0.0;
-
   }
 
   /** Updates the set of loggable inputs. */

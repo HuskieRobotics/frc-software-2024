@@ -246,7 +246,8 @@ public class ShooterIOTalonFX implements ShooterIO {
         Units.rotationsToDegrees(angleMotor.getPosition().getValueAsDouble());
     shooterInputs.angleMotorReferenceAngleDegrees =
         rotationsToDegrees(angleMotorReferencePositionStatusSignal.getValueAsDouble());
-    shooterInputs.angleMotorTemperatureCelsius = angleMotorTemperatureStatusSignal.getValueAsDouble();
+    shooterInputs.angleMotorTemperatureCelsius =
+        angleMotorTemperatureStatusSignal.getValueAsDouble();
     shooterInputs.angleMotorClosedLoopReferenceSlope =
         angleMotorClosedLoopReferenceSlopeStatusSignal.getValueAsDouble();
     if (rotationMotorKP.hasChanged()

@@ -25,7 +25,6 @@ public class Shooter extends SubsystemBase {
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber angle = new TunableNumber("Shooter/Angle", 10.0);
 
-
   private boolean autoShooter = false;
   private boolean hasNote = false;
 
@@ -83,50 +82,51 @@ public class Shooter extends SubsystemBase {
             .getTranslation()
             .getNorm();
     if (hasNote) {
-        if (state == ShooterState.SCORE_PODIUM) { // 1
-          io.setShooterWheelBottomVelocity(ShooterConstants.PODIUM_VELOCITY);
-          io.setShooterWheelTopVelocity(ShooterConstants.PODIUM_VELOCITY);
-          io.setAngle(ShooterConstants.PODIUM_ANGLE);
-        } else if (state==ShooterState.SCORE_SUBWOOFER) { // 2
-          io.setShooterWheelBottomVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
-          io.setShooterWheelTopVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
-          io.setAngle(ShooterConstants.SUBWOOFER_ANGLE);
-        } else if (state == ShooterState.SCORE_AMP) { // 3
-          io.setShooterWheelBottomVelocity(ShooterConstants.AMP_VELOCITY);
-          io.setShooterWheelTopVelocity(ShooterConstants.AMP_VELOCITY);
-          io.setAngle(ShooterConstants.AMP_ANGLE);
-        } else if (state == ShooterState.AIM) { // 4
-          setRangeVelocity();
-          io.setAngle(angleTreeMap.get(Field2d.getInstance()
-              .getAllianceSpeakerCenter()
-              .minus(RobotOdometry.getInstance().getEstimatedPosition())
-              .getTranslation()
-              .getNorm()));
-        } else { // not aiming 5
-          io.setShooterWheelBottomVelocity(ShooterConstants.SHOOTER_IDLE_VELOCITY);
-          io.setShooterWheelTopVelocity(ShooterConstants.SHOOTER_IDLE_VELOCITY);
-          io.setAngle(angleTreeMap.get(test));
-        }
+      if (state == ShooterState.SCORE_PODIUM) { // 1
+        io.setShooterWheelBottomVelocity(ShooterConstants.PODIUM_VELOCITY);
+        io.setShooterWheelTopVelocity(ShooterConstants.PODIUM_VELOCITY);
+        io.setAngle(ShooterConstants.PODIUM_ANGLE);
+      } else if (state == ShooterState.SCORE_SUBWOOFER) { // 2
+        io.setShooterWheelBottomVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
+        io.setShooterWheelTopVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
+        io.setAngle(ShooterConstants.SUBWOOFER_ANGLE);
+      } else if (state == ShooterState.SCORE_AMP) { // 3
+        io.setShooterWheelBottomVelocity(ShooterConstants.AMP_VELOCITY);
+        io.setShooterWheelTopVelocity(ShooterConstants.AMP_VELOCITY);
+        io.setAngle(ShooterConstants.AMP_ANGLE);
+      } else if (state == ShooterState.AIM) { // 4
+        setRangeVelocity();
+        io.setAngle(
+            angleTreeMap.get(
+                Field2d.getInstance()
+                    .getAllianceSpeakerCenter()
+                    .minus(RobotOdometry.getInstance().getEstimatedPosition())
+                    .getTranslation()
+                    .getNorm()));
+      } else { // not aiming 5
+        io.setShooterWheelBottomVelocity(ShooterConstants.SHOOTER_IDLE_VELOCITY);
+        io.setShooterWheelTopVelocity(ShooterConstants.SHOOTER_IDLE_VELOCITY);
+        io.setAngle(angleTreeMap.get(test));
       }
-    else { // no note 0
+    } else { // no note 0
       io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
     }
     this.goToIdleVelocity();
   }
 
   private void setRangeVelocity() {
-      if (Field2d.getInstance()
+    if (Field2d.getInstance()
             .getAllianceSpeakerCenter()
             .minus(RobotOdometry.getInstance().getEstimatedPosition())
             .getTranslation()
             .getNorm()
-          < ShooterConstants.VELOCITY_ZONE_SWITCH) {
-        io.setShooterWheelTopVelocity(ShooterConstants.CLOSE_VELOCITY);
-        io.setShooterWheelBottomVelocity(ShooterConstants.CLOSE_VELOCITY);
-      } else {
-        io.setShooterWheelTopVelocity(ShooterConstants.FAR_VELOCITY);
-        io.setShooterWheelBottomVelocity(ShooterConstants.FAR_VELOCITY);
-      }
+        < ShooterConstants.VELOCITY_ZONE_SWITCH) {
+      io.setShooterWheelTopVelocity(ShooterConstants.CLOSE_VELOCITY);
+      io.setShooterWheelBottomVelocity(ShooterConstants.CLOSE_VELOCITY);
+    } else {
+      io.setShooterWheelTopVelocity(ShooterConstants.FAR_VELOCITY);
+      io.setShooterWheelBottomVelocity(ShooterConstants.FAR_VELOCITY);
+    }
   }
 
   public void goToIdleVelocity() {
