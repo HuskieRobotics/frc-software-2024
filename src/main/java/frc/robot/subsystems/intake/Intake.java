@@ -297,7 +297,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void transitionGamePiece() {
-    this.setKickerVelocity(IntakeConstants.KICKER_VELOCITY_RPS);
+    this.setKickerVelocity(IntakeConstants.KICKER_INTAKING_VELOCITY_RPS);
   }
 
   public void turnKickerOff() {
@@ -314,7 +314,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void outtakeKicker() {
-    this.setKickerVelocity(-IntakeConstants.KICKER_VELOCITY_RPS);
+    this.setKickerVelocity(-IntakeConstants.KICKER_INTAKING_VELOCITY_RPS);
   }
 
   public void setKickerVelocity(double rps) {
@@ -322,6 +322,6 @@ public class Intake extends SubsystemBase {
   }
 
   public void shoot() {
-    this.setKickerVelocity(IntakeConstants.KICKER_VELOCITY_RPS);
+    this.setKickerVelocity(IntakeConstants.KICKER_SHOOTING_VELOCITY_RPS);
   }
 }
