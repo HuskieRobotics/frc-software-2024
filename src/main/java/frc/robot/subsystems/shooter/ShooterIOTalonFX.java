@@ -3,6 +3,7 @@ package frc.robot.subsystems.shooter;
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -23,6 +24,8 @@ import edu.wpi.first.math.util.Units;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.util.ArmSystemSim;
 import frc.lib.team3061.util.VelocitySystemSim;
+import frc.lib.team6328.util.Alert;
+import frc.lib.team6328.util.Alert.AlertType;
 import frc.lib.team6328.util.TunableNumber;
 
 public class ShooterIOTalonFX implements ShooterIO {
@@ -64,6 +67,8 @@ public class ShooterIOTalonFX implements ShooterIO {
   private VelocitySystemSim shootMotorTopSim;
   private VelocitySystemSim shootMotorBottomSim;
   private ArmSystemSim angleMotorSim;
+
+  private Alert configAlert = new Alert("Failed to apply configuration for subsystem.", AlertType.ERROR);
 
   // Shoot PID Tunable Numbers
   private final TunableNumber shootMotorsKP =
@@ -323,8 +328,16 @@ public class ShooterIOTalonFX implements ShooterIO {
     shootMotorsConfig.MotorOutput.Inverted =
         isInverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
 
-    shootMotor.getConfigurator().apply(shootMotorsConfig);
-  }
+    StatusCode status = StatusCode.StatusCodeNotInitialized;
+        for (int i = 0; i < 5; ++i) {
+            status = shootMotor.getConfigurator().apply(shootMotorsConfig);
+        if (status.isOK()) break;
+        }
+        if (!status.isOK()) {
+            configAlert.set(true);
+            configAlert.setText(status.toString());
+        }  
+ }
 
   private void configAngleMotor(TalonFX angleMotor, CANcoder angleEncoder) {
 
@@ -337,7 +350,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotorCurrentLimits.SupplyCurrentThreshold =
         ShooterConstants.ANGLE_MOTOR_PEAK_CURRENT_LIMIT;
     angleMotorCurrentLimits.SupplyTimeThreshold =
-        ShooterConstants.ANGLE_MOTOR_PEAK_CURRENT_DURATION;
+    ShooterConstants.ANGLE_MOTOR_PEAK_CURRENT_DURATION;
     angleMotorCurrentLimits.SupplyCurrentLimitEnable = true;
     angleMotorConfig.CurrentLimits = angleMotorCurrentLimits;
 
@@ -374,6 +387,14 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.SENSOR_TO_MECHANISM_RATIO;
     angleMotorConfig.Feedback.RotorToSensorRatio = ShooterConstants.ANGLE_MOTOR_GEAR_RATIO;
 
-    angleMotor.getConfigurator().apply(angleMotorConfig);
+    StatusCode status = StatusCode.StatusCodeNotInitialized;
+        for (int i = 0; i < 5; ++i) {
+            status = angleMotor.getConfigurator().apply(angleMotorConfig);
+        if (status.isOK()) break;
+        }
+        if (!status.isOK()) {
+            configAlert.set(true);
+            configAlert.setText(status.toString());
+        }  
   }
 }

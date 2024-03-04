@@ -25,6 +25,8 @@ public class Shooter extends SubsystemBase {
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber angle = new TunableNumber("Shooter/Angle", 10.0);
 
+  private double distanceToSpeaker = 0.0;
+
   private boolean autoShooter = false;
   private boolean hasNote = false;
 
@@ -39,6 +41,7 @@ public class Shooter extends SubsystemBase {
     SCORE_SUBWOOFER,
     SCORE_AMP,
     AIM,
+    ANGLING
   }
 
   public Shooter(ShooterIO io, Intake intake) {
@@ -46,6 +49,7 @@ public class Shooter extends SubsystemBase {
     this.intake = intake;
     this.angleTreeMap = new InterpolatingDoubleTreeMap();
 
+    this.distanceToSpeaker = 0.0;
     this.autoShooter = false;
     this.hasNote = false;
 
@@ -60,14 +64,20 @@ public class Shooter extends SubsystemBase {
     io.updateInputs(shooterInputs);
     Logger.processInputs(SUBSYSTEM_NAME, shooterInputs);
     this.hasNote = intake.hasNote();
+    this.distanceToSpeaker =
+        Field2d.getInstance()
+            .getAllianceSpeakerCenter()
+            .minus(RobotOdometry.getInstance().getEstimatedPosition())
+            .getTranslation()
+            .getNorm();
 
     if (TESTING) {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
       io.setAngle(angle.get());
     } else if (!autoShooter) {
-      io.setShooterWheelBottomVelocity(SHOOTER_IDLE_VELOCITY);
-      io.setShooterWheelTopVelocity(SHOOTER_IDLE_VELOCITY);
+      // io.setShooterWheelBottomVelocity(SHOOTER_IDLE_VELOCITY);
+      // io.setShooterWheelTopVelocity(SHOOTER_IDLE_VELOCITY);
     } else {
       this.runAngleStateMachine();
     }
@@ -75,43 +85,31 @@ public class Shooter extends SubsystemBase {
 
   private void runAngleStateMachine() {
 
-    double test =
-        Field2d.getInstance()
-            .getAllianceSpeakerCenter()
-            .minus(RobotOdometry.getInstance().getEstimatedPosition())
-            .getTranslation()
-            .getNorm();
     if (hasNote) {
-      if (state == ShooterState.SCORE_PODIUM) { // 1
-        io.setShooterWheelBottomVelocity(ShooterConstants.PODIUM_VELOCITY);
-        io.setShooterWheelTopVelocity(ShooterConstants.PODIUM_VELOCITY);
-        io.setAngle(ShooterConstants.PODIUM_ANGLE);
-      } else if (state == ShooterState.SCORE_SUBWOOFER) { // 2
-        io.setShooterWheelBottomVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
-        io.setShooterWheelTopVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
-        io.setAngle(ShooterConstants.SUBWOOFER_ANGLE);
-      } else if (state == ShooterState.SCORE_AMP) { // 3
-        io.setShooterWheelBottomVelocity(ShooterConstants.AMP_VELOCITY);
-        io.setShooterWheelTopVelocity(ShooterConstants.AMP_VELOCITY);
-        io.setAngle(ShooterConstants.AMP_ANGLE);
-      } else if (state == ShooterState.AIM) { // 4
-        setRangeVelocity();
-        io.setAngle(
-            angleTreeMap.get(
-                Field2d.getInstance()
-                    .getAllianceSpeakerCenter()
-                    .minus(RobotOdometry.getInstance().getEstimatedPosition())
-                    .getTranslation()
-                    .getNorm()));
-      } else { // not aiming 5
-        io.setShooterWheelBottomVelocity(ShooterConstants.SHOOTER_IDLE_VELOCITY);
-        io.setShooterWheelTopVelocity(ShooterConstants.SHOOTER_IDLE_VELOCITY);
-        io.setAngle(angleTreeMap.get(test));
+        if (state == ShooterState.SCORE_PODIUM) { // 1
+          io.setShooterWheelBottomVelocity(ShooterConstants.PODIUM_VELOCITY);
+          io.setShooterWheelTopVelocity(ShooterConstants.PODIUM_VELOCITY);
+          io.setAngle(ShooterConstants.PODIUM_ANGLE);
+        } else if (state==ShooterState.SCORE_SUBWOOFER) { // 2
+          io.setShooterWheelBottomVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
+          io.setShooterWheelTopVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
+          io.setAngle(ShooterConstants.SUBWOOFER_ANGLE);
+        } else if (state == ShooterState.SCORE_AMP) { // 3
+          io.setShooterWheelBottomVelocity(ShooterConstants.AMP_VELOCITY);
+          io.setShooterWheelTopVelocity(ShooterConstants.AMP_VELOCITY);
+          io.setAngle(ShooterConstants.AMP_ANGLE);
+        } else if (state == ShooterState.AIM) { // 4
+          setRangeVelocity();
+          io.setAngle(angleTreeMap.get(distanceToSpeaker));
+        } else { // not aiming 5
+          this.goToIdleVelocity();
+          io.setAngle(angleTreeMap.get(distanceToSpeaker));
+        }
       }
-    } else { // no note 0
+    else { // no note 0
+      this.goToIdleVelocity();
       io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
     }
-    this.goToIdleVelocity();
   }
 
   private void setRangeVelocity() {
@@ -127,6 +125,10 @@ public class Shooter extends SubsystemBase {
       io.setShooterWheelTopVelocity(ShooterConstants.FAR_VELOCITY);
       io.setShooterWheelBottomVelocity(ShooterConstants.FAR_VELOCITY);
     }
+  }
+
+  public void changeState(ShooterState state) {
+    this.state = state;
   }
 
   public void goToIdleVelocity() {
