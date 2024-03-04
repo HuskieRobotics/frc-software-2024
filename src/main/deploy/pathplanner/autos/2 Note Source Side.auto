@@ -2,15 +2,21 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.5937736136123908,
-      "y": 4.414985377759629
+      "x": 1.42,
+      "y": 1.6
     },
-    "rotation": 121.66075109663659
+    "rotation": 180.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2 Note Source Start - 7"
+          }
+        },
         {
           "type": "path",
           "data": {
