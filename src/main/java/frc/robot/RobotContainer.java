@@ -511,21 +511,27 @@ public class RobotContainer {
                         : Rotation2d.fromDegrees(180.0)));
 
     oi.getLockToSpeakerButton()
-        .whileTrue(
-            new TeleopSwerve(
-                drivetrain,
-                oi::getTranslateX,
-                oi::getTranslateY,
-                () -> {
-                  Transform2d translation =
-                      new Transform2d(
-                          Field2d.getInstance().getAllianceSpeakerCenter().getX()
-                              - drivetrain.getPose().getX(),
-                          Field2d.getInstance().getAllianceSpeakerCenter().getY()
-                              - drivetrain.getPose().getY(),
-                          new Rotation2d());
-                  return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
-                }));
+        .toggleOnTrue(
+            Commands.either(
+                Commands.runOnce(drivetrain::disableLockToSpeaker),
+                Commands.parallel(
+                    // FIXME: set the shooter wheel velocity
+                    Commands.runOnce(drivetrain::enableLockToSpeaker),
+                    new TeleopSwerve(
+                        drivetrain,
+                        oi::getTranslateX,
+                        oi::getTranslateY,
+                        () -> {
+                          Transform2d translation =
+                              new Transform2d(
+                                  Field2d.getInstance().getAllianceSpeakerCenter().getX()
+                                      - drivetrain.getPose().getX(),
+                                  Field2d.getInstance().getAllianceSpeakerCenter().getY()
+                                      - drivetrain.getPose().getY(),
+                                  new Rotation2d());
+                          return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
+                        })),
+                drivetrain::isLockToSpeakerEnabled));
 
     // field-relative toggle
     oi.getFieldRelativeButton()
