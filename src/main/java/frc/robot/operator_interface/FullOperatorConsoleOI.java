@@ -57,14 +57,13 @@ public class FullOperatorConsoleOI implements OperatorInterface {
     return -translateJoystick.getX();
   }
 
-  // temporary replacement as it was in the spot of repel all
   @Override
-  public Trigger getIntakeButton() {
+  public Trigger getLockToSpeakerButton() {
     return translateJoystickButtons[1];
   }
 
   @Override
-  public Trigger getIntakeSourceButton() {
+  public Trigger getShootFullFieldButton() {
     return translateJoystickButtons[2];
   }
 
@@ -74,8 +73,13 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getInterruptCommandsButton() {
+  public Trigger getAlignAndIntakeNoteFromSourceButton() {
     return translateJoystickButtons[4];
+  }
+
+  @Override
+  public Trigger getXStanceButton() {
+    return translateJoystickButtons[5];
   }
 
   @Override
@@ -84,18 +88,8 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getXStanceButton() {
-    return translateJoystickButtons[5];
-  }
-
-  @Override
   public Trigger getFieldRelativeButton() {
     return translateJoystickButtons[9];
-  }
-
-  @Override
-  public Trigger getXStanceButton() {
-    return translateJoystickButtons[5];
   }
 
   // Rotate Joystick
@@ -111,17 +105,12 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getToggleAimButton() {
+  public Trigger getOuttakeAllButton() {
     return rotateJoystickButtons[2];
   }
 
   @Override
-  public Trigger getLockToSpeakerButton() {
-    return rotateJoystickButtons[2];
-  }
-
-  @Override
-  public Trigger getPresetAmpButton() {
+  public Trigger getPrepareToScoreAmpButton() {
     return rotateJoystickButtons[3];
   }
 
@@ -130,21 +119,12 @@ public class FullOperatorConsoleOI implements OperatorInterface {
     return rotateJoystickButtons[4];
   }
 
+  @Override
   public Trigger getResetPoseToVisionButton() {
     return rotateJoystickButtons[5];
   }
 
   // Operator Controller
-  @Override
-  public Trigger getInterruptAll() {
-    return new Trigger(operatorController::getStartButton);
-  }
-
-  //FIXME: doesnt account for controller trigger being an axis value not a boolean
-  @Override
-  public Trigger getIntakeOffButton() {
-    return new Trigger(operatorController::getLeftTriggerAxis);
-  }
 
   @Override
   public Trigger getClimberUpButton() {
@@ -156,32 +136,35 @@ public class FullOperatorConsoleOI implements OperatorInterface {
     return new Trigger(operatorController::getRightBumper);
   }
 
-  @Override 
-  public double getShooterAngleButton() {
-    return operatorController.getLeftY();
-  }
- 
-  //FIXME: figure out d pad bindings
   @Override
-  public Trigger getManualShooterButton() {
-    return new Trigger(operatorController::getPOV);
+  public Trigger getShooterAngleDownButton() {
+    return new Trigger(operatorController::getAButton);
   }
-  
+
+  @Override
+  public Trigger getShooterAngleUpButton() {
+    return new Trigger(operatorController::getYButton);
+  }
+
+  @Override
+  public Trigger getInterruptAll() {
+    return new Trigger(operatorController::getStartButton);
+  }
+
+  @Override
+  public Trigger getEnableManualClimberButton() {
+    return new Trigger(() -> operatorController.getPOV() == 270);
+  }
+
+  @Override
+  public Trigger getDisableManualClimberButton() {
+    return new Trigger(() -> operatorController.getPOV() == 90);
+  }
 
   // Operator Panel
 
   @Override
-  public Trigger getScoreAmpButton() {
-    return operatorPanelButtons[1];
-  }
-
-  @Override
-  public Trigger getShooterStorageButton() {
-    return operatorPanelButtons[2];
-  }
-
-  @Override
-  public Trigger getShootSubwooferButton() {
+  public Trigger getPrepareToScoreSubwooferButton() {
     return operatorPanelButtons[6];
   }
 
@@ -191,37 +174,38 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getShootPodiumButton() {
+  public Trigger getPrepareToScorePodiumButton() {
     return operatorPanelButtons[5];
   }
 
   @Override
-  public Trigger getClimberUpAutoButton() {
+  public Trigger getClimberDeployButton() {
     return operatorPanelButtons[8];
   }
 
-  @Override
-  public Trigger getOuttakeAllButton() {
-    return operatorPanelButtons[9];
-  }
-
-  @Override
-  public Trigger getToggleAutodriveButton() {
-    return operatorPanelButtons[11];
-  }
-  
-  @Override
-  public Trigger getAutoIntakeButton() {
-    return operatorPanelButtons[12];
-  }
-    
   @Override
   public Trigger getVisionIsEnabledSwitch() {
     return operatorPanelButtons[10];
   }
 
   @Override
+  public Trigger getAimAutomationSwitch() {
+    return operatorPanelButtons[11];
+  }
+
+  @Override
+  public Trigger getStoreShooterButton() {
+    return operatorPanelButtons[2];
+  }
+
+  @Override
   public Trigger getIntakeAutomationSwitch() {
     return operatorPanelButtons[12];
+  }
+
+  @Override
+  public Trigger getShooterAutomationSwitch() {
+    // FIXME: assign to a switch
+    return new Trigger(() -> false);
   }
 }
