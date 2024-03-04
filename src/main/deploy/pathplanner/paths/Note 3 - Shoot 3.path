@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.8390924838721711,
-        "y": 4.133828172869615
+        "x": 1.5880448822509015,
+        "y": 4.114374863820816
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.8099125202989738,
-        "y": 4.279727990735602
+        "x": 1.1697987377017405,
+        "y": 4.046288282150024
       },
       "prevControl": {
-        "x": 0.8006678171248828,
-        "y": 4.279727990735602
+        "x": 1.1605540345276495,
+        "y": 4.046288282150024
       },
       "nextControl": null,
       "isLocked": false,
@@ -39,13 +39,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 115.46334506187159,
+    "rotation": 124.99202019855868,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "4 Note Amp-Side Wing",
   "previewStartingState": {
-    "rotation": 90.0,
+    "rotation": -179.2413239391908,
     "velocity": 0
   },
   "useDefaultConstraints": false
