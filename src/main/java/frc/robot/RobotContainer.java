@@ -362,6 +362,21 @@ public class RobotContainer {
     Command distanceTestPathCommand = new PathPlannerAuto("DistanceTest");
     autoChooser.addOption("Distance Path", distanceTestPathCommand);
 
+    Command oneNoteAnywhere =
+        Commands.run(
+                () -> {
+                  drivetrain.drive(1, 0, 0, false, true);
+                },
+                drivetrain)
+            .withTimeout(2.5)
+            .andThen(
+                Commands.runOnce(
+                    () -> {
+                      drivetrain.drive(0, 0, 0, false, false);
+                    },
+                    drivetrain));
+    autoChooser.addOption("One Note Anywhere", oneNoteAnywhere);
+
     /************ Auto Tuning ************
      *
      * useful for tuning the autonomous PID controllers
