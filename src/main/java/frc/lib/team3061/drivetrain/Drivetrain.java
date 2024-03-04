@@ -86,6 +86,8 @@ public class Drivetrain extends SubsystemBase {
 
   private boolean isMoveToPoseEnabled;
 
+  private boolean isLockToSpeakerEnabled;
+
   private Alert noPoseAlert =
       new Alert("Attempted to reset pose from vision, but no pose was found.", AlertType.WARNING);
   private static final String SYSTEM_CHECK_PREFIX = "[System Check] Swerve module ";
@@ -112,6 +114,8 @@ public class Drivetrain extends SubsystemBase {
     this.isTurbo = true;
 
     this.isMoveToPoseEnabled = true;
+
+    this.isLockToSpeakerEnabled = false;
 
     ShuffleboardTab tabMain = Shuffleboard.getTab("MAIN");
     tabMain
@@ -964,6 +968,18 @@ public class Drivetrain extends SubsystemBase {
 
   private void setBrakeMode(boolean enable) {
     this.io.setBrakeMode(enable);
+  }
+
+  public void enableLockToSpeaker() {
+    this.isLockToSpeakerEnabled = true;
+  }
+
+  public void disableLockToSpeaker() {
+    this.isLockToSpeakerEnabled = false;
+  }
+
+  public boolean isLockToSpeakerEnabled() {
+    return this.isLockToSpeakerEnabled;
   }
 
   private enum DriveMode {
