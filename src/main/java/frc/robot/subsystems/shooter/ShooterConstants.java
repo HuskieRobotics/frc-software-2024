@@ -51,8 +51,8 @@ public class ShooterConstants {
   public static final double VELOCITY_TOLERANCE = 0.1;
   public static final double CLOSE_VELOCITY = 20;
   public static final double FAR_VELOCITY = 50;
-  public static final double VELOCITY_ZONE_SWITCH = Units.inchesToMeters(106.901)/ 2.0; 
-  
+  public static final double VELOCITY_ZONE_SWITCH = Units.inchesToMeters(106.901) / 2.0;
+
   // Angle Motor
   public static final double ANGLE_MOTOR_CONTINUOUS_CURRENT_LIMIT = 15;
   public static final double ANGLE_MOTOR_PEAK_CURRENT_LIMIT = 20;

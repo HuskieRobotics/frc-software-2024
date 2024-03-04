@@ -86,27 +86,26 @@ public class Shooter extends SubsystemBase {
   private void runAngleStateMachine() {
 
     if (hasNote) {
-        if (state == ShooterState.SCORE_PODIUM) { // 1
-          io.setShooterWheelBottomVelocity(ShooterConstants.PODIUM_VELOCITY);
-          io.setShooterWheelTopVelocity(ShooterConstants.PODIUM_VELOCITY);
-          io.setAngle(ShooterConstants.PODIUM_ANGLE);
-        } else if (state==ShooterState.SCORE_SUBWOOFER) { // 2
-          io.setShooterWheelBottomVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
-          io.setShooterWheelTopVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
-          io.setAngle(ShooterConstants.SUBWOOFER_ANGLE);
-        } else if (state == ShooterState.SCORE_AMP) { // 3
-          io.setShooterWheelBottomVelocity(ShooterConstants.AMP_VELOCITY);
-          io.setShooterWheelTopVelocity(ShooterConstants.AMP_VELOCITY);
-          io.setAngle(ShooterConstants.AMP_ANGLE);
-        } else if (state == ShooterState.AIM) { // 4
-          setRangeVelocity();
-          io.setAngle(angleTreeMap.get(distanceToSpeaker));
-        } else { // not aiming 5
-          this.goToIdleVelocity();
-          io.setAngle(angleTreeMap.get(distanceToSpeaker));
-        }
+      if (state == ShooterState.SCORE_PODIUM) { // 1
+        io.setShooterWheelBottomVelocity(ShooterConstants.PODIUM_VELOCITY);
+        io.setShooterWheelTopVelocity(ShooterConstants.PODIUM_VELOCITY);
+        io.setAngle(ShooterConstants.PODIUM_ANGLE);
+      } else if (state == ShooterState.SCORE_SUBWOOFER) { // 2
+        io.setShooterWheelBottomVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
+        io.setShooterWheelTopVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
+        io.setAngle(ShooterConstants.SUBWOOFER_ANGLE);
+      } else if (state == ShooterState.SCORE_AMP) { // 3
+        io.setShooterWheelBottomVelocity(ShooterConstants.AMP_VELOCITY);
+        io.setShooterWheelTopVelocity(ShooterConstants.AMP_VELOCITY);
+        io.setAngle(ShooterConstants.AMP_ANGLE);
+      } else if (state == ShooterState.AIM) { // 4
+        setRangeVelocity();
+        io.setAngle(angleTreeMap.get(distanceToSpeaker));
+      } else { // not aiming 5
+        this.goToIdleVelocity();
+        io.setAngle(angleTreeMap.get(distanceToSpeaker));
       }
-    else { // no note 0
+    } else { // no note 0
       this.goToIdleVelocity();
       io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
     }

@@ -68,7 +68,8 @@ public class ShooterIOTalonFX implements ShooterIO {
   private VelocitySystemSim shootMotorBottomSim;
   private ArmSystemSim angleMotorSim;
 
-  private Alert configAlert = new Alert("Failed to apply configuration for subsystem.", AlertType.ERROR);
+  private Alert configAlert =
+      new Alert("Failed to apply configuration for subsystem.", AlertType.ERROR);
 
   // Shoot PID Tunable Numbers
   private final TunableNumber shootMotorsKP =
@@ -329,15 +330,15 @@ public class ShooterIOTalonFX implements ShooterIO {
         isInverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
 
     StatusCode status = StatusCode.StatusCodeNotInitialized;
-        for (int i = 0; i < 5; ++i) {
-            status = shootMotor.getConfigurator().apply(shootMotorsConfig);
-        if (status.isOK()) break;
-        }
-        if (!status.isOK()) {
-            configAlert.set(true);
-            configAlert.setText(status.toString());
-        }  
- }
+    for (int i = 0; i < 5; ++i) {
+      status = shootMotor.getConfigurator().apply(shootMotorsConfig);
+      if (status.isOK()) break;
+    }
+    if (!status.isOK()) {
+      configAlert.set(true);
+      configAlert.setText(status.toString());
+    }
+  }
 
   private void configAngleMotor(TalonFX angleMotor, CANcoder angleEncoder) {
 
@@ -350,7 +351,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotorCurrentLimits.SupplyCurrentThreshold =
         ShooterConstants.ANGLE_MOTOR_PEAK_CURRENT_LIMIT;
     angleMotorCurrentLimits.SupplyTimeThreshold =
-    ShooterConstants.ANGLE_MOTOR_PEAK_CURRENT_DURATION;
+        ShooterConstants.ANGLE_MOTOR_PEAK_CURRENT_DURATION;
     angleMotorCurrentLimits.SupplyCurrentLimitEnable = true;
     angleMotorConfig.CurrentLimits = angleMotorCurrentLimits;
 
@@ -388,13 +389,13 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotorConfig.Feedback.RotorToSensorRatio = ShooterConstants.ANGLE_MOTOR_GEAR_RATIO;
 
     StatusCode status = StatusCode.StatusCodeNotInitialized;
-        for (int i = 0; i < 5; ++i) {
-            status = angleMotor.getConfigurator().apply(angleMotorConfig);
-        if (status.isOK()) break;
-        }
-        if (!status.isOK()) {
-            configAlert.set(true);
-            configAlert.setText(status.toString());
-        }  
+    for (int i = 0; i < 5; ++i) {
+      status = angleMotor.getConfigurator().apply(angleMotorConfig);
+      if (status.isOK()) break;
+    }
+    if (!status.isOK()) {
+      configAlert.set(true);
+      configAlert.setText(status.toString());
+    }
   }
 }
