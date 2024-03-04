@@ -14,6 +14,7 @@ public interface ShooterIO {
     double shootMotorTopReferenceVelocityRPS = 0.0;
     double shootMotorTopTemperatureCelsius = 0.0;
     double shootMotorTopVoltage = 0.0;
+    double shootMotorTopClosedLoopReferenceSlope = 0.0;
 
     // Bottom Shooter Motor Inputs
     double shootMotorBottomStatorCurrentAmps = 0.0;
@@ -22,6 +23,7 @@ public interface ShooterIO {
     double shootMotorBottomReferenceVelocityRPS = 0.0;
     double shootMotorBottomTemperatureCelsius = 0.0;
     double shootMotorBottomVoltage = 0.0;
+    double shootMotorBottomClosedLoopReferenceSlope = 0.0;
 
     // Angle Motor Inputs
     double angleMotorStatorCurrentAmps = 0.0;
