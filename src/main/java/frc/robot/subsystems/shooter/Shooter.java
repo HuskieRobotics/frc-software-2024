@@ -75,11 +75,8 @@ public class Shooter extends SubsystemBase {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
       io.setAngle(angle.get());
-    } else if (!autoShooter) {
-      // io.setShooterWheelBottomVelocity(SHOOTER_IDLE_VELOCITY);
-      // io.setShooterWheelTopVelocity(SHOOTER_IDLE_VELOCITY);
-    } else {
-      this.runAngleStateMachine();
+    } else if (autoShooter) {
+      runAngleStateMachine();
     }
   }
 
@@ -117,12 +114,12 @@ public class Shooter extends SubsystemBase {
             .minus(RobotOdometry.getInstance().getEstimatedPosition())
             .getTranslation()
             .getNorm()
-        < ShooterConstants.VELOCITY_ZONE_SWITCH) {
-      io.setShooterWheelTopVelocity(ShooterConstants.CLOSE_VELOCITY);
-      io.setShooterWheelBottomVelocity(ShooterConstants.CLOSE_VELOCITY);
+        < ShooterConstants.VELOCITY_ZONE_SWITCH_DISTANCE) {
+      io.setShooterWheelTopVelocity(ShooterConstants.CLOSE_RANGE_VELOCITY);
+      io.setShooterWheelBottomVelocity(ShooterConstants.CLOSE_RANGE_VELOCITY);
     } else {
-      io.setShooterWheelTopVelocity(ShooterConstants.FAR_VELOCITY);
-      io.setShooterWheelBottomVelocity(ShooterConstants.FAR_VELOCITY);
+      io.setShooterWheelTopVelocity(ShooterConstants.FAR_RANGE_VELOCITY);
+      io.setShooterWheelBottomVelocity(ShooterConstants.FAR_RANGE_VELOCITY);
     }
   }
 

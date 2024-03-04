@@ -22,11 +22,16 @@ public class ShooterConstants {
   public static final int SET_POINT_COUNT = 5;
 
   // Shooter Velocity PID Constants
-  public static final double SHOOT_KP = 40.0;
-  public static final double SHOOT_KI = 0.0;
-  public static final double SHOOT_KD = 0.0;
-  public static final double SHOOT_KS = 14.0;
-  public static final double SHOOT_PID_PEAK_OUTPUT = 1.0;
+  public static final double TOP_SHOOT_KP = 40.0;
+  public static final double TOP_SHOOT_KI = 0.0;
+  public static final double TOP_SHOOT_KD = 0.0;
+  public static final double TOP_SHOOT_KS = 14.0;
+  public static final double TOP_SHOOT_PID_PEAK_OUTPUT = 1.0;
+  public static final double BOTTOM_SHOOT_KP = 40.0;
+  public static final double BOTTOM_SHOOT_KI = 0.0;
+  public static final double BOTTOM_SHOOT_KD = 0.0;
+  public static final double BOTTOM_SHOOT_KS = 14.0;
+  public static final double BOTTOM_SHOOT_PID_PEAK_OUTPUT = 1.0;
 
   // Shooter Rotation PID Constants
   public static final double ROTATION_KP = 40.0;
@@ -41,17 +46,22 @@ public class ShooterConstants {
   public static final double ROTATION_PID_PEAK_OUTPUT = 1.0;
 
   // Shoot Motors
-  public static final double SHOOT_MOTORS_CONTINUOUS_CURRENT_LIMIT = 20;
-  public static final double SHOOT_MOTORS_PEAK_CURRENT_LIMIT = 30;
-  public static final double SHOOT_MOTORS_PEAK_CURRENT_DURATION = 0.1;
+  public static final double SHOOT_MOTOR_TOP_CONTINUOUS_CURRENT_LIMIT = 20;
+  public static final double SHOOT_MOTOR_TOP_PEAK_CURRENT_LIMIT = 30;
+  public static final double SHOOT_MOTOR_TOP_PEAK_CURRENT_DURATION = 0.1;
+  
+  public static final double SHOOT_MOTOR_BOTTOM_CONTINUOUS_CURRENT_LIMIT = 20;
+  public static final double SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_LIMIT = 30;
+  public static final double SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_DURATION = 0.1;
+
   public static final double SHOOT_MOTORS_GEAR_RATIO = 0.5;
   public static final double SHOOTER_IDLE_VELOCITY = 10.0; // FIXME tune with real robot
   public static final boolean SHOOT_TOP_INVERTED = false;
   public static final boolean SHOOT_BOTTOM_INVERTED = false;
   public static final double VELOCITY_TOLERANCE = 0.1;
-  public static final double CLOSE_VELOCITY = 20;
-  public static final double FAR_VELOCITY = 50;
-  public static final double VELOCITY_ZONE_SWITCH = Units.inchesToMeters(106.901) / 2.0;
+  public static final double CLOSE_RANGE_VELOCITY = 20;
+  public static final double FAR_RANGE_VELOCITY = 50;
+  public static final double VELOCITY_ZONE_SWITCH_DISTANCE = Units.inchesToMeters(106.901) / 2.0;
 
   // Angle Motor
   public static final double ANGLE_MOTOR_CONTINUOUS_CURRENT_LIMIT = 15;

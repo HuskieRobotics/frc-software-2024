@@ -72,14 +72,25 @@ public class ShooterIOTalonFX implements ShooterIO {
       new Alert("Failed to apply configuration for subsystem.", AlertType.ERROR);
 
   // Shoot PID Tunable Numbers
-  private final TunableNumber shootMotorsKP =
-      new TunableNumber("Shooter/SHOOT_KP", ShooterConstants.SHOOT_KP);
-  private final TunableNumber shootMotorsKI =
-      new TunableNumber("Shooter/SHOOT_KI", ShooterConstants.SHOOT_KI);
-  private final TunableNumber shootMotorsKD =
-      new TunableNumber("Shooter/SHOOT_KD", ShooterConstants.SHOOT_KD);
-  private final TunableNumber shootMotorsKS =
-      new TunableNumber("Shooter/SHOOT_KS", ShooterConstants.SHOOT_KS);
+  private final TunableNumber shootMotorTopKP =
+      new TunableNumber("Shooter/SHOOT_TOP_KP", ShooterConstants.TOP_SHOOT_KP);
+  private final TunableNumber shootMotorTopKI =
+      new TunableNumber("Shooter/SHOOT_TOP_KI", ShooterConstants.TOP_SHOOT_KI);
+  private final TunableNumber shootMotorTopKD =
+      new TunableNumber("Shooter/SHOOT_TOP_KD", ShooterConstants.TOP_SHOOT_KD);
+  private final TunableNumber shootMotorTopKS =
+      new TunableNumber("Shooter/SHOOT_TOP_KS", ShooterConstants.TOP_SHOOT_KS);
+      
+  private final TunableNumber shootMotorBottomKP =
+      new TunableNumber("Shooter/SHOOT_BOTTOM_KP", ShooterConstants.BOTTOM_SHOOT_KP);
+  private final TunableNumber shootMotorBottomKI =
+      new TunableNumber("Shooter/SHOOT__BOTTOM_KI", ShooterConstants.BOTTOM_SHOOT_KI);
+  private final TunableNumber shootMotorBottomKD =
+      new TunableNumber("Shooter/SHOOT_BOTTOM_KD", ShooterConstants.BOTTOM_SHOOT_KD);
+  private final TunableNumber shootMotorBottomKS =
+      new TunableNumber("Shooter/SHOOT_BOTTOM_KS", ShooterConstants.BOTTOM_SHOOT_KS);
+
+
 
   // Angle PID Tunable Numbers
   private final TunableNumber rotationMotorKP =
@@ -144,8 +155,8 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     angleMotorClosedLoopReferenceSlopeStatusSignal = angleMotor.getClosedLoopReferenceSlope();
 
-    configShootMotor(shootMotorTop, SHOOT_TOP_INVERTED);
-    configShootMotor(shootMotorBottom, SHOOT_BOTTOM_INVERTED);
+    configShootMotor(shootMotorTop, SHOOT_TOP_INVERTED,true);
+    configShootMotor(shootMotorBottom, SHOOT_BOTTOM_INVERTED, false);
     configAngleMotor(angleMotor, angleEncoder);
 
     this.shootMotorBottomSim =
@@ -229,16 +240,29 @@ public class ShooterIOTalonFX implements ShooterIO {
     shooterInputs.shootMotorBottomVoltage = shootMotorBottomVoltageStatusSignal.getValueAsDouble();
 
     // check if the tunable numbers have changed for the top and bottom shooter motors
-    if (shootMotorsKD.hasChanged()
-        || shootMotorsKI.hasChanged()
-        || shootMotorsKP.hasChanged()
-        || shootMotorsKS.hasChanged()) {
+    if (shootMotorTopKD.hasChanged()
+        || shootMotorTopKI.hasChanged()
+        || shootMotorTopKP.hasChanged()
+        || shootMotorTopKS.hasChanged()) {
       Slot0Configs shootMotorConfig = new Slot0Configs();
-      shootMotorConfig.kP = shootMotorsKP.get();
-      shootMotorConfig.kI = shootMotorsKI.get();
-      shootMotorConfig.kD = shootMotorsKD.get();
-      shootMotorConfig.kS = shootMotorsKS.get();
+      shootMotorConfig.kP = shootMotorTopKP.get();
+      shootMotorConfig.kI = shootMotorTopKI.get();
+      shootMotorConfig.kD = shootMotorTopKD.get();
+      shootMotorConfig.kS = shootMotorTopKS.get();
+
       shootMotorTop.getConfigurator().apply(shootMotorConfig);
+    }
+
+    if (shootMotorBottomKD.hasChanged()
+        || shootMotorBottomKI.hasChanged()
+        || shootMotorBottomKP.hasChanged()
+        || shootMotorBottomKS.hasChanged()) {
+      Slot0Configs shootMotorConfig = new Slot0Configs();
+      shootMotorConfig.kP = shootMotorBottomKP.get();
+      shootMotorConfig.kI = shootMotorBottomKI.get();
+      shootMotorConfig.kD = shootMotorBottomKD.get();
+      shootMotorConfig.kS = shootMotorBottomKS.get();
+
       shootMotorBottom.getConfigurator().apply(shootMotorConfig);
     }
 
@@ -303,26 +327,62 @@ public class ShooterIOTalonFX implements ShooterIO {
     return rotations * 360;
   }
 
-  private void configShootMotor(TalonFX shootMotor, boolean isInverted) {
+  private void configShootMotor(TalonFX shootMotor, boolean isInverted, boolean isTopMotor) {
 
     TalonFXConfiguration shootMotorsConfig = new TalonFXConfiguration();
     CurrentLimitsConfigs shootMotorsCurrentLimits = new CurrentLimitsConfigs();
 
+    if (isTopMotor){
     shootMotorsCurrentLimits.SupplyCurrentLimit =
-        ShooterConstants.SHOOT_MOTORS_CONTINUOUS_CURRENT_LIMIT;
+        ShooterConstants.SHOOT_MOTOR_TOP_CONTINUOUS_CURRENT_LIMIT;
     shootMotorsCurrentLimits.SupplyCurrentThreshold =
-        ShooterConstants.SHOOT_MOTORS_PEAK_CURRENT_LIMIT;
+        ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_LIMIT;
     shootMotorsCurrentLimits.SupplyTimeThreshold =
-        ShooterConstants.SHOOT_MOTORS_PEAK_CURRENT_DURATION;
+        ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_DURATION;
     shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
+    } else {
+    shootMotorsCurrentLimits.SupplyCurrentLimit =
+        ShooterConstants.SHOOT_MOTOR_BOTTOM_CONTINUOUS_CURRENT_LIMIT;
+    shootMotorsCurrentLimits.SupplyCurrentThreshold =
+        ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_LIMIT;
+    shootMotorsCurrentLimits.SupplyTimeThreshold =
+        ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_DURATION;
+    shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
+    }
 
     shootMotorsConfig.CurrentLimits = shootMotorsCurrentLimits;
 
-    shootMotorsConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    shootMotorsConfig.Slot0.kP = shootMotorsKP.get();
-    shootMotorsConfig.Slot0.kI = shootMotorsKI.get();
-    shootMotorsConfig.Slot0.kD = shootMotorsKD.get();
-    shootMotorsConfig.Slot0.kS = shootMotorsKS.get();
+
+    if (isTopMotor){
+        shootMotorsCurrentLimits.SupplyCurrentLimit =
+            ShooterConstants.SHOOT_MOTOR_TOP_CONTINUOUS_CURRENT_LIMIT;
+        shootMotorsCurrentLimits.SupplyCurrentThreshold =
+            ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_LIMIT;
+        shootMotorsCurrentLimits.SupplyTimeThreshold =
+            ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_DURATION;
+            
+        shootMotorsConfig.Slot0.kP = shootMotorTopKP.get();
+        shootMotorsConfig.Slot0.kI = shootMotorTopKI.get();
+        shootMotorsConfig.Slot0.kD = shootMotorTopKD.get();
+        shootMotorsConfig.Slot0.kS = shootMotorTopKS.get();
+
+    } else {
+        shootMotorsCurrentLimits.SupplyCurrentLimit =
+            ShooterConstants.SHOOT_MOTOR_BOTTOM_CONTINUOUS_CURRENT_LIMIT;
+        shootMotorsCurrentLimits.SupplyCurrentThreshold =
+            ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_LIMIT;
+        shootMotorsCurrentLimits.SupplyTimeThreshold =
+            ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_DURATION;
+        shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
+
+        shootMotorsConfig.Slot0.kP = shootMotorBottomKP.get();
+        shootMotorsConfig.Slot0.kI = shootMotorBottomKI.get();
+        shootMotorsConfig.Slot0.kD = shootMotorBottomKD.get();
+        shootMotorsConfig.Slot0.kS = shootMotorBottomKS.get();
+        }
+
+        shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
+        shootMotorsConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     shootMotorsConfig.Feedback.SensorToMechanismRatio = ShooterConstants.SHOOT_MOTORS_GEAR_RATIO;
 
