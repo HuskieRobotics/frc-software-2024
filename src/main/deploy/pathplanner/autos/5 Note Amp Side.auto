@@ -14,31 +14,55 @@
         {
           "type": "path",
           "data": {
-            "pathName": "5 Note Amp Side Start - 5"
+            "pathName": "5 Note Amp Side 1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "5 Note Amp Side 5-1"
+            "pathName": "5 Note Amp Side 2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "5 Note Amp Side 1-2"
+            "pathName": "5 Note Amp Side 3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "5 Note Amp Side 2-3"
+            "pathName": "5 Note Amp Side 4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "5 Note Amp Side 3-End"
+            "pathName": "5 Note Amp Side 5"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 Note Amp Side 6"
           }
         },
         {

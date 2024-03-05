@@ -3,41 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.241076576939884,
-        "y": 5.787359442017461
+        "x": 2.823330006849587,
+        "y": 6.964284639469753
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.689198589547544,
-        "y": 6.826001462937867
+        "x": 2.845805357255029,
+        "y": 6.977487816787395
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.8800655783129747,
-        "y": 6.23
+        "x": 2.9595031701911747,
+        "y": 5.524739769858686
       },
       "prevControl": {
-        "x": 2.1434623748288595,
-        "y": 6.135743357834612
-      },
-      "nextControl": {
-        "x": 1.7508712217424431,
-        "y": 6.276232248828133
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.8427833158983855,
-        "y": 6.983737948518551
-      },
-      "prevControl": {
-        "x": 1.275553999621571,
-        "y": 7.049039170030086
+        "x": 0.5472928481401986,
+        "y": 5.631732969627076
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,21 +30,21 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.75,
-      "rotationDegrees": -162.51586529227615,
+      "waypointRelativePos": 0.3,
+      "rotationDegrees": -145.66,
       "rotateFast": true
     },
     {
-      "waypointRelativePos": 0.4,
+      "waypointRelativePos": 0.75,
       "rotationDegrees": 180.0,
-      "rotateFast": true
+      "rotateFast": false
     }
   ],
   "constraintZones": [
     {
       "name": "New Constraints Zone",
-      "minWaypointRelativePos": 0.7,
-      "maxWaypointRelativePos": 0.8,
+      "minWaypointRelativePos": 0.4,
+      "maxWaypointRelativePos": 0.65,
       "constraints": {
         "maxVelocity": 1.0,
         "maxAcceleration": 11.805,
@@ -72,7 +56,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.75,
+      "waypointRelativePos": 0.35,
       "command": {
         "type": "parallel",
         "data": {
@@ -90,19 +74,19 @@
   ],
   "globalConstraints": {
     "maxVelocity": 1.0,
-    "maxAcceleration": 11.805,
+    "maxAcceleration": 8.0,
     "maxAngularVelocity": 537.0,
     "maxAngularAcceleration": 2303.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 179.22577983507193,
+    "rotation": 179.3306148426471,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "5 Note Amp Side",
   "previewStartingState": {
-    "rotation": 179.1673293067151,
+    "rotation": -143.92749633467133,
     "velocity": 0
   },
   "useDefaultConstraints": false
