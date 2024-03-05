@@ -46,12 +46,12 @@ public class ShooterConstants {
   public static final double ROTATION_PID_PEAK_OUTPUT = 1.0;
 
   // Shoot Motors
-  public static final double SHOOT_MOTOR_TOP_CONTINUOUS_CURRENT_LIMIT = 20;
-  public static final double SHOOT_MOTOR_TOP_PEAK_CURRENT_LIMIT = 30;
+  public static final double SHOOT_MOTOR_TOP_CONTINUOUS_CURRENT_LIMIT = 30;
+  public static final double SHOOT_MOTOR_TOP_PEAK_CURRENT_LIMIT = 40;
   public static final double SHOOT_MOTOR_TOP_PEAK_CURRENT_DURATION = 0.1;
 
-  public static final double SHOOT_MOTOR_BOTTOM_CONTINUOUS_CURRENT_LIMIT = 20;
-  public static final double SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_LIMIT = 30;
+  public static final double SHOOT_MOTOR_BOTTOM_CONTINUOUS_CURRENT_LIMIT = 30;
+  public static final double SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_LIMIT = 40;
   public static final double SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_DURATION = 0.1;
 
   public static final double SHOOT_MOTORS_GEAR_RATIO = 0.5;
@@ -79,9 +79,9 @@ public class ShooterConstants {
 
   // Shooter Presets
   public static final double SUBWOOFER_VELOCITY = 10.0; // FIXME tune with real robot
-  public static final double SUBWOOFER_ANGLE = 0.0; // FIXME tune with real robot
+  public static final double SUBWOOFER_ANGLE = 45.0; // FIXME tune with real robot
   public static final double PODIUM_VELOCITY = 10.0; // FIXME tune with real robot
-  public static final double PODIUM_ANGLE = 0.0; // FIXME tune with real robot
+  public static final double PODIUM_ANGLE = 15.0; // FIXME tune with real robot
   public static final double AMP_VELOCITY = 10.0; // FIXME tune with real robot
-  public static final double AMP_ANGLE = 0.0; // FIXME tune with real robot
+  public static final double AMP_ANGLE = 110.0; // FIXME tune with real robot
 }
