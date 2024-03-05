@@ -12,6 +12,7 @@ public class LEDsRIO extends LEDs {
   protected LEDsRIO() {
     leds = new AddressableLED(0);
     buffer = new AddressableLEDBuffer(ACTUAL_LENGTH);
+    // leds.setBitTiming(500, 200, 1200, 1300);
     leds.setLength(ACTUAL_LENGTH);
     leds.setData(buffer);
     leds.start();

@@ -170,18 +170,18 @@ public abstract class LEDs extends SubsystemBase {
     }
 
     if (distraction) {
-      strobe(Section.SHOULDER, Color.kWhite, STROBE_FAST_DURATION);
+      strobe(Section.SHOULDER, Color.kWhite, STROBE_SLOW_DURATION);
     } else if (endgameAlert) {
       strobe(Section.SHOULDER, Color.kBlue, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
       // Waiting for game piece
-      wave(Section.FULL, Color.kBlue, Color.kWhite, WAVE_SLOW_CYCLE_LENGTH, WAVE_SLOW_DURATION);
+      wave(Section.FULL, Color.kBlue, Color.kOrange, WAVE_SLOW_CYCLE_LENGTH, WAVE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
       // Has game piece
-      strobe(Section.FULL, Color.kOrange, STROBE_FAST_DURATION);
+      strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.MANUAL_REPEL) {
       // Manual repel
-      strobe(Section.FULL, Color.kDeepPink, STROBE_FAST_DURATION);
+      strobe(Section.FULL, Color.kDeepPink, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.INTAKE_MANUALLY_TURNED_OFF) {
       // Intake manually turned off
       solid(Section.FULL, Color.kYellow);
