@@ -88,7 +88,7 @@ public class Drivetrain extends SubsystemBase {
 
   private boolean isMoveToPoseEnabled;
 
-  private boolean isLockToSpeakerEnabled;
+  private boolean isAimToSpeakerEnabled;
 
   private Alert noPoseAlert =
       new Alert("Attempted to reset pose from vision, but no pose was found.", AlertType.WARNING);
@@ -117,7 +117,7 @@ public class Drivetrain extends SubsystemBase {
 
     this.isMoveToPoseEnabled = true;
 
-    this.isLockToSpeakerEnabled = false;
+    this.isAimToSpeakerEnabled = false;
 
     ShuffleboardTab tabMain = Shuffleboard.getTab("MAIN");
     tabMain
@@ -972,16 +972,16 @@ public class Drivetrain extends SubsystemBase {
     this.io.setBrakeMode(enable);
   }
 
-  public void enableLockToSpeaker() {
-    this.isLockToSpeakerEnabled = true;
+  public void enableAimToSpeaker() {
+    this.isAimToSpeakerEnabled = true;
   }
 
-  public void disableLockToSpeaker() {
-    this.isLockToSpeakerEnabled = false;
+  public void disableAimToSpeaker() {
+    this.isAimToSpeakerEnabled = false;
   }
 
-  public boolean isLockToSpeakerEnabled() {
-    return this.isLockToSpeakerEnabled;
+  public boolean isAimToSpeakerEnabled() {
+    return this.isAimToSpeakerEnabled;
   }
 
   public boolean isAimedAtSpeaker() {
@@ -991,8 +991,8 @@ public class Drivetrain extends SubsystemBase {
             Field2d.getInstance().getAllianceSpeakerCenter().getY() - this.getPose().getY(),
             new Rotation2d());
     return Math.abs(
-            Math.atan2(
-                translation.getY(), translation.getX() - this.getPose().getRotation().getRadians()))
+            Math.atan2(translation.getY(), translation.getX())
+                - this.getPose().getRotation().getRadians())
         < ANGLE_TO_SPEAKER_TOLERANCE;
   }
 
