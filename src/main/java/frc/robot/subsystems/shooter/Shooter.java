@@ -36,12 +36,13 @@ public class Shooter extends SubsystemBase {
 
   private ShooterState state = ShooterState.AIM;
 
-  enum ShooterState {
+  public enum ShooterState {
     SCORE_PODIUM,
     SCORE_SUBWOOFER,
     SCORE_AMP,
     AIM,
-    ANGLING
+    ANGLING,
+    STORAGE
   }
 
   public Shooter(ShooterIO io, Intake intake) {
@@ -75,7 +76,7 @@ public class Shooter extends SubsystemBase {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
       io.setAngle(angle.get());
-    } else if (autoShooter) {
+    } else {
       runAngleStateMachine();
     }
   }
@@ -86,25 +87,31 @@ public class Shooter extends SubsystemBase {
       if (state == ShooterState.SCORE_PODIUM) { // 1
         io.setShooterWheelBottomVelocity(ShooterConstants.PODIUM_VELOCITY);
         io.setShooterWheelTopVelocity(ShooterConstants.PODIUM_VELOCITY);
-        io.setAngle(ShooterConstants.PODIUM_ANGLE);
+        if (autoShooter) io.setAngle(ShooterConstants.PODIUM_ANGLE);
       } else if (state == ShooterState.SCORE_SUBWOOFER) { // 2
         io.setShooterWheelBottomVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
         io.setShooterWheelTopVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
-        io.setAngle(ShooterConstants.SUBWOOFER_ANGLE);
+        if (autoShooter) io.setAngle(ShooterConstants.SUBWOOFER_ANGLE);
       } else if (state == ShooterState.SCORE_AMP) { // 3
         io.setShooterWheelBottomVelocity(ShooterConstants.AMP_VELOCITY);
         io.setShooterWheelTopVelocity(ShooterConstants.AMP_VELOCITY);
-        io.setAngle(ShooterConstants.AMP_ANGLE);
+        if (autoShooter) io.setAngle(ShooterConstants.AMP_ANGLE);
       } else if (state == ShooterState.AIM) { // 4
         setRangeVelocity();
-        io.setAngle(angleTreeMap.get(distanceToSpeaker));
-      } else { // not aiming 5
+        if (autoShooter) io.setAngle(angleTreeMap.get(distanceToSpeaker));
+      } else if (state == ShooterState.STORAGE && autoShooter) { // 5
+        this.goToIdleVelocity();
+        io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
+      } else if (autoShooter) { // not aiming 5
         this.goToIdleVelocity();
         io.setAngle(angleTreeMap.get(distanceToSpeaker));
       }
-    } else { // no note 0
+    } else if (autoShooter) { // no note 0
       this.goToIdleVelocity();
       io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
+    } else {
+      io.setShooterWheelBottomVelocity(0);
+      io.setShooterWheelTopVelocity(0);
     }
   }
 
@@ -123,8 +130,16 @@ public class Shooter extends SubsystemBase {
     }
   }
 
-  public void changeState(ShooterState state) {
+  public void setState(ShooterState state) {
     this.state = state;
+  }
+
+  public void enableAutoShooter() {
+    this.autoShooter = true;
+  }
+
+  public void disableAutoShooter() {
+    this.autoShooter = false;
   }
 
   public void goToIdleVelocity() {
@@ -186,5 +201,13 @@ public class Shooter extends SubsystemBase {
       angleAtSetpointIterationCount = 0;
     }
     return false;
+  }
+
+  public boolean isAutoShooter() {
+    return autoShooter;
+  }
+
+  public void setAngleMotorVoltage(double voltage) {
+    io.setAngleMotorVoltage(voltage);
   }
 }

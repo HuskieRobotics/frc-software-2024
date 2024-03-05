@@ -75,6 +75,7 @@ public class ShooterConstants {
   public static final double SENSOR_TO_MECHANISM_RATIO = 4.0;
   public static final double ANGLE_TOLERANCE_DEGREES = 0.5; // FIXME tune with real robot
   public static final double SHOOTER_STORAGE_ANGLE = 0.0; // FIXME tune with real robot
+  public static final double ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE = 1.0;
 
   // Shooter Presets
   public static final double SUBWOOFER_VELOCITY = 10.0; // FIXME tune with real robot

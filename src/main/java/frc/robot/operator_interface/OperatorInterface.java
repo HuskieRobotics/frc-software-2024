@@ -65,7 +65,7 @@ public interface OperatorInterface {
 
   // drivetrain, game-specific
 
-  public default Trigger getLockToSpeakerButton() {
+  public default Trigger getAimSpeakerButton() {
     return new Trigger(() -> false);
   }
 

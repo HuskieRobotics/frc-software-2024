@@ -12,6 +12,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
@@ -34,6 +35,7 @@ public class ShooterIOTalonFX implements ShooterIO {
   private VelocityTorqueCurrentFOC shootMotorTopVelocityRequest;
   private VelocityTorqueCurrentFOC shootMotorBottomVelocityRequest;
   private MotionMagicExpoVoltage angleMotorPositionRequest;
+  private VoltageOut angleMotorVoltageRequest;
 
   // Using StatusSignal to get the stator current of the motors
   private StatusSignal<Double> shootMotorTopStatorCurrentStatusSignal;
@@ -65,7 +67,6 @@ public class ShooterIOTalonFX implements ShooterIO {
   private StatusSignal<Double> shootMotorTopClosedLoopReferenceSlopeStatusSignal;
   private StatusSignal<Double> shootMotorBottomClosedLoopReferenceSlopeStatusSignal;
   private StatusSignal<Double> angleMotorClosedLoopReferenceSlopeStatusSignal;
-
 
   private VelocitySystemSim shootMotorTopSim;
   private VelocitySystemSim shootMotorBottomSim;
@@ -129,6 +130,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     shootMotorTopVelocityRequest = new VelocityTorqueCurrentFOC(0);
     shootMotorBottomVelocityRequest = new VelocityTorqueCurrentFOC(0);
     angleMotorPositionRequest = new MotionMagicExpoVoltage(0);
+    angleMotorVoltageRequest = new VoltageOut(0);
 
     shootMotorTopVelocityStatusSignal = shootMotorTop.getVelocity();
     shootMotorBottomVelocityStatusSignal = shootMotorBottom.getVelocity();
@@ -155,7 +157,8 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotorVoltageStatusSignal = angleMotor.getMotorVoltage();
 
     shootMotorTopClosedLoopReferenceSlopeStatusSignal = shootMotorTop.getClosedLoopReferenceSlope();
-    shootMotorBottomClosedLoopReferenceSlopeStatusSignal = shootMotorBottom.getClosedLoopReferenceSlope();
+    shootMotorBottomClosedLoopReferenceSlopeStatusSignal =
+        shootMotorBottom.getClosedLoopReferenceSlope();
     angleMotorClosedLoopReferenceSlopeStatusSignal = angleMotor.getClosedLoopReferenceSlope();
 
     configShootMotor(shootMotorTop, SHOOT_TOP_INVERTED, true);
@@ -331,6 +334,11 @@ public class ShooterIOTalonFX implements ShooterIO {
   @Override
   public void setAngle(double angle) {
     angleMotor.setControl(angleMotorPositionRequest.withPosition(Units.degreesToRotations(angle)));
+  }
+
+  @Override
+  public void setAngleMotorVoltage(double voltage) {
+    angleMotor.setControl(angleMotorVoltageRequest.withOutput(voltage));
   }
 
   private double rotationsToDegrees(double rotations) {
