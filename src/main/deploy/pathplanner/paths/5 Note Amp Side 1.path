@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.4229570277322372,
-        "y": 6.28
+        "x": 1.2680663740957114,
+        "y": 6.291774852068222
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.792458494007897,
-        "y": 6.156972313944628
+        "x": 3.637567840371373,
+        "y": 6.16874716601285
       },
       "isLocked": false,
       "linkedName": null
@@ -49,6 +49,11 @@
       "waypointRelativePos": 0.7,
       "rotationDegrees": 179.9156174720765,
       "rotateFast": true
+    },
+    {
+      "waypointRelativePos": 0.25,
+      "rotationDegrees": -169.5059460285663,
+      "rotateFast": false
     }
   ],
   "constraintZones": [],
@@ -67,7 +72,7 @@
   "reversed": false,
   "folder": "5 Note Amp Side",
   "previewStartingState": {
-    "rotation": -179.7435078772501,
+    "rotation": -151.5779301808669,
     "velocity": 0
   },
   "useDefaultConstraints": false
