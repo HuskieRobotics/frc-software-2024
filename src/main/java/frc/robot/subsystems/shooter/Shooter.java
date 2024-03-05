@@ -26,29 +26,29 @@ public class Shooter extends SubsystemBase {
   private final TunableNumber angle = new TunableNumber("Shooter/Angle", 10.0);
 
   private boolean autoShooter = true;
-  private boolean hasNote = false;
 
   private int topAtSetpointIterationCount = 0;
   private int bottomAtSetpointIterationCount = 0;
   private int angleAtSetpointIterationCount = 0;
 
-  private ShooterState state = ShooterState.AIM;
+  private ShooterState state = ShooterState.HAS_NOTE;
 
   public enum ShooterState {
+    STORAGE,
+    HAS_NOTE,
+    AIM,
     SCORE_PODIUM,
     SCORE_SUBWOOFER,
-    SCORE_AMP,
-    AIM,
-    STORAGE
+    SCORE_AMP
   }
 
   public Shooter(ShooterIO io, Intake intake) {
     this.io = io;
     this.intake = intake;
     this.angleTreeMap = new InterpolatingDoubleTreeMap();
+    populateAngleMap();
 
     this.autoShooter = true;
-    this.hasNote = false;
 
     if (TESTING) {
       ShuffleboardTab tab = Shuffleboard.getTab(SUBSYSTEM_NAME);
@@ -56,11 +56,18 @@ public class Shooter extends SubsystemBase {
     }
   }
 
+  private void populateAngleMap() {
+    // FIXME: update after characterization
+    for (int i = 0; i < 10; i++) {
+      angleTreeMap.put(0.3 * i + 1.3, 60.0 - i * 5.0);
+    }
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(shooterInputs);
     Logger.processInputs(SUBSYSTEM_NAME, shooterInputs);
-    this.hasNote = intake.hasNote();
+    Logger.recordOutput("Shooter/State", this.state.toString());
 
     if (TESTING) {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
@@ -73,7 +80,7 @@ public class Shooter extends SubsystemBase {
 
   private void runAngleStateMachine() {
 
-    if (hasNote) {
+    if (intake.hasNote()) {
       double distanceToSpeaker =
           Field2d.getInstance()
               .getAllianceSpeakerCenter()
@@ -99,7 +106,7 @@ public class Shooter extends SubsystemBase {
       } else if (state == ShooterState.STORAGE && autoShooter) { // 5
         this.goToIdleVelocity();
         io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
-      } else if (autoShooter) { // not aiming 5
+      } else if (state == ShooterState.HAS_NOTE && autoShooter) { // not aiming 5
         this.goToIdleVelocity();
         io.setAngle(angleTreeMap.get(distanceToSpeaker));
       }
@@ -107,6 +114,8 @@ public class Shooter extends SubsystemBase {
       this.goToIdleVelocity();
       io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
     } else {
+      // if automation is disabled, stop the shooter wheels so that we don't accidentally
+      // shoot notes when we manually intake them
       io.setShooterWheelBottomVelocity(0);
       io.setShooterWheelTopVelocity(0);
     }
