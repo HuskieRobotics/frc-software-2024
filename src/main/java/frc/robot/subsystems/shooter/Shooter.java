@@ -27,7 +27,7 @@ public class Shooter extends SubsystemBase {
 
   private double distanceToSpeaker = 0.0;
 
-  private boolean autoShooter = false;
+  private boolean autoShooter = true;
   private boolean hasNote = false;
 
   private int topAtSetpointIterationCount = 0;
@@ -51,7 +51,7 @@ public class Shooter extends SubsystemBase {
     this.angleTreeMap = new InterpolatingDoubleTreeMap();
 
     this.distanceToSpeaker = 0.0;
-    this.autoShooter = false;
+    this.autoShooter = true;
     this.hasNote = false;
 
     if (TESTING) {
