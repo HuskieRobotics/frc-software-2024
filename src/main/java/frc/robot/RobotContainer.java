@@ -362,6 +362,22 @@ public class RobotContainer {
     Command distanceTestPathCommand = new PathPlannerAuto("DistanceTest");
     autoChooser.addOption("Distance Path", distanceTestPathCommand);
 
+    /************ Auto Tuning ************
+     *
+     * useful for tuning the autonomous PID controllers
+     *
+     */
+    Command tuningCommand = new PathPlannerAuto("Tuning");
+    autoChooser.addOption("Auto Tuning", tuningCommand);
+
+    /************ 1 Note Anywhere ************
+     *
+     * shoot initial note and leave robot starting zone
+     *
+     */
+
+    // FIXME: add commands to wait for the shooter wheel to reach the desired velocity and then
+    // shoot
     Command oneNoteAnywhere =
         Commands.run(
                 () -> {
@@ -377,17 +393,28 @@ public class RobotContainer {
                     drivetrain));
     autoChooser.addOption("One Note Anywhere", oneNoteAnywhere);
 
-    /************ Auto Tuning ************
+    /************ 2 Notes ************
      *
-     * useful for tuning the autonomous PID controllers
+     * 2 notes (initial and second center note from source side)
      *
      */
-    Command tuningCommand = new PathPlannerAuto("Tuning");
-    autoChooser.addOption("Auto Tuning", tuningCommand);
 
-    /************ 4 Note ************
+    Command twoNoteSourceSide = new PathPlannerAuto("2 Note Source Side");
+    autoChooser.addOption("2 Note Source Side", twoNoteSourceSide);
+
+    /************ 3 Notes ************
      *
-     * used for testing the 6 note autonomous (Still Testing)
+     * 3 notes (initial and first and second center notes from source side)
+     *
+     */
+
+    Command threeNoteSourceSide = new PathPlannerAuto("3 Note Source Side");
+    autoChooser.addOption("3 Note Source Side", threeNoteSourceSide);
+
+    /************ 4 Notes ************
+     *
+     * 4 note starting from the amp side
+     * 4 note starting from the source side
      *
      */
     Command fourNoteAmpSideWing = new PathPlannerAuto("4 Note Amp-Side Wing");
@@ -396,22 +423,13 @@ public class RobotContainer {
     Command fourNoteSourceSideWing = new PathPlannerAuto("4 Note Source-Side Wing");
     autoChooser.addOption("4 Note Source-Side Wing", fourNoteSourceSideWing);
 
-    // 2 Note Auto's
-
-    Command twoNoteAmpSideCenter = new PathPlannerAuto("2 Note Amp Side Center");
-    autoChooser.addOption("2 Note Amp Side Center", twoNoteAmpSideCenter);
-
-    Command twoNoteSourceSide = new PathPlannerAuto("2 Note Source Side");
-    autoChooser.addOption("2 Note Source Side", twoNoteSourceSide);
-
-    Command threeNoteSourceSide = new PathPlannerAuto("3 Note Source Side");
-    autoChooser.addOption("2 Note Amp Side", threeNoteSourceSide);
-
+    /************ 5 Notes ************
+     *
+     * 5 notes (initial, 3 in wing, and second center note from amp side)
+     *
+     */
     Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Amp Side");
     autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
-
-    Command sixNoteAmpSide = new PathPlannerAuto("6 Note Amp Side");
-    autoChooser.addOption("6 Note Amp Side", sixNoteAmpSide);
 
     /************ Drive Velocity Tuning ************
      *
