@@ -117,6 +117,10 @@ public class ShooterIOTalonFX implements ShooterIO {
   private TalonFX angleMotor;
   private CANcoder angleEncoder;
 
+  private double angleSetpoint;
+  private double topWheelVelocity;
+  private double bottomWheelVelocity;
+
   public ShooterIOTalonFX() {
 
     shootMotorTop = new TalonFX(TOP_SHOOTER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
@@ -145,6 +149,9 @@ public class ShooterIOTalonFX implements ShooterIO {
     shootMotorTopReferenceVelocityStatusSignal = shootMotorTop.getClosedLoopReference();
     shootMotorBottomReferenceVelocityStatusSignal = shootMotorBottom.getClosedLoopReference();
     angleMotorReferencePositionStatusSignal = angleMotor.getClosedLoopReference();
+    // FIXME: this shouldn't be needed and doesn't work in sim; check if it works on the real robot
+    // and file a bug
+    angleMotorReferencePositionStatusSignal.setUpdateFrequency(100.0);
 
     shootMotorTopTemperatureStatusSignal = shootMotorTop.getDeviceTemp();
     shootMotorBottomTemperatureStatusSignal = shootMotorBottom.getDeviceTemp();
@@ -155,6 +162,9 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotorVoltageStatusSignal = angleMotor.getMotorVoltage();
 
     angleMotorClosedLoopReferenceSlopeStatusSignal = angleMotor.getClosedLoopReferenceSlope();
+    // FIXME: this shouldn't be needed and doesn't work in sim; check if it works on the real robot
+    // and file a bug
+    angleMotorClosedLoopReferenceSlopeStatusSignal.setUpdateFrequency(100.0);
 
     configShootMotor(shootMotorTop, SHOOT_TOP_INVERTED, true);
     configShootMotor(shootMotorBottom, SHOOT_BOTTOM_INVERTED, false);
@@ -184,7 +194,7 @@ public class ShooterIOTalonFX implements ShooterIO {
             Units.inchesToMeters(20.0),
             Units.lbsToKilograms(20.0),
             Units.degreesToRadians(10.0),
-            Units.degreesToRadians(100.0),
+            Units.degreesToRadians(120.0),
             Units.degreesToRadians(10.0),
             SUBSYSTEM_NAME);
   }
@@ -222,7 +232,8 @@ public class ShooterIOTalonFX implements ShooterIO {
     shooterInputs.shootMotorTopSupplyCurrentAmps =
         shootMotorTopSupplyCurrentStatusSignal.getValueAsDouble();
     shooterInputs.shootMotorTopVelocityRPS = shootMotorTopVelocityStatusSignal.getValueAsDouble();
-    shooterInputs.shootMotorTopReferenceVelocityRPS =
+    shooterInputs.shootMotorTopReferenceVelocityRPS = this.topWheelVelocity;
+    shooterInputs.shootMotorTopClosedLoopReferenceRPS =
         shootMotorTopReferenceVelocityStatusSignal.getValueAsDouble();
     shooterInputs.shootMotorTopTemperatureCelsius =
         shootMotorTopTemperatureStatusSignal.getValueAsDouble();
@@ -235,7 +246,8 @@ public class ShooterIOTalonFX implements ShooterIO {
         shootMotorBottomSupplyCurrentStatusSignal.getValueAsDouble();
     shooterInputs.shootMotorBottomVelocityRPS =
         shootMotorBottomVelocityStatusSignal.getValueAsDouble();
-    shooterInputs.shootMotorBottomReferenceVelocityRPS =
+    shooterInputs.shootMotorBottomReferenceVelocityRPS = this.bottomWheelVelocity;
+    shooterInputs.shootMotorBottomClosedLoopReferenceRPS =
         shootMotorBottomReferenceVelocityStatusSignal.getValueAsDouble();
     shooterInputs.shootMotorBottomTemperatureCelsius =
         shootMotorBottomTemperatureStatusSignal.getValueAsDouble();
@@ -278,7 +290,8 @@ public class ShooterIOTalonFX implements ShooterIO {
     shooterInputs.angleMotorVoltage = angleMotor.getMotorVoltage().getValue();
     shooterInputs.angleEncoderAngleDegrees =
         Units.rotationsToDegrees(angleMotorPositionStatusSignal.getValueAsDouble());
-    shooterInputs.angleMotorReferenceAngleDegrees =
+    shooterInputs.angleMotorReferenceAngleDegrees = this.angleSetpoint;
+    shooterInputs.angleMotorClosedLoopReferenceDegrees =
         Units.rotationsToDegrees(angleMotorReferencePositionStatusSignal.getValueAsDouble());
     shooterInputs.angleMotorTemperatureCelsius =
         angleMotorTemperatureStatusSignal.getValueAsDouble();
@@ -317,16 +330,19 @@ public class ShooterIOTalonFX implements ShooterIO {
   @Override
   public void setShooterWheelTopVelocity(double rps) {
     shootMotorTop.setControl(shootMotorTopVelocityRequest.withVelocity(rps));
+    this.topWheelVelocity = rps;
   }
 
   @Override
   public void setShooterWheelBottomVelocity(double rps) {
     shootMotorBottom.setControl(shootMotorBottomVelocityRequest.withVelocity(rps));
+    this.bottomWheelVelocity = rps;
   }
 
   @Override
   public void setAngle(double angle) {
     angleMotor.setControl(angleMotorPositionRequest.withPosition(Units.degreesToRotations(angle)));
+    this.angleSetpoint = angle;
   }
 
   @Override
