@@ -3,8 +3,13 @@
   "robotLength": 0.88,
   "holonomicMode": true,
   "pathFolders": [
+    "2 Note Amp Side Center",
+    "2 Note Source Side",
     "4 Note Amp-Side Wing",
     "4 Note Source-Side Wing",
+    "5 Note Amp Side",
+    "6 Note Amp Side",
+    "3 Note Source Side",
     "Tuning"
   ],
   "autoFolders": [

@@ -370,9 +370,51 @@ public class RobotContainer {
     Command tuningCommand = new PathPlannerAuto("Tuning");
     autoChooser.addOption("Auto Tuning", tuningCommand);
 
-    /************ 4 Note ************
+    /************ 1 Note Anywhere ************
      *
-     * used for testing the 6 note autonomous (Still Testing)
+     * shoot initial note and leave robot starting zone
+     *
+     */
+
+    // FIXME: add commands to wait for the shooter wheel to reach the desired velocity and then
+    // shoot
+    Command oneNoteAnywhere =
+        Commands.run(
+                () -> {
+                  drivetrain.drive(1, 0, 0, false, true);
+                },
+                drivetrain)
+            .withTimeout(2.5)
+            .andThen(
+                Commands.runOnce(
+                    () -> {
+                      drivetrain.drive(0, 0, 0, false, false);
+                    },
+                    drivetrain));
+    autoChooser.addOption("One Note Anywhere", oneNoteAnywhere);
+
+    /************ 2 Notes ************
+     *
+     * 2 notes (initial and second center note from source side)
+     *
+     */
+
+    Command twoNoteSourceSide = new PathPlannerAuto("2 Note Source Side");
+    autoChooser.addOption("2 Note Source Side", twoNoteSourceSide);
+
+    /************ 3 Notes ************
+     *
+     * 3 notes (initial and first and second center notes from source side)
+     *
+     */
+
+    Command threeNoteSourceSide = new PathPlannerAuto("3 Note Source Side");
+    autoChooser.addOption("3 Note Source Side", threeNoteSourceSide);
+
+    /************ 4 Notes ************
+     *
+     * 4 note starting from the amp side
+     * 4 note starting from the source side
      *
      */
     Command fourNoteAmpSideWing = new PathPlannerAuto("4 Note Amp-Side Wing");
@@ -380,6 +422,14 @@ public class RobotContainer {
 
     Command fourNoteSourceSideWing = new PathPlannerAuto("4 Note Source-Side Wing");
     autoChooser.addOption("4 Note Source-Side Wing", fourNoteSourceSideWing);
+
+    /************ 5 Notes ************
+     *
+     * 5 notes (initial, 3 in wing, and second center note from amp side)
+     *
+     */
+    Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Amp Side");
+    autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
 
     /************ Drive Velocity Tuning ************
      *
