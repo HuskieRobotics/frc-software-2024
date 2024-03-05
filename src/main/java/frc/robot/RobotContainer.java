@@ -635,10 +635,12 @@ public class RobotContainer {
             Commands.runOnce(() -> shooter.setAngleMotorVoltage(0), shooter)
                 .onlyIf(() -> !shooter.isAutoShooter()));
 
-    // FIXME: needs to make sure the intake sensor is unblocked befor going back to angling (default
-    // state)
     oi.getShootButton()
-        .onTrue(Commands.waitUntil(this::isReadyToShoot).andThen(intake::shoot, intake));
+        .onTrue( // whileTrue?
+            Commands.waitUntil(this::isReadyToShoot)
+                .andThen(
+                    Commands.parallel(
+                        Commands.runOnce(intake::shoot, intake), NoteVisualizer.shoot())));
   }
 
   /**
