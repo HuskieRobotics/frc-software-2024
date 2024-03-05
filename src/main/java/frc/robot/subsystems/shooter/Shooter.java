@@ -25,8 +25,6 @@ public class Shooter extends SubsystemBase {
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber angle = new TunableNumber("Shooter/Angle", 10.0);
 
-  private double distanceToSpeaker = 0.0;
-
   private boolean autoShooter = true;
   private boolean hasNote = false;
 
@@ -41,7 +39,6 @@ public class Shooter extends SubsystemBase {
     SCORE_SUBWOOFER,
     SCORE_AMP,
     AIM,
-    ANGLING,
     STORAGE
   }
 
@@ -50,7 +47,6 @@ public class Shooter extends SubsystemBase {
     this.intake = intake;
     this.angleTreeMap = new InterpolatingDoubleTreeMap();
 
-    this.distanceToSpeaker = 0.0;
     this.autoShooter = true;
     this.hasNote = false;
 
@@ -65,12 +61,6 @@ public class Shooter extends SubsystemBase {
     io.updateInputs(shooterInputs);
     Logger.processInputs(SUBSYSTEM_NAME, shooterInputs);
     this.hasNote = intake.hasNote();
-    this.distanceToSpeaker =
-        Field2d.getInstance()
-            .getAllianceSpeakerCenter()
-            .minus(RobotOdometry.getInstance().getEstimatedPosition())
-            .getTranslation()
-            .getNorm();
 
     if (TESTING) {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
@@ -84,6 +74,13 @@ public class Shooter extends SubsystemBase {
   private void runAngleStateMachine() {
 
     if (hasNote) {
+      double distanceToSpeaker =
+          Field2d.getInstance()
+              .getAllianceSpeakerCenter()
+              .minus(RobotOdometry.getInstance().getEstimatedPosition())
+              .getTranslation()
+              .getNorm();
+
       if (state == ShooterState.SCORE_PODIUM) { // 1
         io.setShooterWheelBottomVelocity(ShooterConstants.PODIUM_VELOCITY);
         io.setShooterWheelTopVelocity(ShooterConstants.PODIUM_VELOCITY);
@@ -96,8 +93,8 @@ public class Shooter extends SubsystemBase {
         io.setShooterWheelBottomVelocity(ShooterConstants.AMP_VELOCITY);
         io.setShooterWheelTopVelocity(ShooterConstants.AMP_VELOCITY);
         if (autoShooter) io.setAngle(ShooterConstants.AMP_ANGLE);
-      } else if (state == ShooterState.AIM) { // 4
-        setRangeVelocity();
+      } else if (state == ShooterState.AIM && autoShooter) { // 4
+        setRangeVelocity(distanceToSpeaker);
         if (autoShooter) io.setAngle(angleTreeMap.get(distanceToSpeaker));
       } else if (state == ShooterState.STORAGE && autoShooter) { // 5
         this.goToIdleVelocity();
@@ -115,13 +112,8 @@ public class Shooter extends SubsystemBase {
     }
   }
 
-  private void setRangeVelocity() {
-    if (Field2d.getInstance()
-            .getAllianceSpeakerCenter()
-            .minus(RobotOdometry.getInstance().getEstimatedPosition())
-            .getTranslation()
-            .getNorm()
-        < ShooterConstants.VELOCITY_ZONE_SWITCH_DISTANCE) {
+  private void setRangeVelocity(double distanceToSpeaker) {
+    if (distanceToSpeaker < ShooterConstants.VELOCITY_ZONE_SWITCH_DISTANCE) {
       io.setShooterWheelTopVelocity(ShooterConstants.CLOSE_RANGE_VELOCITY);
       io.setShooterWheelBottomVelocity(ShooterConstants.CLOSE_RANGE_VELOCITY);
     } else {
