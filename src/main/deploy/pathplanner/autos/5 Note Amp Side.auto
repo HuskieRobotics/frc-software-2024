@@ -18,6 +18,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "5 Note Amp Side 2"

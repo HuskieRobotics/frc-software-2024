@@ -18,6 +18,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "2 Note Source Start - 7"
@@ -27,6 +33,12 @@
           "type": "path",
           "data": {
             "pathName": "2 Note Source 7-End"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         }
       ]
