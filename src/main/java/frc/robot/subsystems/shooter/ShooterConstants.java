@@ -58,10 +58,11 @@ public class ShooterConstants {
   public static final double SHOOTER_IDLE_VELOCITY = 10.0; // FIXME tune with real robot
   public static final boolean SHOOT_TOP_INVERTED = false;
   public static final boolean SHOOT_BOTTOM_INVERTED = false;
-  public static final double VELOCITY_TOLERANCE = 0.1;
-  public static final double CLOSE_RANGE_VELOCITY = 20;
-  public static final double FAR_RANGE_VELOCITY = 50;
-  public static final double VELOCITY_ZONE_SWITCH_DISTANCE = Units.inchesToMeters(106.901) / 2.0;
+  public static final double VELOCITY_TOLERANCE = 5.0; // FIXME: tune with real robot
+  public static final double CLOSE_RANGE_VELOCITY = 15; // FIXME: tune with real robot
+  public static final double FAR_RANGE_VELOCITY = 30; // FIXME: tune with real robot
+  public static final double VELOCITY_ZONE_SWITCH_DISTANCE =
+      Units.inchesToMeters(106.901) / 2.0; // FIXME: tune with real robot
 
   // Angle Motor
   public static final double ANGLE_MOTOR_CONTINUOUS_CURRENT_LIMIT = 15;
@@ -73,15 +74,15 @@ public class ShooterConstants {
   public static final boolean ANGLE_MOTOR_INVERTED = false;
   public static final double MAGNET_OFFSET = 0.0;
   public static final double SENSOR_TO_MECHANISM_RATIO = 4.0;
-  public static final double ANGLE_TOLERANCE_DEGREES = 0.5; // FIXME tune with real robot
-  public static final double SHOOTER_STORAGE_ANGLE = 0.0; // FIXME tune with real robot
+  public static final double ANGLE_TOLERANCE_DEGREES = 2.0; // FIXME tune with real robot
+  public static final double SHOOTER_STORAGE_ANGLE = 11.0; // FIXME tune with real robot
   public static final double ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE = 1.0;
 
   // Shooter Presets
-  public static final double SUBWOOFER_VELOCITY = 10.0; // FIXME tune with real robot
+  public static final double SUBWOOFER_VELOCITY = 12.0; // FIXME tune with real robot
   public static final double SUBWOOFER_ANGLE = 45.0; // FIXME tune with real robot
-  public static final double PODIUM_VELOCITY = 10.0; // FIXME tune with real robot
+  public static final double PODIUM_VELOCITY = 20.0; // FIXME tune with real robot
   public static final double PODIUM_ANGLE = 15.0; // FIXME tune with real robot
-  public static final double AMP_VELOCITY = 10.0; // FIXME tune with real robot
+  public static final double AMP_VELOCITY = 5.0; // FIXME tune with real robot
   public static final double AMP_ANGLE = 110.0; // FIXME tune with real robot
 }
