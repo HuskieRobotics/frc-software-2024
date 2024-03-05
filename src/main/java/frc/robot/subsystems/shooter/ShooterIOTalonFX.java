@@ -64,8 +64,6 @@ public class ShooterIOTalonFX implements ShooterIO {
   private StatusSignal<Double> shootMotorBottomVoltageStatusSignal;
   private StatusSignal<Double> angleMotorVoltageStatusSignal;
 
-  private StatusSignal<Double> shootMotorTopClosedLoopReferenceSlopeStatusSignal;
-  private StatusSignal<Double> shootMotorBottomClosedLoopReferenceSlopeStatusSignal;
   private StatusSignal<Double> angleMotorClosedLoopReferenceSlopeStatusSignal;
 
   private VelocitySystemSim shootMotorTopSim;
@@ -156,9 +154,6 @@ public class ShooterIOTalonFX implements ShooterIO {
     shootMotorBottomVoltageStatusSignal = shootMotorBottom.getMotorVoltage();
     angleMotorVoltageStatusSignal = angleMotor.getMotorVoltage();
 
-    shootMotorTopClosedLoopReferenceSlopeStatusSignal = shootMotorTop.getClosedLoopReferenceSlope();
-    shootMotorBottomClosedLoopReferenceSlopeStatusSignal =
-        shootMotorBottom.getClosedLoopReferenceSlope();
     angleMotorClosedLoopReferenceSlopeStatusSignal = angleMotor.getClosedLoopReferenceSlope();
 
     configShootMotor(shootMotorTop, SHOOT_TOP_INVERTED, true);
@@ -219,8 +214,6 @@ public class ShooterIOTalonFX implements ShooterIO {
         shootMotorTopVoltageStatusSignal,
         shootMotorBottomVoltageStatusSignal,
         angleMotorVoltageStatusSignal,
-        shootMotorTopClosedLoopReferenceSlopeStatusSignal,
-        shootMotorBottomClosedLoopReferenceSlopeStatusSignal,
         angleMotorClosedLoopReferenceSlopeStatusSignal);
 
     // Updates Top Shooter Motor Inputs
@@ -234,8 +227,6 @@ public class ShooterIOTalonFX implements ShooterIO {
     shooterInputs.shootMotorTopTemperatureCelsius =
         shootMotorTopTemperatureStatusSignal.getValueAsDouble();
     shooterInputs.shootMotorTopVoltage = shootMotorTopVoltageStatusSignal.getValueAsDouble();
-    shooterInputs.shootMotorTopClosedLoopReferenceSlope =
-        shootMotorTopClosedLoopReferenceSlopeStatusSignal.getValueAsDouble();
 
     // Updates Bottom Shooter Motor Inputs
     shooterInputs.shootMotorBottomStatorCurrentAmps =
@@ -249,8 +240,6 @@ public class ShooterIOTalonFX implements ShooterIO {
     shooterInputs.shootMotorBottomTemperatureCelsius =
         shootMotorBottomTemperatureStatusSignal.getValueAsDouble();
     shooterInputs.shootMotorBottomVoltage = shootMotorBottomVoltageStatusSignal.getValueAsDouble();
-    shooterInputs.shootMotorBottomClosedLoopReferenceSlope =
-        shootMotorBottomClosedLoopReferenceSlopeStatusSignal.getValueAsDouble();
 
     // check if the tunable numbers have changed for the top and bottom shooter motors
     if (shootMotorTopKD.hasChanged()
@@ -258,6 +247,7 @@ public class ShooterIOTalonFX implements ShooterIO {
         || shootMotorTopKP.hasChanged()
         || shootMotorTopKS.hasChanged()) {
       Slot0Configs shootMotorConfig = new Slot0Configs();
+      shootMotorTop.getConfigurator().refresh(shootMotorConfig);
       shootMotorConfig.kP = shootMotorTopKP.get();
       shootMotorConfig.kI = shootMotorTopKI.get();
       shootMotorConfig.kD = shootMotorTopKD.get();
@@ -271,6 +261,7 @@ public class ShooterIOTalonFX implements ShooterIO {
         || shootMotorBottomKP.hasChanged()
         || shootMotorBottomKS.hasChanged()) {
       Slot0Configs shootMotorConfig = new Slot0Configs();
+      shootMotorBottom.getConfigurator().refresh(shootMotorConfig);
       shootMotorConfig.kP = shootMotorBottomKP.get();
       shootMotorConfig.kI = shootMotorBottomKI.get();
       shootMotorConfig.kD = shootMotorBottomKD.get();
@@ -288,7 +279,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     shooterInputs.angleEncoderAngleDegrees =
         Units.rotationsToDegrees(angleMotorPositionStatusSignal.getValueAsDouble());
     shooterInputs.angleMotorReferenceAngleDegrees =
-        rotationsToDegrees(angleMotorReferencePositionStatusSignal.getValueAsDouble());
+        Units.rotationsToDegrees(angleMotorReferencePositionStatusSignal.getValueAsDouble());
     shooterInputs.angleMotorTemperatureCelsius =
         angleMotorTemperatureStatusSignal.getValueAsDouble();
     shooterInputs.angleMotorClosedLoopReferenceSlope =
@@ -303,6 +294,7 @@ public class ShooterIOTalonFX implements ShooterIO {
         || rotationMotorExpoKV.hasChanged()
         || rotationMotorExpoKA.hasChanged()) {
       Slot0Configs angleMotorConfig = new Slot0Configs();
+      angleMotor.getConfigurator().refresh(angleMotorConfig);
       angleMotorConfig.kP = rotationMotorKP.get();
       angleMotorConfig.kI = rotationMotorKI.get();
       angleMotorConfig.kD = rotationMotorKD.get();
@@ -313,6 +305,7 @@ public class ShooterIOTalonFX implements ShooterIO {
       angleMotor.getConfigurator().apply(angleMotorConfig);
 
       MotionMagicConfigs rotationMotionMagicConfig = new MotionMagicConfigs();
+      angleMotor.getConfigurator().refresh(rotationMotionMagicConfig);
       rotationMotionMagicConfig.MotionMagicExpo_kV = rotationMotorExpoKV.get();
       rotationMotionMagicConfig.MotionMagicExpo_kA = rotationMotorExpoKA.get();
       rotationMotionMagicConfig.MotionMagicCruiseVelocity =
@@ -341,10 +334,6 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotor.setControl(angleMotorVoltageRequest.withOutput(voltage));
   }
 
-  private double rotationsToDegrees(double rotations) {
-    return rotations * 360;
-  }
-
   private void configShootMotor(TalonFX shootMotor, boolean isInverted, boolean isTopMotor) {
 
     TalonFXConfiguration shootMotorsConfig = new TalonFXConfiguration();
@@ -371,34 +360,18 @@ public class ShooterIOTalonFX implements ShooterIO {
     shootMotorsConfig.CurrentLimits = shootMotorsCurrentLimits;
 
     if (isTopMotor) {
-      shootMotorsCurrentLimits.SupplyCurrentLimit =
-          ShooterConstants.SHOOT_MOTOR_TOP_CONTINUOUS_CURRENT_LIMIT;
-      shootMotorsCurrentLimits.SupplyCurrentThreshold =
-          ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_LIMIT;
-      shootMotorsCurrentLimits.SupplyTimeThreshold =
-          ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_DURATION;
-
       shootMotorsConfig.Slot0.kP = shootMotorTopKP.get();
       shootMotorsConfig.Slot0.kI = shootMotorTopKI.get();
       shootMotorsConfig.Slot0.kD = shootMotorTopKD.get();
       shootMotorsConfig.Slot0.kS = shootMotorTopKS.get();
 
     } else {
-      shootMotorsCurrentLimits.SupplyCurrentLimit =
-          ShooterConstants.SHOOT_MOTOR_BOTTOM_CONTINUOUS_CURRENT_LIMIT;
-      shootMotorsCurrentLimits.SupplyCurrentThreshold =
-          ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_LIMIT;
-      shootMotorsCurrentLimits.SupplyTimeThreshold =
-          ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_DURATION;
-      shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
-
       shootMotorsConfig.Slot0.kP = shootMotorBottomKP.get();
       shootMotorsConfig.Slot0.kI = shootMotorBottomKI.get();
       shootMotorsConfig.Slot0.kD = shootMotorBottomKD.get();
       shootMotorsConfig.Slot0.kS = shootMotorBottomKS.get();
     }
 
-    shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
     shootMotorsConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     shootMotorsConfig.Feedback.SensorToMechanismRatio = ShooterConstants.SHOOT_MOTORS_GEAR_RATIO;
