@@ -31,6 +31,7 @@ import frc.lib.team3061.vision.Vision;
 import frc.lib.team3061.vision.VisionConstants;
 import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
+import frc.lib.team6328.util.NoteVisualizer;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.configs.GenericDrivetrainRobotConfig;
@@ -527,10 +528,10 @@ public class RobotContainer {
     oi.getAimSpeakerButton()
         .toggleOnTrue(
             Commands.either(
-                Commands.runOnce(drivetrain::disableLockToSpeaker),
+                Commands.runOnce(drivetrain::disableAimToSpeaker),
                 Commands.parallel(
                     Commands.runOnce(() -> shooter.setState(ShooterState.AIM), shooter),
-                    Commands.runOnce(drivetrain::enableLockToSpeaker),
+                    Commands.runOnce(drivetrain::enableAimToSpeaker),
                     new TeleopSwerve(
                         drivetrain,
                         oi::getTranslateX,
@@ -545,7 +546,7 @@ public class RobotContainer {
                                   new Rotation2d());
                           return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
                         })),
-                drivetrain::isLockToSpeakerEnabled));
+                drivetrain::isAimToSpeakerEnabled));
 
     // field-relative toggle
     oi.getFieldRelativeButton()
@@ -591,81 +592,47 @@ public class RobotContainer {
                 Commands.runOnce(() -> vision.enable(false), vision),
                 Commands.runOnce(drivetrain::resetPoseRotationToGyro)));
   }
-  // FIXME: command nees a rework for state machine
+
   private void configureShooterCommands() {
-    //   NoteVisualizer.setRobotPoseSupplier(this.drivetrain::getPose);
-    //   oi.getShootButton()
-    //       .onTrue(
-    //           Commands.parallel(
-    //               Commands.runOnce(() -> shooter.shoot(0.0, 0.0)), NoteVisualizer.shoot()));
+    NoteVisualizer.setRobotPoseSupplier(this.drivetrain::getPose);
 
     oi.getAimAutomationSwitch().onTrue(Commands.runOnce(shooter::enableAutoShooter, shooter));
     oi.getAimAutomationSwitch().onFalse(Commands.runOnce(shooter::disableAutoShooter, shooter));
 
     oi.getPrepareToScoreAmpButton()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  shooter.setState(ShooterState.SCORE_AMP);
-                },
-                shooter));
+        .onTrue(Commands.runOnce(() -> shooter.setState(ShooterState.SCORE_AMP), shooter));
 
     oi.getPrepareToScoreSubwooferButton()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  shooter.setState(ShooterState.SCORE_SUBWOOFER);
-                },
-                shooter));
+        .onTrue(Commands.runOnce(() -> shooter.setState(ShooterState.SCORE_SUBWOOFER), shooter));
 
     oi.getPrepareToScorePodiumButton()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  shooter.setState(ShooterState.SCORE_PODIUM);
-                },
-                shooter));
+        .onTrue(Commands.runOnce(() -> shooter.setState(ShooterState.SCORE_PODIUM), shooter));
 
     oi.getStoreShooterButton()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  shooter.setState(ShooterState.STORAGE);
-                },
-                shooter));
+        .onTrue(Commands.runOnce(() -> shooter.setState(ShooterState.STORAGE), shooter));
 
     oi.getShooterAngleUpButton()
         .whileTrue(
             Commands.runOnce(
-                    () -> {
-                      shooter.setAngleMotorVoltage(
-                          ShooterConstants.ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE);
-                    },
+                    () ->
+                        shooter.setAngleMotorVoltage(
+                            ShooterConstants.ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE),
                     shooter)
                 .onlyIf(() -> !shooter.isAutoShooter()))
         .onFalse(
-            Commands.runOnce(
-                    () -> {
-                      shooter.setAngleMotorVoltage(0);
-                    },
-                    shooter)
+            Commands.runOnce(() -> shooter.setAngleMotorVoltage(0), shooter)
                 .onlyIf(() -> !shooter.isAutoShooter()));
 
     oi.getShooterAngleDownButton()
         .whileTrue(
             Commands.runOnce(
-                    () -> {
-                      shooter.setAngleMotorVoltage(
-                          -ShooterConstants.ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE);
-                    },
+                    () ->
+                        shooter.setAngleMotorVoltage(
+                            -ShooterConstants.ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE),
                     shooter)
                 .onlyIf(() -> !shooter.isAutoShooter()))
         .onFalse(
-            Commands.runOnce(
-                    () -> {
-                      shooter.setAngleMotorVoltage(0);
-                    },
-                    shooter)
+            Commands.runOnce(() -> shooter.setAngleMotorVoltage(0), shooter)
                 .onlyIf(() -> !shooter.isAutoShooter()));
 
     // FIXME: needs to make sure the intake sensor is unblocked befor going back to angling (default
@@ -690,10 +657,11 @@ public class RobotContainer {
     if (vision.isEnabled()) {
       if (drivetrain.isAimedAtSpeaker()) {
         return shooter.isShooterReadyToShoot();
-      } else if (shooter.isShooterReadyToShoot()) {
-        return true;
       }
+    } else if (shooter.isShooterReadyToShoot()) {
+      return true;
     }
+
     return false;
   }
 
