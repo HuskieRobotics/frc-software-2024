@@ -31,15 +31,22 @@ public class Shooter extends SubsystemBase {
   private int bottomAtSetpointIterationCount = 0;
   private int angleAtSetpointIterationCount = 0;
 
-  private ShooterState state = ShooterState.HAS_NOTE;
+  private State state = State.WAITING_FOR_NOTE;
+  private ShootingPosition shootingPosition = ShootingPosition.FIELD;
+  private boolean overrideSetpointsForNextShot = false;
 
-  public enum ShooterState {
-    STORAGE,
-    HAS_NOTE,
-    AIM,
-    SCORE_PODIUM,
-    SCORE_SUBWOOFER,
-    SCORE_AMP
+  public enum ShootingPosition {
+    FIELD,
+    PODIUM,
+    SUBWOOFER,
+    AMP,
+    STORAGE
+  }
+
+  private enum State {
+    WAITING_FOR_NOTE,
+    AIMING_AT_SPEAKER,
+    PREPARING_TO_SHOOT
   }
 
   public Shooter(ShooterIO io, Intake intake) {
@@ -49,6 +56,8 @@ public class Shooter extends SubsystemBase {
     populateAngleMap();
 
     this.autoShooter = true;
+
+    this.resetToInitialState();
 
     if (TESTING) {
       ShuffleboardTab tab = Shuffleboard.getTab(SUBSYSTEM_NAME);
@@ -68,6 +77,7 @@ public class Shooter extends SubsystemBase {
     io.updateInputs(shooterInputs);
     Logger.processInputs(SUBSYSTEM_NAME, shooterInputs);
     Logger.recordOutput("Shooter/State", this.state.toString());
+    Logger.recordOutput("Shooter/ShootingPosition", this.shootingPosition.toString());
 
     if (TESTING) {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
@@ -79,60 +89,103 @@ public class Shooter extends SubsystemBase {
   }
 
   private void runAngleStateMachine() {
+    if (state == State.WAITING_FOR_NOTE) {
+      if (intake.hasNote()) {
+        state = State.AIMING_AT_SPEAKER;
+      }
+    } else if (state == State.AIMING_AT_SPEAKER) {
+      if (!intake.hasNote()) {
+        this.resetToInitialState();
+      } else if (overrideSetpointsForNextShot) {
+        state = State.PREPARING_TO_SHOOT;
+      } else {
+        double distanceToSpeaker =
+            Field2d.getInstance()
+                .getAllianceSpeakerCenter()
+                .minus(RobotOdometry.getInstance().getEstimatedPosition())
+                .getTranslation()
+                .getNorm();
+        this.adjustAngle(distanceToSpeaker);
+      }
+    } else if (state == State.PREPARING_TO_SHOOT) {
+      if (!intake.hasNote()) {
+        this.resetToInitialState();
+      } else {
 
-    if (intake.hasNote()) {
-      double distanceToSpeaker =
-          Field2d.getInstance()
-              .getAllianceSpeakerCenter()
-              .minus(RobotOdometry.getInstance().getEstimatedPosition())
-              .getTranslation()
-              .getNorm();
+        double distanceToSpeaker =
+            Field2d.getInstance()
+                .getAllianceSpeakerCenter()
+                .minus(RobotOdometry.getInstance().getEstimatedPosition())
+                .getTranslation()
+                .getNorm();
+        this.adjustAngle(distanceToSpeaker);
+        this.setRangeVelocity(distanceToSpeaker);
+      }
+    }
+  }
 
-      if (state == ShooterState.SCORE_PODIUM) { // 1
-        io.setShooterWheelBottomVelocity(ShooterConstants.PODIUM_VELOCITY);
-        io.setShooterWheelTopVelocity(ShooterConstants.PODIUM_VELOCITY);
-        if (autoShooter) io.setAngle(ShooterConstants.PODIUM_ANGLE);
-      } else if (state == ShooterState.SCORE_SUBWOOFER) { // 2
-        io.setShooterWheelBottomVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
-        io.setShooterWheelTopVelocity(ShooterConstants.SUBWOOFER_VELOCITY);
-        if (autoShooter) io.setAngle(ShooterConstants.SUBWOOFER_ANGLE);
-      } else if (state == ShooterState.SCORE_AMP) { // 3
-        io.setShooterWheelBottomVelocity(ShooterConstants.AMP_VELOCITY);
-        io.setShooterWheelTopVelocity(ShooterConstants.AMP_VELOCITY);
-        if (autoShooter) io.setAngle(ShooterConstants.AMP_ANGLE);
-      } else if (state == ShooterState.AIM && autoShooter) { // 4
-        setRangeVelocity(distanceToSpeaker);
-        if (autoShooter) io.setAngle(angleTreeMap.get(distanceToSpeaker));
-      } else if (state == ShooterState.STORAGE && autoShooter) { // 5
-        this.goToIdleVelocity();
+  private void resetToInitialState() {
+    this.state = State.WAITING_FOR_NOTE;
+    this.shootingPosition = ShootingPosition.FIELD;
+    this.overrideSetpointsForNextShot = false;
+
+    double velocity;
+    if (autoShooter) {
+      io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
+      velocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
+    } else {
+      velocity = 0.0;
+    }
+    io.setShooterWheelBottomVelocity(velocity);
+    io.setShooterWheelTopVelocity(velocity);
+  }
+
+  private void adjustAngle(double distanceToSpeaker) {
+    if (autoShooter) {
+      if (shootingPosition == ShootingPosition.PODIUM) {
+        io.setAngle(ShooterConstants.PODIUM_ANGLE);
+      } else if (shootingPosition == ShootingPosition.SUBWOOFER) {
+        io.setAngle(ShooterConstants.SUBWOOFER_ANGLE);
+      } else if (shootingPosition == ShootingPosition.AMP) {
+        io.setAngle(ShooterConstants.AMP_ANGLE);
+      } else if (shootingPosition == ShootingPosition.STORAGE) {
         io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
-      } else if (state == ShooterState.HAS_NOTE && autoShooter) { // not aiming 5
-        this.goToIdleVelocity();
+      } else {
         io.setAngle(angleTreeMap.get(distanceToSpeaker));
       }
-    } else if (autoShooter) { // no note 0
-      this.goToIdleVelocity();
-      io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
-    } else {
-      // if automation is disabled, stop the shooter wheels so that we don't accidentally
-      // shoot notes when we manually intake them
-      io.setShooterWheelBottomVelocity(0);
-      io.setShooterWheelTopVelocity(0);
     }
   }
 
   private void setRangeVelocity(double distanceToSpeaker) {
-    if (distanceToSpeaker < ShooterConstants.VELOCITY_ZONE_SWITCH_DISTANCE) {
-      io.setShooterWheelTopVelocity(ShooterConstants.CLOSE_RANGE_VELOCITY);
-      io.setShooterWheelBottomVelocity(ShooterConstants.CLOSE_RANGE_VELOCITY);
+    double velocity;
+    if (shootingPosition == ShootingPosition.PODIUM) {
+      velocity = ShooterConstants.PODIUM_VELOCITY;
+    } else if (shootingPosition == ShootingPosition.SUBWOOFER) {
+      velocity = ShooterConstants.SUBWOOFER_VELOCITY;
+    } else if (shootingPosition == ShootingPosition.AMP) {
+      velocity = ShooterConstants.AMP_VELOCITY;
+    } else if (shootingPosition == ShootingPosition.STORAGE) {
+      velocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
+    } else if (distanceToSpeaker < ShooterConstants.VELOCITY_ZONE_SWITCH_DISTANCE) {
+      velocity = ShooterConstants.CLOSE_RANGE_VELOCITY;
     } else {
-      io.setShooterWheelTopVelocity(ShooterConstants.FAR_RANGE_VELOCITY);
-      io.setShooterWheelBottomVelocity(ShooterConstants.FAR_RANGE_VELOCITY);
+      velocity = ShooterConstants.FAR_RANGE_VELOCITY;
     }
+
+    io.setShooterWheelBottomVelocity(velocity);
+    io.setShooterWheelTopVelocity(velocity);
   }
 
-  public void setState(ShooterState state) {
-    this.state = state;
+  public void setShootingPosition(ShootingPosition position) {
+    this.shootingPosition = position;
+    this.overrideSetpointsForNextShot = true;
+  }
+
+  public void prepareToShoot() {
+    // if we have a note, force the state transition
+    if (intake.hasNote()) {
+      this.state = State.PREPARING_TO_SHOOT;
+    }
   }
 
   public void enableAutoShooter() {
@@ -143,21 +196,17 @@ public class Shooter extends SubsystemBase {
     this.autoShooter = false;
   }
 
-  public void goToIdleVelocity() {
-    io.setShooterWheelTopVelocity(ShooterConstants.SHOOTER_IDLE_VELOCITY);
-    io.setShooterWheelBottomVelocity(ShooterConstants.SHOOTER_IDLE_VELOCITY);
-  }
-
   public BooleanSupplier getShooterAngleReadySupplier() {
     return this::isAngleAtSetpoint;
   }
 
-  public boolean isShooterReadyToShoot() {
-    if (!autoShooter) {
-      return isTopShootAtSetpoint() && isBottomShootAtSetpoint();
-    } else {
-      return isTopShootAtSetpoint() && isBottomShootAtSetpoint() && isAngleAtSetpoint();
-    }
+  public boolean isShooterReadyToShoot(boolean isAimedAtSpeaker) {
+    boolean alignedToShoot = isAimedAtSpeaker || this.shootingPosition == ShootingPosition.AMP;
+
+    return alignedToShoot
+        && isTopShootAtSetpoint()
+        && isBottomShootAtSetpoint()
+        && (!autoShooter || isAngleAtSetpoint());
   }
 
   public boolean isTopShootAtSetpoint() {
