@@ -44,7 +44,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.Shooter.ShooterState;
+import frc.robot.subsystems.shooter.Shooter.ShootingPosition;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
@@ -460,14 +460,18 @@ public class RobotContainer {
   }
 
   private void configureIntakeCommands() {
-    oi.getIntakeAutomationSwitch().onTrue(Commands.runOnce(intake::enableAutomation, intake));
+    oi.getIntakeAutomationSwitch()
+        .onTrue(
+            Commands.runOnce(intake::enableAutomation, intake)
+                .withName("enable intake automation"));
 
     oi.getIntakeAutomationSwitch()
         .onFalse(
             Commands.parallel(
-                Commands.runOnce(intake::disableAutomation, intake),
-                Commands.runOnce(intake::turnIntakeOff),
-                Commands.runOnce(intake::turnKickerOff)));
+                    Commands.runOnce(intake::disableAutomation, intake),
+                    Commands.runOnce(intake::turnIntakeOff),
+                    Commands.runOnce(intake::turnKickerOff))
+                .withName("disable intake automation"));
 
     oi.getRunIntakeButton()
         .and(() -> !intake.automationEnabled())
@@ -516,100 +520,137 @@ public class RobotContainer {
     oi.getLock180Button()
         .whileTrue(
             new TeleopSwerve(
-                drivetrain,
-                oi::getTranslateX,
-                oi::getTranslateY,
-                () ->
-                    (drivetrain.getPose().getRotation().getDegrees() > -90
-                            && drivetrain.getPose().getRotation().getDegrees() < 90)
-                        ? Rotation2d.fromDegrees(0.0)
-                        : Rotation2d.fromDegrees(180.0)));
+                    drivetrain,
+                    oi::getTranslateX,
+                    oi::getTranslateY,
+                    () ->
+                        (drivetrain.getPose().getRotation().getDegrees() > -90
+                                && drivetrain.getPose().getRotation().getDegrees() < 90)
+                            ? Rotation2d.fromDegrees(0.0)
+                            : Rotation2d.fromDegrees(180.0))
+                .withName("lock 180"));
 
     oi.getAimSpeakerButton()
         .toggleOnTrue(
             Commands.either(
-                Commands.runOnce(drivetrain::disableAimToSpeaker),
-                Commands.parallel(
-                    Commands.runOnce(() -> shooter.setState(ShooterState.AIM), shooter),
-                    Commands.runOnce(drivetrain::enableAimToSpeaker),
-                    new TeleopSwerve(
-                        drivetrain,
-                        oi::getTranslateX,
-                        oi::getTranslateY,
-                        () -> {
-                          Transform2d translation =
-                              new Transform2d(
-                                  Field2d.getInstance().getAllianceSpeakerCenter().getX()
-                                      - drivetrain.getPose().getX(),
-                                  Field2d.getInstance().getAllianceSpeakerCenter().getY()
-                                      - drivetrain.getPose().getY(),
-                                  new Rotation2d());
-                          return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
-                        })),
-                drivetrain::isAimToSpeakerEnabled));
+                    Commands.runOnce(drivetrain::disableAimToSpeaker),
+                    Commands.parallel(
+                        Commands.runOnce(() -> shooter.prepareToShoot(), shooter),
+                        Commands.runOnce(drivetrain::enableAimToSpeaker),
+                        new TeleopSwerve(
+                                drivetrain,
+                                oi::getTranslateX,
+                                oi::getTranslateY,
+                                () -> {
+                                  Transform2d translation =
+                                      new Transform2d(
+                                          Field2d.getInstance().getAllianceSpeakerCenter().getX()
+                                              - drivetrain.getPose().getX(),
+                                          Field2d.getInstance().getAllianceSpeakerCenter().getY()
+                                              - drivetrain.getPose().getY(),
+                                          new Rotation2d());
+                                  return new Rotation2d(
+                                      Math.atan2(translation.getY(), translation.getX()));
+                                })
+                            .until(() -> !intake.hasNote())),
+                    drivetrain::isAimToSpeakerEnabled)
+                .withName("toggle aim to speaker"));
 
     // field-relative toggle
     oi.getFieldRelativeButton()
         .toggleOnTrue(
             Commands.either(
-                Commands.runOnce(drivetrain::disableFieldRelative, drivetrain),
-                Commands.runOnce(drivetrain::enableFieldRelative, drivetrain),
-                drivetrain::getFieldRelative));
+                    Commands.runOnce(drivetrain::disableFieldRelative, drivetrain),
+                    Commands.runOnce(drivetrain::enableFieldRelative, drivetrain),
+                    drivetrain::getFieldRelative)
+                .withName("toggle field relative"));
 
     // slow-mode toggle
     oi.getTranslationSlowModeButton()
-        .onTrue(Commands.runOnce(drivetrain::enableTranslationSlowMode, drivetrain));
+        .onTrue(
+            Commands.runOnce(drivetrain::enableTranslationSlowMode, drivetrain)
+                .withName("enable translation slow mode"));
     oi.getTranslationSlowModeButton()
-        .onFalse(Commands.runOnce(drivetrain::disableTranslationSlowMode, drivetrain));
+        .onFalse(
+            Commands.runOnce(drivetrain::disableTranslationSlowMode, drivetrain)
+                .withName("disable translation slow mode"));
     oi.getRotationSlowModeButton()
-        .onTrue(Commands.runOnce(drivetrain::enableRotationSlowMode, drivetrain));
+        .onTrue(
+            Commands.runOnce(drivetrain::enableRotationSlowMode, drivetrain)
+                .withName("enable rotation slow mode"));
     oi.getRotationSlowModeButton()
-        .onFalse(Commands.runOnce(drivetrain::disableRotationSlowMode, drivetrain));
+        .onFalse(
+            Commands.runOnce(drivetrain::disableRotationSlowMode, drivetrain)
+                .withName("disable rotation slow mode"));
 
     // reset gyro to 0 degrees
-    oi.getResetGyroButton().onTrue(Commands.runOnce(drivetrain::zeroGyroscope, drivetrain));
+    oi.getResetGyroButton()
+        .onTrue(Commands.runOnce(drivetrain::zeroGyroscope, drivetrain).withName("zero gyro"));
 
     // reset pose based on vision
     oi.getResetPoseToVisionButton()
         .onTrue(
-            Commands.runOnce(() -> drivetrain.resetPoseToVision(() -> vision.getBestRobotPose())));
+            Commands.runOnce(() -> drivetrain.resetPoseToVision(() -> vision.getBestRobotPose()))
+                .withName("reset pose to vision"));
 
     // x-stance
-    oi.getXStanceButton().onTrue(Commands.runOnce(drivetrain::enableXstance, drivetrain));
-    oi.getXStanceButton().onFalse(Commands.runOnce(drivetrain::disableXstance, drivetrain));
+    oi.getXStanceButton()
+        .onTrue(
+            Commands.runOnce(drivetrain::enableXstance, drivetrain).withName("enable x-stance"));
+    oi.getXStanceButton()
+        .onFalse(
+            Commands.runOnce(drivetrain::disableXstance, drivetrain).withName("disable x-stance"));
 
     // turbo
-    oi.getTurboButton().onTrue(Commands.runOnce(drivetrain::enableTurbo, drivetrain));
-    oi.getTurboButton().onFalse(Commands.runOnce(drivetrain::disableTurbo, drivetrain));
+    oi.getTurboButton()
+        .onTrue(Commands.runOnce(drivetrain::enableTurbo, drivetrain).withName("enable turbo"));
+    oi.getTurboButton()
+        .onFalse(Commands.runOnce(drivetrain::disableTurbo, drivetrain).withName("disable turbo"));
   }
 
   private void configureVisionCommands() {
     // enable/disable vision
-    oi.getVisionIsEnabledSwitch().onTrue(Commands.runOnce(() -> vision.enable(true)));
+    oi.getVisionIsEnabledSwitch()
+        .onTrue(Commands.runOnce(() -> vision.enable(true)).withName("enable vision"));
     oi.getVisionIsEnabledSwitch()
         .onFalse(
             Commands.parallel(
-                Commands.runOnce(() -> vision.enable(false), vision),
-                Commands.runOnce(drivetrain::resetPoseRotationToGyro)));
+                    Commands.runOnce(() -> vision.enable(false), vision),
+                    Commands.runOnce(drivetrain::resetPoseRotationToGyro))
+                .withName("disable vision"));
   }
 
   private void configureShooterCommands() {
     NoteVisualizer.setRobotPoseSupplier(this.drivetrain::getPose);
 
-    oi.getAimAutomationSwitch().onTrue(Commands.runOnce(shooter::enableAutoShooter, shooter));
-    oi.getAimAutomationSwitch().onFalse(Commands.runOnce(shooter::disableAutoShooter, shooter));
+    oi.getAimAutomationSwitch()
+        .onTrue(
+            Commands.runOnce(shooter::enableAutoShooter, shooter)
+                .withName("enable shooter automation"));
+    oi.getAimAutomationSwitch()
+        .onFalse(
+            Commands.runOnce(shooter::disableAutoShooter, shooter)
+                .withName("disable shooter automation"));
 
     oi.getPrepareToScoreAmpButton()
-        .onTrue(Commands.runOnce(() -> shooter.setState(ShooterState.SCORE_AMP), shooter));
+        .onTrue(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP), shooter)
+                .withName("prepare to score amp"));
 
     oi.getPrepareToScoreSubwooferButton()
-        .onTrue(Commands.runOnce(() -> shooter.setState(ShooterState.SCORE_SUBWOOFER), shooter));
+        .onTrue(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER), shooter)
+                .withName("prepare to score subwoofer"));
 
     oi.getPrepareToScorePodiumButton()
-        .onTrue(Commands.runOnce(() -> shooter.setState(ShooterState.SCORE_PODIUM), shooter));
+        .onTrue(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.PODIUM), shooter)
+                .withName("prepare to score podium"));
 
     oi.getStoreShooterButton()
-        .onTrue(Commands.runOnce(() -> shooter.setState(ShooterState.STORAGE), shooter));
+        .onTrue(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.STORAGE), shooter)
+                .withName("store shooter"));
 
     oi.getShooterAngleUpButton()
         .whileTrue(
@@ -618,10 +659,12 @@ public class RobotContainer {
                         shooter.setAngleMotorVoltage(
                             ShooterConstants.ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE),
                     shooter)
-                .onlyIf(() -> !shooter.isAutoShooter()))
+                .onlyIf(() -> !shooter.isAutoShooter())
+                .withName("shooter manual up"))
         .onFalse(
             Commands.runOnce(() -> shooter.setAngleMotorVoltage(0), shooter)
-                .onlyIf(() -> !shooter.isAutoShooter()));
+                .onlyIf(() -> !shooter.isAutoShooter())
+                .withName("shooter manual up stop"));
 
     oi.getShooterAngleDownButton()
         .whileTrue(
@@ -630,17 +673,25 @@ public class RobotContainer {
                         shooter.setAngleMotorVoltage(
                             -ShooterConstants.ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE),
                     shooter)
-                .onlyIf(() -> !shooter.isAutoShooter()))
+                .onlyIf(() -> !shooter.isAutoShooter())
+                .withName("shooter manual down"))
         .onFalse(
             Commands.runOnce(() -> shooter.setAngleMotorVoltage(0), shooter)
-                .onlyIf(() -> !shooter.isAutoShooter()));
+                .onlyIf(() -> !shooter.isAutoShooter())
+                .withName("shooter manual down stop"));
 
     oi.getShootButton()
-        .onTrue( // whileTrue?
-            Commands.waitUntil(this::isReadyToShoot)
+        .whileTrue(
+            Commands.waitUntil(
+                    () ->
+                        shooter.isShooterReadyToShoot(
+                            !vision.isEnabled() || drivetrain.isAimedAtSpeaker()))
                 .andThen(
-                    Commands.parallel(
-                        Commands.runOnce(intake::shoot, intake), NoteVisualizer.shoot())));
+                    Commands.sequence(
+                        Commands.runOnce(intake::shoot, intake),
+                        NoteVisualizer.shoot(),
+                        Commands.runOnce(drivetrain::disableAimToSpeaker)))
+                .withName("shoot"));
   }
 
   /**
@@ -650,18 +701,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
-  }
-
-  public boolean isReadyToShoot() {
-    if (vision.isEnabled()) {
-      if (drivetrain.isAimedAtSpeaker()) {
-        return shooter.isShooterReadyToShoot();
-      }
-    } else if (shooter.isShooterReadyToShoot()) {
-      return true;
-    }
-
-    return false;
   }
 
   /**
