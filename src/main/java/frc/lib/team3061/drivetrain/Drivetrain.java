@@ -945,9 +945,11 @@ public class Drivetrain extends SubsystemBase {
    * stopped moving for the specified period of time, and brake mode is enabled, disable it.
    */
   private void updateBrakeMode() {
-    if (DriverStation.isEnabled() && !brakeMode) {
-      brakeMode = true;
-      setBrakeMode(true);
+    if (DriverStation.isEnabled()) {
+      if (!brakeMode) {
+        brakeMode = true;
+        setBrakeMode(true);
+      }
       brakeModeTimer.restart();
 
     } else if (!DriverStation.isEnabled()) {
