@@ -8,11 +8,14 @@ public class LEDsRIO extends LEDs {
 
   private final AddressableLED leds;
   private final AddressableLEDBuffer buffer;
+  private boolean isGBR;
 
   protected LEDsRIO() {
     leds = new AddressableLED(0);
     buffer = new AddressableLEDBuffer(ACTUAL_LENGTH);
+    isGBR = true;
     // leds.setBitTiming(500, 200, 1200, 1300);
+
     leds.setLength(ACTUAL_LENGTH);
     leds.setData(buffer);
     leds.start();
@@ -25,9 +28,20 @@ public class LEDsRIO extends LEDs {
 
   @Override
   protected void setLEDBuffer(int index, Color color) {
+    if (isGBR) {
+      color = changeToGBR(color);
+    }
+    
     buffer.setLED(index, color);
     if (MIRROR_LEDS) {
       buffer.setLED(ACTUAL_LENGTH - index - 1, color);
     }
+  }
+
+  static Color changeToGBR(Color color) {
+    int newGreen = (int) (color.green * 255);
+    int newBlue = (int) (color.blue * 255);
+    int newRed = (int) (color.red * 255);
+    return new Color(newGreen, newBlue, newRed);
   }
 }
