@@ -27,7 +27,6 @@ public class Intake extends SubsystemBase {
 
   private IntakeState intakeState;
   private boolean automationEnabled;
-  private boolean hasNote;
 
   // system tests
   private IntakeState mostRecentIntakeState;
@@ -106,12 +105,10 @@ public class Intake extends SubsystemBase {
       intakeState = IntakeState.NOTE_IN_INTAKE;
       leds.setIntakeLEDState(IntakeLEDState.HAS_GAME_PIECE);
       this.transitionGamePiece();
-      hasNote = true;
     } else if (inputs.isShooterIRBlocked) {
       intakeState = IntakeState.NOTE_IN_SHOOTER;
       leds.setIntakeLEDState(IntakeLEDState.HAS_GAME_PIECE);
       this.repelGamePiece();
-      hasNote = true;
     }
   }
 
@@ -123,7 +120,6 @@ public class Intake extends SubsystemBase {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
-      hasNote = false;
     }
   }
 
@@ -153,12 +149,11 @@ public class Intake extends SubsystemBase {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
-      hasNote = false;
     }
   }
 
   public boolean hasNote() {
-    return hasNote;
+    return (!inputs.isRollerIRBlocked && (inputs.isKickerIRBlocked || inputs.isShooterIRBlocked));
   }
 
   private void setIntakeState(IntakeState state) {
@@ -297,7 +292,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void transitionGamePiece() {
-    this.setKickerVelocity(IntakeConstants.KICKER_VELOCITY_RPS);
+    this.setKickerVelocity(IntakeConstants.KICKER_INTAKING_VELOCITY_RPS);
   }
 
   public void turnKickerOff() {
@@ -314,7 +309,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void outtakeKicker() {
-    this.setKickerVelocity(-IntakeConstants.KICKER_VELOCITY_RPS);
+    this.setKickerVelocity(-IntakeConstants.KICKER_INTAKING_VELOCITY_RPS);
   }
 
   public void setKickerVelocity(double rps) {
@@ -322,6 +317,6 @@ public class Intake extends SubsystemBase {
   }
 
   public void shoot() {
-    this.setKickerVelocity(IntakeConstants.KICKER_VELOCITY_RPS);
+    this.setKickerVelocity(IntakeConstants.KICKER_SHOOTING_VELOCITY_RPS);
   }
 }

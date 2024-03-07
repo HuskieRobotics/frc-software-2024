@@ -57,25 +57,34 @@ public class FullOperatorConsoleOI implements OperatorInterface {
     return -translateJoystick.getX();
   }
 
-  // temporary replacement as it was in the spot of repel all
   @Override
-  public Trigger getLock180Button() {
+  public Trigger getAimSpeakerButton() {
+    return translateJoystickButtons[1];
+  }
+
+  @Override
+  public Trigger getShootFullFieldButton() {
     return translateJoystickButtons[2];
   }
 
   @Override
-  public Trigger getLockToSpeakerButton() {
-    return rotateJoystickButtons[3];
+  public Trigger getLock180Button() {
+    return translateJoystickButtons[3];
   }
 
   @Override
-  public Trigger getResetGyroButton() {
+  public Trigger getAlignAndIntakeNoteFromSourceButton() {
     return translateJoystickButtons[4];
   }
 
   @Override
   public Trigger getXStanceButton() {
     return translateJoystickButtons[5];
+  }
+
+  @Override
+  public Trigger getResetGyroButton() {
+    return translateJoystickButtons[8];
   }
 
   @Override
@@ -91,8 +100,18 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getResetPoseToVisionButton() {
-    return rotateJoystickButtons[5];
+  public Trigger getShootButton() {
+    return rotateJoystickButtons[1];
+  }
+
+  @Override
+  public Trigger getOuttakeAllButton() {
+    return rotateJoystickButtons[2];
+  }
+
+  @Override
+  public Trigger getPrepareToScoreAmpButton() {
+    return rotateJoystickButtons[3];
   }
 
   @Override
@@ -100,17 +119,68 @@ public class FullOperatorConsoleOI implements OperatorInterface {
     return rotateJoystickButtons[4];
   }
 
+  @Override
+  public Trigger getResetPoseToVisionButton() {
+    return rotateJoystickButtons[5];
+  }
+
   // Operator Controller
+
+  @Override
+  public Trigger getClimberUpButton() {
+    return new Trigger(operatorController::getLeftBumper);
+  }
+
+  @Override
+  public Trigger getClimberDownButton() {
+    return new Trigger(operatorController::getRightBumper);
+  }
+
+  @Override
+  public Trigger getShooterAngleDownButton() {
+    return new Trigger(operatorController::getAButton);
+  }
+
+  @Override
+  public Trigger getShooterAngleUpButton() {
+    return new Trigger(operatorController::getYButton);
+  }
+
   @Override
   public Trigger getInterruptAll() {
     return new Trigger(operatorController::getStartButton);
   }
 
+  @Override
+  public Trigger getEnableManualClimberButton() {
+    return new Trigger(() -> operatorController.getPOV() == 270);
+  }
+
+  @Override
+  public Trigger getDisableManualClimberButton() {
+    return new Trigger(() -> operatorController.getPOV() == 90);
+  }
+
   // Operator Panel
 
   @Override
-  public Trigger getOuttakeAllButton() {
-    return operatorPanelButtons[9];
+  public Trigger getPrepareToScoreSubwooferButton() {
+    return operatorPanelButtons[6];
+  }
+
+  @Override
+  public Trigger getFinishClimbButton() {
+    return operatorPanelButtons[7];
+  }
+
+  @Override
+  public Trigger getPrepareToScorePodiumButton() {
+    return operatorPanelButtons[5];
+  }
+
+  @Override
+  public Trigger getClimberDeployButton() {
+    return operatorPanelButtons[8];
   }
 
   @Override
@@ -119,11 +189,23 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getShootButton() {
-    return new Trigger(operatorController::getAButton);
+  public Trigger getAimAutomationSwitch() {
+    return operatorPanelButtons[11];
   }
 
+  @Override
+  public Trigger getStoreShooterButton() {
+    return operatorPanelButtons[2];
+  }
+
+  @Override
   public Trigger getIntakeAutomationSwitch() {
     return operatorPanelButtons[12];
+  }
+
+  @Override
+  public Trigger getShooterAutomationSwitch() {
+    // FIXME: assign to a switch
+    return new Trigger(() -> false);
   }
 }

@@ -15,6 +15,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -33,6 +34,7 @@ import frc.lib.team6328.util.Alert;
 import frc.lib.team6328.util.Alert.AlertType;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
+import frc.robot.Field2d;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -86,6 +88,8 @@ public class Drivetrain extends SubsystemBase {
 
   private boolean isMoveToPoseEnabled;
 
+  private boolean isAimToSpeakerEnabled;
+
   private Alert noPoseAlert =
       new Alert("Attempted to reset pose from vision, but no pose was found.", AlertType.WARNING);
   private static final String SYSTEM_CHECK_PREFIX = "[System Check] Swerve module ";
@@ -112,6 +116,8 @@ public class Drivetrain extends SubsystemBase {
     this.isTurbo = true;
 
     this.isMoveToPoseEnabled = true;
+
+    this.isAimToSpeakerEnabled = false;
 
     ShuffleboardTab tabMain = Shuffleboard.getTab("MAIN");
     tabMain
@@ -964,6 +970,30 @@ public class Drivetrain extends SubsystemBase {
 
   private void setBrakeMode(boolean enable) {
     this.io.setBrakeMode(enable);
+  }
+
+  public void enableAimToSpeaker() {
+    this.isAimToSpeakerEnabled = true;
+  }
+
+  public void disableAimToSpeaker() {
+    this.isAimToSpeakerEnabled = false;
+  }
+
+  public boolean isAimToSpeakerEnabled() {
+    return this.isAimToSpeakerEnabled;
+  }
+
+  public boolean isAimedAtSpeaker() {
+    Transform2d translation =
+        new Transform2d(
+            Field2d.getInstance().getAllianceSpeakerCenter().getX() - this.getPose().getX(),
+            Field2d.getInstance().getAllianceSpeakerCenter().getY() - this.getPose().getY(),
+            new Rotation2d());
+    return Math.abs(
+            Math.atan2(translation.getY(), translation.getX())
+                - this.getPose().getRotation().getRadians())
+        < ANGLE_TO_SPEAKER_TOLERANCE;
   }
 
   private enum DriveMode {
