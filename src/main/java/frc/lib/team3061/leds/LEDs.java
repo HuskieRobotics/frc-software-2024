@@ -410,7 +410,12 @@ public abstract class LEDs extends SubsystemBase {
 
     for (int i = 0; i < heat.length; i++) {
       double ratio = heat[i];
-      // Use shades of orange for the flame effect
+      // pink
+      // int red = (int) (255 * ratio);
+      // int green = (int) (20 * ratio);
+      // int blue = (int) (40 * ratio);
+
+      // orange
       int red = (int) (255 * ratio);
       int green = (int) (20 * ratio);
       int blue = 0;
