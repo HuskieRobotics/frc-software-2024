@@ -12,7 +12,6 @@ import frc.lib.team3061.drivetrain.swerve.SwerveConstants;
  * these methods, refer to the documentation in the RobotConfig class.
  */
 public class NameRobotConfig extends RobotConfig {
-  // FIXME: update all CAN IDs and steer offsets
   private static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1;
   private static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2;
   private static final int FRONT_LEFT_MODULE_STEER_ENCODER = 22;
@@ -33,7 +32,7 @@ public class NameRobotConfig extends RobotConfig {
   private static final int BACK_RIGHT_MODULE_STEER_ENCODER = 25;
   private static final double BACK_RIGHT_MODULE_STEER_OFFSET_ROT = -0.335693;
 
-  private static final int GYRO_ID = 26; // FIXME: Update gyro ID
+  private static final int GYRO_ID = 26;
 
   private static final double TRACKWIDTH_METERS = 0.57785; // 22.75
   private static final double WHEELBASE_METERS = 0.57785; // 22.75
@@ -67,16 +66,16 @@ public class NameRobotConfig extends RobotConfig {
   private static final double DRIVE_KA = 0.0; // FIXME: Values taken from nova, need to be updated
 
   private static final double MAX_VELOCITY_METERS_PER_SECOND =
-      3.5; // FIXME: Values taken from nova, need to be updated
+      4.5; // FIXME: confirm max velocity with real robot
   private static final double MAX_COAST_VELOCITY_METERS_PER_SECOND =
       0.05; // FIXME: Values taken from nova, need to be updated
   private static final double SLOW_MODE_MULTIPLIER =
       0.75; // FIXME: Values taken from nova, need to be updated
 
   private static final double MAX_DRIVE_ACCELERATION_METERS_PER_SECOND_SQUARED =
-      11.365; // FIXME: Values taken from nova, need to be updated
+      9.467; // from Choreo estimate
   private static final double MAX_TURN_ACCELERATION_RADIANS_PER_SECOND_SQUARED =
-      36.0; // FIXME: Values taken from nova, need to be updated
+      33.436; // from Choreo estimate
 
   private static final String CAN_BUS_NAME = "canbus1";
 
