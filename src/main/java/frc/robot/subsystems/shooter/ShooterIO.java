@@ -50,9 +50,5 @@ public interface ShooterIO {
 
   public default void setAngle(double angle) {}
 
-  public default boolean getCoastMode() {
-    return false;
-  }
-
   public default void setCoastMode(boolean coast) {}
 }

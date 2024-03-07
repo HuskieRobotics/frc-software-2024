@@ -331,7 +331,6 @@ public class ShooterIOTalonFX implements ShooterIO {
       angleMotor.getConfigurator().apply(rotationMotionMagicConfig);
     }
 
-    // For logging
     shooterInputs.coastMode = coastModeButton.get();
   }
 
@@ -471,11 +470,6 @@ public class ShooterIOTalonFX implements ShooterIO {
       configAlert.set(true);
       configAlert.setText(status.toString());
     }
-  }
-
-  @Override
-  public boolean getCoastMode() {
-    return coastModeButton.get();
   }
 
   @Override

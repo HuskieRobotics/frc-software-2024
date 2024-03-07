@@ -37,7 +37,7 @@ public class Shooter extends SubsystemBase {
   private ShootingPosition shootingPosition = ShootingPosition.FIELD;
   private boolean overrideSetpointsForNextShot = false;
 
-  private Trigger coastModeButton = new Trigger(io::getCoastMode);
+  private Trigger coastModeButton = new Trigger(() -> shooterInputs.coastMode);
 
   public enum ShootingPosition {
     FIELD,
@@ -68,8 +68,8 @@ public class Shooter extends SubsystemBase {
       tab.add(SUBSYSTEM_NAME, this);
     }
 
-    coastModeButton.onTrue(Commands.runOnce(()->io.setCoastMode(true)).ignoringDisable(true));
-    coastModeButton.onFalse(Commands.runOnce(()->io.setCoastMode(false)).ignoringDisable(true));
+    coastModeButton.onTrue(Commands.runOnce(() -> io.setCoastMode(true)).ignoringDisable(true));
+    coastModeButton.onFalse(Commands.runOnce(() -> io.setCoastMode(false)).ignoringDisable(true));
   }
 
   private void enableCoastMode() {}
