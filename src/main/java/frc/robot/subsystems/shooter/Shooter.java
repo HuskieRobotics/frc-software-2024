@@ -8,12 +8,16 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
+import frc.lib.team3061.leds.LEDs;
+import frc.lib.team3061.leds.LEDs.ShooterLEDState;
 import frc.robot.Field2d;
 import frc.robot.subsystems.intake.Intake;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
+
+  private boolean isShooting = false; 
 
   private ShooterIO io;
   private Intake intake;
@@ -26,6 +30,7 @@ public class Shooter extends SubsystemBase {
   private final TunableNumber angle = new TunableNumber("Shooter/Angle", 10.0);
 
   private boolean autoShooter = true;
+  private final LEDs leds;
 
   private int topAtSetpointIterationCount = 0;
   private int bottomAtSetpointIterationCount = 0;
@@ -49,11 +54,19 @@ public class Shooter extends SubsystemBase {
     PREPARING_TO_SHOOT
   }
 
+  // TODO: add implementation for ready to shoot after talking with Jake and Mr. Schmit
+
   public Shooter(ShooterIO io, Intake intake) {
     this.io = io;
     this.intake = intake;
     this.angleTreeMap = new InterpolatingDoubleTreeMap();
     populateAngleMap();
+    
+    leds = LEDs.getInstance();
+
+    leds.setShooterLEDState(ShooterLEDState.WAITING_FOR_GAME_PIECE);
+
+    
 
     this.autoShooter = true;
 
@@ -86,14 +99,30 @@ public class Shooter extends SubsystemBase {
     } else {
       runAngleStateMachine();
     }
+
+    if (state == State.WAITING_FOR_NOTE) {
+      isShooting = false;
+    }
+
+    //led controls
+    if (isShooting) {
+      leds.setShooterLEDState(ShooterLEDState.SHOOTING);
+    }
+  }
+
+  public void setIsShooting(boolean value) {
+    isShooting = value;
   }
 
   private void runAngleStateMachine() {
     if (state == State.WAITING_FOR_NOTE) {
+      leds.setShooterLEDState(ShooterLEDState.WAITING_FOR_GAME_PIECE);
+
       if (intake.hasNote()) {
         state = State.AIMING_AT_SPEAKER;
       }
     } else if (state == State.AIMING_AT_SPEAKER) {
+      leds.setShooterLEDState(ShooterLEDState.AIMING_AT_SPEAKER);
       if (!intake.hasNote()) {
         this.resetToInitialState();
       } else if (overrideSetpointsForNextShot) {
@@ -108,6 +137,7 @@ public class Shooter extends SubsystemBase {
         this.adjustAngle(distanceToSpeaker);
       }
     } else if (state == State.PREPARING_TO_SHOOT) {
+      leds.setShooterLEDState(ShooterLEDState.IS_READY_TO_SHOOT);
       if (!intake.hasNote()) {
         this.resetToInitialState();
       } else {

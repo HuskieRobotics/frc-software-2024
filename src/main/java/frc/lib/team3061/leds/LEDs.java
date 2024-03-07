@@ -50,6 +50,7 @@ public abstract class LEDs extends SubsystemBase {
   private boolean estopped = false;
 
   private IntakeLEDState intakeLEDState;
+  private ShooterLEDState shooterLEDState;
 
   // LED IO
   private final Notifier loadingNotifier;
@@ -170,15 +171,26 @@ public abstract class LEDs extends SubsystemBase {
     }
 
     if (distraction) {
+      // Distraction
       strobe(Section.SHOULDER, Color.kWhite, STROBE_FAST_DURATION);
     } else if (endgameAlert) {
+      // Endgame alert
       strobe(Section.SHOULDER, Color.kBlue, STROBE_SLOW_DURATION);
-    } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
-      // Waiting for game piece
-      wave(Section.FULL, Color.kBlue, Color.kWhite, WAVE_SLOW_CYCLE_LENGTH, WAVE_SLOW_DURATION);
+    } else if (shooterLEDState == ShooterLEDState.SHOOTING) {
+      // Actively shooting
+      rainbow(Section.FULL, RAINBOW_CYCLE_LENGTH, RAINBOW_DURATION);
+    } else if (shooterLEDState == ShooterLEDState.AIMING_AT_SPEAKER) {
+      // Aiming at speaker
+      solid(Section.FULL, Color.kGreen);
+    } else if (shooterLEDState == ShooterLEDState.IS_READY_TO_SHOOT) {
+      // Ready to shoot
+      solid(Section.FULL, Color.kBlue);
     } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
       // Has game piece
       strobe(Section.FULL, Color.kOrange, STROBE_FAST_DURATION);
+    } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
+      // Waiting for game piece
+      wave(Section.FULL, Color.kBlue, Color.kWhite, WAVE_SLOW_CYCLE_LENGTH, WAVE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.MANUAL_REPEL) {
       // Manual repel
       strobe(Section.FULL, Color.kDeepPink, STROBE_FAST_DURATION);
@@ -309,6 +321,13 @@ public abstract class LEDs extends SubsystemBase {
     this.demoMode = demoMode;
   }
 
+  public enum ShooterLEDState {
+    IS_READY_TO_SHOOT,
+    SHOOTING,
+    AIMING_AT_SPEAKER,
+    WAITING_FOR_GAME_PIECE,
+  }
+
   public enum IntakeLEDState {
     WAITING_FOR_GAME_PIECE,
     HAS_GAME_PIECE,
@@ -317,10 +336,13 @@ public abstract class LEDs extends SubsystemBase {
     // TODO: add implementation for ready to shoot after talking with Jake and Mr. Schmit
   }
 
+  public void setShooterLEDState(ShooterLEDState state) {
+    this.shooterLEDState = state;
+  }
+  
   public void setIntakeLEDState(IntakeLEDState state) {
     this.intakeLEDState = state;
   }
-
   protected abstract void updateLEDs();
 
   protected abstract void setLEDBuffer(int index, Color color);

@@ -688,6 +688,7 @@ public class RobotContainer {
                             !vision.isEnabled() || drivetrain.isAimedAtSpeaker()))
                 .andThen(
                     Commands.sequence(
+                        Commands.runOnce(() -> {shooter.setIsShooting(true);}),
                         Commands.runOnce(intake::shoot, intake),
                         NoteVisualizer.shoot(),
                         Commands.runOnce(drivetrain::disableAimToSpeaker)))
