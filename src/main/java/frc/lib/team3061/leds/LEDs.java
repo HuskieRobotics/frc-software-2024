@@ -175,13 +175,17 @@ public abstract class LEDs extends SubsystemBase {
       strobe(Section.SHOULDER, Color.kBlue, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
       // Waiting for game piece
-      // wave(
-      //     Section.FULL,
-      //     Color.kBlue,
-      //     new Color(255, 20, 0),
-      //     WAVE_FAST_CYCLE_LENGTH,
-      //     WAVE_SLOW_DURATION);
-      fireAnimation(Section.FULL, BREATH_DURATION);
+      wave(
+          Section.FULL,
+          Color.kBlue,
+          new Color(255, 20, 0),
+          WAVE_FAST_CYCLE_LENGTH,
+          WAVE_SLOW_DURATION);
+
+      // animation testing
+      // fire(Section.FULL, BREATH_DURATION);
+      // fireWave(Section.FULL, BREATH_DURATION);
+      // rainbowWave(Section.FULL, RAINBOW_CYCLE_LENGTH, RAINBOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
       // Has game piece
       strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
@@ -398,7 +402,106 @@ public abstract class LEDs extends SubsystemBase {
     }
   }
 
-  private void fireAnimation(Section section, double duration) {
+  private void rainbowWave(Section section, double cycleLength, double duration) {
+    double x = (1 - ((Timer.getFPGATimestamp() % duration) / duration)) * 2.0 * Math.PI;
+    double xDiffPerLed = (2.0 * Math.PI) / cycleLength;
+    int numColors = 6; // Number of colors in the rainbow
+    int colorStep = 255 / (numColors - 1); // Calculate color step for smooth gradient
+    for (int i = 0; i < section.end(); i++) {
+      x += xDiffPerLed;
+      if (i >= section.start()) {
+        double ratio = (Math.pow(Math.sin(x), WAVE_EXPONENT) + 1.0) / 2.0;
+        if (Double.isNaN(ratio)) {
+          ratio = (-Math.pow(Math.sin(x + Math.PI), WAVE_EXPONENT) + 1.0) / 2.0;
+        }
+        if (Double.isNaN(ratio)) {
+          ratio = 0.5;
+        }
+        int colorIndex = (int) (ratio * (numColors - 1)); // Calculate the color index
+        double colorRatio =
+            (ratio * (numColors - 1)) - colorIndex; // Calculate the color ratio for interpolation
+        Color c1 = rainbowColor(colorIndex);
+        Color c2 = rainbowColor(colorIndex + 1);
+        double red = (c1.red * (1 - colorRatio)) + (c2.red * colorRatio);
+        double green = (c1.green * (1 - colorRatio)) + (c2.green * colorRatio);
+        double blue = (c1.blue * (1 - colorRatio)) + (c2.blue * colorRatio);
+        setLEDBuffer(i, new Color((int) red, (int) green, (int) blue));
+      }
+    }
+  }
+
+  private Color rainbowColor(int index) {
+    int colorStep = 255 / 5; // 6 colors in total
+    int red, green, blue;
+    int colorIndex = index % 6;
+    switch (colorIndex) {
+      case 0: // Red to Orange
+        red = 255;
+        green = (index % colorStep) * colorStep;
+        blue = 0;
+        break;
+      case 1: // Orange to Yellow
+        red = 255 - (index % colorStep) * colorStep;
+        green = 255;
+        blue = 0;
+        break;
+      case 2: // Yellow to Green
+        red = 0;
+        green = 255;
+        blue = (index % colorStep) * colorStep;
+        break;
+      case 3: // Green to Blue
+        red = 0;
+        green = 255 - (index % colorStep) * colorStep;
+        blue = 255;
+        break;
+      case 4: // Blue to Indigo
+        red = (index % colorStep) * colorStep;
+        green = 0;
+        blue = 255;
+        break;
+      case 5: // Indigo to Violet
+        red = 255;
+        green = 0;
+        blue = 255 - (index % colorStep) * colorStep;
+        break;
+      default:
+        red = green = blue = 0;
+        break;
+    }
+    return new Color(red, green, blue);
+  }
+
+  private void fire(Section section, double duration) {
+    double x = (1 - ((Timer.getFPGATimestamp() % duration) / duration)) * 2.0 * Math.PI;
+    double[] heat = new double[section.end() - section.start()];
+    double xDiffPerLed = (2.0 * Math.PI) / heat.length;
+
+    for (int i = 0; i < heat.length; i++) {
+      x += xDiffPerLed;
+      heat[i] = (Math.sin(x) + 1.0) / 2.0; // Heat level between 0 and 1
+    }
+
+    for (int i = 0; i < heat.length; i++) {
+      double ratio = heat[i];
+      // Use shades of blue and orange for the flame effect
+      int red = (int) (255 * ratio);
+      int green = (int) (20 * ratio);
+      int blue = (int) (0 + 255 * ratio); // Blend blue and orange
+
+      // Simulate rising and falling effect
+      double sinValue = Math.sin(x + (i * 0.2));
+      int offset = (int) ((sinValue + 1) / 2 * 255); // Scale to 0-255
+
+      // Apply the color and intensity to the LED
+      setLEDBuffer(
+          section.start() + i,
+          new Color(
+              Math.max(0, red - offset), Math.max(0, green - offset), Math.max(0, blue - offset)));
+    }
+  }
+
+  private void fireWave(Section section, double duration) {
     double x = (1 - ((Timer.getFPGATimestamp() % duration) / duration)) * 2.0 * Math.PI;
     double[] heat = new double[section.end() - section.start()];
     double xDiffPerLed = (2.0 * Math.PI) / heat.length;
