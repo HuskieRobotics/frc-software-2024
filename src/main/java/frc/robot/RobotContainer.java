@@ -689,15 +689,19 @@ public class RobotContainer {
   }
 
   private Command getShootCommand() {
-    return Commands.waitUntil(
-            () ->
-                shooter.isShooterReadyToShoot(!vision.isEnabled() || drivetrain.isAimedAtSpeaker()))
-        .andThen(
-            Commands.sequence(
-                Commands.runOnce(intake::shoot, intake),
-                NoteVisualizer.shoot(),
-                Commands.runOnce(drivetrain::disableAimToSpeaker)))
-        .withName("shoot");
+
+    return Commands.runOnce(intake::shoot, intake).withName("shoot");
+
+    // return Commands.waitUntil(
+    //         () ->
+    //             shooter.isShooterReadyToShoot(!vision.isEnabled() ||
+    // drivetrain.isAimedAtSpeaker()))
+    //     .andThen(
+    //         Commands.sequence(
+    //             Commands.runOnce(intake::shoot, intake),
+    //             NoteVisualizer.shoot(),
+    //             Commands.runOnce(drivetrain::disableAimToSpeaker)))
+    //     .withName("shoot");
   }
 
   /**
