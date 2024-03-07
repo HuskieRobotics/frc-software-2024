@@ -72,8 +72,6 @@ public class Shooter extends SubsystemBase {
     coastModeButton.onFalse(Commands.runOnce(() -> io.setCoastMode(false)).ignoringDisable(true));
   }
 
-  private void enableCoastMode() {}
-
   private void populateAngleMap() {
     // FIXME: update after characterization
     for (int i = 0; i < 10; i++) {
