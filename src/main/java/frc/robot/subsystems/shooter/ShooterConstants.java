@@ -85,4 +85,6 @@ public class ShooterConstants {
   public static final double PODIUM_ANGLE = 15.0; // FIXME tune with real robot
   public static final double AMP_VELOCITY = 5.0; // FIXME tune with real robot
   public static final double AMP_ANGLE = 110.0; // FIXME tune with real robot
+  public static final double PASS_VELOCITY = 35.0; // FIXME tune with real robot
+  public static final double PASS_ANGLE = 12.0; // FIXME tune with real robot
 }

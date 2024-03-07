@@ -38,6 +38,7 @@ public class Shooter extends SubsystemBase {
   public enum ShootingPosition {
     FIELD,
     AUTO,
+    PASS,
     PODIUM,
     SUBWOOFER,
     AMP,
@@ -143,7 +144,9 @@ public class Shooter extends SubsystemBase {
 
   private void adjustAngle(double distanceToSpeaker) {
     if (autoShooter) {
-      if (shootingPosition == ShootingPosition.PODIUM) {
+      if (shootingPosition == ShootingPosition.PASS) {
+        io.setAngle(ShooterConstants.PASS_ANGLE);
+      } else if (shootingPosition == ShootingPosition.PODIUM) {
         io.setAngle(ShooterConstants.PODIUM_ANGLE);
       } else if (shootingPosition == ShootingPosition.SUBWOOFER) {
         io.setAngle(ShooterConstants.SUBWOOFER_ANGLE);
@@ -159,7 +162,9 @@ public class Shooter extends SubsystemBase {
 
   private void setRangeVelocity(double distanceToSpeaker) {
     double velocity;
-    if (shootingPosition == ShootingPosition.PODIUM) {
+    if (shootingPosition == ShootingPosition.PASS) {
+      velocity = ShooterConstants.PASS_VELOCITY;
+    } else if (shootingPosition == ShootingPosition.PODIUM) {
       velocity = ShooterConstants.PODIUM_VELOCITY;
     } else if (shootingPosition == ShootingPosition.SUBWOOFER) {
       velocity = ShooterConstants.SUBWOOFER_VELOCITY;
@@ -205,7 +210,8 @@ public class Shooter extends SubsystemBase {
     boolean alignedToShoot =
         isAimedAtSpeaker
             || this.shootingPosition == ShootingPosition.AMP
-            || this.shootingPosition == ShootingPosition.AUTO;
+            || this.shootingPosition == ShootingPosition.AUTO
+            || this.shootingPosition == ShootingPosition.PASS;
 
     return alignedToShoot
         && isTopShootAtSetpoint()
