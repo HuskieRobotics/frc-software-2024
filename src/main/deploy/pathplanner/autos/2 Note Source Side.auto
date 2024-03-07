@@ -40,6 +40,12 @@
           "data": {
             "name": "Shoot"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2 Note Source Center Line"
+          }
         }
       ]
     }
