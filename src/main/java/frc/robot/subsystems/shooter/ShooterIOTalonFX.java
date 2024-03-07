@@ -23,6 +23,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
+import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.util.ArmSystemSim;
 import frc.lib.team3061.util.VelocitySystemSim;
@@ -411,6 +412,9 @@ public class ShooterIOTalonFX implements ShooterIO {
       configAlert.set(true);
       configAlert.setText(status.toString());
     }
+
+    FaultReporter.getInstance()
+        .registerHardware(SUBSYSTEM_NAME, isTopMotor ? "TopMotor" : "BottomMotor", shootMotor);
   }
 
   private void configAngleMotor(TalonFX angleMotor, CANcoder angleEncoder) {
@@ -470,6 +474,9 @@ public class ShooterIOTalonFX implements ShooterIO {
       configAlert.set(true);
       configAlert.setText(status.toString());
     }
+
+    FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "AngleMotor", angleMotor);
+    FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "AngleCANcoder", angleEncoder);
   }
 
   @Override
