@@ -175,7 +175,13 @@ public abstract class LEDs extends SubsystemBase {
       strobe(Section.SHOULDER, Color.kBlue, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
       // Waiting for game piece
-      wave(Section.FULL, Color.kBlue, Color.kOrange, WAVE_FAST_CYCLE_LENGTH, WAVE_SLOW_DURATION);
+      // wave(
+      //     Section.FULL,
+      //     Color.kBlue,
+      //     new Color(255, 20, 0),
+      //     WAVE_FAST_CYCLE_LENGTH,
+      //     WAVE_SLOW_DURATION);
+      fireAnimation(Section.FULL, BREATH_DURATION);
     } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
       // Has game piece
       strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
@@ -389,6 +395,33 @@ public abstract class LEDs extends SubsystemBase {
         double blue = (c1.blue * (1 - ratio)) + (c2.blue * ratio);
         setLEDBuffer(i, new Color(red, green, blue));
       }
+    }
+  }
+
+  private void fireAnimation(Section section, double duration) {
+    double x = (1 - ((Timer.getFPGATimestamp() % duration) / duration)) * 2.0 * Math.PI;
+    double[] heat = new double[section.end() - section.start()];
+    double xDiffPerLed = (2.0 * Math.PI) / heat.length;
+
+    for (int i = 0; i < heat.length; i++) {
+      x += xDiffPerLed;
+      heat[i] = (Math.sin(x) + 1.0) / 2.0; // Heat level between 0 and 1
+    }
+
+    for (int i = 0; i < heat.length; i++) {
+      double ratio = heat[i];
+      // Use shades of orange for the flame effect
+      int red = (int) (255 * ratio);
+      int green = (int) (20 * ratio);
+      int blue = 0;
+
+      // Simulate rising and falling effect
+      int offset = (int) (10 * Math.sin(x + (i * 0.2)));
+
+      // Apply the color to the LED
+      setLEDBuffer(
+          section.start() + i,
+          new Color(Math.max(0, red - offset), Math.max(0, green - offset), blue));
     }
   }
 
