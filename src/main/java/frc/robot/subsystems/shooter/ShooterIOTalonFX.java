@@ -22,6 +22,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.util.ArmSystemSim;
 import frc.lib.team3061.util.VelocitySystemSim;
@@ -117,6 +118,8 @@ public class ShooterIOTalonFX implements ShooterIO {
   private TalonFX angleMotor;
   private CANcoder angleEncoder;
 
+  private DigitalInput coastModeButton;
+
   private double angleSetpoint;
   private double topWheelVelocity;
   private double bottomWheelVelocity;
@@ -128,6 +131,8 @@ public class ShooterIOTalonFX implements ShooterIO {
         new TalonFX(BOTTOM_SHOOTER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
     angleMotor = new TalonFX(ANGLE_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
     angleEncoder = new CANcoder(ANGLE_ENCODER_ID, RobotConfig.getInstance().getCANBusName());
+
+    coastModeButton = new DigitalInput(COAST_BUTTON_ID);
 
     shootMotorTopVelocityRequest = new VelocityTorqueCurrentFOC(0);
     shootMotorBottomVelocityRequest = new VelocityTorqueCurrentFOC(0);
@@ -325,6 +330,9 @@ public class ShooterIOTalonFX implements ShooterIO {
           ShooterConstants.MOTION_MAGIC_CRUISE_VELOCITY;
       angleMotor.getConfigurator().apply(rotationMotionMagicConfig);
     }
+
+    // For logging
+    shooterInputs.coastMode = coastModeButton.get();
   }
 
   @Override
@@ -463,5 +471,15 @@ public class ShooterIOTalonFX implements ShooterIO {
       configAlert.set(true);
       configAlert.setText(status.toString());
     }
+  }
+
+  @Override
+  public boolean getCoastMode() {
+    return coastModeButton.get();
+  }
+
+  @Override
+  public void setCoastMode(boolean coast) {
+    angleMotor.setNeutralMode(coast ? NeutralModeValue.Coast : NeutralModeValue.Brake);
   }
 }

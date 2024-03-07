@@ -19,6 +19,8 @@ public class ShooterConstants {
   public static final int ANGLE_MOTOR_ID = 29;
   public static final int ANGLE_ENCODER_ID = 9;
 
+  public static final int COAST_BUTTON_ID = 5;
+
   public static final int SET_POINT_COUNT = 5;
 
   // Shooter Velocity PID Constants

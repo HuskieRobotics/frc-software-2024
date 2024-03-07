@@ -5,7 +5,9 @@ import static frc.robot.subsystems.shooter.ShooterConstants.*;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Field2d;
@@ -35,6 +37,8 @@ public class Shooter extends SubsystemBase {
   private ShootingPosition shootingPosition = ShootingPosition.FIELD;
   private boolean overrideSetpointsForNextShot = false;
 
+  private Trigger coastModeButton = new Trigger(io::getCoastMode);
+
   public enum ShootingPosition {
     FIELD,
     PODIUM,
@@ -63,7 +67,12 @@ public class Shooter extends SubsystemBase {
       ShuffleboardTab tab = Shuffleboard.getTab(SUBSYSTEM_NAME);
       tab.add(SUBSYSTEM_NAME, this);
     }
+
+    coastModeButton.onTrue(Commands.runOnce(()->io.setCoastMode(true)).ignoringDisable(true));
+    coastModeButton.onFalse(Commands.runOnce(()->io.setCoastMode(false)).ignoringDisable(true));
   }
+
+  private void enableCoastMode() {}
 
   private void populateAngleMap() {
     // FIXME: update after characterization
