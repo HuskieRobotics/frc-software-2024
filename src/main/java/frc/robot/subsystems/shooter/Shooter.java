@@ -28,6 +28,7 @@ public class Shooter extends SubsystemBase {
   private final TunableNumber bottomWheelVelocity =
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber pivotAngle = new TunableNumber("Shooter/Angle", 10.0);
+  private final TunableNumber pivotVoltage = new TunableNumber("Shooter/Pivot Voltage", 0.0);
 
   private boolean autoShooter = true;
 
@@ -95,7 +96,8 @@ public class Shooter extends SubsystemBase {
     if (TESTING) {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
-      io.setAngle(pivotAngle.get());
+      // io.setAngle(pivotAngle.get());
+      io.setAngleMotorVoltage(pivotVoltage.get());
     } else {
       runAngleStateMachine();
     }
