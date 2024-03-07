@@ -37,6 +37,7 @@ public class Shooter extends SubsystemBase {
 
   public enum ShootingPosition {
     FIELD,
+    AUTO,
     PODIUM,
     SUBWOOFER,
     AMP,
@@ -201,7 +202,10 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean isShooterReadyToShoot(boolean isAimedAtSpeaker) {
-    boolean alignedToShoot = isAimedAtSpeaker || this.shootingPosition == ShootingPosition.AMP;
+    boolean alignedToShoot =
+        isAimedAtSpeaker
+            || this.shootingPosition == ShootingPosition.AMP
+            || this.shootingPosition == ShootingPosition.AUTO;
 
     return alignedToShoot
         && isTopShootAtSetpoint()
@@ -253,7 +257,7 @@ public class Shooter extends SubsystemBase {
     return false;
   }
 
-  public boolean isAutoShooter() {
+  public boolean isAutomated() {
     return autoShooter;
   }
 
