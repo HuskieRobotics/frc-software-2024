@@ -98,6 +98,8 @@ public class Drivetrain extends SubsystemBase {
 
   private DriverStation.Alliance alliance = DriverStation.Alliance.Blue;
 
+  private ShuffleboardTab sysCheckTab;
+
   /**
    * Creates a new Drivetrain subsystem.
    *
@@ -116,6 +118,9 @@ public class Drivetrain extends SubsystemBase {
     this.isMoveToPoseEnabled = true;
 
     this.isLockToSpeakerEnabled = false;
+
+    sysCheckTab = Shuffleboard.getTab("System Check");
+    sysCheckTab.add("DriveTrain System Check", getSystemCheckCommand());
 
     ShuffleboardTab tabMain = Shuffleboard.getTab("MAIN");
     tabMain
