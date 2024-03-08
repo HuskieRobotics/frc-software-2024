@@ -12,15 +12,15 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "5 Note Amp Side 1"
+            "name": "PrepAutoShoot"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Shoot"
+            "pathName": "5 Note Amp Side 1"
           }
         },
         {
@@ -36,6 +36,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "PrepAutoShoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "5 Note Amp Side 3"
@@ -48,6 +54,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "PrepAutoShoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "5 Note Amp Side 4"
@@ -57,6 +69,12 @@
           "type": "named",
           "data": {
             "name": "Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PrepAutoShoot"
           }
         },
         {

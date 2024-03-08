@@ -12,6 +12,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "PrepAutoShoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "3 Note Start"
@@ -21,6 +27,12 @@
           "type": "named",
           "data": {
             "name": "Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PrepAutoShoot"
           }
         },
         {

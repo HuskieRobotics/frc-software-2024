@@ -379,18 +379,21 @@ public class RobotContainer {
     // FIXME: add commands to wait for the shooter wheel to reach the desired velocity and then
     // shoot
     Command oneNoteAnywhere =
-        Commands.run(
-                () -> {
-                  drivetrain.drive(1, 0, 0, false, true);
-                },
-                drivetrain)
-            .withTimeout(2.5)
-            .andThen(
-                Commands.runOnce(
+        Commands.sequence(
+            // Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AUTO)),
+            // getShootCommand(),
+            Commands.run(
                     () -> {
-                      drivetrain.drive(0, 0, 0, false, false);
+                      drivetrain.drive(1, 0, 0, false, true);
                     },
-                    drivetrain));
+                    drivetrain)
+                .withTimeout(2.5)
+                .andThen(
+                    Commands.runOnce(
+                        () -> {
+                          drivetrain.drive(0, 0, 0, false, false);
+                        },
+                        drivetrain)));
     autoChooser.addOption("One Note Anywhere", oneNoteAnywhere);
 
     /************ 2 Notes ************
