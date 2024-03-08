@@ -80,6 +80,7 @@ public class Shooter extends SubsystemBase {
     coastModeButton.onFalse(Commands.runOnce(() -> io.setCoastMode(false)).ignoringDisable(true));
 
     FaultReporter.getInstance().registerSystemCheck(SUBSYSTEM_NAME, getSystemCheckCommand());
+
   }
 
   private void populateAngleMap() {
