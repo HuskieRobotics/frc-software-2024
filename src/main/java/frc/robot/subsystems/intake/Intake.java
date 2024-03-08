@@ -15,7 +15,6 @@ public class Intake extends SubsystemBase {
   private static final String SUBSYSTEM_NAME = "INTAKE";
 
   private final IntakeIO io;
-  private final BooleanSupplier isShooterAngleReady;
 
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
   private final LEDs leds;
@@ -24,9 +23,10 @@ public class Intake extends SubsystemBase {
     IntakeMotor.ROLLER, IntakeMotor.KICKER,
   };
 
+  private BooleanSupplier isShooterAngleReady;
+
   private IntakeState intakeState;
   private boolean automationEnabled;
-  private boolean hasNote;
 
   // system tests
   private IntakeState mostRecentIntakeState;
@@ -46,9 +46,8 @@ public class Intake extends SubsystemBase {
     NOTE_IN_SHOOTER
   }
 
-  public Intake(IntakeIO io, BooleanSupplier isShooterAngleReady) {
+  public Intake(IntakeIO io) {
     this.io = io;
-    this.isShooterAngleReady = isShooterAngleReady;
 
     leds = LEDs.getInstance();
     intakeState = IntakeState.EMPTY;
@@ -61,6 +60,10 @@ public class Intake extends SubsystemBase {
     this.intakeGamePiece();
 
     FaultReporter.getInstance().registerSystemCheck(SUBSYSTEM_NAME, getSystemCheckCommand());
+  }
+
+  public void setShooterAngleReady(BooleanSupplier isShooterAngleReady) {
+    this.isShooterAngleReady = isShooterAngleReady;
   }
 
   @Override
@@ -102,12 +105,10 @@ public class Intake extends SubsystemBase {
       intakeState = IntakeState.NOTE_IN_INTAKE;
       leds.setIntakeLEDState(IntakeLEDState.HAS_GAME_PIECE);
       this.transitionGamePiece();
-      hasNote = true;
     } else if (inputs.isShooterIRBlocked) {
       intakeState = IntakeState.NOTE_IN_SHOOTER;
       leds.setIntakeLEDState(IntakeLEDState.HAS_GAME_PIECE);
       this.repelGamePiece();
-      hasNote = true;
     }
   }
 
@@ -119,7 +120,6 @@ public class Intake extends SubsystemBase {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
-      hasNote = false;
     }
   }
 
@@ -145,17 +145,15 @@ public class Intake extends SubsystemBase {
   }
 
   private void runNoteInShooterState() {
-    // TODO: Set up access of shooter angle
     if (!inputs.isShooterIRBlocked) {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
-      hasNote = false;
     }
   }
 
   public boolean hasNote() {
-    return hasNote;
+    return (!inputs.isRollerIRBlocked && (inputs.isKickerIRBlocked || inputs.isShooterIRBlocked));
   }
 
   private void setIntakeState(IntakeState state) {

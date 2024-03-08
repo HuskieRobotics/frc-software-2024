@@ -58,7 +58,7 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getLockToSpeakerButton() {
+  public Trigger getAimSpeakerButton() {
     return translateJoystickButtons[1];
   }
 
