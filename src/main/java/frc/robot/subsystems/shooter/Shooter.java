@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.team3015.subsystem.FaultReporter;
+import frc.lib.team3015.subsystem.SubsystemFault;
 import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Field2d;
@@ -42,6 +43,8 @@ public class Shooter extends SubsystemBase {
   private boolean overrideSetpointsForNextShot = false;
 
   private Trigger coastModeButton = new Trigger(() -> shooterInputs.coastMode);
+
+  private ShuffleboardTab sysCheckTab;
 
   // FIXME: consider having 1-2 set distances with fixed angles for auto shots (near subwoofer, near
   // podium) and create a shooter preset for thoses
@@ -80,6 +83,18 @@ public class Shooter extends SubsystemBase {
     coastModeButton.onFalse(Commands.runOnce(() -> io.setCoastMode(false)).ignoringDisable(true));
 
     FaultReporter.getInstance().registerSystemCheck(SUBSYSTEM_NAME, getSystemCheckCommand());
+
+    sysCheckTab = Shuffleboard.getTab("System Check");
+
+     Shuffleboard.getTab("System Check").addStringArray("Shooter Train Faults",()->{
+      String[] faults = new String[FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).size()];
+      int i = 0;
+      for (SubsystemFault fault : FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME)){
+        faults[i]= String.format("[%.2f] %s", fault.timestamp, fault.description);
+        i++;
+      }
+      return faults;
+    });
 
   }
 
