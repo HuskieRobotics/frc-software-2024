@@ -39,9 +39,6 @@ public class LEDsRIO extends LEDs {
   }
 
   static Color changeToGRB(Color color) {
-    double newGreen = color.green * 255;
-    double newBlue = color.blue * 255;
-    double newRed = color.red * 255;
-    return new Color((int) newGreen, (int) newRed, (int) newBlue);
+    return new Color(color.green, color.red, color.blue);
   }
 }
