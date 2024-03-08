@@ -125,15 +125,19 @@ public class Drivetrain extends SubsystemBase {
     sysCheckTab = Shuffleboard.getTab("System Check");
     sysCheckTab.add("DriveTrain System Check", getSystemCheckCommand());
 
-    Shuffleboard.getTab("System Check").addStringArray("Drive Train Faults",()->{
-      String[] faults = new String[FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).size()];
-      int i = 0;
-      for (SubsystemFault fault : FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME)){
-        faults[i]= String.format("[%.2f] %s", fault.timestamp, fault.description);
-        i++;
-      }
-      return faults;
-    });
+    Shuffleboard.getTab("System Check")
+        .addStringArray(
+            "Drive Train Faults",
+            () -> {
+              String[] faults =
+                  new String[FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).size()];
+              int i = 0;
+              for (SubsystemFault fault : FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME)) {
+                faults[i] = String.format("[%.2f] %s", fault.timestamp, fault.description);
+                i++;
+              }
+              return faults;
+            });
 
     ShuffleboardTab tabMain = Shuffleboard.getTab("MAIN");
     tabMain

@@ -67,16 +67,21 @@ public class Intake extends SubsystemBase {
     FaultReporter.getInstance().registerSystemCheck(SUBSYSTEM_NAME, getSystemCheckCommand());
 
     sysCheckTab = Shuffleboard.getTab("System Check");
+    sysCheckTab.add(getSystemCheckCommand());
 
-     Shuffleboard.getTab("System Check").addStringArray("Intake Train Faults",()->{
-      String[] faults = new String[FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).size()];
-      int i = 0;
-      for (SubsystemFault fault : FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME)){
-        faults[i]= String.format("[%.2f] %s", fault.timestamp, fault.description);
-        i++;
-      }
-      return faults;
-    });
+    Shuffleboard.getTab("System Check")
+        .addStringArray(
+            "Intake Train Faults",
+            () -> {
+              String[] faults =
+                  new String[FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).size()];
+              int i = 0;
+              for (SubsystemFault fault : FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME)) {
+                faults[i] = String.format("[%.2f] %s", fault.timestamp, fault.description);
+                i++;
+              }
+              return faults;
+            });
   }
 
   public void setShooterAngleReady(BooleanSupplier isShooterAngleReady) {

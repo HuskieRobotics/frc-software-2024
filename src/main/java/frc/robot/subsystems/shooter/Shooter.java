@@ -86,16 +86,21 @@ public class Shooter extends SubsystemBase {
 
     sysCheckTab = Shuffleboard.getTab("System Check");
 
-     Shuffleboard.getTab("System Check").addStringArray("Shooter Train Faults",()->{
-      String[] faults = new String[FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).size()];
-      int i = 0;
-      for (SubsystemFault fault : FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME)){
-        faults[i]= String.format("[%.2f] %s", fault.timestamp, fault.description);
-        i++;
-      }
-      return faults;
-    });
+    sysCheckTab.add(getSystemCheckCommand());
 
+    Shuffleboard.getTab("System Check")
+        .addStringArray(
+            "Shooter Train Faults",
+            () -> {
+              String[] faults =
+                  new String[FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).size()];
+              int i = 0;
+              for (SubsystemFault fault : FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME)) {
+                faults[i] = String.format("[%.2f] %s", fault.timestamp, fault.description);
+                i++;
+              }
+              return faults;
+            });
   }
 
   private void populateAngleMap() {
