@@ -5,7 +5,7 @@
       "x": 1.4229570277322372,
       "y": 6.28
     },
-    "rotation": 179.34477450273
+    "rotation": 177.6980142486933
   },
   "command": {
     "type": "sequential",
@@ -14,7 +14,7 @@
         {
           "type": "named",
           "data": {
-            "name": "PrepAutoShoot"
+            "name": "PrepAutoShot"
           }
         },
         {
@@ -38,7 +38,7 @@
         {
           "type": "named",
           "data": {
-            "name": "PrepAutoShoot"
+            "name": "PrepAutoShot"
           }
         },
         {
@@ -56,7 +56,7 @@
         {
           "type": "named",
           "data": {
-            "name": "PrepAutoShoot"
+            "name": "PrepAutoShot"
           }
         },
         {
@@ -74,7 +74,7 @@
         {
           "type": "named",
           "data": {
-            "name": "PrepAutoShoot"
+            "name": "PrepAutoShot"
           }
         },
         {
