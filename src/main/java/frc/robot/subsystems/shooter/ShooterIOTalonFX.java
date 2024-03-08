@@ -9,6 +9,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
@@ -452,13 +453,11 @@ public class ShooterIOTalonFX implements ShooterIO {
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
 
-    CANcoderConfiguration angleCANCoderConfig = new CANcoderConfiguration();
-
-    angleCANCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
-    angleCANCoderConfig.MagnetSensor.SensorDirection =
-        SensorDirectionValue.CounterClockwise_Positive;
-    angleCANCoderConfig.MagnetSensor.MagnetOffset = ShooterConstants.MAGNET_OFFSET;
-    angleEncoder.getConfigurator().apply(angleCANCoderConfig);
+    SoftwareLimitSwitchConfigs angleMotorLimitSwitches = angleMotorConfig.SoftwareLimitSwitch;
+    angleMotorLimitSwitches.ForwardSoftLimitEnable = true;
+    angleMotorLimitSwitches.ForwardSoftLimitThreshold = ShooterConstants.UPPER_ANGLE_LIMIT;
+    angleMotorLimitSwitches.ReverseSoftLimitEnable = true;
+    angleMotorLimitSwitches.ReverseSoftLimitThreshold = ShooterConstants.SHOOTER_STORAGE_ANGLE;
 
     angleMotorConfig.Feedback.FeedbackRemoteSensorID = angleEncoder.getDeviceID();
     angleMotorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
@@ -468,6 +467,22 @@ public class ShooterIOTalonFX implements ShooterIO {
     StatusCode status = StatusCode.StatusCodeNotInitialized;
     for (int i = 0; i < 5; ++i) {
       status = angleMotor.getConfigurator().apply(angleMotorConfig);
+      if (status.isOK()) break;
+    }
+    if (!status.isOK()) {
+      configAlert.set(true);
+      configAlert.setText(status.toString());
+    }
+
+    CANcoderConfiguration angleCANCoderConfig = new CANcoderConfiguration();
+    angleCANCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
+    angleCANCoderConfig.MagnetSensor.SensorDirection =
+        SensorDirectionValue.CounterClockwise_Positive;
+    angleCANCoderConfig.MagnetSensor.MagnetOffset = ShooterConstants.MAGNET_OFFSET;
+
+    status = StatusCode.StatusCodeNotInitialized;
+    for (int i = 0; i < 5; ++i) {
+      status = angleEncoder.getConfigurator().apply(angleCANCoderConfig);
       if (status.isOK()) break;
     }
     if (!status.isOK()) {
