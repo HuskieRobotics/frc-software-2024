@@ -662,7 +662,7 @@ public class RobotContainer {
     oi.getShootFullFieldButton()
         .onTrue(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.PASS), shooter)
-                .withName("store shooter"));
+                .withName("prepare to pass"));
 
     oi.getShooterAngleUpButton()
         .whileTrue(
