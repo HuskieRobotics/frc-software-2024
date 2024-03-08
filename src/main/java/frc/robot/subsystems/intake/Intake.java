@@ -71,7 +71,7 @@ public class Intake extends SubsystemBase {
 
     Shuffleboard.getTab("System Check")
         .addStringArray(
-            "Intake Train Faults",
+            "Intake Faults",
             () -> {
               String[] faults =
                   new String[FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).size()];

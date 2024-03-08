@@ -90,7 +90,7 @@ public class Shooter extends SubsystemBase {
 
     Shuffleboard.getTab("System Check")
         .addStringArray(
-            "Shooter Train Faults",
+            "Shooter Faults",
             () -> {
               String[] faults =
                   new String[FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).size()];
