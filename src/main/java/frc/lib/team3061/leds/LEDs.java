@@ -73,11 +73,13 @@ public abstract class LEDs extends SubsystemBase {
   private static final double STROBE_FAST_DURATION = 0.1;
   private static final double STROBE_SLOW_DURATION = 0.2;
   private static final double BREATH_DURATION = 1.0;
-  private static final double RAINBOW_CYCLE_LENGTH = 25.0;
-  private static final double RAINBOW_DURATION = 0.25;
+  private static final double PULSE_DURATION = 0.5;
+  private static final double RAINBOW_CYCLE_LENGTH = 30.0;
+  private static final double RAINBOW_DURATION = 1;
   private static final double WAVE_EXPONENT = 0.4;
   private static final double WAVE_FAST_CYCLE_LENGTH = 25.0;
   private static final double WAVE_FAST_DURATION = 0.25;
+  private static final double WAVE_MEDIUM_DURATION = 0.75;
   private static final double WAVE_SLOW_CYCLE_LENGTH = 25.0;
   private static final double WAVE_SLOW_DURATION = 3.0;
   private static final double WAVE_ALLIANCE_CYCLE_LENGTH = 15.0;
@@ -175,16 +177,16 @@ public abstract class LEDs extends SubsystemBase {
       strobe(Section.SHOULDER, Color.kBlue, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
       // Waiting for game piece
-      wave(
-          Section.FULL,
-          Color.kBlue,
-          new Color(255, 20, 0),
-          WAVE_FAST_CYCLE_LENGTH,
-          WAVE_SLOW_DURATION);
+      // wave(
+      //     Section.FULL,
+      //     Color.kBlue,
+      //     new Color(255, 20, 0),
+      //     WAVE_FAST_CYCLE_LENGTH,
+      //     WAVE_SLOW_DURATION);
 
       // animation testing
       // fire(Section.FULL, BREATH_DURATION);
-      // fireWave(Section.FULL, BREATH_DURATION);
+      orangePulse(Section.FULL, PULSE_DURATION);
       // rainbowWave(Section.FULL, RAINBOW_CYCLE_LENGTH, RAINBOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
       // Has game piece
@@ -201,14 +203,14 @@ public abstract class LEDs extends SubsystemBase {
   private void updateToAutoPattern() {
     wave(
         Section.FULL,
-        Color.kDarkOrange,
-        Color.kDarkBlue,
+        Color.kBlue,
+        new Color(255, 20, 0),
         WAVE_FAST_CYCLE_LENGTH,
-        WAVE_FAST_DURATION);
-    if (autoFinished) {
-      double fullTime = LENGTH / WAVE_FAST_CYCLE_LENGTH * WAVE_FAST_DURATION;
-      solid((Timer.getFPGATimestamp() - autoFinishedTime) / fullTime, Color.kGreen);
-    }
+        WAVE_MEDIUM_DURATION);
+    // if (autoFinished) {
+    //   double fullTime = LENGTH / WAVE_FAST_CYCLE_LENGTH * WAVE_FAST_DURATION;
+    //   solid((Timer.getFPGATimestamp() - autoFinishedTime) / fullTime, Color.kGreen);
+    // }
   }
 
   private void updateToDisabledPattern() {
@@ -484,10 +486,10 @@ public abstract class LEDs extends SubsystemBase {
 
     for (int i = 0; i < heat.length; i++) {
       double ratio = heat[i];
-      // Use shades of blue and orange for the flame effect
+      // Use shades of blue and orange for the fire effect
       int red = (int) (255 * ratio);
       int green = (int) (20 * ratio);
-      int blue = (int) (0 + 255 * ratio); // Blend blue and orange
+      int blue = 0; // Blend blue and orange
 
       // Simulate rising and falling effect
       double sinValue = Math.sin(x + (i * 0.2));
@@ -501,7 +503,7 @@ public abstract class LEDs extends SubsystemBase {
     }
   }
 
-  private void fireWave(Section section, double duration) {
+  private void orangePulse(Section section, double duration) {
     double x = (1 - ((Timer.getFPGATimestamp() % duration) / duration)) * 2.0 * Math.PI;
     double[] heat = new double[section.end() - section.start()];
     double xDiffPerLed = (2.0 * Math.PI) / heat.length;
@@ -513,23 +515,21 @@ public abstract class LEDs extends SubsystemBase {
 
     for (int i = 0; i < heat.length; i++) {
       double ratio = heat[i];
-      // pink
-      // int red = (int) (255 * ratio);
-      // int green = (int) (20 * ratio);
-      // int blue = (int) (40 * ratio);
 
-      // orange
+      // Orange color
       int red = (int) (255 * ratio);
-      int green = (int) (20 * ratio);
+      int green = (int) (30 * ratio);
       int blue = 0;
+      // int blue = (int) (10 * ratio);
 
       // Simulate rising and falling effect
-      int offset = (int) (10 * Math.sin(x + (i * 0.2)));
+      int offset = (int) (2 * Math.sin(x + (i * 0.2)));
 
       // Apply the color to the LED
       setLEDBuffer(
           section.start() + i,
-          new Color(Math.max(0, red - offset), Math.max(0, green - offset), blue));
+          new Color(
+              Math.max(0, red - offset), Math.max(0, green - offset), Math.max(0, blue - offset)));
     }
   }
 
