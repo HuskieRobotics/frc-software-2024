@@ -74,12 +74,14 @@ public class ShooterConstants {
   public static final double MOTION_MAGIC_CRUISE_VELOCITY = 0;
   public static final double ANGLE_MOTOR_GEAR_RATIO = 45.0;
   public static final boolean ANGLE_MOTOR_INVERTED = false;
-  public static final double MAGNET_OFFSET = 0.0;
+  public static final double MAGNET_OFFSET = -0.899334111;
   public static final double SENSOR_TO_MECHANISM_RATIO = 4.0;
   public static final double ANGLE_TOLERANCE_DEGREES = 2.0; // FIXME tune with real robot
   public static final double SHOOTER_STORAGE_ANGLE = 11.0; // FIXME tune with real robot
   public static final double ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE = 1.0;
   public static final double UPPER_ANGLE_LIMIT = 120.0;
+
+  // 0.074951 rotations = 10.4 degrees
 
   // Shooter Presets
   public static final double SUBWOOFER_VELOCITY = 12.0; // FIXME tune with real robot

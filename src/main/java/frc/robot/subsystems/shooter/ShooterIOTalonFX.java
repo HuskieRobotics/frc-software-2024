@@ -333,7 +333,7 @@ public class ShooterIOTalonFX implements ShooterIO {
       angleMotor.getConfigurator().apply(rotationMotionMagicConfig);
     }
 
-    shooterInputs.coastMode = coastModeButton.get();
+    shooterInputs.coastMode = !coastModeButton.get();
   }
 
   @Override
@@ -419,6 +419,20 @@ public class ShooterIOTalonFX implements ShooterIO {
   }
 
   private void configAngleMotor(TalonFX angleMotor, CANcoder angleEncoder) {
+    CANcoderConfiguration angleCANCoderConfig = new CANcoderConfiguration();
+    angleCANCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
+    angleCANCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+    angleCANCoderConfig.MagnetSensor.MagnetOffset = ShooterConstants.MAGNET_OFFSET;
+
+    StatusCode status = StatusCode.StatusCodeNotInitialized;
+    for (int i = 0; i < 5; ++i) {
+      status = angleEncoder.getConfigurator().apply(angleCANCoderConfig);
+      if (status.isOK()) break;
+    }
+    if (!status.isOK()) {
+      configAlert.set(true);
+      configAlert.setText(status.toString());
+    }
 
     TalonFXConfiguration angleMotorConfig = new TalonFXConfiguration();
     CurrentLimitsConfigs angleMotorCurrentLimits = new CurrentLimitsConfigs();
@@ -464,7 +478,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.SENSOR_TO_MECHANISM_RATIO;
     angleMotorConfig.Feedback.RotorToSensorRatio = ShooterConstants.ANGLE_MOTOR_GEAR_RATIO;
 
-    StatusCode status = StatusCode.StatusCodeNotInitialized;
+    status = StatusCode.StatusCodeNotInitialized;
     for (int i = 0; i < 5; ++i) {
       status = angleMotor.getConfigurator().apply(angleMotorConfig);
       if (status.isOK()) break;
@@ -474,21 +488,7 @@ public class ShooterIOTalonFX implements ShooterIO {
       configAlert.setText(status.toString());
     }
 
-    CANcoderConfiguration angleCANCoderConfig = new CANcoderConfiguration();
-    angleCANCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
-    angleCANCoderConfig.MagnetSensor.SensorDirection =
-        SensorDirectionValue.CounterClockwise_Positive;
-    angleCANCoderConfig.MagnetSensor.MagnetOffset = ShooterConstants.MAGNET_OFFSET;
-
-    status = StatusCode.StatusCodeNotInitialized;
-    for (int i = 0; i < 5; ++i) {
-      status = angleEncoder.getConfigurator().apply(angleCANCoderConfig);
-      if (status.isOK()) break;
-    }
-    if (!status.isOK()) {
-      configAlert.set(true);
-      configAlert.setText(status.toString());
-    }
+    angleMotor.setPosition(Units.degreesToRotations(10.4 * 4.0));
 
     FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "AngleMotor", angleMotor);
     FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "AngleCANcoder", angleEncoder);
@@ -496,6 +496,7 @@ public class ShooterIOTalonFX implements ShooterIO {
 
   @Override
   public void setCoastMode(boolean coast) {
-    angleMotor.setNeutralMode(coast ? NeutralModeValue.Coast : NeutralModeValue.Brake);
+    // FIXME: debug later
+    // angleMotor.setNeutralMode(coast ? NeutralModeValue.Coast : NeutralModeValue.Brake);
   }
 }
