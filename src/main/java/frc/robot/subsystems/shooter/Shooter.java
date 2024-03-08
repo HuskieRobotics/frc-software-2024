@@ -14,6 +14,7 @@ import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Field2d;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.shooter.Shooter.ShootingPosition;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -42,6 +43,8 @@ public class Shooter extends SubsystemBase {
 
   private Trigger coastModeButton = new Trigger(() -> shooterInputs.coastMode);
 
+  // FIXME: consider having 1-2 set distances with fixed angles for auto shots (near subwoofer, near
+  // podium) and create a shooter preset for thoses
   public enum ShootingPosition {
     FIELD,
     AUTO,

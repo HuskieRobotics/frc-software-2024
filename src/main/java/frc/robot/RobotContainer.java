@@ -348,10 +348,12 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "disableXStance", Commands.runOnce(drivetrain::disableXstance, drivetrain));
     NamedCommands.registerCommand("wait5Seconds", Commands.waitSeconds(5.0));
+
     NamedCommands.registerCommand("Shoot", getShootCommand());
     NamedCommands.registerCommand(
         "PrepAutoSubwooferShot",
         Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)));
+    // FIXME: consider making this a shoot and prep single named command
     NamedCommands.registerCommand(
         "PrepAutoShot", Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AUTO)));
 
