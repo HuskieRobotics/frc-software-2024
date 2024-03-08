@@ -5,13 +5,18 @@ import static frc.robot.subsystems.shooter.ShooterConstants.*;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.leds.LEDs.ShooterLEDState;
 import frc.robot.Field2d;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.shooter.Shooter.ShootingPosition;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -27,7 +32,8 @@ public class Shooter extends SubsystemBase {
   private final TunableNumber topWheelVelocity = new TunableNumber("Shooter/Top Wheel Velocity", 0);
   private final TunableNumber bottomWheelVelocity =
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
-  private final TunableNumber angle = new TunableNumber("Shooter/Angle", 10.0);
+  private final TunableNumber pivotAngle = new TunableNumber("Shooter/Angle", 10.0);
+  private final TunableNumber pivotVoltage = new TunableNumber("Shooter/Pivot Voltage", 0.0);
 
   private boolean autoShooter = true;
   private final LEDs leds;
@@ -40,8 +46,14 @@ public class Shooter extends SubsystemBase {
   private ShootingPosition shootingPosition = ShootingPosition.FIELD;
   private boolean overrideSetpointsForNextShot = false;
 
+  private Trigger coastModeButton = new Trigger(() -> shooterInputs.coastMode);
+
+  // FIXME: consider having 1-2 set distances with fixed angles for auto shots (near subwoofer, near
+  // podium) and create a shooter preset for thoses
   public enum ShootingPosition {
     FIELD,
+    AUTO,
+    PASS,
     PODIUM,
     SUBWOOFER,
     AMP,
@@ -76,6 +88,11 @@ public class Shooter extends SubsystemBase {
       ShuffleboardTab tab = Shuffleboard.getTab(SUBSYSTEM_NAME);
       tab.add(SUBSYSTEM_NAME, this);
     }
+
+    coastModeButton.onTrue(Commands.runOnce(() -> io.setCoastMode(true)).ignoringDisable(true));
+    coastModeButton.onFalse(Commands.runOnce(() -> io.setCoastMode(false)).ignoringDisable(true));
+
+    FaultReporter.getInstance().registerSystemCheck(SUBSYSTEM_NAME, getSystemCheckCommand());
   }
 
   private void populateAngleMap() {
@@ -95,7 +112,8 @@ public class Shooter extends SubsystemBase {
     if (TESTING) {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
-      io.setAngle(angle.get());
+      // io.setAngle(pivotAngle.get());
+      io.setAngleMotorVoltage(pivotVoltage.get());
     } else {
       runAngleStateMachine();
     }
@@ -172,7 +190,9 @@ public class Shooter extends SubsystemBase {
 
   private void adjustAngle(double distanceToSpeaker) {
     if (autoShooter) {
-      if (shootingPosition == ShootingPosition.PODIUM) {
+      if (shootingPosition == ShootingPosition.PASS) {
+        io.setAngle(ShooterConstants.PASS_ANGLE);
+      } else if (shootingPosition == ShootingPosition.PODIUM) {
         io.setAngle(ShooterConstants.PODIUM_ANGLE);
       } else if (shootingPosition == ShootingPosition.SUBWOOFER) {
         io.setAngle(ShooterConstants.SUBWOOFER_ANGLE);
@@ -188,7 +208,9 @@ public class Shooter extends SubsystemBase {
 
   private void setRangeVelocity(double distanceToSpeaker) {
     double velocity;
-    if (shootingPosition == ShootingPosition.PODIUM) {
+    if (shootingPosition == ShootingPosition.PASS) {
+      velocity = ShooterConstants.PASS_VELOCITY;
+    } else if (shootingPosition == ShootingPosition.PODIUM) {
       velocity = ShooterConstants.PODIUM_VELOCITY;
     } else if (shootingPosition == ShootingPosition.SUBWOOFER) {
       velocity = ShooterConstants.SUBWOOFER_VELOCITY;
@@ -231,7 +253,11 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean isShooterReadyToShoot(boolean isAimedAtSpeaker) {
-    boolean alignedToShoot = isAimedAtSpeaker || this.shootingPosition == ShootingPosition.AMP;
+    boolean alignedToShoot =
+        isAimedAtSpeaker
+            || this.shootingPosition == ShootingPosition.AMP
+            || this.shootingPosition == ShootingPosition.AUTO
+            || this.shootingPosition == ShootingPosition.PASS;
 
     return alignedToShoot
         && isTopShootAtSetpoint()
@@ -283,11 +309,118 @@ public class Shooter extends SubsystemBase {
     return false;
   }
 
-  public boolean isAutoShooter() {
+  public boolean isAutomated() {
     return autoShooter;
   }
 
   public void setAngleMotorVoltage(double voltage) {
     io.setAngleMotorVoltage(voltage);
+  }
+
+  private Command getSystemCheckCommand() {
+    return Commands.sequence(
+        getPresetCheckCommand(ShootingPosition.AMP),
+        getPresetCheckCommand(ShootingPosition.SUBWOOFER),
+        getPresetCheckCommand(ShootingPosition.PODIUM),
+        getPresetCheckCommand(ShootingPosition.PASS)
+            .until(() -> !FaultReporter.getInstance().getFaults(SUBSYSTEM_NAME).isEmpty())
+            .andThen(
+                Commands.runOnce(
+                    () -> {
+                      io.setShooterWheelBottomVelocity(0.0);
+                      io.setShooterWheelTopVelocity(0.0);
+                      io.setAngle(SHOOTER_STORAGE_ANGLE);
+                    }))
+            .withName(SUBSYSTEM_NAME + "SystemCheck"));
+  }
+
+  private Command getPresetCheckCommand(ShootingPosition position) {
+    double angle;
+    double velocity;
+
+    if (position == ShootingPosition.SUBWOOFER) {
+      angle = SUBWOOFER_ANGLE;
+      velocity = SUBWOOFER_VELOCITY;
+    } else if (position == ShootingPosition.PODIUM) {
+      angle = PODIUM_ANGLE;
+      velocity = PODIUM_VELOCITY;
+    } else if (position == ShootingPosition.PASS) {
+      angle = PASS_ANGLE;
+      velocity = PASS_VELOCITY;
+    } else { // ShootingPosition.AMP
+      angle = AMP_ANGLE;
+      velocity = AMP_VELOCITY;
+    }
+
+    return Commands.sequence(
+        Commands.runOnce(() -> this.setShootingPosition(position)),
+        Commands.waitSeconds(2.0),
+        Commands.runOnce(() -> this.checkAngle(angle)),
+        Commands.runOnce(() -> this.checkVelocity(velocity)));
+  }
+
+  private void checkAngle(double degrees) {
+    if (Math.abs(this.shooterInputs.angleEncoderAngleDegrees - degrees) > ANGLE_TOLERANCE_DEGREES) {
+      if (Math.abs(degrees) - Math.abs(this.shooterInputs.angleEncoderAngleDegrees) > 0) {
+        FaultReporter.getInstance()
+            .addFault(
+                SUBSYSTEM_NAME,
+                "Shooter angle is too low, should be "
+                    + degrees
+                    + " but is "
+                    + this.shooterInputs.angleEncoderAngleDegrees);
+      } else {
+        FaultReporter.getInstance()
+            .addFault(
+                SUBSYSTEM_NAME,
+                "Shooter angle is too high, should be "
+                    + degrees
+                    + " but is "
+                    + this.shooterInputs.angleEncoderAngleDegrees);
+      }
+    }
+  }
+
+  private void checkVelocity(double velocity) {
+    // check bottom motor
+    if (Math.abs(this.shooterInputs.shootMotorBottomVelocityRPS - velocity) > VELOCITY_TOLERANCE) {
+      if (Math.abs(this.shooterInputs.shootMotorBottomVelocityRPS) - Math.abs(velocity) < 0) {
+        FaultReporter.getInstance()
+            .addFault(
+                SUBSYSTEM_NAME,
+                "Bottom shooter wheel velocity is too low, should be "
+                    + velocity
+                    + " but is "
+                    + this.shooterInputs.shootMotorBottomVelocityRPS);
+      } else {
+        FaultReporter.getInstance()
+            .addFault(
+                SUBSYSTEM_NAME,
+                "Bottom shooter wheel velocity is too high, should be "
+                    + velocity
+                    + " but is "
+                    + this.shooterInputs.shootMotorBottomVelocityRPS);
+      }
+    }
+    // check top motor
+    if (Math.abs(this.shooterInputs.shootMotorTopVelocityRPS - velocity) > VELOCITY_TOLERANCE) {
+      if (Math.abs(this.shooterInputs.shootMotorTopVelocityRPS) - Math.abs(velocity) < 0) {
+        FaultReporter.getInstance()
+            .addFault(
+                SUBSYSTEM_NAME,
+                "Top shooter wheel velocity is too low, should be "
+                    + velocity
+                    + " but is "
+                    + this.shooterInputs.shootMotorTopVelocityRPS);
+      } else {
+        FaultReporter.getInstance()
+            .addFault(
+                SUBSYSTEM_NAME,
+                "Top shooter wheel velocity is too high, should be "
+                    + velocity
+                    + " but is "
+                    + this.shooterInputs.shootMotorTopVelocityRPS);
+      }
+    }
   }
 }

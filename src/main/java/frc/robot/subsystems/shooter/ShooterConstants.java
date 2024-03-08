@@ -19,6 +19,8 @@ public class ShooterConstants {
   public static final int ANGLE_MOTOR_ID = 29;
   public static final int ANGLE_ENCODER_ID = 9;
 
+  public static final int COAST_BUTTON_ID = 5;
+
   public static final int SET_POINT_COUNT = 5;
 
   // Shooter Velocity PID Constants
@@ -77,6 +79,7 @@ public class ShooterConstants {
   public static final double ANGLE_TOLERANCE_DEGREES = 2.0; // FIXME tune with real robot
   public static final double SHOOTER_STORAGE_ANGLE = 11.0; // FIXME tune with real robot
   public static final double ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE = 1.0;
+  public static final double UPPER_ANGLE_LIMIT = 120.0;
 
   // Shooter Presets
   public static final double SUBWOOFER_VELOCITY = 12.0; // FIXME tune with real robot
@@ -85,4 +88,6 @@ public class ShooterConstants {
   public static final double PODIUM_ANGLE = 15.0; // FIXME tune with real robot
   public static final double AMP_VELOCITY = 5.0; // FIXME tune with real robot
   public static final double AMP_ANGLE = 110.0; // FIXME tune with real robot
+  public static final double PASS_VELOCITY = 35.0; // FIXME tune with real robot
+  public static final double PASS_ANGLE = 12.0; // FIXME tune with real robot
 }

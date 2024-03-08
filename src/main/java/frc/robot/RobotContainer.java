@@ -348,7 +348,14 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "disableXStance", Commands.runOnce(drivetrain::disableXstance, drivetrain));
     NamedCommands.registerCommand("wait5Seconds", Commands.waitSeconds(5.0));
-    NamedCommands.registerCommand("Shoot", Commands.waitSeconds(1.0));
+
+    NamedCommands.registerCommand("Shoot", getShootCommand());
+    NamedCommands.registerCommand(
+        "PrepAutoSubwooferShot",
+        Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)));
+    // FIXME: consider making this a shoot and prep single named command
+    NamedCommands.registerCommand(
+        "PrepAutoShot", Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AUTO)));
 
     // build auto path commands
 
@@ -652,6 +659,11 @@ public class RobotContainer {
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.STORAGE), shooter)
                 .withName("store shooter"));
 
+    oi.getShootFullFieldButton()
+        .onTrue(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.PASS), shooter)
+                .withName("store shooter"));
+
     oi.getShooterAngleUpButton()
         .whileTrue(
             Commands.runOnce(
@@ -659,11 +671,11 @@ public class RobotContainer {
                         shooter.setAngleMotorVoltage(
                             ShooterConstants.ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE),
                     shooter)
-                .onlyIf(() -> !shooter.isAutoShooter())
+                .onlyIf(() -> !shooter.isAutomated())
                 .withName("shooter manual up"))
         .onFalse(
             Commands.runOnce(() -> shooter.setAngleMotorVoltage(0), shooter)
-                .onlyIf(() -> !shooter.isAutoShooter())
+                .onlyIf(() -> !shooter.isAutomated())
                 .withName("shooter manual up stop"));
 
     oi.getShooterAngleDownButton()
@@ -673,26 +685,30 @@ public class RobotContainer {
                         shooter.setAngleMotorVoltage(
                             -ShooterConstants.ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE),
                     shooter)
-                .onlyIf(() -> !shooter.isAutoShooter())
+                .onlyIf(() -> !shooter.isAutomated())
                 .withName("shooter manual down"))
         .onFalse(
             Commands.runOnce(() -> shooter.setAngleMotorVoltage(0), shooter)
-                .onlyIf(() -> !shooter.isAutoShooter())
+                .onlyIf(() -> !shooter.isAutomated())
                 .withName("shooter manual down stop"));
 
-    oi.getShootButton()
-        .whileTrue(
-            Commands.waitUntil(
-                    () ->
-                        shooter.isShooterReadyToShoot(
-                            !vision.isEnabled() || drivetrain.isAimedAtSpeaker()))
-                .andThen(
-                    Commands.sequence(
-                        Commands.runOnce(() -> {shooter.setIsShooting(true);}),
-                        Commands.runOnce(intake::shoot, intake),
-                        NoteVisualizer.shoot(),
-                        Commands.runOnce(drivetrain::disableAimToSpeaker)))
-                .withName("shoot"));
+    oi.getShootButton().whileTrue(getShootCommand());
+  }
+
+  private Command getShootCommand() {
+
+    return Commands.runOnce(intake::shoot, intake).withName("shoot");
+
+    // return Commands.waitUntil(
+    //         () ->
+    //             shooter.isShooterReadyToShoot(!vision.isEnabled() ||
+    // drivetrain.isAimedAtSpeaker()))
+    //     .andThen(
+    //         Commands.sequence(
+    //             Commands.runOnce(intake::shoot, intake),
+    //             NoteVisualizer.shoot(),
+    //             Commands.runOnce(drivetrain::disableAimToSpeaker)))
+    //     .withName("shoot");
   }
 
   /**

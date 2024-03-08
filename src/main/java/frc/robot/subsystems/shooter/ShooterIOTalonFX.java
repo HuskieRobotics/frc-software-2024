@@ -9,6 +9,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
@@ -22,6 +23,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
+import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.util.ArmSystemSim;
 import frc.lib.team3061.util.VelocitySystemSim;
@@ -117,6 +120,8 @@ public class ShooterIOTalonFX implements ShooterIO {
   private TalonFX angleMotor;
   private CANcoder angleEncoder;
 
+  private DigitalInput coastModeButton;
+
   private double angleSetpoint;
   private double topWheelVelocity;
   private double bottomWheelVelocity;
@@ -128,6 +133,8 @@ public class ShooterIOTalonFX implements ShooterIO {
         new TalonFX(BOTTOM_SHOOTER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
     angleMotor = new TalonFX(ANGLE_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
     angleEncoder = new CANcoder(ANGLE_ENCODER_ID, RobotConfig.getInstance().getCANBusName());
+
+    coastModeButton = new DigitalInput(COAST_BUTTON_ID);
 
     shootMotorTopVelocityRequest = new VelocityTorqueCurrentFOC(0);
     shootMotorBottomVelocityRequest = new VelocityTorqueCurrentFOC(0);
@@ -325,6 +332,8 @@ public class ShooterIOTalonFX implements ShooterIO {
           ShooterConstants.MOTION_MAGIC_CRUISE_VELOCITY;
       angleMotor.getConfigurator().apply(rotationMotionMagicConfig);
     }
+
+    shooterInputs.coastMode = coastModeButton.get();
   }
 
   @Override
@@ -404,6 +413,9 @@ public class ShooterIOTalonFX implements ShooterIO {
       configAlert.set(true);
       configAlert.setText(status.toString());
     }
+
+    FaultReporter.getInstance()
+        .registerHardware(SUBSYSTEM_NAME, isTopMotor ? "TopMotor" : "BottomMotor", shootMotor);
   }
 
   private void configAngleMotor(TalonFX angleMotor, CANcoder angleEncoder) {
@@ -441,13 +453,11 @@ public class ShooterIOTalonFX implements ShooterIO {
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
 
-    CANcoderConfiguration angleCANCoderConfig = new CANcoderConfiguration();
-
-    angleCANCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
-    angleCANCoderConfig.MagnetSensor.SensorDirection =
-        SensorDirectionValue.CounterClockwise_Positive;
-    angleCANCoderConfig.MagnetSensor.MagnetOffset = ShooterConstants.MAGNET_OFFSET;
-    angleEncoder.getConfigurator().apply(angleCANCoderConfig);
+    SoftwareLimitSwitchConfigs angleMotorLimitSwitches = angleMotorConfig.SoftwareLimitSwitch;
+    angleMotorLimitSwitches.ForwardSoftLimitEnable = true;
+    angleMotorLimitSwitches.ForwardSoftLimitThreshold = ShooterConstants.UPPER_ANGLE_LIMIT;
+    angleMotorLimitSwitches.ReverseSoftLimitEnable = true;
+    angleMotorLimitSwitches.ReverseSoftLimitThreshold = ShooterConstants.SHOOTER_STORAGE_ANGLE;
 
     angleMotorConfig.Feedback.FeedbackRemoteSensorID = angleEncoder.getDeviceID();
     angleMotorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
@@ -463,5 +473,29 @@ public class ShooterIOTalonFX implements ShooterIO {
       configAlert.set(true);
       configAlert.setText(status.toString());
     }
+
+    CANcoderConfiguration angleCANCoderConfig = new CANcoderConfiguration();
+    angleCANCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
+    angleCANCoderConfig.MagnetSensor.SensorDirection =
+        SensorDirectionValue.CounterClockwise_Positive;
+    angleCANCoderConfig.MagnetSensor.MagnetOffset = ShooterConstants.MAGNET_OFFSET;
+
+    status = StatusCode.StatusCodeNotInitialized;
+    for (int i = 0; i < 5; ++i) {
+      status = angleEncoder.getConfigurator().apply(angleCANCoderConfig);
+      if (status.isOK()) break;
+    }
+    if (!status.isOK()) {
+      configAlert.set(true);
+      configAlert.setText(status.toString());
+    }
+
+    FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "AngleMotor", angleMotor);
+    FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "AngleCANcoder", angleEncoder);
+  }
+
+  @Override
+  public void setCoastMode(boolean coast) {
+    angleMotor.setNeutralMode(coast ? NeutralModeValue.Coast : NeutralModeValue.Brake);
   }
 }

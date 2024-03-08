@@ -34,6 +34,9 @@ public interface ShooterIO {
     double angleEncoderAngleDegrees = 0.0;
     double angleMotorTemperatureCelsius = 0.0;
     double angleMotorClosedLoopReferenceSlope = 0.0;
+
+    // Coast mode
+    boolean coastMode = false;
   }
 
   /** Updates the set of loggable inputs. */
@@ -46,4 +49,6 @@ public interface ShooterIO {
   public default void setAngleMotorVoltage(double voltage) {}
 
   public default void setAngle(double angle) {}
+
+  public default void setCoastMode(boolean coast) {}
 }
