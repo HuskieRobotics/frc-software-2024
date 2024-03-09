@@ -104,8 +104,8 @@ public class Shooter extends SubsystemBase {
     if (TESTING) {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
-      // io.setAngle(pivotAngle.get());
-      io.setAngleMotorVoltage(pivotVoltage.get());
+      io.setAngle(pivotAngle.get());
+      // io.setAngleMotorVoltage(pivotVoltage.get());
     } else {
       runAngleStateMachine();
     }

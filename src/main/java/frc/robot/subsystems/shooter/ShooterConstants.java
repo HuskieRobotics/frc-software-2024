@@ -24,25 +24,25 @@ public class ShooterConstants {
   public static final int SET_POINT_COUNT = 5;
 
   // Shooter Velocity PID Constants
-  public static final double TOP_SHOOT_KP = 12.0;
+  public static final double TOP_SHOOT_KP = 5.0;
   public static final double TOP_SHOOT_KI = 0.0;
   public static final double TOP_SHOOT_KD = 0.0;
   public static final double TOP_SHOOT_KS = 6.0;
   public static final double TOP_SHOOT_PID_PEAK_OUTPUT = 1.0;
-  public static final double BOTTOM_SHOOT_KP = 11.0;
+  public static final double BOTTOM_SHOOT_KP = 5.0;
   public static final double BOTTOM_SHOOT_KI = 0.0;
   public static final double BOTTOM_SHOOT_KD = 0.0;
   public static final double BOTTOM_SHOOT_KS = 7.0;
   public static final double BOTTOM_SHOOT_PID_PEAK_OUTPUT = 1.0;
 
   // Shooter Rotation PID Constants
-  public static final double ROTATION_KP = 40.0;
+  public static final double ROTATION_KP = 75;
   public static final double ROTATION_KI = 0.0;
-  public static final double ROTATION_KD = 1.0;
-  public static final double ROTATION_KS = 1.0;
-  public static final double ROTATION_KG = 0.08;
-  public static final double ROTATION_KV = 1.0;
-  public static final double ROTATION_KA = 0.01;
+  public static final double ROTATION_KD = 15;
+  public static final double ROTATION_KS = 2.4475;
+  public static final double ROTATION_KG = 0.25;
+  public static final double ROTATION_KV = 2.4669;
+  public static final double ROTATION_KA = 0.74655;
   public static final double ROTATION_EXPO_KV = 80.0;
   public static final double ROTATION_EXPO_KA = 24.0;
   public static final double ROTATION_PID_PEAK_OUTPUT = 1.0;
@@ -79,6 +79,7 @@ public class ShooterConstants {
   public static final double ANGLE_TOLERANCE_DEGREES = 2.0; // FIXME tune with real robot
   public static final double SHOOTER_STORAGE_ANGLE = 11.0; // FIXME tune with real robot
   public static final double ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE = 1.0;
+  // FIXME: restore to 120.0
   public static final double UPPER_ANGLE_LIMIT = 90.0;
 
   // 0.074951 rotations = 10.4 degrees

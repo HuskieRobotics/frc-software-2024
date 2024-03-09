@@ -490,6 +490,7 @@ public class ShooterIOTalonFX implements ShooterIO {
       configAlert.setText(status.toString());
     }
 
+    // FIXME: this shouldn't be neeed; need to debug the position issue
     angleMotor.setPosition(Units.degreesToRotations(10.4 * 4.0));
 
     FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "AngleMotor", angleMotor);

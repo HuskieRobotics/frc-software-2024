@@ -81,7 +81,7 @@ public class Intake extends SubsystemBase {
 
     if (TESTING) {
       io.setRollerVelocity(rollerVelocity.get());
-      io.setKickerVelocity(kickerVelocity.get());
+      io.setKickerVoltage(kickerVelocity.get());
     } else {
       if (automationEnabled) {
         this.runIntakeStateMachine();
@@ -171,8 +171,9 @@ public class Intake extends SubsystemBase {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
+      this.turnKickerOff();
     } else {
-      this.setKickerVelocity(IntakeConstants.KICKER_SHOOTING_VELOCITY_RPS);
+      this.io.setKickerVoltage(KICKER_SHOOTING_VELOCITY_VOLTAGE);
     }
   }
 
