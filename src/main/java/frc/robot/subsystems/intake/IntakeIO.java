@@ -34,4 +34,6 @@ public interface IntakeIO {
   public default void setRollerVelocity(double velocity) {}
 
   public default void setKickerVelocity(double velocity) {}
+
+  public default void setKickerVoltage(double voltage) {}
 }

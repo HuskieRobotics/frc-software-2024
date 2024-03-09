@@ -1,11 +1,14 @@
 package frc.robot.subsystems.intake;
 
+import static frc.robot.subsystems.intake.IntakeConstants.*;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.leds.LEDs.IntakeLEDState;
+import frc.lib.team6328.util.TunableNumber;
 import java.util.ArrayList;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -15,7 +18,6 @@ public class Intake extends SubsystemBase {
   private static final String SUBSYSTEM_NAME = "INTAKE";
 
   private final IntakeIO io;
-  private final BooleanSupplier isShooterAngleReady;
 
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
   private final LEDs leds;
@@ -24,13 +26,17 @@ public class Intake extends SubsystemBase {
     IntakeMotor.ROLLER, IntakeMotor.KICKER,
   };
 
+  private BooleanSupplier isShooterAngleReady;
+
   private IntakeState intakeState;
   private boolean automationEnabled;
-  private boolean hasNote;
 
   // system tests
   private IntakeState mostRecentIntakeState;
   private boolean checkComplete;
+
+  private final TunableNumber rollerVelocity = new TunableNumber("Intake/Roller Velocity", 0);
+  private final TunableNumber kickerVelocity = new TunableNumber("Intake/Kicker Velocity", 0);
 
   enum IntakeMotor {
     ROLLER,
@@ -43,12 +49,12 @@ public class Intake extends SubsystemBase {
     NOTE_IN_INTAKE_AND_KICKER,
     NOTE_IN_KICKER,
     NOTE_IN_KICKER_AND_SHOOTER,
-    NOTE_IN_SHOOTER
+    NOTE_IN_SHOOTER,
+    SHOOTING
   }
 
-  public Intake(IntakeIO io, BooleanSupplier isShooterAngleReady) {
+  public Intake(IntakeIO io) {
     this.io = io;
-    this.isShooterAngleReady = isShooterAngleReady;
 
     leds = LEDs.getInstance();
     intakeState = IntakeState.EMPTY;
@@ -63,14 +69,23 @@ public class Intake extends SubsystemBase {
     FaultReporter.getInstance().registerSystemCheck(SUBSYSTEM_NAME, getSystemCheckCommand());
   }
 
+  public void setShooterAngleReady(BooleanSupplier isShooterAngleReady) {
+    this.isShooterAngleReady = isShooterAngleReady;
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
     Logger.recordOutput("Intake/State", intakeState.toString());
 
-    if (automationEnabled) {
-      this.runIntakeStateMachine();
+    if (TESTING) {
+      io.setRollerVelocity(rollerVelocity.get());
+      io.setKickerVoltage(kickerVelocity.get());
+    } else {
+      if (automationEnabled) {
+        this.runIntakeStateMachine();
+      }
     }
   }
 
@@ -88,6 +103,8 @@ public class Intake extends SubsystemBase {
       runNoteInKickerAndShooterState();
     } else if (intakeState == IntakeState.NOTE_IN_SHOOTER) {
       runNoteInShooterState();
+    } else if (intakeState == IntakeState.SHOOTING) {
+      runShootingState();
     }
   }
 
@@ -102,12 +119,10 @@ public class Intake extends SubsystemBase {
       intakeState = IntakeState.NOTE_IN_INTAKE;
       leds.setIntakeLEDState(IntakeLEDState.HAS_GAME_PIECE);
       this.transitionGamePiece();
-      hasNote = true;
     } else if (inputs.isShooterIRBlocked) {
       intakeState = IntakeState.NOTE_IN_SHOOTER;
       leds.setIntakeLEDState(IntakeLEDState.HAS_GAME_PIECE);
       this.repelGamePiece();
-      hasNote = true;
     }
   }
 
@@ -119,7 +134,6 @@ public class Intake extends SubsystemBase {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
-      hasNote = false;
     }
   }
 
@@ -145,17 +159,26 @@ public class Intake extends SubsystemBase {
   }
 
   private void runNoteInShooterState() {
-    // TODO: Set up access of shooter angle
     if (!inputs.isShooterIRBlocked) {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
-      hasNote = false;
+    }
+  }
+
+  private void runShootingState() {
+    if (!inputs.isShooterIRBlocked) {
+      intakeState = IntakeState.EMPTY;
+      leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
+      this.intakeGamePiece();
+      this.turnKickerOff();
+    } else {
+      this.io.setKickerVoltage(KICKER_SHOOTING_VELOCITY_VOLTAGE);
     }
   }
 
   public boolean hasNote() {
-    return hasNote;
+    return inputs.isKickerIRBlocked || inputs.isShooterIRBlocked;
   }
 
   private void setIntakeState(IntakeState state) {
@@ -319,6 +342,6 @@ public class Intake extends SubsystemBase {
   }
 
   public void shoot() {
-    this.setKickerVelocity(IntakeConstants.KICKER_SHOOTING_VELOCITY_RPS);
+    this.intakeState = IntakeState.SHOOTING;
   }
 }

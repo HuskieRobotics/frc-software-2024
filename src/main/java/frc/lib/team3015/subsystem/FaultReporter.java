@@ -91,13 +91,15 @@ public class FaultReporter {
         .schedule(
             Commands.repeatingSequence(
                     Commands.runOnce(this::checkForFaults), Commands.waitSeconds(0.25))
-                .ignoringDisable(true));
+                .ignoringDisable(true)
+                .withName("check for faults"));
 
     CommandScheduler.getInstance()
         .schedule(
             Commands.repeatingSequence(
                     Commands.runOnce(this::publishStatus), Commands.waitSeconds(1.0))
-                .ignoringDisable(true));
+                .ignoringDisable(true)
+                .withName("publish faults"));
   }
 
   private void publishStatus() {
