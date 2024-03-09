@@ -546,11 +546,13 @@ public class RobotContainer {
                 .withName("lock 180"));
 
     oi.getAimSpeakerButton()
-        .toggleOnTrue(
+        .onTrue(
             Commands.either(
-                    Commands.runOnce(drivetrain::disableAimToSpeaker),
                     Commands.parallel(
-                        Commands.runOnce(() -> shooter.prepareToShoot(), shooter),
+                        Commands.runOnce(drivetrain::disableAimToSpeaker, drivetrain),
+                        Commands.runOnce(shooter::cancelPrepareToShoot, shooter)),
+                    Commands.parallel(
+                        Commands.runOnce(shooter::prepareToShoot, shooter),
                         Commands.runOnce(drivetrain::enableAimToSpeaker),
                         new TeleopSwerve(
                                 drivetrain,

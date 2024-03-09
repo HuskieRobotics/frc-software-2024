@@ -139,6 +139,7 @@ public class Shooter extends SubsystemBase {
                 .getTranslation()
                 .getNorm();
         this.adjustAngle(distanceToSpeaker);
+        this.setIdleVelocity();
       }
     } else if (state == State.PREPARING_TO_SHOOT) {
       if (!intake.hasNote()) {
@@ -162,14 +163,13 @@ public class Shooter extends SubsystemBase {
     this.shootingPosition = ShootingPosition.FIELD;
     this.overrideSetpointsForNextShot = false;
 
+    setIdleVelocity();
+  }
+
+  private void setIdleVelocity() {
     double velocity;
-    if (autoShooter) {
-      io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
-      if (intakeEnabled) {
-        velocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
-      } else {
-        velocity = 0.0;
-      }
+    if (intakeEnabled) {
+      velocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
     } else {
       velocity = 0.0;
     }
@@ -226,6 +226,13 @@ public class Shooter extends SubsystemBase {
     // if we have a note, force the state transition
     if (intake.hasNote()) {
       this.state = State.PREPARING_TO_SHOOT;
+    }
+  }
+
+  public void cancelPrepareToShoot() {
+    // if we have a note, force the state transition
+    if (intake.hasNote()) {
+      this.state = State.AIMING_AT_SPEAKER;
     }
   }
 
