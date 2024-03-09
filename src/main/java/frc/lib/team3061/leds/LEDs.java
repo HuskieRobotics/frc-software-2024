@@ -173,14 +173,13 @@ public abstract class LEDs extends SubsystemBase {
     }
 
     if (distraction) {
-      // Distraction
       strobe(Section.SHOULDER, Color.kWhite, STROBE_SLOW_DURATION);
     } else if (endgameAlert) {
       // Endgame alert
       strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.SHOOTING) {
       // Actively shooting
-      rainbow(Section.FULL, RAINBOW_CYCLE_LENGTH, RAINBOW_DURATION);
+      strobe(Section.FULL, Color.kGreen, STROBE_SLOW_DURATION);
     } else if (shooterLEDState == ShooterLEDState.AIMING_AT_SPEAKER) {
       // Aiming at speaker
       solid(Section.FULL, Color.kGreen);
@@ -191,13 +190,15 @@ public abstract class LEDs extends SubsystemBase {
       // Has game piece
       strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
-      // Waiting for game piece
       wave(
           Section.FULL,
           Color.kBlue,
           new Color(255, 20, 0),
           WAVE_FAST_CYCLE_LENGTH,
           WAVE_SLOW_DURATION);
+    } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
+      // Has game piece
+      strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.MANUAL_REPEL) {
       // Manual repel
       strobe(Section.FULL, Color.kDeepPink, STROBE_SLOW_DURATION);
