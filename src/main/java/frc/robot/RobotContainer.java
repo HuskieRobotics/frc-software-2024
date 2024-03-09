@@ -405,6 +405,9 @@ public class RobotContainer {
     Command fourNoteSourceSideWing = new PathPlannerAuto("4 Note Source-Side Wing");
     autoChooser.addOption("4 Note Source-Side Wing", fourNoteSourceSideWing);
 
+    Command startingPoint = new PathPlannerAuto("Starting Point");
+    autoChooser.addOption("Starting Point", startingPoint);
+
     /************ Drive Velocity Tuning ************
      *
      * useful for tuning the drive velocity PID controller
@@ -698,19 +701,15 @@ public class RobotContainer {
   }
 
   private Command getShootCommand() {
-
-    return Commands.runOnce(intake::shoot, intake).withName("shoot");
-
-    // return Commands.waitUntil(
-    //         () ->
-    //             shooter.isShooterReadyToShoot(!vision.isEnabled() ||
-    // drivetrain.isAimedAtSpeaker()))
-    //     .andThen(
-    //         Commands.sequence(
-    //             Commands.runOnce(intake::shoot, intake),
-    //             NoteVisualizer.shoot(),
-    //             Commands.runOnce(drivetrain::disableAimToSpeaker)))
-    //     .withName("shoot");
+    return Commands.waitUntil(
+            () ->
+                shooter.isShooterReadyToShoot(!vision.isEnabled() || drivetrain.isAimedAtSpeaker()))
+        .andThen(
+            Commands.sequence(
+                Commands.runOnce(intake::shoot, intake),
+                NoteVisualizer.shoot(),
+                Commands.runOnce(drivetrain::disableAimToSpeaker)))
+        .withName("shoot");
   }
 
   /**
