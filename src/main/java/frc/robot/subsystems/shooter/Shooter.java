@@ -252,6 +252,11 @@ public class Shooter extends SubsystemBase {
     boolean bottomWheelAtSetpoint = isBottomShootAtSetpoint();
     boolean angleAtSetpoint = isAngleAtSetpoint();
 
+    Logger.recordOutput("Shooter/AlignedToShoot", alignedToShoot);
+    Logger.recordOutput("Shooter/TopWheelAtSetpoint", topWheelAtSetpoint);
+    Logger.recordOutput("Shooter/BottomWheelAtSetpoint", bottomWheelAtSetpoint);
+    Logger.recordOutput("Shooter/AngleAtSetpoint", angleAtSetpoint);
+
     return alignedToShoot
         && topWheelAtSetpoint
         && bottomWheelAtSetpoint
