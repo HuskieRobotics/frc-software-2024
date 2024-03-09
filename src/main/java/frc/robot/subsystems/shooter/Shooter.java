@@ -31,10 +31,16 @@ public class Shooter extends SubsystemBase {
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber pivotAngle = new TunableNumber("Shooter/Angle", 10.0);
   private final TunableNumber pivotVoltage = new TunableNumber("Shooter/Pivot Voltage", 0.0);
-  private final double[] populationRealAngles = {61, 60.2, 39.3, 46.1, 38.7, 33, 28.8, 26.8};
-  private final double[] populationRobotAngles = {54.14, 53.17, 33.5, 39, 31.82, 28, 23, 20};
+  private final double[] populationRealAngles = {60.2, 39.3, 46.1, 38.7, 33, 28.8, 26.8};
+  private final double[] populationRobotAngles = {53.17, 33.5, 39, 31.82, 28, 23, 20};
   private final double[] populationDistances = {
-    53.53, 53.53, 119.194, 88.53, 113.53, 137.53, 161.53, 185.53
+    Units.inchesToMeters(53.53),
+    Units.inchesToMeters(119.194),
+    Units.inchesToMeters(88.53),
+    Units.inchesToMeters(113.53),
+    Units.inchesToMeters(137.53),
+    Units.inchesToMeters(161.53),
+    Units.inchesToMeters(185.53)
   };
 
   private boolean autoShooter = true;
@@ -138,12 +144,11 @@ public class Shooter extends SubsystemBase {
       } else {
 
         double distanceToSpeaker =
-            Units.metersToInches(
-                Field2d.getInstance()
-                    .getAllianceSpeakerCenter()
-                    .minus(RobotOdometry.getInstance().getEstimatedPosition())
-                    .getTranslation()
-                    .getNorm());
+            Field2d.getInstance()
+                .getAllianceSpeakerCenter()
+                .minus(RobotOdometry.getInstance().getEstimatedPosition())
+                .getTranslation()
+                .getNorm();
         this.adjustAngle(distanceToSpeaker);
         this.setRangeVelocity(distanceToSpeaker);
       }
@@ -237,10 +242,14 @@ public class Shooter extends SubsystemBase {
             || this.shootingPosition == ShootingPosition.AUTO
             || this.shootingPosition == ShootingPosition.PASS;
 
+    boolean topWheelAtSetpoint = isTopShootAtSetpoint();
+    boolean bottomWheelAtSetpoint = isBottomShootAtSetpoint();
+    boolean angleAtSetpoint = isAngleAtSetpoint();
+
     return alignedToShoot
-        && isTopShootAtSetpoint()
-        && isBottomShootAtSetpoint()
-        && (!autoShooter || isAngleAtSetpoint());
+        && topWheelAtSetpoint
+        && bottomWheelAtSetpoint
+        && (!autoShooter || angleAtSetpoint);
   }
 
   public boolean isTopShootAtSetpoint() {
@@ -279,6 +288,7 @@ public class Shooter extends SubsystemBase {
         < ANGLE_TOLERANCE_DEGREES) {
       angleAtSetpointIterationCount++;
       if (angleAtSetpointIterationCount >= ShooterConstants.SET_POINT_COUNT) {
+
         return true;
       }
     } else {
