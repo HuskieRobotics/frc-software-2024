@@ -35,7 +35,6 @@ public abstract class LEDs extends SubsystemBase {
 
   // Robot state tracking
   private int loopCycleCount = 0;
-  private boolean distraction = false;
   private boolean fallen = false;
   private boolean endgameAlert = false;
   private boolean autoFinished = false;
@@ -172,9 +171,7 @@ public abstract class LEDs extends SubsystemBase {
           WAVE_SLOW_DURATION);
     }
 
-    if (distraction) {
-      strobe(Section.SHOULDER, Color.kWhite, STROBE_SLOW_DURATION);
-    } else if (endgameAlert) {
+    if (endgameAlert) {
       // Endgame alert
       strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.SHOOTING) {
@@ -296,10 +293,6 @@ public abstract class LEDs extends SubsystemBase {
     if (DriverStation.isEStopped()) {
       estopped = true;
     }
-  }
-
-  public void setDistraction(boolean distraction) {
-    this.distraction = distraction;
   }
 
   public void setFallen(boolean fallen) {
