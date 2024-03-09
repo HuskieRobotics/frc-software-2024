@@ -175,8 +175,8 @@ public abstract class LEDs extends SubsystemBase {
       strobe(Section.SHOULDER, Color.kWhite, STROBE_FAST_DURATION);
     } else if (endgameAlert) {
       // Endgame alert
-      strobe(Section.SHOULDER, Color.kBlue, STROBE_SLOW_DURATION);
-    } else if (shooterLEDState == ShooterLEDState.SHOOTING) {
+      strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
+    } else if (intakeLEDState == IntakeLEDState.SHOOTING) {
       // Actively shooting
       rainbow(Section.FULL, RAINBOW_CYCLE_LENGTH, RAINBOW_DURATION);
     } else if (shooterLEDState == ShooterLEDState.AIMING_AT_SPEAKER) {
@@ -323,14 +323,14 @@ public abstract class LEDs extends SubsystemBase {
 
   public enum ShooterLEDState {
     IS_READY_TO_SHOOT,
-    SHOOTING,
     AIMING_AT_SPEAKER,
-    WAITING_FOR_GAME_PIECE,
+    WAITING_FOR_GAME_PIECE
   }
 
   public enum IntakeLEDState {
     WAITING_FOR_GAME_PIECE,
     HAS_GAME_PIECE,
+    SHOOTING,
     MANUAL_REPEL,
     INTAKE_MANUALLY_TURNED_OFF,
     // TODO: add implementation for ready to shoot after talking with Jake and Mr. Schmit
@@ -339,10 +339,11 @@ public abstract class LEDs extends SubsystemBase {
   public void setShooterLEDState(ShooterLEDState state) {
     this.shooterLEDState = state;
   }
-  
+
   public void setIntakeLEDState(IntakeLEDState state) {
     this.intakeLEDState = state;
   }
+
   protected abstract void updateLEDs();
 
   protected abstract void setLEDBuffer(int index, Color color);

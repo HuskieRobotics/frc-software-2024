@@ -218,6 +218,8 @@ public class Robot extends LoggedRobot {
       LEDs.getInstance().setAutoFinished(true);
     }
 
+    robotContainer.periodic();
+
     Threads.setCurrentThreadPriority(true, 10);
   }
 

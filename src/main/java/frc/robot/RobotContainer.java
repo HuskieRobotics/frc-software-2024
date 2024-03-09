@@ -27,6 +27,7 @@ import frc.lib.team3061.drivetrain.swerve.SwerveModuleIO;
 import frc.lib.team3061.drivetrain.swerve.SwerveModuleIOTalonFXPhoenix6;
 import frc.lib.team3061.gyro.GyroIOPigeon2Phoenix6;
 import frc.lib.team3061.leds.LEDs;
+import frc.lib.team3061.leds.LEDs.ShooterLEDState;
 import frc.lib.team3061.vision.Vision;
 import frc.lib.team3061.vision.VisionConstants;
 import frc.lib.team3061.vision.VisionIO;
@@ -751,9 +752,7 @@ public class RobotContainer {
   }
 
   private Command getShootCommand() {
-    return Commands.waitUntil(
-            () ->
-                shooter.isShooterReadyToShoot(!vision.isEnabled() || drivetrain.isAimedAtSpeaker()))
+    return Commands.waitUntil(this::isReadyToShoot)
         .andThen(
             Commands.sequence(
                 Commands.runOnce(intake::shoot, intake),
@@ -782,5 +781,15 @@ public class RobotContainer {
       this.drivetrain.updateAlliance(this.lastAlliance);
       Field2d.getInstance().updateAlliance(this.lastAlliance);
     }
+  }
+
+  public void periodic() {
+    if (this.isReadyToShoot()) {
+      LEDs.getInstance().setShooterLEDState(ShooterLEDState.IS_READY_TO_SHOOT);
+    }
+  }
+
+  private boolean isReadyToShoot() {
+    return shooter.isShooterReadyToShoot(!vision.isEnabled() || drivetrain.isAimedAtSpeaker());
   }
 }

@@ -11,18 +11,16 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.team3015.subsystem.FaultReporter;
-import frc.lib.team3061.util.RobotOdometry;
-import frc.lib.team6328.util.TunableNumber;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.leds.LEDs.ShooterLEDState;
+import frc.lib.team3061.util.RobotOdometry;
+import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Field2d;
 import frc.robot.subsystems.intake.Intake;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
-
-  private boolean isShooting = false; 
 
   private ShooterIO io;
   private Intake intake;
@@ -88,6 +86,8 @@ public class Shooter extends SubsystemBase {
 
     this.autoShooter = true;
 
+    this.leds = LEDs.getInstance();
+
     this.resetToInitialState();
 
     if (TESTING) {
@@ -120,27 +120,22 @@ public class Shooter extends SubsystemBase {
       io.setAngle(pivotAngle.get());
     } else {
       runAngleStateMachine();
-
-      //led controls
-    if (isShooting) {
-      leds.setShooterLEDState(ShooterLEDState.SHOOTING);
-    }
     }
   }
 
   private void runAngleStateMachine() {
     if (state == State.WAITING_FOR_NOTE) {
-      leds.setShooterLEDState(ShooterLEDState.WAITING_FOR_GAME_PIECE);
-
       if (intake.hasNote()) {
         state = State.AIMING_AT_SPEAKER;
       }
+
+      leds.setShooterLEDState(ShooterLEDState.WAITING_FOR_GAME_PIECE);
     } else if (state == State.AIMING_AT_SPEAKER) {
-      leds.setShooterLEDState(ShooterLEDState.AIMING_AT_SPEAKER);
       if (!intake.hasNote()) {
         this.resetToInitialState();
       } else if (overrideSetpointsForNextShot) {
         state = State.PREPARING_TO_SHOOT;
+        leds.setShooterLEDState(ShooterLEDState.IS_READY_TO_SHOOT);
       } else {
         double distanceToSpeaker =
             Field2d.getInstance()
@@ -150,12 +145,12 @@ public class Shooter extends SubsystemBase {
                 .getNorm();
         this.adjustAngle(distanceToSpeaker);
         this.setIdleVelocity();
+        leds.setShooterLEDState(ShooterLEDState.IS_READY_TO_SHOOT);
       }
     } else if (state == State.PREPARING_TO_SHOOT) {
       if (!intake.hasNote()) {
         this.resetToInitialState();
       } else {
-
         double distanceToSpeaker =
             Field2d.getInstance()
                 .getAllianceSpeakerCenter()
@@ -164,7 +159,6 @@ public class Shooter extends SubsystemBase {
                 .getNorm();
         this.adjustAngle(distanceToSpeaker);
         this.setRangeVelocity(distanceToSpeaker);
-        leds.setShooterLEDState(ShooterLEDState.IS_READY_TO_SHOOT);
       }
     }
   }
