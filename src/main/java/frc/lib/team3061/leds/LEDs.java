@@ -192,7 +192,12 @@ public abstract class LEDs extends SubsystemBase {
       strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
       // Waiting for game piece
-      wave(Section.FULL, Color.kBlue, new Color(255, 20, 0),, WAVE_FAST_CYCLE_LENGTH, WAVE_SLOW_DURATION);
+      wave(
+          Section.FULL,
+          Color.kBlue,
+          new Color(255, 20, 0),
+          WAVE_FAST_CYCLE_LENGTH,
+          WAVE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.MANUAL_REPEL) {
       // Manual repel
       strobe(Section.FULL, Color.kDeepPink, STROBE_SLOW_DURATION);
