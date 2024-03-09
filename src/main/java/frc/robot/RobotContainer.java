@@ -693,7 +693,7 @@ public class RobotContainer {
                 .onlyIf(() -> !shooter.isAutomated())
                 .withName("shooter manual down stop"));
 
-    oi.getShootButton().whileTrue(getShootCommand());
+    oi.getShootButton().onTrue(getShootCommand());
   }
 
   private Command getShootCommand() {

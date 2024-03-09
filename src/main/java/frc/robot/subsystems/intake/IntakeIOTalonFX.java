@@ -9,6 +9,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -32,6 +33,7 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   private VelocityTorqueCurrentFOC rollerVelocityRequest;
   private VelocityTorqueCurrentFOC kickerVelocityRequest;
+  private VoltageOut kickerVoltageRequest;
 
   private StatusSignal<Double> rollerVelocityStatusSignal;
   private StatusSignal<Double> kickerVelocityStatusSignal;
@@ -99,6 +101,7 @@ public class IntakeIOTalonFX implements IntakeIO {
 
     rollerVelocityRequest = new VelocityTorqueCurrentFOC(0);
     kickerVelocityRequest = new VelocityTorqueCurrentFOC(0);
+    kickerVoltageRequest = new VoltageOut(0);
 
     rollerVelocityStatusSignal = rollerMotor.getVelocity();
     kickerVelocityStatusSignal = kickerMotor.getVelocity();
@@ -213,6 +216,11 @@ public class IntakeIOTalonFX implements IntakeIO {
   @Override
   public void setKickerVelocity(double rps) {
     kickerMotor.setControl(kickerVelocityRequest.withVelocity(rps));
+  }
+
+  @Override
+  public void setKickerVoltage(double voltage) {
+    kickerMotor.setControl(kickerVoltageRequest.withOutput(voltage));
   }
 
   private void configureIntakeRollerMotor(TalonFX rollerMotor) {

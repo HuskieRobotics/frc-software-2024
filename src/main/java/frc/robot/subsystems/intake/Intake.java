@@ -172,7 +172,7 @@ public class Intake extends SubsystemBase {
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
     } else {
-      this.setKickerVelocity(IntakeConstants.KICKER_SHOOTING_VELOCITY_RPS);
+      this.io.setKickerVoltage(12.0);
     }
   }
 
