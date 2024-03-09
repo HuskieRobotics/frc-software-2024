@@ -61,6 +61,7 @@ public class Intake extends SubsystemBase {
     automationEnabled = true;
 
     mostRecentIntakeState = null;
+
     checkComplete = false;
 
     leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
@@ -78,6 +79,7 @@ public class Intake extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
     Logger.recordOutput("Intake/State", intakeState.toString());
+    Logger.recordOutput("Intake/AutomationEnabled", automationEnabled);
 
     if (TESTING) {
       io.setRollerVelocity(rollerVelocity.get());
