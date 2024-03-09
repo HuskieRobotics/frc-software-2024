@@ -136,7 +136,7 @@ public abstract class LEDs extends SubsystemBase {
 
       } else if (lowBatteryAlert) {
         // Low battery
-        solid(Section.FULL, Color.kOrangeRed);
+        solid(Section.FULL, new Color(255, 20, 0));
 
       } else if (PRIDE_LEDS) {
         // Pride stripes
@@ -174,7 +174,20 @@ public abstract class LEDs extends SubsystemBase {
     if (distraction) {
       strobe(Section.SHOULDER, Color.kWhite, STROBE_SLOW_DURATION);
     } else if (endgameAlert) {
-      strobe(Section.SHOULDER, Color.kBlue, STROBE_SLOW_DURATION);
+      // Endgame alert
+      strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
+    } else if (intakeLEDState == IntakeLEDState.SHOOTING) {
+      // Actively shooting
+      strobe(Section.FULL, Color.kGreen, STROBE_SLOW_DURATION);
+    } else if (shooterLEDState == ShooterLEDState.AIMING_AT_SPEAKER) {
+      // Aiming at speaker
+      solid(Section.FULL, Color.kGreen);
+    } else if (shooterLEDState == ShooterLEDState.IS_READY_TO_SHOOT) {
+      // Ready to shoot
+      solid(Section.FULL, Color.kBlue);
+    } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
+      // Has game piece
+      strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
       wave(
           Section.FULL,
