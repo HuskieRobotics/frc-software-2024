@@ -45,6 +45,8 @@ public class Shooter extends SubsystemBase {
 
   private boolean autoShooter = true;
 
+  private boolean intakeEnabled = true;
+
   private int topAtSetpointIterationCount = 0;
   private int bottomAtSetpointIterationCount = 0;
   private int angleAtSetpointIterationCount = 0;
@@ -163,7 +165,11 @@ public class Shooter extends SubsystemBase {
     double velocity;
     if (autoShooter) {
       io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
-      velocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
+      if (intakeEnabled) {
+        velocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
+      } else {
+        velocity = 0.0;
+      }
     } else {
       velocity = 0.0;
     }
@@ -410,5 +416,13 @@ public class Shooter extends SubsystemBase {
                     + this.shooterInputs.shootMotorTopVelocityRPS);
       }
     }
+  }
+
+  public void intakeEnabled() {
+    this.intakeEnabled = true;
+  }
+
+  public void intakeDisabled() {
+    this.intakeEnabled = false;
   }
 }

@@ -474,7 +474,9 @@ public class RobotContainer {
   private void configureIntakeCommands() {
     oi.getIntakeAutomationSwitch()
         .onTrue(
-            Commands.runOnce(intake::enableAutomation, intake)
+            Commands.parallel(
+                    Commands.runOnce(shooter::intakeEnabled),
+                    Commands.runOnce(intake::enableAutomation, intake))
                 .withName("enable intake automation"));
 
     oi.getIntakeAutomationSwitch()
@@ -482,7 +484,8 @@ public class RobotContainer {
             Commands.parallel(
                     Commands.runOnce(intake::disableAutomation, intake),
                     Commands.runOnce(intake::turnIntakeOff),
-                    Commands.runOnce(intake::turnKickerOff))
+                    Commands.runOnce(intake::turnKickerOff),
+                    Commands.runOnce(shooter::intakeDisabled))
                 .withName("disable intake automation"));
 
     oi.getRunIntakeButton()
