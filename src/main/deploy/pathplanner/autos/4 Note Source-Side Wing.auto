@@ -18,27 +18,9 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Deploy Intake"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "4 Source Start to Note 3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "4 Source Note 3 to Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
           }
         },
         {
@@ -57,6 +39,24 @@
           "type": "path",
           "data": {
             "pathName": "4 Source Note 2 to Note 1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4 Source Note 1-End"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         }
       ]

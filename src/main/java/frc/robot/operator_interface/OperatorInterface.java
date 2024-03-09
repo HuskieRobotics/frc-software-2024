@@ -65,15 +65,11 @@ public interface OperatorInterface {
 
   // drivetrain, game-specific
 
-  public default Trigger getLockToSpeakerButton() {
+  public default Trigger getAimSpeakerButton() {
     return new Trigger(() -> false);
   }
 
   public default Trigger getAlignAndIntakeNoteFromSourceButton() {
-    return new Trigger(() -> false);
-  }
-
-  public default Trigger getAimAutomationSwitch() {
     return new Trigger(() -> false);
   }
 
@@ -113,11 +109,11 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getShooterAutomationSwitch() {
+  public default Trigger getShooterAngleDownButton() {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getShooterAngleDownButton() {
+  public default Trigger getAimAutomationSwitch() {
     return new Trigger(() -> false);
   }
 

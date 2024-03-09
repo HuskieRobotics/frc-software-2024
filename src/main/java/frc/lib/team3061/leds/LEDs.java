@@ -50,6 +50,7 @@ public abstract class LEDs extends SubsystemBase {
   private boolean estopped = false;
 
   private IntakeLEDState intakeLEDState;
+  private ShooterLEDState shooterLEDState;
 
   // LED IO
   private final Notifier loadingNotifier;
@@ -172,19 +173,26 @@ public abstract class LEDs extends SubsystemBase {
     }
 
     if (distraction) {
+      // Distraction
       strobe(Section.SHOULDER, Color.kWhite, STROBE_SLOW_DURATION);
     } else if (endgameAlert) {
-      strobe(Section.SHOULDER, Color.kBlue, STROBE_SLOW_DURATION);
-    } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
-      wave(
-          Section.FULL,
-          Color.kBlue,
-          new Color(255, 20, 0),
-          WAVE_FAST_CYCLE_LENGTH,
-          WAVE_SLOW_DURATION);
+      // Endgame alert
+      strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
+    } else if (intakeLEDState == IntakeLEDState.SHOOTING) {
+      // Actively shooting
+      rainbow(Section.FULL, RAINBOW_CYCLE_LENGTH, RAINBOW_DURATION);
+    } else if (shooterLEDState == ShooterLEDState.AIMING_AT_SPEAKER) {
+      // Aiming at speaker
+      solid(Section.FULL, Color.kGreen);
+    } else if (shooterLEDState == ShooterLEDState.IS_READY_TO_SHOOT) {
+      // Ready to shoot
+      solid(Section.FULL, Color.kBlue);
     } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
       // Has game piece
       strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
+    } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
+      // Waiting for game piece
+      wave(Section.FULL, Color.kBlue, new Color(255, 20, 0),, WAVE_FAST_CYCLE_LENGTH, WAVE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.MANUAL_REPEL) {
       // Manual repel
       strobe(Section.FULL, Color.kDeepPink, STROBE_SLOW_DURATION);
@@ -311,12 +319,23 @@ public abstract class LEDs extends SubsystemBase {
     this.demoMode = demoMode;
   }
 
+  public enum ShooterLEDState {
+    IS_READY_TO_SHOOT,
+    AIMING_AT_SPEAKER,
+    WAITING_FOR_GAME_PIECE
+  }
+
   public enum IntakeLEDState {
     WAITING_FOR_GAME_PIECE,
     HAS_GAME_PIECE,
+    SHOOTING,
     MANUAL_REPEL,
     INTAKE_MANUALLY_TURNED_OFF,
     // TODO: add implementation for ready to shoot after talking with Jake and Mr. Schmit
+  }
+
+  public void setShooterLEDState(ShooterLEDState state) {
+    this.shooterLEDState = state;
   }
 
   public void setIntakeLEDState(IntakeLEDState state) {

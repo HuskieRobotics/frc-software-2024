@@ -27,10 +27,12 @@ import frc.lib.team3061.drivetrain.swerve.SwerveModuleIO;
 import frc.lib.team3061.drivetrain.swerve.SwerveModuleIOTalonFXPhoenix6;
 import frc.lib.team3061.gyro.GyroIOPigeon2Phoenix6;
 import frc.lib.team3061.leds.LEDs;
+import frc.lib.team3061.leds.LEDs.ShooterLEDState;
 import frc.lib.team3061.vision.Vision;
 import frc.lib.team3061.vision.VisionConstants;
 import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
+import frc.lib.team6328.util.NoteVisualizer;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.configs.GenericDrivetrainRobotConfig;
@@ -42,6 +44,11 @@ import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.Shooter.ShootingPosition;
+import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.shooter.ShooterIO;
+import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -60,6 +67,7 @@ public class RobotContainer {
   private Drivetrain drivetrain;
   private Alliance lastAlliance = DriverStation.Alliance.Red;
   private Vision vision;
+  private Shooter shooter;
   private Intake intake;
 
   // use AdvantageKit's LoggedDashboardChooser instead of SendableChooser to ensure accurate logging
@@ -120,8 +128,9 @@ public class RobotContainer {
     } else {
       drivetrain = new Drivetrain(new DrivetrainIO() {});
 
-      // FIXME: connect to shooter's boolean supplier
-      intake = new Intake(new IntakeIO() {}, () -> true);
+      intake = new Intake(new IntakeIO() {});
+      shooter = new Shooter(new ShooterIO() {}, intake);
+      intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
       String[] cameraNames = config.getCameraNames();
       VisionIO[] visionIOs = new VisionIO[cameraNames.length];
@@ -165,8 +174,9 @@ public class RobotContainer {
   private void createCTRESubsystems() {
     drivetrain = new Drivetrain(new DrivetrainIOCTRE());
 
-    // FIXME: connect to shooter's boolean supplier
-    intake = new Intake(new IntakeIOTalonFX(), () -> true);
+    intake = new Intake(new IntakeIOTalonFX());
+    shooter = new Shooter(new ShooterIOTalonFX(), intake);
+    intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
     String[] cameraNames = config.getCameraNames();
     VisionIO[] visionIOs = new VisionIO[cameraNames.length];
@@ -212,8 +222,9 @@ public class RobotContainer {
                 blModule,
                 brModule));
 
-    // FIXME: connect to shooter's boolean supplier
-    intake = new Intake(new IntakeIOTalonFX(), () -> true);
+    intake = new Intake(new IntakeIOTalonFX());
+    shooter = new Shooter(new ShooterIOTalonFX(), intake);
+    intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
     if (Constants.getRobot() == Constants.RobotType.ROBOT_SIMBOT) {
       vision = new Vision(new VisionIO[] {new VisionIO() {}});
@@ -237,8 +248,9 @@ public class RobotContainer {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
 
-    // FIXME: connect to shooter's boolean supplier
-    intake = new Intake(new IntakeIOTalonFX(), () -> true);
+    intake = new Intake(new IntakeIOTalonFX());
+    shooter = new Shooter(new ShooterIOTalonFX(), intake);
+    intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
   }
@@ -246,7 +258,9 @@ public class RobotContainer {
   private void createPracticeBoardSubsystem() {
     // change the following to connect the subsystem being tested to actual hardware
     drivetrain = new Drivetrain(new DrivetrainIO() {});
-    intake = new Intake(new IntakeIO() {}, () -> true);
+    intake = new Intake(new IntakeIO() {});
+    shooter = new Shooter(new ShooterIO() {}, intake);
+    intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
   }
 
@@ -289,6 +303,8 @@ public class RobotContainer {
     configureIntakeCommands();
 
     configureVisionCommands();
+
+    configureShooterCommands();
 
     // Endgame alerts
     new Trigger(
@@ -333,7 +349,14 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "disableXStance", Commands.runOnce(drivetrain::disableXstance, drivetrain));
     NamedCommands.registerCommand("wait5Seconds", Commands.waitSeconds(5.0));
-    NamedCommands.registerCommand("Shoot", Commands.waitSeconds(1.0));
+
+    NamedCommands.registerCommand("Shoot", getShootCommand());
+    NamedCommands.registerCommand(
+        "PrepAutoSubwooferShot",
+        Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)));
+    // FIXME: consider making this a shoot and prep single named command
+    NamedCommands.registerCommand(
+        "PrepAutoShot", Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AUTO)));
 
     // build auto path commands
 
@@ -350,7 +373,7 @@ public class RobotContainer {
         Commands.runOnce(
             () ->
                 drivetrain.resetPose(
-                    PathPlannerPath.fromPathFile("StartPoint").getPreviewStartingHolonomicPose()),
+                    PathPlannerPath.fromPathFile("Start Point").getPreviewStartingHolonomicPose()),
             drivetrain);
     autoChooser.addOption("Start Point", startPoint);
 
@@ -370,9 +393,51 @@ public class RobotContainer {
     Command tuningCommand = new PathPlannerAuto("Tuning");
     autoChooser.addOption("Auto Tuning", tuningCommand);
 
-    /************ 4 Note ************
+    /************ 1 Note Anywhere ************
      *
-     * used for testing the 6 note autonomous (Still Testing)
+     * shoot initial note and leave robot starting zone
+     *
+     */
+
+    // FIXME: add commands to wait for the shooter wheel to reach the desired velocity and then
+    // shoot
+    Command oneNoteAnywhere =
+        Commands.run(
+                () -> {
+                  drivetrain.drive(1, 0, 0, false, true);
+                },
+                drivetrain)
+            .withTimeout(2.5)
+            .andThen(
+                Commands.runOnce(
+                    () -> {
+                      drivetrain.drive(0, 0, 0, false, false);
+                    },
+                    drivetrain));
+    autoChooser.addOption("One Note Anywhere", oneNoteAnywhere);
+
+    /************ 2 Notes ************
+     *
+     * 2 notes (initial and second center note from source side)
+     *
+     */
+
+    Command twoNoteSourceSide = new PathPlannerAuto("2 Note Source Side");
+    autoChooser.addOption("2 Note Source Side", twoNoteSourceSide);
+
+    /************ 3 Notes ************
+     *
+     * 3 notes (initial and first and second center notes from source side)
+     *
+     */
+
+    Command threeNoteSourceSide = new PathPlannerAuto("3 Note Source Side");
+    autoChooser.addOption("3 Note Source Side", threeNoteSourceSide);
+
+    /************ 4 Notes ************
+     *
+     * 4 note starting from the amp side
+     * 4 note starting from the source side
      *
      */
     Command fourNoteAmpSideWing = new PathPlannerAuto("4 Note Amp-Side Wing");
@@ -380,6 +445,14 @@ public class RobotContainer {
 
     Command fourNoteSourceSideWing = new PathPlannerAuto("4 Note Source-Side Wing");
     autoChooser.addOption("4 Note Source-Side Wing", fourNoteSourceSideWing);
+
+    /************ 5 Notes ************
+     *
+     * 5 notes (initial, 3 in wing, and second center note from amp side)
+     *
+     */
+    Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Amp Side");
+    autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
 
     /************ Drive Velocity Tuning ************
      *
@@ -445,14 +518,21 @@ public class RobotContainer {
   }
 
   private void configureIntakeCommands() {
-    oi.getIntakeAutomationSwitch().onTrue(Commands.runOnce(intake::enableAutomation, intake));
+    oi.getIntakeAutomationSwitch()
+        .onTrue(
+            Commands.parallel(
+                    Commands.runOnce(shooter::intakeEnabled),
+                    Commands.runOnce(intake::enableAutomation, intake))
+                .withName("enable intake automation"));
 
     oi.getIntakeAutomationSwitch()
         .onFalse(
             Commands.parallel(
-                Commands.runOnce(intake::disableAutomation, intake),
-                Commands.runOnce(intake::turnIntakeOff),
-                Commands.runOnce(intake::turnKickerOff)));
+                    Commands.runOnce(intake::disableAutomation, intake),
+                    Commands.runOnce(intake::turnIntakeOff),
+                    Commands.runOnce(intake::turnKickerOff),
+                    Commands.runOnce(shooter::intakeDisabled))
+                .withName("disable intake automation"));
 
     oi.getRunIntakeButton()
         .and(() -> !intake.automationEnabled())
@@ -501,81 +581,184 @@ public class RobotContainer {
     oi.getLock180Button()
         .whileTrue(
             new TeleopSwerve(
-                drivetrain,
-                oi::getTranslateX,
-                oi::getTranslateY,
-                () ->
-                    (drivetrain.getPose().getRotation().getDegrees() > -90
-                            && drivetrain.getPose().getRotation().getDegrees() < 90)
-                        ? Rotation2d.fromDegrees(0.0)
-                        : Rotation2d.fromDegrees(180.0)));
+                    drivetrain,
+                    oi::getTranslateX,
+                    oi::getTranslateY,
+                    () ->
+                        (drivetrain.getPose().getRotation().getDegrees() > -90
+                                && drivetrain.getPose().getRotation().getDegrees() < 90)
+                            ? Rotation2d.fromDegrees(0.0)
+                            : Rotation2d.fromDegrees(180.0))
+                .withName("lock 180"));
 
-    oi.getLockToSpeakerButton()
-        .toggleOnTrue(
+    oi.getAimSpeakerButton()
+        .onTrue(
             Commands.either(
-                Commands.runOnce(drivetrain::disableLockToSpeaker),
-                Commands.parallel(
-                    // FIXME: set the shooter wheel velocity
-                    Commands.runOnce(drivetrain::enableLockToSpeaker),
-                    new TeleopSwerve(
-                        drivetrain,
-                        oi::getTranslateX,
-                        oi::getTranslateY,
-                        () -> {
-                          Transform2d translation =
-                              new Transform2d(
-                                  Field2d.getInstance().getAllianceSpeakerCenter().getX()
-                                      - drivetrain.getPose().getX(),
-                                  Field2d.getInstance().getAllianceSpeakerCenter().getY()
-                                      - drivetrain.getPose().getY(),
-                                  new Rotation2d());
-                          return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
-                        })),
-                drivetrain::isLockToSpeakerEnabled));
+                    Commands.parallel(
+                        Commands.runOnce(drivetrain::disableAimToSpeaker, drivetrain),
+                        Commands.runOnce(shooter::cancelPrepareToShoot, shooter)),
+                    Commands.parallel(
+                        Commands.runOnce(shooter::prepareToShoot, shooter),
+                        Commands.runOnce(drivetrain::enableAimToSpeaker),
+                        new TeleopSwerve(
+                                drivetrain,
+                                oi::getTranslateX,
+                                oi::getTranslateY,
+                                () -> {
+                                  Transform2d translation =
+                                      new Transform2d(
+                                          Field2d.getInstance().getAllianceSpeakerCenter().getX()
+                                              - drivetrain.getPose().getX(),
+                                          Field2d.getInstance().getAllianceSpeakerCenter().getY()
+                                              - drivetrain.getPose().getY(),
+                                          new Rotation2d());
+                                  return new Rotation2d(
+                                      Math.atan2(translation.getY(), translation.getX()));
+                                })
+                            .until(() -> !intake.hasNote())),
+                    drivetrain::isAimToSpeakerEnabled)
+                .withName("toggle aim to speaker"));
 
     // field-relative toggle
     oi.getFieldRelativeButton()
         .toggleOnTrue(
             Commands.either(
-                Commands.runOnce(drivetrain::disableFieldRelative, drivetrain),
-                Commands.runOnce(drivetrain::enableFieldRelative, drivetrain),
-                drivetrain::getFieldRelative));
+                    Commands.runOnce(drivetrain::disableFieldRelative, drivetrain),
+                    Commands.runOnce(drivetrain::enableFieldRelative, drivetrain),
+                    drivetrain::getFieldRelative)
+                .withName("toggle field relative"));
 
     // slow-mode toggle
     oi.getTranslationSlowModeButton()
-        .onTrue(Commands.runOnce(drivetrain::enableTranslationSlowMode, drivetrain));
+        .onTrue(
+            Commands.runOnce(drivetrain::enableTranslationSlowMode, drivetrain)
+                .withName("enable translation slow mode"));
     oi.getTranslationSlowModeButton()
-        .onFalse(Commands.runOnce(drivetrain::disableTranslationSlowMode, drivetrain));
+        .onFalse(
+            Commands.runOnce(drivetrain::disableTranslationSlowMode, drivetrain)
+                .withName("disable translation slow mode"));
     oi.getRotationSlowModeButton()
-        .onTrue(Commands.runOnce(drivetrain::enableRotationSlowMode, drivetrain));
+        .onTrue(
+            Commands.runOnce(drivetrain::enableRotationSlowMode, drivetrain)
+                .withName("enable rotation slow mode"));
     oi.getRotationSlowModeButton()
-        .onFalse(Commands.runOnce(drivetrain::disableRotationSlowMode, drivetrain));
+        .onFalse(
+            Commands.runOnce(drivetrain::disableRotationSlowMode, drivetrain)
+                .withName("disable rotation slow mode"));
 
     // reset gyro to 0 degrees
-    oi.getResetGyroButton().onTrue(Commands.runOnce(drivetrain::zeroGyroscope, drivetrain));
+    oi.getResetGyroButton()
+        .onTrue(Commands.runOnce(drivetrain::zeroGyroscope, drivetrain).withName("zero gyro"));
 
     // reset pose based on vision
     oi.getResetPoseToVisionButton()
         .onTrue(
-            Commands.runOnce(() -> drivetrain.resetPoseToVision(() -> vision.getBestRobotPose())));
+            Commands.runOnce(() -> drivetrain.resetPoseToVision(() -> vision.getBestRobotPose()))
+                .withName("reset pose to vision"));
 
     // x-stance
-    oi.getXStanceButton().onTrue(Commands.runOnce(drivetrain::enableXstance, drivetrain));
-    oi.getXStanceButton().onFalse(Commands.runOnce(drivetrain::disableXstance, drivetrain));
+    oi.getXStanceButton()
+        .onTrue(
+            Commands.runOnce(drivetrain::enableXstance, drivetrain).withName("enable x-stance"));
+    oi.getXStanceButton()
+        .onFalse(
+            Commands.runOnce(drivetrain::disableXstance, drivetrain).withName("disable x-stance"));
 
     // turbo
-    oi.getTurboButton().onTrue(Commands.runOnce(drivetrain::enableTurbo, drivetrain));
-    oi.getTurboButton().onFalse(Commands.runOnce(drivetrain::disableTurbo, drivetrain));
+    oi.getTurboButton()
+        .onTrue(Commands.runOnce(drivetrain::enableTurbo, drivetrain).withName("enable turbo"));
+    oi.getTurboButton()
+        .onFalse(Commands.runOnce(drivetrain::disableTurbo, drivetrain).withName("disable turbo"));
   }
 
   private void configureVisionCommands() {
     // enable/disable vision
-    oi.getVisionIsEnabledSwitch().onTrue(Commands.runOnce(() -> vision.enable(true)));
+    oi.getVisionIsEnabledSwitch()
+        .onTrue(Commands.runOnce(() -> vision.enable(true)).withName("enable vision"));
     oi.getVisionIsEnabledSwitch()
         .onFalse(
             Commands.parallel(
-                Commands.runOnce(() -> vision.enable(false), vision),
-                Commands.runOnce(drivetrain::resetPoseRotationToGyro)));
+                    Commands.runOnce(() -> vision.enable(false), vision),
+                    Commands.runOnce(drivetrain::resetPoseRotationToGyro))
+                .withName("disable vision"));
+  }
+
+  private void configureShooterCommands() {
+    NoteVisualizer.setRobotPoseSupplier(this.drivetrain::getPose);
+
+    oi.getAimAutomationSwitch()
+        .onTrue(
+            Commands.runOnce(shooter::enableAutoShooter, shooter)
+                .withName("enable shooter automation"));
+    oi.getAimAutomationSwitch()
+        .onFalse(
+            Commands.runOnce(shooter::disableAutoShooter, shooter)
+                .withName("disable shooter automation"));
+
+    oi.getPrepareToScoreAmpButton()
+        .onTrue(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP), shooter)
+                .withName("prepare to score amp"));
+
+    oi.getPrepareToScoreSubwooferButton()
+        .onTrue(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER), shooter)
+                .withName("prepare to score subwoofer"));
+
+    oi.getPrepareToScorePodiumButton()
+        .onTrue(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.PODIUM), shooter)
+                .withName("prepare to score podium"));
+
+    oi.getStoreShooterButton()
+        .onTrue(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.STORAGE), shooter)
+                .withName("store shooter"));
+
+    oi.getShootFullFieldButton()
+        .onTrue(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.PASS), shooter)
+                .withName("prepare to pass"));
+
+    oi.getShooterAngleUpButton()
+        .whileTrue(
+            Commands.runOnce(
+                    () ->
+                        shooter.setAngleMotorVoltage(
+                            ShooterConstants.ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE),
+                    shooter)
+                .onlyIf(() -> !shooter.isAutomated())
+                .withName("shooter manual up"))
+        .onFalse(
+            Commands.runOnce(() -> shooter.setAngleMotorVoltage(0), shooter)
+                .onlyIf(() -> !shooter.isAutomated())
+                .withName("shooter manual up stop"));
+
+    oi.getShooterAngleDownButton()
+        .whileTrue(
+            Commands.runOnce(
+                    () ->
+                        shooter.setAngleMotorVoltage(
+                            -ShooterConstants.ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE),
+                    shooter)
+                .onlyIf(() -> !shooter.isAutomated())
+                .withName("shooter manual down"))
+        .onFalse(
+            Commands.runOnce(() -> shooter.setAngleMotorVoltage(0), shooter)
+                .onlyIf(() -> !shooter.isAutomated())
+                .withName("shooter manual down stop"));
+
+    oi.getShootButton().whileTrue(getShootCommand());
+  }
+
+  private Command getShootCommand() {
+    return Commands.waitUntil(this::isReadyToShoot)
+        .andThen(
+            Commands.sequence(
+                Commands.runOnce(intake::shoot, intake),
+                NoteVisualizer.shoot(),
+                Commands.runOnce(drivetrain::disableAimToSpeaker)))
+        .withName("shoot");
   }
 
   /**
@@ -598,5 +781,15 @@ public class RobotContainer {
       this.drivetrain.updateAlliance(this.lastAlliance);
       Field2d.getInstance().updateAlliance(this.lastAlliance);
     }
+  }
+
+  public void periodic() {
+    if (this.isReadyToShoot()) {
+      LEDs.getInstance().setShooterLEDState(ShooterLEDState.IS_READY_TO_SHOOT);
+    }
+  }
+
+  private boolean isReadyToShoot() {
+    return shooter.isShooterReadyToShoot(!vision.isEnabled() || drivetrain.isAimedAtSpeaker());
   }
 }

@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.01,
-        "y": 4.84
+        "x": 1.4229570277322372,
+        "y": 6.28
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.5856144043115159,
-        "y": 5.709473073081484
+        "x": 3.792458494007897,
+        "y": 6.156972313944628
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.9208403278961947,
-        "y": 5.575737667766062
+        "x": 4.9988827797204465,
+        "y": 6.6147588936781885
       },
       "prevControl": {
-        "x": 2.9156966584609862,
-        "y": 5.5611493554816676
+        "x": 4.10332317041941,
+        "y": 6.6147588936781885
       },
       "nextControl": {
-        "x": 2.9259839973314032,
-        "y": 5.590325980050457
+        "x": 6.2308424913171025,
+        "y": 6.6147588936781885
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.9002656501553608,
-        "y": 5.565450328895646
+        "x": 8.28970984956188,
+        "y": 5.777632787493063
       },
       "prevControl": {
-        "x": 2.9131248237433818,
-        "y": 5.577888154473051
+        "x": 6.890282363898061,
+        "y": 5.929173839829161
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,27 +47,27 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.7,
-      "rotationDegrees": -179.53838722084666,
-      "rotateFast": false
+      "rotationDegrees": 179.9156174720765,
+      "rotateFast": true
     }
   ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.0,
-    "maxAcceleration": 8.27,
-    "maxAngularVelocity": 537.5,
-    "maxAngularAcceleration": 2390.0
+    "maxVelocity": 2.5,
+    "maxAcceleration": 11.0,
+    "maxAngularVelocity": 537.0,
+    "maxAngularAcceleration": 2303.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0,
+    "rotation": 177.6370027333413,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "4 Note Source-Side Wing",
+  "folder": "5 Note Amp Side",
   "previewStartingState": {
-    "rotation": 162.9903320175804,
+    "rotation": -179.7435078772501,
     "velocity": 0
   },
   "useDefaultConstraints": false
