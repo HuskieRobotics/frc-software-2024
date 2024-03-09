@@ -73,10 +73,6 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getAimAutomationSwitch() {
-    return new Trigger(() -> false);
-  }
-
   // intake
 
   public default Trigger getIntakeAutomationSwitch() {
@@ -113,11 +109,11 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getShooterAutomationSwitch() {
+  public default Trigger getShooterAngleDownButton() {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getShooterAngleDownButton() {
+  public default Trigger getAimAutomationSwitch() {
     return new Trigger(() -> false);
   }
 

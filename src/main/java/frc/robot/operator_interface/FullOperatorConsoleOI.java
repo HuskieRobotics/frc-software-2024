@@ -202,10 +202,4 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   public Trigger getIntakeAutomationSwitch() {
     return operatorPanelButtons[12];
   }
-
-  @Override
-  public Trigger getShooterAutomationSwitch() {
-    // FIXME: assign to a switch
-    return new Trigger(() -> false);
-  }
 }

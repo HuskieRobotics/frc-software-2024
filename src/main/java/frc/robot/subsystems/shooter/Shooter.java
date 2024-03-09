@@ -15,7 +15,6 @@ import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Field2d;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.shooter.Shooter.ShootingPosition;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -30,7 +29,6 @@ public class Shooter extends SubsystemBase {
   private final TunableNumber bottomWheelVelocity =
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber pivotAngle = new TunableNumber("Shooter/Angle", 10.0);
-  private final TunableNumber pivotVoltage = new TunableNumber("Shooter/Pivot Voltage", 0.0);
   private final double[] populationRealAngles = {60.2, 39.3, 46.1, 38.7, 33, 28.8, 26.8};
   private final double[] populationRobotAngles = {53.17, 33.5, 39, 31.82, 28, 23, 20};
   private final double[] populationDistances = {
@@ -57,8 +55,10 @@ public class Shooter extends SubsystemBase {
 
   private Trigger coastModeButton = new Trigger(() -> shooterInputs.coastMode);
 
+  private static final String BUT_IS = " but is ";
+
   // FIXME: consider having 1-2 set distances with fixed angles for auto shots (near subwoofer, near
-  // podium) and create a shooter preset for thoses
+  // podium) and create a shooter preset for these
   public enum ShootingPosition {
     FIELD,
     AUTO,
@@ -97,9 +97,7 @@ public class Shooter extends SubsystemBase {
   }
 
   private void populateAngleMap() {
-    // FIXME: update after characterization
     for (int i = 0; i < populationRealAngles.length; i++) {
-      // angleTreeMap.put(populationDistances[i], populationRealAngles[i]);
       angleTreeMap.put(populationDistances[i], populationRobotAngles[i]);
     }
   }
@@ -115,7 +113,6 @@ public class Shooter extends SubsystemBase {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
       io.setAngle(pivotAngle.get());
-      // io.setAngleMotorVoltage(pivotVoltage.get());
     } else {
       runAngleStateMachine();
     }
@@ -204,6 +201,7 @@ public class Shooter extends SubsystemBase {
     } else if (shootingPosition == ShootingPosition.SUBWOOFER) {
       velocity = ShooterConstants.SUBWOOFER_VELOCITY;
     } else if (shootingPosition == ShootingPosition.AMP) {
+      // FIXME: add support for different top and bottom velocities
       velocity = ShooterConstants.AMP_VELOCITY;
     } else if (shootingPosition == ShootingPosition.STORAGE) {
       velocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
@@ -373,7 +371,7 @@ public class Shooter extends SubsystemBase {
                 SUBSYSTEM_NAME,
                 "Shooter angle is too low, should be "
                     + degrees
-                    + " but is "
+                    + BUT_IS
                     + this.shooterInputs.angleEncoderAngleDegrees);
       } else {
         FaultReporter.getInstance()
@@ -381,7 +379,7 @@ public class Shooter extends SubsystemBase {
                 SUBSYSTEM_NAME,
                 "Shooter angle is too high, should be "
                     + degrees
-                    + " but is "
+                    + BUT_IS
                     + this.shooterInputs.angleEncoderAngleDegrees);
       }
     }
@@ -396,7 +394,7 @@ public class Shooter extends SubsystemBase {
                 SUBSYSTEM_NAME,
                 "Bottom shooter wheel velocity is too low, should be "
                     + velocity
-                    + " but is "
+                    + BUT_IS
                     + this.shooterInputs.shootMotorBottomVelocityRPS);
       } else {
         FaultReporter.getInstance()
@@ -404,7 +402,7 @@ public class Shooter extends SubsystemBase {
                 SUBSYSTEM_NAME,
                 "Bottom shooter wheel velocity is too high, should be "
                     + velocity
-                    + " but is "
+                    + BUT_IS
                     + this.shooterInputs.shootMotorBottomVelocityRPS);
       }
     }
@@ -416,7 +414,7 @@ public class Shooter extends SubsystemBase {
                 SUBSYSTEM_NAME,
                 "Top shooter wheel velocity is too low, should be "
                     + velocity
-                    + " but is "
+                    + BUT_IS
                     + this.shooterInputs.shootMotorTopVelocityRPS);
       } else {
         FaultReporter.getInstance()
@@ -424,7 +422,7 @@ public class Shooter extends SubsystemBase {
                 SUBSYSTEM_NAME,
                 "Top shooter wheel velocity is too high, should be "
                     + velocity
-                    + " but is "
+                    + BUT_IS
                     + this.shooterInputs.shootMotorTopVelocityRPS);
       }
     }
