@@ -24,12 +24,12 @@ public class ShooterConstants {
   public static final int SET_POINT_COUNT = 5;
 
   // Shooter Velocity PID Constants
-  public static final double TOP_SHOOT_KP = 12.0;
+  public static final double TOP_SHOOT_KP = 5.0;
   public static final double TOP_SHOOT_KI = 0.0;
   public static final double TOP_SHOOT_KD = 0.0;
   public static final double TOP_SHOOT_KS = 6.0;
   public static final double TOP_SHOOT_PID_PEAK_OUTPUT = 1.0;
-  public static final double BOTTOM_SHOOT_KP = 11.0;
+  public static final double BOTTOM_SHOOT_KP = 5.0;
   public static final double BOTTOM_SHOOT_KI = 0.0;
   public static final double BOTTOM_SHOOT_KD = 0.0;
   public static final double BOTTOM_SHOOT_KS = 7.0;
