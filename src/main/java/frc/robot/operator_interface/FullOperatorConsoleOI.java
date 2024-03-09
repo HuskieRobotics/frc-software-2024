@@ -58,7 +58,7 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getLockToSpeakerButton() {
+  public Trigger getAimSpeakerButton() {
     return translateJoystickButtons[1];
   }
 
@@ -201,11 +201,5 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   @Override
   public Trigger getIntakeAutomationSwitch() {
     return operatorPanelButtons[12];
-  }
-
-  @Override
-  public Trigger getShooterAutomationSwitch() {
-    // FIXME: assign to a switch
-    return new Trigger(() -> false);
   }
 }
