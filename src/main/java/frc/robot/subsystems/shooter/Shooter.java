@@ -168,6 +168,8 @@ public class Shooter extends SubsystemBase {
     this.shootingPosition = ShootingPosition.FIELD;
     this.overrideSetpointsForNextShot = false;
 
+    io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
+
     setIdleVelocity();
   }
 
