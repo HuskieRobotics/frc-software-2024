@@ -24,15 +24,15 @@ public class ShooterConstants {
   public static final int SET_POINT_COUNT = 5;
 
   // Shooter Velocity PID Constants
-  public static final double TOP_SHOOT_KP = 40.0;
+  public static final double TOP_SHOOT_KP = 12.0;
   public static final double TOP_SHOOT_KI = 0.0;
   public static final double TOP_SHOOT_KD = 0.0;
-  public static final double TOP_SHOOT_KS = 14.0;
+  public static final double TOP_SHOOT_KS = 6.0;
   public static final double TOP_SHOOT_PID_PEAK_OUTPUT = 1.0;
-  public static final double BOTTOM_SHOOT_KP = 40.0;
+  public static final double BOTTOM_SHOOT_KP = 11.0;
   public static final double BOTTOM_SHOOT_KI = 0.0;
   public static final double BOTTOM_SHOOT_KD = 0.0;
-  public static final double BOTTOM_SHOOT_KS = 14.0;
+  public static final double BOTTOM_SHOOT_KS = 7.0;
   public static final double BOTTOM_SHOOT_PID_PEAK_OUTPUT = 1.0;
 
   // Shooter Rotation PID Constants
@@ -73,13 +73,13 @@ public class ShooterConstants {
   public static final double ANGLE_MOTOR_STATOR_CURRENT_LIMIT_TIME = 0.5;
   public static final double MOTION_MAGIC_CRUISE_VELOCITY = 0;
   public static final double ANGLE_MOTOR_GEAR_RATIO = 45.0;
-  public static final boolean ANGLE_MOTOR_INVERTED = false;
+  public static final boolean ANGLE_MOTOR_INVERTED = true;
   public static final double MAGNET_OFFSET = -0.899334111;
   public static final double SENSOR_TO_MECHANISM_RATIO = 4.0;
   public static final double ANGLE_TOLERANCE_DEGREES = 2.0; // FIXME tune with real robot
   public static final double SHOOTER_STORAGE_ANGLE = 11.0; // FIXME tune with real robot
   public static final double ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE = 1.0;
-  public static final double UPPER_ANGLE_LIMIT = 120.0;
+  public static final double UPPER_ANGLE_LIMIT = 90.0;
 
   // 0.074951 rotations = 10.4 degrees
 

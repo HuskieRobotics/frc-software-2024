@@ -23,7 +23,7 @@ public class IntakeConstants {
   public static final double INTAKE_KICKER_MOTOR_KP = 1.0;
   public static final double INTAKE_KICKER_MOTOR_KI = 0.0;
   public static final double INTAKE_KICKER_MOTOR_KD = 0.0;
-  public static final double INTAKE_KICKER_MOTOR_KS = 4.0;
+  public static final double INTAKE_KICKER_MOTOR_KS = 13.0;
 
   // velocities
 

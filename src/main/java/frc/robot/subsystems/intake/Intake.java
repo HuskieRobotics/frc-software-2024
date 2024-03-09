@@ -43,7 +43,8 @@ public class Intake extends SubsystemBase {
     NOTE_IN_INTAKE_AND_KICKER,
     NOTE_IN_KICKER,
     NOTE_IN_KICKER_AND_SHOOTER,
-    NOTE_IN_SHOOTER
+    NOTE_IN_SHOOTER,
+    SHOOTING
   }
 
   public Intake(IntakeIO io) {
@@ -91,6 +92,8 @@ public class Intake extends SubsystemBase {
       runNoteInKickerAndShooterState();
     } else if (intakeState == IntakeState.NOTE_IN_SHOOTER) {
       runNoteInShooterState();
+    } else if (intakeState == IntakeState.SHOOTING) {
+      runShootingState();
     }
   }
 
@@ -149,6 +152,16 @@ public class Intake extends SubsystemBase {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
+    }
+  }
+
+  private void runShootingState() {
+    if (!inputs.isShooterIRBlocked) {
+      intakeState = IntakeState.EMPTY;
+      leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
+      this.intakeGamePiece();
+    } else {
+      this.setKickerVelocity(IntakeConstants.KICKER_SHOOTING_VELOCITY_RPS);
     }
   }
 
@@ -317,6 +330,6 @@ public class Intake extends SubsystemBase {
   }
 
   public void shoot() {
-    this.setKickerVelocity(IntakeConstants.KICKER_SHOOTING_VELOCITY_RPS);
+    this.intakeState = IntakeState.SHOOTING;
   }
 }

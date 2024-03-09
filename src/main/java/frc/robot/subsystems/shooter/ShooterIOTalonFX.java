@@ -469,9 +469,11 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     SoftwareLimitSwitchConfigs angleMotorLimitSwitches = angleMotorConfig.SoftwareLimitSwitch;
     angleMotorLimitSwitches.ForwardSoftLimitEnable = true;
-    angleMotorLimitSwitches.ForwardSoftLimitThreshold = ShooterConstants.UPPER_ANGLE_LIMIT;
+    angleMotorLimitSwitches.ForwardSoftLimitThreshold =
+        Units.degreesToRotations(ShooterConstants.UPPER_ANGLE_LIMIT);
     angleMotorLimitSwitches.ReverseSoftLimitEnable = true;
-    angleMotorLimitSwitches.ReverseSoftLimitThreshold = ShooterConstants.SHOOTER_STORAGE_ANGLE;
+    angleMotorLimitSwitches.ReverseSoftLimitThreshold =
+        Units.degreesToRotations(ShooterConstants.SHOOTER_STORAGE_ANGLE);
 
     angleMotorConfig.Feedback.FeedbackRemoteSensorID = angleEncoder.getDeviceID();
     angleMotorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;

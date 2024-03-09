@@ -175,7 +175,8 @@ public class RobotContainer {
 
     intake = new Intake(new IntakeIOTalonFX());
     shooter = new Shooter(new ShooterIOTalonFX(), intake);
-    intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
+    // intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
+    intake.setShooterAngleReady(() -> true);
 
     String[] cameraNames = config.getCameraNames();
     VisionIO[] visionIOs = new VisionIO[cameraNames.length];
