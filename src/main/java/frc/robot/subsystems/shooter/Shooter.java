@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.team3015.subsystem.FaultReporter;
+import frc.lib.team3061.leds.LEDs;
+import frc.lib.team3061.leds.LEDs.ShooterLEDState;
 import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Field2d;
@@ -44,6 +46,7 @@ public class Shooter extends SubsystemBase {
   private boolean autoShooter = true;
 
   private boolean intakeEnabled = true;
+  private final LEDs leds;
 
   private int topAtSetpointIterationCount = 0;
   private int bottomAtSetpointIterationCount = 0;
@@ -82,6 +85,8 @@ public class Shooter extends SubsystemBase {
     populateAngleMap();
 
     this.autoShooter = true;
+
+    this.leds = LEDs.getInstance();
 
     this.resetToInitialState();
 
@@ -123,11 +128,14 @@ public class Shooter extends SubsystemBase {
       if (intake.hasNote()) {
         state = State.AIMING_AT_SPEAKER;
       }
+
+      leds.setShooterLEDState(ShooterLEDState.WAITING_FOR_GAME_PIECE);
     } else if (state == State.AIMING_AT_SPEAKER) {
       if (!intake.hasNote()) {
         this.resetToInitialState();
       } else if (overrideSetpointsForNextShot) {
         state = State.PREPARING_TO_SHOOT;
+        leds.setShooterLEDState(ShooterLEDState.IS_READY_TO_SHOOT);
       } else {
         double distanceToSpeaker =
             Field2d.getInstance()
@@ -137,12 +145,12 @@ public class Shooter extends SubsystemBase {
                 .getNorm();
         this.adjustAngle(distanceToSpeaker);
         this.setIdleVelocity();
+        leds.setShooterLEDState(ShooterLEDState.IS_READY_TO_SHOOT);
       }
     } else if (state == State.PREPARING_TO_SHOOT) {
       if (!intake.hasNote()) {
         this.resetToInitialState();
       } else {
-
         double distanceToSpeaker =
             Field2d.getInstance()
                 .getAllianceSpeakerCenter()
@@ -304,7 +312,6 @@ public class Shooter extends SubsystemBase {
         < ANGLE_TOLERANCE_DEGREES) {
       angleAtSetpointIterationCount++;
       if (angleAtSetpointIterationCount >= ShooterConstants.SET_POINT_COUNT) {
-
         return true;
       }
     } else {
