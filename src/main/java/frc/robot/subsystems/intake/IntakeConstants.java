@@ -47,8 +47,8 @@ public class IntakeConstants {
 
   public static final double ROLLERS_CONTINUOUS_STATOR_CURRENT_LIMIT = 25.0;
 
-  public static final double KICKER_CONTINUOUS_SUPPLY_CURRENT_LIMIT = 15.0;
-  public static final double KICKER_PEAK_SUPPLY_CURRENT_LIMIT = 20.0;
+  public static final double KICKER_CONTINUOUS_SUPPLY_CURRENT_LIMIT = 30.0;
+  public static final double KICKER_PEAK_SUPPLY_CURRENT_LIMIT = 40.0;
   public static final double KICKER_PEAK_SUPPLY_CURRENT_DURATION = 0.1;
 
   public static final double KICKER_CONTINUOUS_STATOR_CURRENT_LIMIT = 30.0;
