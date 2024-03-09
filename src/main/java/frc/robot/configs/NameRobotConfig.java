@@ -36,34 +36,28 @@ public class NameRobotConfig extends RobotConfig {
 
   private static final double TRACKWIDTH_METERS = 0.57785; // 22.75
   private static final double WHEELBASE_METERS = 0.57785; // 22.75
-  private static final double WHEEL_DIAMETER_METERS = 0.09659072671; // FIXME: measure and update
+  private static final double WHEEL_DIAMETER_METERS = 0.09849016753330445;
   private static final double ROBOT_WIDTH_WITH_BUMPERS =
       0.88265; // meters //34.75 in , measure the actual bumpers
   private static final double ROBOT_LENGTH_WITH_BUMPERS = 0.88265; // meters // 34.75 in same above
 
   /* Angle Motor PID Values */
-  private static final double ANGLE_KP = 100.0; // FIXME: Values taken from nova, need to be updated
-  private static final double ANGLE_KI = 0.0; // FIXME: Values taken from nova, need to be updated
-  private static final double ANGLE_KD = 0.05; // FIXME: Values taken from nova, need to be updated
+  private static final double ANGLE_KP = 100.0;
+  private static final double ANGLE_KI = 0.0;
+  private static final double ANGLE_KD = 3.9628;
 
-  private static final double ANGLE_KS =
-      0.1891233333; // FIXME: Values taken from nova, need to be updated
-  private static final double ANGLE_KV = // FIXME: Values taken from nova, need to be updated
-      0.4399866667
-          * 2
-          * Math.PI; // convert from V/(radians/s) to V/(rotations/s) // FIXME: Values taken from
-  // nova, need to be updated
-  private static final double ANGLE_KA =
-      0.001663333333; // FIXME: Values taken from nova, need to be updated
+  private static final double ANGLE_KS = 0.24719;
+  private static final double ANGLE_KV = 2.5845; // rps
+  private static final double ANGLE_KA = 0.030892;
 
   /* Drive Motor PID Values */
-  private static final double DRIVE_KP = 8.0; // FIXME: Values taken from nova, need to be updated
-  private static final double DRIVE_KI = 0.0; // FIXME: Values taken from nova, need to be updated
-  private static final double DRIVE_KD = 0.0; // FIXME: Values taken from nova, need to be updated
+  private static final double DRIVE_KP = 10.0;
+  private static final double DRIVE_KI = 0.0;
+  private static final double DRIVE_KD = 0.0;
 
-  private static final double DRIVE_KS = 5.0; // FIXME: Values taken from nova, need to be updated
-  private static final double DRIVE_KV = 0.0; // FIXME: Values taken from nova, need to be updated
-  private static final double DRIVE_KA = 0.0; // FIXME: Values taken from nova, need to be updated
+  private static final double DRIVE_KS = 0.23819;
+  private static final double DRIVE_KV = 0.0;
+  private static final double DRIVE_KA = 0.0;
 
   private static final double MAX_VELOCITY_METERS_PER_SECOND =
       4.5; // FIXME: confirm max velocity with real robot
