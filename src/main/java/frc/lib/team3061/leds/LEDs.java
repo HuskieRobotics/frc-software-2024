@@ -75,7 +75,7 @@ public abstract class LEDs extends SubsystemBase {
   private static final double BREATH_DURATION = 1.0;
   private static final double PULSE_DURATION = 0.5;
   private static final double RAINBOW_CYCLE_LENGTH = 30.0;
-  private static final double RAINBOW_DURATION = 1;
+  private static final double RAINBOW_DURATION = .25;
   private static final double WAVE_EXPONENT = 0.4;
   private static final double WAVE_FAST_CYCLE_LENGTH = 25.0;
   private static final double WAVE_FAST_DURATION = 0.25;
@@ -176,18 +176,12 @@ public abstract class LEDs extends SubsystemBase {
     } else if (endgameAlert) {
       strobe(Section.SHOULDER, Color.kBlue, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
-      // Waiting for game piece
-      // wave(
-      //     Section.FULL,
-      //     Color.kBlue,
-      //     new Color(255, 20, 0),
-      //     WAVE_FAST_CYCLE_LENGTH,
-      //     WAVE_SLOW_DURATION);
-
-      // animation testing
-      // fire(Section.FULL, BREATH_DURATION);
-      orangePulse(Section.FULL, PULSE_DURATION);
-      // rainbowWave(Section.FULL, RAINBOW_CYCLE_LENGTH, RAINBOW_DURATION);
+      wave(
+          Section.FULL,
+          Color.kBlue,
+          new Color(255, 20, 0),
+          WAVE_FAST_CYCLE_LENGTH,
+          WAVE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
       // Has game piece
       strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
@@ -201,12 +195,8 @@ public abstract class LEDs extends SubsystemBase {
   }
 
   private void updateToAutoPattern() {
-    wave(
-        Section.FULL,
-        Color.kBlue,
-        new Color(255, 20, 0),
-        WAVE_FAST_CYCLE_LENGTH,
-        WAVE_MEDIUM_DURATION);
+    orangePulse(Section.FULL, PULSE_DURATION);
+
     // if (autoFinished) {
     //   double fullTime = LENGTH / WAVE_FAST_CYCLE_LENGTH * WAVE_FAST_DURATION;
     //   solid((Timer.getFPGATimestamp() - autoFinishedTime) / fullTime, Color.kGreen);
@@ -402,76 +392,6 @@ public abstract class LEDs extends SubsystemBase {
         setLEDBuffer(i, new Color(red, green, blue));
       }
     }
-  }
-
-  private void rainbowWave(Section section, double cycleLength, double duration) {
-    double x = (1 - ((Timer.getFPGATimestamp() % duration) / duration)) * 2.0 * Math.PI;
-    double xDiffPerLed = (2.0 * Math.PI) / cycleLength;
-    int numColors = 6; // Number of colors in the rainbow
-    int colorStep = 255 / (numColors - 1); // Calculate color step for smooth gradient
-    for (int i = 0; i < section.end(); i++) {
-      x += xDiffPerLed;
-      if (i >= section.start()) {
-        double ratio = (Math.pow(Math.sin(x), WAVE_EXPONENT) + 1.0) / 2.0;
-        if (Double.isNaN(ratio)) {
-          ratio = (-Math.pow(Math.sin(x + Math.PI), WAVE_EXPONENT) + 1.0) / 2.0;
-        }
-        if (Double.isNaN(ratio)) {
-          ratio = 0.5;
-        }
-        int colorIndex = (int) (ratio * (numColors - 1)); // Calculate the color index
-        double colorRatio =
-            (ratio * (numColors - 1)) - colorIndex; // Calculate the color ratio for interpolation
-        Color c1 = rainbowColor(colorIndex);
-        Color c2 = rainbowColor(colorIndex + 1);
-        double red = (c1.red * (1 - colorRatio)) + (c2.red * colorRatio);
-        double green = (c1.green * (1 - colorRatio)) + (c2.green * colorRatio);
-        double blue = (c1.blue * (1 - colorRatio)) + (c2.blue * colorRatio);
-        setLEDBuffer(i, new Color((int) red, (int) green, (int) blue));
-      }
-    }
-  }
-
-  private Color rainbowColor(int index) {
-    int colorStep = 255 / 5; // 6 colors in total
-    int red, green, blue;
-    int colorIndex = index % 6;
-    switch (colorIndex) {
-      case 0: // Red to Orange
-        red = 255;
-        green = (index % colorStep) * colorStep;
-        blue = 0;
-        break;
-      case 1: // Orange to Yellow
-        red = 255 - (index % colorStep) * colorStep;
-        green = 255;
-        blue = 0;
-        break;
-      case 2: // Yellow to Green
-        red = 0;
-        green = 255;
-        blue = (index % colorStep) * colorStep;
-        break;
-      case 3: // Green to Blue
-        red = 0;
-        green = 255 - (index % colorStep) * colorStep;
-        blue = 255;
-        break;
-      case 4: // Blue to Indigo
-        red = (index % colorStep) * colorStep;
-        green = 0;
-        blue = 255;
-        break;
-      case 5: // Indigo to Violet
-        red = 255;
-        green = 0;
-        blue = 255 - (index % colorStep) * colorStep;
-        break;
-      default:
-        red = green = blue = 0;
-        break;
-    }
-    return new Color(red, green, blue);
   }
 
   private void fire(Section section, double duration) {
