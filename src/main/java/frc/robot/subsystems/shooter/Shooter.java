@@ -3,6 +3,7 @@ package frc.robot.subsystems.shooter;
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,6 +31,9 @@ public class Shooter extends SubsystemBase {
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber pivotAngle = new TunableNumber("Shooter/Angle", 10.0);
   private final TunableNumber pivotVoltage = new TunableNumber("Shooter/Pivot Voltage", 0.0);
+  private final double[] populationRealAngles = {61, 60.2, 39.3, 46.1, 38.7, 33, 28.8, 26.8};
+  private final double[] populationRobotAngles = {54.14 ,53.17, 33.5, 39, 31.82, 28, 23, 20};
+  private final double[] populationDistances = {53.53, 53.53,119.194 ,88.53, 113.53, 137.53, 161.53, 185.53};
 
   private boolean autoShooter = true;
 
@@ -84,8 +88,9 @@ public class Shooter extends SubsystemBase {
 
   private void populateAngleMap() {
     // FIXME: update after characterization
-    for (int i = 0; i < 10; i++) {
-      angleTreeMap.put(0.3 * i + 1.3, 60.0 - i * 5.0);
+    for (int i = 0; i < populationRealAngles.length; i++) {
+      angleTreeMap.put(populationDistances[i], populationRealAngles[i]);
+      //angleTreeMap.put(populationDistances[i], populationRobotAngles[i]);
     }
   }
 
@@ -131,11 +136,11 @@ public class Shooter extends SubsystemBase {
       } else {
 
         double distanceToSpeaker =
-            Field2d.getInstance()
+           Units.metersToInches(Field2d.getInstance()
                 .getAllianceSpeakerCenter()
                 .minus(RobotOdometry.getInstance().getEstimatedPosition())
                 .getTranslation()
-                .getNorm();
+                .getNorm());
         this.adjustAngle(distanceToSpeaker);
         this.setRangeVelocity(distanceToSpeaker);
       }
