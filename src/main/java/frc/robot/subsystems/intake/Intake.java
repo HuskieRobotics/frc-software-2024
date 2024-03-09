@@ -178,7 +178,7 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean hasNote() {
-    return (!inputs.isRollerIRBlocked && (inputs.isKickerIRBlocked || inputs.isShooterIRBlocked));
+    return inputs.isKickerIRBlocked || inputs.isShooterIRBlocked;
   }
 
   private void setIntakeState(IntakeState state) {
