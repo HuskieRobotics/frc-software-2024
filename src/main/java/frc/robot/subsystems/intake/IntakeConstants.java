@@ -8,7 +8,7 @@ public class IntakeConstants {
     throw new IllegalStateException(CONSTRUCTOR_EXCEPTION);
   }
 
-  public static final boolean TESTING = true;
+  public static final boolean TESTING = false;
 
   public static final int INTAKE_ROLLER_MOTOR_ID = 18;
   public static final int INTAKE_KICKER_MOTOR_ID = 21;
