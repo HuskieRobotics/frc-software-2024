@@ -1,11 +1,14 @@
 package frc.robot.subsystems.intake;
 
+import static frc.robot.subsystems.intake.IntakeConstants.*;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.leds.LEDs.IntakeLEDState;
+import frc.lib.team6328.util.TunableNumber;
 import java.util.ArrayList;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -31,6 +34,9 @@ public class Intake extends SubsystemBase {
   // system tests
   private IntakeState mostRecentIntakeState;
   private boolean checkComplete;
+
+  private final TunableNumber rollerVelocity = new TunableNumber("Intake/Roller Velocity", 0);
+  private final TunableNumber kickerVelocity = new TunableNumber("Intake/Kicker Velocity", 0);
 
   enum IntakeMotor {
     ROLLER,
@@ -73,8 +79,13 @@ public class Intake extends SubsystemBase {
     Logger.processInputs("Intake", inputs);
     Logger.recordOutput("Intake/State", intakeState.toString());
 
-    if (automationEnabled) {
-      this.runIntakeStateMachine();
+    if (TESTING) {
+      io.setRollerVelocity(rollerVelocity.get());
+      io.setKickerVelocity(kickerVelocity.get());
+    } else {
+      if (automationEnabled) {
+        this.runIntakeStateMachine();
+      }
     }
   }
 
