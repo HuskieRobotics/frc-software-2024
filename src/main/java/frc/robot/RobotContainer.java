@@ -694,8 +694,7 @@ public class RobotContainer {
                 .onlyIf(() -> !shooter.isAutomated())
                 .withName("shooter manual down stop"));
 
-    // FIXME: is whileTrue better? Do we need an onFalse that cancels the shoot command?
-    oi.getShootButton().onTrue(getShootCommand());
+    oi.getShootButton().whileTrue(getShootCommand());
   }
 
   private Command getShootCommand() {
