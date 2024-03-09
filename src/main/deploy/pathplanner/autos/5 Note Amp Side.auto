@@ -2,37 +2,19 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7543128599770712,
-      "y": 6.637696878997361
+      "x": 1.4229570277322372,
+      "y": 6.28
     },
-    "rotation": -121.4295656148386
+    "rotation": 179.34477450273
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "Start-1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Note 1-2"
+            "pathName": "5 Note Amp Side 1"
           }
         },
         {
@@ -44,13 +26,49 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Note 2-Note 3"
+            "pathName": "5 Note Amp Side 2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Note 3 - Shoot 3"
+            "pathName": "5 Note Amp Side 3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 Note Amp Side 4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 Note Amp Side 5"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 Note Amp Side 6"
           }
         },
         {

@@ -2,37 +2,19 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7543128599770712,
-      "y": 6.637696878997361
+      "x": 0.7029193205305838,
+      "y": 4.367267881455193
     },
-    "rotation": -121.4295656148386
+    "rotation": 121.08840984705458
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "Start-1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Note 1-2"
+            "pathName": "3 Note Start"
           }
         },
         {
@@ -44,19 +26,43 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Note 2-Note 3"
+            "pathName": "3 Note First Note"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Note 3 - Shoot 3"
+            "pathName": "3 Note First Shot"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "3 Note Second Note"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "3 Note Second Shot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "3 Note Exit"
           }
         }
       ]
