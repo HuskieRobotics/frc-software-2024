@@ -175,9 +175,7 @@ public class RobotContainer {
 
     intake = new Intake(new IntakeIOTalonFX());
     shooter = new Shooter(new ShooterIOTalonFX(), intake);
-    // FIXME: restore after tuning
-    // intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
-    intake.setShooterAngleReady(() -> true);
+    intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
     String[] cameraNames = config.getCameraNames();
     VisionIO[] visionIOs = new VisionIO[cameraNames.length];
