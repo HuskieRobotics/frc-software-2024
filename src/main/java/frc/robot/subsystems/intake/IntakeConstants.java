@@ -36,6 +36,10 @@ public class IntakeConstants {
   public static final double ROLLER_VELOCITY_TOLERANCE = 1.0;
   public static final double KICKER_VELOCITY_TOLERANCE = 0.5;
 
+
+  // deadzone timeout
+  public static final double IN_BETWEEN_TIMEOUT_SECONDS = 1.0;
+
   // current limits
 
   public static final double ROLLERS_CONTINUOUS_SUPPLY_CURRENT_LIMIT = 15.0;

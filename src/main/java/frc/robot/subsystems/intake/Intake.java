@@ -32,6 +32,8 @@ public class Intake extends SubsystemBase {
   private IntakeState mostRecentIntakeState;
   private boolean checkComplete;
 
+  private int intakeAndKickerTimeout;
+
   enum IntakeMotor {
     ROLLER,
     KICKER
@@ -40,6 +42,7 @@ public class Intake extends SubsystemBase {
   enum IntakeState {
     EMPTY,
     NOTE_IN_INTAKE,
+    IN_BETWEEN_INTAKE_AND_KICKER,
     NOTE_IN_INTAKE_AND_KICKER,
     NOTE_IN_KICKER,
     NOTE_IN_KICKER_AND_SHOOTER,
@@ -59,6 +62,8 @@ public class Intake extends SubsystemBase {
 
     leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
     this.intakeGamePiece();
+
+    this.intakeAndKickerTimeout = 0;
 
     FaultReporter.getInstance().registerSystemCheck(SUBSYSTEM_NAME, getSystemCheckCommand());
   }
@@ -82,6 +87,8 @@ public class Intake extends SubsystemBase {
       runNoteInIntakeState();
     } else if (intakeState == IntakeState.NOTE_IN_INTAKE_AND_KICKER) {
       runNoteInIntakeAndKickerState();
+    } else if (intakeState == IntakeState.IN_BETWEEN_INTAKE_AND_KICKER) {
+      runInBetweenIntakeAndKickerState();
     } else if (intakeState == IntakeState.NOTE_IN_KICKER) {
       runNoteInKickerState();
     } else if (intakeState == IntakeState.NOTE_IN_KICKER_AND_SHOOTER) {
@@ -116,10 +123,23 @@ public class Intake extends SubsystemBase {
       intakeState = IntakeState.NOTE_IN_INTAKE_AND_KICKER;
       this.transitionGamePiece();
     } else if (!inputs.isRollerIRBlocked) {
+      intakeState = IntakeState.IN_BETWEEN_INTAKE_AND_KICKER;
+      this.transitionGamePiece();
+    }
+  }
+
+  private void runInBetweenIntakeAndKickerState() {
+    this.intakeAndKickerTimeout++;
+
+    if (intakeAndKickerTimeout > IntakeConstants.IN_BETWEEN_TIMEOUT_SECONDS * 50) {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
       hasNote = false;
+    } else if (inputs.isKickerIRBlocked) {
+      intakeState = IntakeState.NOTE_IN_KICKER;
+      this.transitionGamePiece();
+      this.repelGamePiece();
     }
   }
 
