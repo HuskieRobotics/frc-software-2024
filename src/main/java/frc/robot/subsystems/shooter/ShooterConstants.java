@@ -85,10 +85,10 @@ public class ShooterConstants {
   // 0.074951 rotations = 10.4 degrees
 
   // Shooter Presets
-  public static final double SUBWOOFER_VELOCITY = 12.0; // FIXME tune with real robot
-  public static final double SUBWOOFER_ANGLE = 45.0; // FIXME tune with real robot
-  public static final double PODIUM_VELOCITY = 20.0; // FIXME tune with real robot
-  public static final double PODIUM_ANGLE = 15.0; // FIXME tune with real robot
+  public static final double SUBWOOFER_VELOCITY = 40; // FIXME tune with real robot
+  public static final double SUBWOOFER_ANGLE = 53.17; // FIXME tune with real robot
+  public static final double PODIUM_VELOCITY = 60; // FIXME tune with real robot
+  public static final double PODIUM_ANGLE = 33.5; // FIXME tune with real robot
   public static final double AMP_VELOCITY = 5.0; // FIXME tune with real robot
   public static final double AMP_ANGLE = 110.0; // FIXME tune with real robot
   public static final double PASS_VELOCITY = 35.0; // FIXME tune with real robot
