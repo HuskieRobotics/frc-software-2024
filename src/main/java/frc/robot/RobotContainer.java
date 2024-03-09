@@ -372,7 +372,7 @@ public class RobotContainer {
         Commands.runOnce(
             () ->
                 drivetrain.resetPose(
-                    PathPlannerPath.fromPathFile("StartPoint").getPreviewStartingHolonomicPose()),
+                    PathPlannerPath.fromPathFile("Start Point").getPreviewStartingHolonomicPose()),
             drivetrain);
     autoChooser.addOption("Start Point", startPoint);
 
@@ -392,9 +392,51 @@ public class RobotContainer {
     Command tuningCommand = new PathPlannerAuto("Tuning");
     autoChooser.addOption("Auto Tuning", tuningCommand);
 
-    /************ 4 Note ************
+    /************ 1 Note Anywhere ************
      *
-     * used for testing the 6 note autonomous (Still Testing)
+     * shoot initial note and leave robot starting zone
+     *
+     */
+
+    // FIXME: add commands to wait for the shooter wheel to reach the desired velocity and then
+    // shoot
+    Command oneNoteAnywhere =
+        Commands.run(
+                () -> {
+                  drivetrain.drive(1, 0, 0, false, true);
+                },
+                drivetrain)
+            .withTimeout(2.5)
+            .andThen(
+                Commands.runOnce(
+                    () -> {
+                      drivetrain.drive(0, 0, 0, false, false);
+                    },
+                    drivetrain));
+    autoChooser.addOption("One Note Anywhere", oneNoteAnywhere);
+
+    /************ 2 Notes ************
+     *
+     * 2 notes (initial and second center note from source side)
+     *
+     */
+
+    Command twoNoteSourceSide = new PathPlannerAuto("2 Note Source Side");
+    autoChooser.addOption("2 Note Source Side", twoNoteSourceSide);
+
+    /************ 3 Notes ************
+     *
+     * 3 notes (initial and first and second center notes from source side)
+     *
+     */
+
+    Command threeNoteSourceSide = new PathPlannerAuto("3 Note Source Side");
+    autoChooser.addOption("3 Note Source Side", threeNoteSourceSide);
+
+    /************ 4 Notes ************
+     *
+     * 4 note starting from the amp side
+     * 4 note starting from the source side
      *
      */
     Command fourNoteAmpSideWing = new PathPlannerAuto("4 Note Amp-Side Wing");
@@ -402,6 +444,14 @@ public class RobotContainer {
 
     Command fourNoteSourceSideWing = new PathPlannerAuto("4 Note Source-Side Wing");
     autoChooser.addOption("4 Note Source-Side Wing", fourNoteSourceSideWing);
+
+    /************ 5 Notes ************
+     *
+     * 5 notes (initial, 3 in wing, and second center note from amp side)
+     *
+     */
+    Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Amp Side");
+    autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
 
     /************ Drive Velocity Tuning ************
      *
@@ -469,7 +519,9 @@ public class RobotContainer {
   private void configureIntakeCommands() {
     oi.getIntakeAutomationSwitch()
         .onTrue(
-            Commands.runOnce(intake::enableAutomation, intake)
+            Commands.parallel(
+                    Commands.runOnce(shooter::intakeEnabled),
+                    Commands.runOnce(intake::enableAutomation, intake))
                 .withName("enable intake automation"));
 
     oi.getIntakeAutomationSwitch()
@@ -477,7 +529,8 @@ public class RobotContainer {
             Commands.parallel(
                     Commands.runOnce(intake::disableAutomation, intake),
                     Commands.runOnce(intake::turnIntakeOff),
-                    Commands.runOnce(intake::turnKickerOff))
+                    Commands.runOnce(intake::turnKickerOff),
+                    Commands.runOnce(shooter::intakeDisabled))
                 .withName("disable intake automation"));
 
     oi.getRunIntakeButton()
@@ -538,11 +591,13 @@ public class RobotContainer {
                 .withName("lock 180"));
 
     oi.getAimSpeakerButton()
-        .toggleOnTrue(
+        .onTrue(
             Commands.either(
-                    Commands.runOnce(drivetrain::disableAimToSpeaker),
                     Commands.parallel(
-                        Commands.runOnce(() -> shooter.prepareToShoot(), shooter),
+                        Commands.runOnce(drivetrain::disableAimToSpeaker, drivetrain),
+                        Commands.runOnce(shooter::cancelPrepareToShoot, shooter)),
+                    Commands.parallel(
+                        Commands.runOnce(shooter::prepareToShoot, shooter),
                         Commands.runOnce(drivetrain::enableAimToSpeaker),
                         new TeleopSwerve(
                                 drivetrain,
@@ -662,7 +717,7 @@ public class RobotContainer {
     oi.getShootFullFieldButton()
         .onTrue(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.PASS), shooter)
-                .withName("store shooter"));
+                .withName("prepare to pass"));
 
     oi.getShooterAngleUpButton()
         .whileTrue(
@@ -696,19 +751,15 @@ public class RobotContainer {
   }
 
   private Command getShootCommand() {
-
-    return Commands.runOnce(intake::shoot, intake).withName("shoot");
-
-    // return Commands.waitUntil(
-    //         () ->
-    //             shooter.isShooterReadyToShoot(!vision.isEnabled() ||
-    // drivetrain.isAimedAtSpeaker()))
-    //     .andThen(
-    //         Commands.sequence(
-    //             Commands.runOnce(intake::shoot, intake),
-    //             NoteVisualizer.shoot(),
-    //             Commands.runOnce(drivetrain::disableAimToSpeaker)))
-    //     .withName("shoot");
+    return Commands.waitUntil(
+            () ->
+                shooter.isShooterReadyToShoot(!vision.isEnabled() || drivetrain.isAimedAtSpeaker()))
+        .andThen(
+            Commands.sequence(
+                Commands.runOnce(intake::shoot, intake),
+                NoteVisualizer.shoot(),
+                Commands.runOnce(drivetrain::disableAimToSpeaker)))
+        .withName("shoot");
   }
 
   /**

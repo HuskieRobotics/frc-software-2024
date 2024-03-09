@@ -12,7 +12,6 @@ import frc.lib.team3061.drivetrain.swerve.SwerveConstants;
  * these methods, refer to the documentation in the RobotConfig class.
  */
 public class NameRobotConfig extends RobotConfig {
-  // FIXME: update all CAN IDs and steer offsets
   private static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1;
   private static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2;
   private static final int FRONT_LEFT_MODULE_STEER_ENCODER = 22;
@@ -33,7 +32,7 @@ public class NameRobotConfig extends RobotConfig {
   private static final int BACK_RIGHT_MODULE_STEER_ENCODER = 25;
   private static final double BACK_RIGHT_MODULE_STEER_OFFSET_ROT = -0.335693;
 
-  private static final int GYRO_ID = 26; // FIXME: Update gyro ID
+  private static final int GYRO_ID = 26;
 
   private static final double TRACKWIDTH_METERS = 0.57785; // 22.75
   private static final double WHEELBASE_METERS = 0.57785; // 22.75

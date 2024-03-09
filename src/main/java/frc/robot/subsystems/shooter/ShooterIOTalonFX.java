@@ -333,7 +333,7 @@ public class ShooterIOTalonFX implements ShooterIO {
       angleMotor.getConfigurator().apply(rotationMotionMagicConfig);
     }
 
-    shooterInputs.coastMode = coastModeButton.get();
+    shooterInputs.coastMode = !coastModeButton.get();
   }
 
   @Override
@@ -419,6 +419,20 @@ public class ShooterIOTalonFX implements ShooterIO {
   }
 
   private void configAngleMotor(TalonFX angleMotor, CANcoder angleEncoder) {
+    CANcoderConfiguration angleCANCoderConfig = new CANcoderConfiguration();
+    angleCANCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
+    angleCANCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+    angleCANCoderConfig.MagnetSensor.MagnetOffset = ShooterConstants.MAGNET_OFFSET;
+
+    StatusCode status = StatusCode.StatusCodeNotInitialized;
+    for (int i = 0; i < 5; ++i) {
+      status = angleEncoder.getConfigurator().apply(angleCANCoderConfig);
+      if (status.isOK()) break;
+    }
+    if (!status.isOK()) {
+      configAlert.set(true);
+      configAlert.setText(status.toString());
+    }
 
     TalonFXConfiguration angleMotorConfig = new TalonFXConfiguration();
     CurrentLimitsConfigs angleMotorCurrentLimits = new CurrentLimitsConfigs();
@@ -455,16 +469,18 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     SoftwareLimitSwitchConfigs angleMotorLimitSwitches = angleMotorConfig.SoftwareLimitSwitch;
     angleMotorLimitSwitches.ForwardSoftLimitEnable = true;
-    angleMotorLimitSwitches.ForwardSoftLimitThreshold = ShooterConstants.UPPER_ANGLE_LIMIT;
+    angleMotorLimitSwitches.ForwardSoftLimitThreshold =
+        Units.degreesToRotations(ShooterConstants.UPPER_ANGLE_LIMIT);
     angleMotorLimitSwitches.ReverseSoftLimitEnable = true;
-    angleMotorLimitSwitches.ReverseSoftLimitThreshold = ShooterConstants.SHOOTER_STORAGE_ANGLE;
+    angleMotorLimitSwitches.ReverseSoftLimitThreshold =
+        Units.degreesToRotations(ShooterConstants.SHOOTER_STORAGE_ANGLE);
 
     angleMotorConfig.Feedback.FeedbackRemoteSensorID = angleEncoder.getDeviceID();
     angleMotorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
     angleMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.SENSOR_TO_MECHANISM_RATIO;
     angleMotorConfig.Feedback.RotorToSensorRatio = ShooterConstants.ANGLE_MOTOR_GEAR_RATIO;
 
-    StatusCode status = StatusCode.StatusCodeNotInitialized;
+    status = StatusCode.StatusCodeNotInitialized;
     for (int i = 0; i < 5; ++i) {
       status = angleMotor.getConfigurator().apply(angleMotorConfig);
       if (status.isOK()) break;
@@ -474,21 +490,8 @@ public class ShooterIOTalonFX implements ShooterIO {
       configAlert.setText(status.toString());
     }
 
-    CANcoderConfiguration angleCANCoderConfig = new CANcoderConfiguration();
-    angleCANCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
-    angleCANCoderConfig.MagnetSensor.SensorDirection =
-        SensorDirectionValue.CounterClockwise_Positive;
-    angleCANCoderConfig.MagnetSensor.MagnetOffset = ShooterConstants.MAGNET_OFFSET;
-
-    status = StatusCode.StatusCodeNotInitialized;
-    for (int i = 0; i < 5; ++i) {
-      status = angleEncoder.getConfigurator().apply(angleCANCoderConfig);
-      if (status.isOK()) break;
-    }
-    if (!status.isOK()) {
-      configAlert.set(true);
-      configAlert.setText(status.toString());
-    }
+    // FIXME: this shouldn't be neeed; need to debug the position issue
+    angleMotor.setPosition(Units.degreesToRotations(10.4 * 4.0));
 
     FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "AngleMotor", angleMotor);
     FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "AngleCANcoder", angleEncoder);
@@ -496,6 +499,7 @@ public class ShooterIOTalonFX implements ShooterIO {
 
   @Override
   public void setCoastMode(boolean coast) {
-    angleMotor.setNeutralMode(coast ? NeutralModeValue.Coast : NeutralModeValue.Brake);
+    // FIXME: debug later
+    // angleMotor.setNeutralMode(coast ? NeutralModeValue.Coast : NeutralModeValue.Brake);
   }
 }

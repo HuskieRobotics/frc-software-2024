@@ -1,11 +1,14 @@
 package frc.robot.subsystems.intake;
 
+import static frc.robot.subsystems.intake.IntakeConstants.*;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.leds.LEDs.IntakeLEDState;
+import frc.lib.team6328.util.TunableNumber;
 import java.util.ArrayList;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -32,6 +35,9 @@ public class Intake extends SubsystemBase {
   private IntakeState mostRecentIntakeState;
   private boolean checkComplete;
 
+  private final TunableNumber rollerVelocity = new TunableNumber("Intake/Roller Velocity", 0);
+  private final TunableNumber kickerVelocity = new TunableNumber("Intake/Kicker Velocity", 0);
+
   enum IntakeMotor {
     ROLLER,
     KICKER
@@ -43,7 +49,8 @@ public class Intake extends SubsystemBase {
     NOTE_IN_INTAKE_AND_KICKER,
     NOTE_IN_KICKER,
     NOTE_IN_KICKER_AND_SHOOTER,
-    NOTE_IN_SHOOTER
+    NOTE_IN_SHOOTER,
+    SHOOTING
   }
 
   public Intake(IntakeIO io) {
@@ -72,8 +79,13 @@ public class Intake extends SubsystemBase {
     Logger.processInputs("Intake", inputs);
     Logger.recordOutput("Intake/State", intakeState.toString());
 
-    if (automationEnabled) {
-      this.runIntakeStateMachine();
+    if (TESTING) {
+      io.setRollerVelocity(rollerVelocity.get());
+      io.setKickerVoltage(kickerVelocity.get());
+    } else {
+      if (automationEnabled) {
+        this.runIntakeStateMachine();
+      }
     }
   }
 
@@ -91,6 +103,8 @@ public class Intake extends SubsystemBase {
       runNoteInKickerAndShooterState();
     } else if (intakeState == IntakeState.NOTE_IN_SHOOTER) {
       runNoteInShooterState();
+    } else if (intakeState == IntakeState.SHOOTING) {
+      runShootingState();
     }
   }
 
@@ -152,8 +166,19 @@ public class Intake extends SubsystemBase {
     }
   }
 
+  private void runShootingState() {
+    if (!inputs.isShooterIRBlocked) {
+      intakeState = IntakeState.EMPTY;
+      leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
+      this.intakeGamePiece();
+      this.turnKickerOff();
+    } else {
+      this.io.setKickerVoltage(KICKER_SHOOTING_VELOCITY_VOLTAGE);
+    }
+  }
+
   public boolean hasNote() {
-    return (!inputs.isRollerIRBlocked && (inputs.isKickerIRBlocked || inputs.isShooterIRBlocked));
+    return inputs.isKickerIRBlocked || inputs.isShooterIRBlocked;
   }
 
   private void setIntakeState(IntakeState state) {
@@ -317,6 +342,6 @@ public class Intake extends SubsystemBase {
   }
 
   public void shoot() {
-    this.setKickerVelocity(IntakeConstants.KICKER_SHOOTING_VELOCITY_RPS);
+    this.intakeState = IntakeState.SHOOTING;
   }
 }
