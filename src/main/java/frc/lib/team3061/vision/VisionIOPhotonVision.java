@@ -1,7 +1,5 @@
 package frc.lib.team3061.vision;
 
-import static frc.lib.team3061.vision.VisionConstants.*;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.lib.team6328.util.Alert;

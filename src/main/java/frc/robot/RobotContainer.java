@@ -25,7 +25,6 @@ import frc.lib.team3061.drivetrain.DrivetrainIOCTRE;
 import frc.lib.team3061.drivetrain.DrivetrainIOGeneric;
 import frc.lib.team3061.drivetrain.swerve.SwerveModuleIO;
 import frc.lib.team3061.drivetrain.swerve.SwerveModuleIOTalonFXPhoenix6;
-import frc.lib.team3061.gyro.GyroIO;
 import frc.lib.team3061.gyro.GyroIOPigeon2Phoenix6;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.vision.Vision;
@@ -36,9 +35,14 @@ import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.WheelDiameterCharacterization;
 import frc.robot.configs.GenericDrivetrainRobotConfig;
+import frc.robot.configs.NameRobotConfig;
+import frc.robot.configs.PracticeBoardConfig;
 import frc.robot.configs.PracticeRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -57,6 +61,7 @@ public class RobotContainer {
   private Drivetrain drivetrain;
   private Alliance lastAlliance = DriverStation.Alliance.Red;
   private Vision vision;
+  private Intake intake;
 
   // use AdvantageKit's LoggedDashboardChooser instead of SendableChooser to ensure accurate logging
   private final LoggedDashboardChooser<Command> autoChooser =
@@ -87,6 +92,11 @@ public class RobotContainer {
     if (Constants.getMode() != Mode.REPLAY) {
 
       switch (Constants.getRobot()) {
+        case ROBOT_PRACTICE_BOARD:
+          {
+            createPracticeBoardSubsystem();
+            break;
+          }
         case ROBOT_PRACTICE:
         case ROBOT_COMPETITION:
           {
@@ -110,6 +120,9 @@ public class RobotContainer {
 
     } else {
       drivetrain = new Drivetrain(new DrivetrainIO() {});
+
+      // FIXME: connect to shooter's boolean supplier
+      intake = new Intake(new IntakeIO() {}, () -> true);
 
       String[] cameraNames = config.getCameraNames();
       VisionIO[] visionIOs = new VisionIO[cameraNames.length];
@@ -138,17 +151,23 @@ public class RobotContainer {
       case ROBOT_SIMBOT:
         config = new GenericDrivetrainRobotConfig();
         break;
-      case ROBOT_SIMBOT_CTRE:
       case ROBOT_PRACTICE:
-      case ROBOT_COMPETITION:
         config = new PracticeRobotConfig();
         break;
+      case ROBOT_SIMBOT_CTRE:
+      case ROBOT_COMPETITION:
+        config = new NameRobotConfig();
+        break;
+      case ROBOT_PRACTICE_BOARD:
+        config = new PracticeBoardConfig();
     }
   }
 
   private void createCTRESubsystems() {
-    DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
-    drivetrain = new Drivetrain(drivetrainIO);
+    drivetrain = new Drivetrain(new DrivetrainIOCTRE());
+
+    // FIXME: connect to shooter's boolean supplier
+    intake = new Intake(new IntakeIOTalonFX(), () -> true);
 
     String[] cameraNames = config.getCameraNames();
     VisionIO[] visionIOs = new VisionIO[cameraNames.length];
@@ -185,10 +204,17 @@ public class RobotContainer {
         new SwerveModuleIOTalonFXPhoenix6(
             3, driveMotorCANIDs[3], steerMotorCANDIDs[3], steerEncoderCANDIDs[3], steerOffsets[3]);
 
-    GyroIO gyro = new GyroIOPigeon2Phoenix6(config.getGyroCANID());
-    DrivetrainIO drivetrainIO =
-        new DrivetrainIOGeneric(gyro, flModule, frModule, blModule, brModule);
-    drivetrain = new Drivetrain(drivetrainIO);
+    drivetrain =
+        new Drivetrain(
+            new DrivetrainIOGeneric(
+                new GyroIOPigeon2Phoenix6(config.getGyroCANID()),
+                flModule,
+                frModule,
+                blModule,
+                brModule));
+
+    // FIXME: connect to shooter's boolean supplier
+    intake = new Intake(new IntakeIOTalonFX(), () -> true);
 
     if (Constants.getRobot() == Constants.RobotType.ROBOT_SIMBOT) {
       vision = new Vision(new VisionIO[] {new VisionIO() {}});
@@ -211,6 +237,17 @@ public class RobotContainer {
   private void createCTRESimSubsystems() {
     DrivetrainIO drivetrainIO = new DrivetrainIOCTRE();
     drivetrain = new Drivetrain(drivetrainIO);
+
+    // FIXME: connect to shooter's boolean supplier
+    intake = new Intake(new IntakeIOTalonFX(), () -> true);
+
+    vision = new Vision(new VisionIO[] {new VisionIO() {}});
+  }
+
+  private void createPracticeBoardSubsystem() {
+    // change the following to connect the subsystem being tested to actual hardware
+    drivetrain = new Drivetrain(new DrivetrainIO() {});
+    intake = new Intake(new IntakeIO() {}, () -> true);
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
   }
 
@@ -249,6 +286,8 @@ public class RobotContainer {
   private void configureButtonBindings() {
 
     configureDrivetrainCommands();
+
+    configureIntakeCommands();
 
     configureVisionCommands();
 
@@ -332,9 +371,51 @@ public class RobotContainer {
     Command tuningCommand = new PathPlannerAuto("Tuning");
     autoChooser.addOption("Auto Tuning", tuningCommand);
 
-    /************ 4 Note ************
+    /************ 1 Note Anywhere ************
      *
-     * used for testing the 6 note autonomous (Still Testing)
+     * shoot initial note and leave robot starting zone
+     *
+     */
+
+    // FIXME: add commands to wait for the shooter wheel to reach the desired velocity and then
+    // shoot
+    Command oneNoteAnywhere =
+        Commands.run(
+                () -> {
+                  drivetrain.drive(1, 0, 0, false, true);
+                },
+                drivetrain)
+            .withTimeout(2.5)
+            .andThen(
+                Commands.runOnce(
+                    () -> {
+                      drivetrain.drive(0, 0, 0, false, false);
+                    },
+                    drivetrain));
+    autoChooser.addOption("One Note Anywhere", oneNoteAnywhere);
+
+    /************ 2 Notes ************
+     *
+     * 2 notes (initial and second center note from source side)
+     *
+     */
+
+    Command twoNoteSourceSide = new PathPlannerAuto("2 Note Source Side");
+    autoChooser.addOption("2 Note Source Side", twoNoteSourceSide);
+
+    /************ 3 Notes ************
+     *
+     * 3 notes (initial and first and second center notes from source side)
+     *
+     */
+
+    Command threeNoteSourceSide = new PathPlannerAuto("3 Note Source Side");
+    autoChooser.addOption("3 Note Source Side", threeNoteSourceSide);
+
+    /************ 4 Notes ************
+     *
+     * 4 note starting from the amp side
+     * 4 note starting from the source side
      *
      */
     Command fourNoteAmpSideWing = new PathPlannerAuto("4 Note Amp-Side Wing");
@@ -342,6 +423,14 @@ public class RobotContainer {
 
     Command fourNoteSourceSideWing = new PathPlannerAuto("4 Note Source-Side Wing");
     autoChooser.addOption("4 Note Source-Side Wing", fourNoteSourceSideWing);
+
+    /************ 5 Notes ************
+     *
+     * 5 notes (initial, 3 in wing, and second center note from amp side)
+     *
+     */
+    Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Amp Side");
+    autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
 
     /************ Drive Velocity Tuning ************
      *
@@ -423,6 +512,45 @@ public class RobotContainer {
     Shuffleboard.getTab("MAIN").add(autoChooser.getSendableChooser());
   }
 
+  private void configureIntakeCommands() {
+    oi.getIntakeAutomationSwitch().onTrue(Commands.runOnce(intake::enableAutomation, intake));
+
+    oi.getIntakeAutomationSwitch()
+        .onFalse(
+            Commands.parallel(
+                Commands.runOnce(intake::disableAutomation, intake),
+                Commands.runOnce(intake::turnIntakeOff),
+                Commands.runOnce(intake::turnKickerOff)));
+
+    oi.getRunIntakeButton()
+        .and(() -> !intake.automationEnabled())
+        .whileTrue(
+            Commands.parallel(
+                    Commands.run(intake::intakeGamePiece),
+                    Commands.run(intake::transitionGamePiece))
+                .withName("ManualIntakeOn"));
+
+    oi.getRunIntakeButton()
+        .and(() -> !intake.automationEnabled())
+        .onFalse(
+            Commands.sequence(
+                    Commands.runOnce(intake::turnIntakeOff),
+                    Commands.runOnce(intake::turnKickerOff))
+                .withName("ManualIntakeOff"));
+
+    oi.getOuttakeAllButton()
+        .and(() -> !intake.automationEnabled())
+        .whileTrue(Commands.run(intake::outtakeAll).withName("ManualOuttakeOn"));
+
+    oi.getOuttakeAllButton()
+        .and(() -> !intake.automationEnabled())
+        .onFalse(
+            Commands.sequence(
+                    Commands.runOnce(intake::turnIntakeOff),
+                    Commands.runOnce(intake::turnKickerOff))
+                .withName("ManualOuttakeOff"));
+  }
+
   private void configureDrivetrainCommands() {
     /*
      * Set up the default command for the drivetrain. The joysticks' values map to percentage of the
@@ -451,21 +579,27 @@ public class RobotContainer {
                         : Rotation2d.fromDegrees(180.0)));
 
     oi.getLockToSpeakerButton()
-        .whileTrue(
-            new TeleopSwerve(
-                drivetrain,
-                oi::getTranslateX,
-                oi::getTranslateY,
-                () -> {
-                  Transform2d translation =
-                      new Transform2d(
-                          Field2d.getInstance().getAllianceSpeakerCenter().getX()
-                              - drivetrain.getPose().getX(),
-                          Field2d.getInstance().getAllianceSpeakerCenter().getY()
-                              - drivetrain.getPose().getY(),
-                          new Rotation2d());
-                  return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
-                }));
+        .toggleOnTrue(
+            Commands.either(
+                Commands.runOnce(drivetrain::disableLockToSpeaker),
+                Commands.parallel(
+                    // FIXME: set the shooter wheel velocity
+                    Commands.runOnce(drivetrain::enableLockToSpeaker),
+                    new TeleopSwerve(
+                        drivetrain,
+                        oi::getTranslateX,
+                        oi::getTranslateY,
+                        () -> {
+                          Transform2d translation =
+                              new Transform2d(
+                                  Field2d.getInstance().getAllianceSpeakerCenter().getX()
+                                      - drivetrain.getPose().getX(),
+                                  Field2d.getInstance().getAllianceSpeakerCenter().getY()
+                                      - drivetrain.getPose().getY(),
+                                  new Rotation2d());
+                          return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
+                        })),
+                drivetrain::isLockToSpeakerEnabled));
 
     // field-relative toggle
     oi.getFieldRelativeButton()

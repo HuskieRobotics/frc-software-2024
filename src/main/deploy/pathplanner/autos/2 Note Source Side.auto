@@ -2,37 +2,19 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7543128599770712,
-      "y": 6.637696878997361
+      "x": 0.7,
+      "y": 4.37
     },
-    "rotation": -121.4295656148386
+    "rotation": 120.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "Start-1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Note 1-2"
+            "pathName": "3 Note Start"
           }
         },
         {
@@ -44,13 +26,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Note 2-Note 3"
+            "pathName": "2 Note Source Start - 7"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Note 3 - Shoot 3"
+            "pathName": "2 Note Source 7-End"
           }
         },
         {
