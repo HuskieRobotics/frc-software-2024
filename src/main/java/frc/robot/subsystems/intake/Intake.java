@@ -81,7 +81,7 @@ public class Intake extends SubsystemBase {
 
     if (TESTING) {
       io.setRollerVelocity(rollerVelocity.get());
-      io.setKickerVelocity(kickerVelocity.get());
+      io.setKickerVoltage(kickerVelocity.get());
     } else {
       if (automationEnabled) {
         this.runIntakeStateMachine();
