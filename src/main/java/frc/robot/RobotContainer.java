@@ -374,7 +374,7 @@ public class RobotContainer {
         Commands.runOnce(
             () ->
                 drivetrain.resetPose(
-                    PathPlannerPath.fromPathFile("StartPoint").getPreviewStartingHolonomicPose()),
+                    PathPlannerPath.fromPathFile("Start Point").getPreviewStartingHolonomicPose()),
             drivetrain);
     autoChooser.addOption("Start Point", startPoint);
 
@@ -404,9 +404,6 @@ public class RobotContainer {
 
     Command fourNoteSourceSideWing = new PathPlannerAuto("4 Note Source-Side Wing");
     autoChooser.addOption("4 Note Source-Side Wing", fourNoteSourceSideWing);
-
-    Command startingPoint = new PathPlannerAuto("Starting Point");
-    autoChooser.addOption("Starting Point", startingPoint);
 
     /************ Drive Velocity Tuning ************
      *
