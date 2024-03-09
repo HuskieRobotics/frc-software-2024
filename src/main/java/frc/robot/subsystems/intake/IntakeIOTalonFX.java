@@ -275,11 +275,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     kickerCurrentLimits.SupplyCurrentLimit = IntakeConstants.KICKER_CONTINUOUS_SUPPLY_CURRENT_LIMIT;
     kickerCurrentLimits.SupplyCurrentThreshold = IntakeConstants.KICKER_PEAK_SUPPLY_CURRENT_LIMIT;
     kickerCurrentLimits.SupplyTimeThreshold = IntakeConstants.KICKER_PEAK_SUPPLY_CURRENT_DURATION;
-
-    kickerCurrentLimits.StatorCurrentLimit = IntakeConstants.KICKER_CONTINUOUS_STATOR_CURRENT_LIMIT;
-
-    kickerCurrentLimits.StatorCurrentLimitEnable = false;
-    kickerCurrentLimits.SupplyCurrentLimitEnable = false;
+    kickerCurrentLimits.SupplyCurrentLimitEnable = true;
 
     kickerConfig.CurrentLimits = kickerCurrentLimits;
 

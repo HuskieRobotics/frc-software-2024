@@ -175,6 +175,7 @@ public class RobotContainer {
 
     intake = new Intake(new IntakeIOTalonFX());
     shooter = new Shooter(new ShooterIOTalonFX(), intake);
+    // FIXME: restore after tuning
     // intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
     intake.setShooterAngleReady(() -> true);
 
@@ -693,6 +694,7 @@ public class RobotContainer {
                 .onlyIf(() -> !shooter.isAutomated())
                 .withName("shooter manual down stop"));
 
+    // FIXME: is whileTrue better? Do we need an onFalse that cancels the shoot command?
     oi.getShootButton().onTrue(getShootCommand());
   }
 
