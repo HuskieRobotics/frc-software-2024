@@ -11,7 +11,7 @@ public class ShooterConstants {
   }
 
   public static final boolean DEBUGGING = false;
-  public static final boolean TESTING = true;
+  public static final boolean TESTING = false;
   public static final String SUBSYSTEM_NAME = "Shooter";
 
   public static final int TOP_SHOOTER_MOTOR_ID = 27;
@@ -36,9 +36,9 @@ public class ShooterConstants {
   public static final double BOTTOM_SHOOT_PID_PEAK_OUTPUT = 1.0;
 
   // Shooter Rotation PID Constants
-  public static final double ROTATION_KP = 75;
+  public static final double ROTATION_KP = 70;
   public static final double ROTATION_KI = 0.0;
-  public static final double ROTATION_KD = 15;
+  public static final double ROTATION_KD = 10.0;
   public static final double ROTATION_KS = 2.4475;
   public static final double ROTATION_KG = 0.25;
   public static final double ROTATION_KV = 2.4669;
