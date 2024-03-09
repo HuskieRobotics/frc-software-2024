@@ -74,11 +74,13 @@ public abstract class LEDs extends SubsystemBase {
   private static final double STROBE_FAST_DURATION = 0.1;
   private static final double STROBE_SLOW_DURATION = 0.2;
   private static final double BREATH_DURATION = 1.0;
-  private static final double RAINBOW_CYCLE_LENGTH = 25.0;
-  private static final double RAINBOW_DURATION = 0.25;
+  private static final double PULSE_DURATION = 0.5;
+  private static final double RAINBOW_CYCLE_LENGTH = 30.0;
+  private static final double RAINBOW_DURATION = .25;
   private static final double WAVE_EXPONENT = 0.4;
   private static final double WAVE_FAST_CYCLE_LENGTH = 25.0;
   private static final double WAVE_FAST_DURATION = 0.25;
+  private static final double WAVE_MEDIUM_DURATION = 0.75;
   private static final double WAVE_SLOW_CYCLE_LENGTH = 25.0;
   private static final double WAVE_SLOW_DURATION = 3.0;
   private static final double WAVE_ALLIANCE_CYCLE_LENGTH = 15.0;
@@ -172,7 +174,7 @@ public abstract class LEDs extends SubsystemBase {
 
     if (distraction) {
       // Distraction
-      strobe(Section.SHOULDER, Color.kWhite, STROBE_FAST_DURATION);
+      strobe(Section.SHOULDER, Color.kWhite, STROBE_SLOW_DURATION);
     } else if (endgameAlert) {
       // Endgame alert
       strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
@@ -187,13 +189,18 @@ public abstract class LEDs extends SubsystemBase {
       solid(Section.FULL, Color.kBlue);
     } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
       // Has game piece
-      strobe(Section.FULL, Color.kOrange, STROBE_FAST_DURATION);
+      strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
       // Waiting for game piece
-      wave(Section.FULL, Color.kBlue, Color.kWhite, WAVE_SLOW_CYCLE_LENGTH, WAVE_SLOW_DURATION);
+      wave(
+          Section.FULL,
+          Color.kBlue,
+          new Color(255, 20, 0),
+          WAVE_FAST_CYCLE_LENGTH,
+          WAVE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.MANUAL_REPEL) {
       // Manual repel
-      strobe(Section.FULL, Color.kDeepPink, STROBE_FAST_DURATION);
+      strobe(Section.FULL, Color.kDeepPink, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.INTAKE_MANUALLY_TURNED_OFF) {
       // Intake manually turned off
       solid(Section.FULL, Color.kYellow);
@@ -201,16 +208,12 @@ public abstract class LEDs extends SubsystemBase {
   }
 
   private void updateToAutoPattern() {
-    wave(
-        Section.FULL,
-        Color.kDarkOrange,
-        Color.kDarkBlue,
-        WAVE_FAST_CYCLE_LENGTH,
-        WAVE_FAST_DURATION);
-    if (autoFinished) {
-      double fullTime = LENGTH / WAVE_FAST_CYCLE_LENGTH * WAVE_FAST_DURATION;
-      solid((Timer.getFPGATimestamp() - autoFinishedTime) / fullTime, Color.kGreen);
-    }
+    orangePulse(Section.FULL, PULSE_DURATION);
+
+    // if (autoFinished) {
+    //   double fullTime = LENGTH / WAVE_FAST_CYCLE_LENGTH * WAVE_FAST_DURATION;
+    //   solid((Timer.getFPGATimestamp() - autoFinishedTime) / fullTime, Color.kGreen);
+    // }
   }
 
   private void updateToDisabledPattern() {
@@ -412,6 +415,65 @@ public abstract class LEDs extends SubsystemBase {
         double blue = (c1.blue * (1 - ratio)) + (c2.blue * ratio);
         setLEDBuffer(i, new Color(red, green, blue));
       }
+    }
+  }
+
+  private void fire(Section section, double duration) {
+    double x = (1 - ((Timer.getFPGATimestamp() % duration) / duration)) * 2.0 * Math.PI;
+    double[] heat = new double[section.end() - section.start()];
+    double xDiffPerLed = (2.0 * Math.PI) / heat.length;
+
+    for (int i = 0; i < heat.length; i++) {
+      x += xDiffPerLed;
+      heat[i] = (Math.sin(x) + 1.0) / 2.0; // Heat level between 0 and 1
+    }
+
+    for (int i = 0; i < heat.length; i++) {
+      double ratio = heat[i];
+      // Use shades of blue and orange for the fire effect
+      int red = (int) (255 * ratio);
+      int green = (int) (20 * ratio);
+      int blue = 0; // Blend blue and orange
+
+      // Simulate rising and falling effect
+      double sinValue = Math.sin(x + (i * 0.2));
+      int offset = (int) ((sinValue + 1) / 2 * 255); // Scale to 0-255
+
+      // Apply the color and intensity to the LED
+      setLEDBuffer(
+          section.start() + i,
+          new Color(
+              Math.max(0, red - offset), Math.max(0, green - offset), Math.max(0, blue - offset)));
+    }
+  }
+
+  private void orangePulse(Section section, double duration) {
+    double x = (1 - ((Timer.getFPGATimestamp() % duration) / duration)) * 2.0 * Math.PI;
+    double[] heat = new double[section.end() - section.start()];
+    double xDiffPerLed = (2.0 * Math.PI) / heat.length;
+
+    for (int i = 0; i < heat.length; i++) {
+      x += xDiffPerLed;
+      heat[i] = (Math.sin(x) + 1.0) / 2.0; // Heat level between 0 and 1
+    }
+
+    for (int i = 0; i < heat.length; i++) {
+      double ratio = heat[i];
+
+      // Orange color
+      int red = (int) (255 * ratio);
+      int green = (int) (30 * ratio);
+      int blue = 0;
+      // int blue = (int) (10 * ratio);
+
+      // Simulate rising and falling effect
+      int offset = (int) (2 * Math.sin(x + (i * 0.2)));
+
+      // Apply the color to the LED
+      setLEDBuffer(
+          section.start() + i,
+          new Color(
+              Math.max(0, red - offset), Math.max(0, green - offset), Math.max(0, blue - offset)));
     }
   }
 
