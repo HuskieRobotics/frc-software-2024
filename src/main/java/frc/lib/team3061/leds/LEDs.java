@@ -35,7 +35,6 @@ public abstract class LEDs extends SubsystemBase {
 
   // Robot state tracking
   private int loopCycleCount = 0;
-  private boolean fallen = false;
   private boolean endgameAlert = false;
   private boolean autoFinished = false;
   private double autoFinishedTime = 0.0;
@@ -146,8 +145,6 @@ public abstract class LEDs extends SubsystemBase {
         // Default pattern
         updateToDisabledPattern();
       }
-    } else if (fallen) {
-      strobe(Section.FULL, Color.kWhite, STROBE_FAST_DURATION);
     } else if (DriverStation.isAutonomous()) {
       updateToAutoPattern();
     } else { // teleop
@@ -293,10 +290,6 @@ public abstract class LEDs extends SubsystemBase {
     if (DriverStation.isEStopped()) {
       estopped = true;
     }
-  }
-
-  public void setFallen(boolean fallen) {
-    this.fallen = fallen;
   }
 
   public void setEndgameAlert(boolean endgameAlert) {
