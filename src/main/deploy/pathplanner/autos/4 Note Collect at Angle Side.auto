@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.81,
+      "y": 6.64
+    },
+    "rotation": -120.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4 Note Amp - 1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4 Note Amp - 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4 Note Amp - 3"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

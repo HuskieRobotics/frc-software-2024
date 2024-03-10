@@ -454,6 +454,9 @@ public class RobotContainer {
     Command fourNoteSourceSideWing = new PathPlannerAuto("4 Note Source-Side Wing");
     autoChooser.addOption("4 Note Source-Side Wing", fourNoteSourceSideWing);
 
+    Command fourNoteAmpSideAlignShot = new PathPlannerAuto("4 Note Collect at Angle Side");
+    autoChooser.addOption("4 Note Amp Side Align Shot With Collection", fourNoteAmpSideAlignShot);
+
     /************ 5 Notes ************
      *
      * 5 notes (initial, 3 in wing, and second center note from amp side)
