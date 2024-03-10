@@ -259,7 +259,8 @@ public class Shooter extends SubsystemBase {
         isAimedAtSpeaker
             || this.shootingPosition == ShootingPosition.AMP
             || this.shootingPosition == ShootingPosition.AUTO
-            || this.shootingPosition == ShootingPosition.PASS;
+            || this.shootingPosition == ShootingPosition.PASS
+            || DriverStation.isAutonomousEnabled();
 
     boolean topWheelAtSetpoint = isTopShootAtSetpoint();
     boolean bottomWheelAtSetpoint = isBottomShootAtSetpoint();
