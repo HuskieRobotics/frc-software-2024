@@ -24,12 +24,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "PrepAutoShot"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Start-1"
@@ -42,12 +36,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "PrepAutoShot"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Note 1-2"
@@ -57,12 +45,6 @@
           "type": "named",
           "data": {
             "name": "Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "PrepAutoShot"
           }
         },
         {
