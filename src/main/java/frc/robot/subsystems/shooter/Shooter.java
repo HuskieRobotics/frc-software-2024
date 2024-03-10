@@ -95,9 +95,6 @@ public class Shooter extends SubsystemBase {
       tab.add(SUBSYSTEM_NAME, this);
     }
 
-    coastModeButton.onTrue(Commands.runOnce(() -> io.setCoastMode(true)).ignoringDisable(true));
-    coastModeButton.onFalse(Commands.runOnce(() -> io.setCoastMode(false)).ignoringDisable(true));
-
     FaultReporter.getInstance().registerSystemCheck(SUBSYSTEM_NAME, getSystemCheckCommand());
   }
 
@@ -440,5 +437,13 @@ public class Shooter extends SubsystemBase {
 
   public void intakeDisabled() {
     this.intakeEnabled = false;
+  }
+
+  public boolean getCoastEnableOverride() {
+    return shooterInputs.coastMode;
+  }
+
+  public void setCoastModeOverride(boolean coast) {
+    io.setCoastMode(coast);
   }
 }

@@ -537,6 +537,12 @@ public class RobotContainer {
                     Commands.runOnce(shooter::intakeDisabled))
                 .withName("disable intake automation"));
 
+    Trigger coastModeButton = new Trigger(shooter::getCoastEnableOverride);
+    coastModeButton.onTrue(
+        Commands.runOnce(() -> shooter.setCoastModeOverride(true)).ignoringDisable(true));
+    coastModeButton.onFalse(
+        Commands.runOnce(() -> shooter.setCoastModeOverride(false)).ignoringDisable(true));
+
     oi.getRunIntakeButton()
         .and(() -> !intake.automationEnabled())
         .whileTrue(
