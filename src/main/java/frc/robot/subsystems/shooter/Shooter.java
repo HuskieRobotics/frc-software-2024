@@ -3,7 +3,7 @@ package frc.robot.subsystems.shooter;
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,16 +31,9 @@ public class Shooter extends SubsystemBase {
   private final TunableNumber bottomWheelVelocity =
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber pivotAngle = new TunableNumber("Shooter/Angle", 10.0);
-  private final double[] populationRealAngles = {60.2, 39.3, 46.1, 38.7, 33, 28.8, 26.8};
-  private final double[] populationRobotAngles = {53.17, 33.5, 39, 31.82, 28, 23, 20};
+  private final double[] populationRealAngles = {64, 54, 45, 40, 33, 30, 28};
   private final double[] populationDistances = {
-    Units.inchesToMeters(53.53),
-    Units.inchesToMeters(119.194),
-    Units.inchesToMeters(88.53),
-    Units.inchesToMeters(113.53),
-    Units.inchesToMeters(137.53),
-    Units.inchesToMeters(161.53),
-    Units.inchesToMeters(185.53)
+    1.3597, 1.9693, 2.5789, 3.1885, 3.7981, 4.4077, 5.0173
   };
 
   private boolean autoShooter = true;
@@ -166,7 +159,7 @@ public class Shooter extends SubsystemBase {
   private void resetToInitialState() {
     this.state = State.WAITING_FOR_NOTE;
     this.shootingPosition = ShootingPosition.FIELD;
-    this.overrideSetpointsForNextShot = false;
+    this.overrideSetpointsForNextShot = DriverStation.isAutonomousEnabled();
   }
 
   private void setIdleVelocity() {
@@ -205,6 +198,7 @@ public class Shooter extends SubsystemBase {
   }
 
   private void setRangeVelocity(double distanceToSpeaker) {
+    Logger.recordOutput("Shooter/distanceToSpeaker", distanceToSpeaker);
     double velocity;
     if (shootingPosition == ShootingPosition.PASS) {
       velocity = ShooterConstants.PASS_VELOCITY;
