@@ -100,7 +100,7 @@ public class Shooter extends SubsystemBase {
 
   private void populateAngleMap() {
     for (int i = 0; i < populationRealAngles.length; i++) {
-      angleTreeMap.put(populationDistances[i], populationRobotAngles[i]);
+      angleTreeMap.put(populationDistances[i], populationRealAngles[i]);
     }
   }
 
@@ -127,7 +127,7 @@ public class Shooter extends SubsystemBase {
       if (intake.hasNote()) {
         state = State.AIMING_AT_SPEAKER;
       }
-      io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
+      this.moveToIntakePosition();
       this.setIdleVelocity();
       leds.setShooterLEDState(ShooterLEDState.WAITING_FOR_GAME_PIECE);
     } else if (state == State.AIMING_AT_SPEAKER) {
@@ -195,6 +195,12 @@ public class Shooter extends SubsystemBase {
       } else {
         io.setAngle(angleTreeMap.get(distanceToSpeaker));
       }
+    }
+  }
+
+  private void moveToIntakePosition() {
+    if (autoShooter) {
+      io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
     }
   }
 
