@@ -464,10 +464,10 @@ public class Drivetrain extends SubsystemBase {
     Logger.processInputs(SUBSYSTEM_NAME + "/BR", this.inputs.swerve[3]);
 
     // Check for fallen robot
-    LEDs.getInstance()
-        .setFallen(
-            Math.abs(this.inputs.gyro.pitchDeg) > LEDS_FALLEN_ANGLE_DEGREES
-                || Math.abs(this.inputs.gyro.rollDeg) > LEDS_FALLEN_ANGLE_DEGREES);
+    // LEDs.getInstance()
+    //     .setFallen(
+    //         Math.abs(this.inputs.gyro.pitchDeg) > LEDS_FALLEN_ANGLE_DEGREES
+    //             || Math.abs(this.inputs.gyro.rollDeg) > LEDS_FALLEN_ANGLE_DEGREES);
 
     // update the brake mode based on the robot's velocity and state (enabled/disabled)
     updateBrakeMode();
