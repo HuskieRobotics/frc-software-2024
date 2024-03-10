@@ -128,7 +128,8 @@ public class Shooter extends SubsystemBase {
       if (intake.hasNote()) {
         state = State.AIMING_AT_SPEAKER;
       }
-
+      io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
+      this.setIdleVelocity();
       leds.setShooterLEDState(ShooterLEDState.WAITING_FOR_GAME_PIECE);
     } else if (state == State.AIMING_AT_SPEAKER) {
       if (!intake.hasNote()) {
@@ -167,10 +168,6 @@ public class Shooter extends SubsystemBase {
     this.state = State.WAITING_FOR_NOTE;
     this.shootingPosition = ShootingPosition.FIELD;
     this.overrideSetpointsForNextShot = false;
-
-    io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
-
-    setIdleVelocity();
   }
 
   private void setIdleVelocity() {
