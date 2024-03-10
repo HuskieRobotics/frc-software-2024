@@ -110,6 +110,8 @@ public class Shooter extends SubsystemBase {
     Logger.processInputs(SUBSYSTEM_NAME, shooterInputs);
     Logger.recordOutput("Shooter/State", this.state.toString());
     Logger.recordOutput("Shooter/ShootingPosition", this.shootingPosition.toString());
+    Logger.recordOutput("Shooter/AngleAutomated", this.autoShooter);
+    Logger.recordOutput("Shooter/IntakeAutomated", this.intakeEnabled);
 
     if (TESTING) {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
