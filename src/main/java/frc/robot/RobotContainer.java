@@ -401,6 +401,8 @@ public class RobotContainer {
      * shoot initial note and leave robot starting zone
      *
      */
+    Command oneNoteSourceSide = new PathPlannerAuto("1 Note Auto");
+    autoChooser.addOption("1 Note Source Side", oneNoteSourceSide);
 
     // FIXME: add commands to wait for the shooter wheel to reach the desired velocity and then
     // shoot

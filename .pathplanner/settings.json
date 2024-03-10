@@ -11,9 +11,12 @@
     "5 Note Amp Side",
     "6 Note Amp Side",
     "4 Note Collect at Angle",
+    "1 Note Source Side",
     "Tuning"
   ],
   "autoFolders": [
+    "New Folder",
+    "New New Folder",
     "Tuning"
   ],
   "defaultMaxVel": 3.88,
