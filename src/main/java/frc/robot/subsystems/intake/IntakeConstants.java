@@ -51,7 +51,7 @@ public class IntakeConstants {
   public static final double KICKER_PEAK_SUPPLY_CURRENT_LIMIT = 40.0;
   public static final double KICKER_PEAK_SUPPLY_CURRENT_DURATION = 1.0;
 
-  public static final boolean ROLLER_MOTOR_INVERTED = true;
+  public static final boolean ROLLER_MOTOR_INVERTED = false;
   public static final boolean KICKER_MOTOR_INVERTED = false;
 
   public static final double ROLLERS_SENSOR_TO_MECHANISM_RATIO = 15.0 / 12.0;
