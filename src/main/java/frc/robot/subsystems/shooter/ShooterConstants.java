@@ -73,7 +73,7 @@ public class ShooterConstants {
   public static final double MOTION_MAGIC_CRUISE_VELOCITY = 0;
   public static final double ANGLE_MOTOR_GEAR_RATIO = 45.0;
   public static final boolean ANGLE_MOTOR_INVERTED = true;
-  public static final double MAGNET_OFFSET = -0.899334111;
+  public static final double MAGNET_OFFSET = -0.811;
   public static final double SENSOR_TO_MECHANISM_RATIO = 4.0;
   public static final double ANGLE_TOLERANCE_DEGREES = 1.0;
   public static final double SHOOTER_STORAGE_ANGLE = 10.4;
