@@ -20,6 +20,12 @@
         {
           "type": "named",
           "data": {
+            "name": "PrepAutoShot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Shoot"
           }
         },

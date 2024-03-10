@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7,
-      "y": 4.37
+      "x": 0.85,
+      "y": 4.367267881455193
     },
-    "rotation": 120.0
+    "rotation": 135.7073193685443
   },
   "command": {
     "type": "sequential",
@@ -14,13 +14,7 @@
         {
           "type": "named",
           "data": {
-            "name": "PrepAutoShot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "3 Note Start"
+            "name": "PrepAutoSubwooferShot"
           }
         },
         {
@@ -30,9 +24,9 @@
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "PrepAutoShot"
+            "pathName": "3 Note Start"
           }
         },
         {
