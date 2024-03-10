@@ -135,7 +135,7 @@ public abstract class LEDs extends SubsystemBase {
 
       } else if (lowBatteryAlert) {
         // Low battery
-        solid(Section.FULL, Color.kOrangeRed);
+        solid(Section.FULL, new Color(255, 20, 0));
 
       } else if (PRIDE_LEDS) {
         // Pride stripes
@@ -162,7 +162,7 @@ public abstract class LEDs extends SubsystemBase {
     if (demoMode) {
       wave(
           Section.FULL,
-          Color.kDarkOrange,
+          new Color(255, 30, 0),
           Color.kDarkBlue,
           WAVE_SLOW_CYCLE_LENGTH,
           WAVE_MEDIUM_DURATION);
@@ -231,7 +231,7 @@ public abstract class LEDs extends SubsystemBase {
     } else {
       wave(
           Section.FULL,
-          Color.kDarkOrange,
+          new Color(255, 30, 0),
           Color.kDarkBlue,
           WAVE_SLOW_CYCLE_LENGTH,
           WAVE_SLOW_DURATION);
