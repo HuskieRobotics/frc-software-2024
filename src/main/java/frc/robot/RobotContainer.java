@@ -753,7 +753,7 @@ public class RobotContainer {
             Commands.sequence(
                 Commands.runOnce(intake::shoot, intake),
                 NoteVisualizer.shoot(),
-                Commands.runOnce(drivetrain::disableAimToSpeaker, drivetrain)))
+                Commands.runOnce(drivetrain::disableAimToSpeaker)))
         .withName("shoot");
   }
 
