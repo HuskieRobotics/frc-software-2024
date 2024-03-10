@@ -27,6 +27,8 @@ public class Shooter extends SubsystemBase {
   private InterpolatingDoubleTreeMap angleTreeMap;
   private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
 
+  private final TunableNumber angleManualControlVoltage =
+      new TunableNumber("Shooter/ManualControlVoltage", ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE);
   private final TunableNumber topWheelVelocity = new TunableNumber("Shooter/Top Wheel Velocity", 0);
   private final TunableNumber bottomWheelVelocity =
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
@@ -327,7 +329,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setAngleMotorVoltage(double voltage) {
-    io.setAngleMotorVoltage(voltage);
+    io.setAngleMotorVoltage(voltage * angleManualControlVoltage.get());
   }
 
   private Command getSystemCheckCommand() {
