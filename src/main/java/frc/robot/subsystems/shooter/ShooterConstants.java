@@ -62,8 +62,11 @@ public class ShooterConstants {
   public static final boolean SHOOT_BOTTOM_INVERTED = false;
   public static final double VELOCITY_TOLERANCE = 5.0; // FIXME: tune with real robot
   public static final double CLOSE_RANGE_VELOCITY = 60;
+  public static final double MID_RANGE_VELOCITY = 80;
   public static final double FAR_RANGE_VELOCITY = 120;
-  public static final double VELOCITY_ZONE_SWITCH_DISTANCE = Units.inchesToMeters(1006.901) / 2.0;
+  public static final double SLOW_TO_MID_VELOCITY_DISTANCE_METERS =
+      Units.inchesToMeters(106.901) / 2.0;
+  public static final double MID_TO_FAST_VELOCITY_DISTANCE_METERS = Units.inchesToMeters(106.901);
 
   // Angle Motor
   public static final double ANGLE_MOTOR_CONTINUOUS_CURRENT_LIMIT = 15;

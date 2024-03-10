@@ -211,8 +211,10 @@ public class Shooter extends SubsystemBase {
       velocity = ShooterConstants.AMP_VELOCITY;
     } else if (shootingPosition == ShootingPosition.STORAGE) {
       velocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
-    } else if (distanceToSpeaker < ShooterConstants.VELOCITY_ZONE_SWITCH_DISTANCE) {
+    } else if (distanceToSpeaker < ShooterConstants.SLOW_TO_MID_VELOCITY_DISTANCE_METERS) {
       velocity = ShooterConstants.CLOSE_RANGE_VELOCITY;
+    } else if (distanceToSpeaker < ShooterConstants.MID_TO_FAST_VELOCITY_DISTANCE_METERS) {
+      velocity = ShooterConstants.MID_RANGE_VELOCITY;
     } else {
       velocity = ShooterConstants.FAR_RANGE_VELOCITY;
     }
@@ -271,7 +273,8 @@ public class Shooter extends SubsystemBase {
     return alignedToShoot
         && topWheelAtSetpoint
         && bottomWheelAtSetpoint
-        && (!autoShooter || angleAtSetpoint);
+        && (!autoShooter || angleAtSetpoint)
+        && this.state == State.PREPARING_TO_SHOOT;
   }
 
   public boolean isTopShootAtSetpoint() {
