@@ -9,7 +9,6 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -35,6 +34,7 @@ import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.lib.team6328.util.NoteVisualizer;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
+import frc.robot.commands.TeleopSwerveAimAtSpeaker;
 import frc.robot.configs.GenericDrivetrainRobotConfig;
 import frc.robot.configs.NameRobotConfig;
 import frc.robot.configs.PracticeBoardConfig;
@@ -454,8 +454,8 @@ public class RobotContainer {
      * 5 notes (initial, 3 in wing, and second center note from amp side)
      *
      */
-    Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Amp Side");
-    autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
+    // Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Amp Side");
+    // autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
 
     /************ Drive Velocity Tuning ************
      *
@@ -595,32 +595,9 @@ public class RobotContainer {
                 .withName("lock 180"));
 
     oi.getAimSpeakerButton()
-        .onTrue(
-            Commands.either(
-                    Commands.parallel(
-                        Commands.runOnce(drivetrain::disableAimToSpeaker, drivetrain),
-                        Commands.runOnce(shooter::cancelPrepareToShoot, shooter)),
-                    Commands.parallel(
-                        Commands.runOnce(shooter::prepareToShoot, shooter),
-                        Commands.runOnce(drivetrain::enableAimToSpeaker),
-                        new TeleopSwerve(
-                                drivetrain,
-                                oi::getTranslateX,
-                                oi::getTranslateY,
-                                () -> {
-                                  Transform2d translation =
-                                      new Transform2d(
-                                          Field2d.getInstance().getAllianceSpeakerCenter().getX()
-                                              - drivetrain.getPose().getX(),
-                                          Field2d.getInstance().getAllianceSpeakerCenter().getY()
-                                              - drivetrain.getPose().getY(),
-                                          new Rotation2d());
-                                  return new Rotation2d(
-                                      Math.atan2(translation.getY(), translation.getX()));
-                                })
-                            .until(() -> !intake.hasNote())),
-                    drivetrain::isAimToSpeakerEnabled)
-                .withName("toggle aim to speaker"));
+        .toggleOnTrue(
+            new TeleopSwerveAimAtSpeaker(
+                drivetrain, shooter, intake, oi::getTranslateX, oi::getTranslateY));
 
     // field-relative toggle
     oi.getFieldRelativeButton()
@@ -760,7 +737,7 @@ public class RobotContainer {
             Commands.sequence(
                 Commands.runOnce(intake::shoot, intake),
                 NoteVisualizer.shoot(),
-                Commands.runOnce(drivetrain::disableAimToSpeaker)))
+                Commands.runOnce(drivetrain::disableAimToSpeaker, drivetrain)))
         .withName("shoot");
   }
 
