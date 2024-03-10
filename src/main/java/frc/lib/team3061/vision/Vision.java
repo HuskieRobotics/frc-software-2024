@@ -155,6 +155,7 @@ public class Vision extends SubsystemBase {
       // only update the pose estimator if the vision subsystem is enabled and vision's estimated
       // pose is within the specified tolerance of the current pose
       if (isEnabled
+          && ios[i].minAmbiguity < 0.5
           && estimatedRobotPose2d
                   .getTranslation()
                   .getDistance(odometry.getEstimatedPosition().getTranslation())
