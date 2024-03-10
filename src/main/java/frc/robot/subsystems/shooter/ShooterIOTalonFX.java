@@ -115,6 +115,9 @@ public class ShooterIOTalonFX implements ShooterIO {
   private final TunableNumber rotationMotorExpoKA =
       new TunableNumber("Shooter/ROTATION_EXPO_KA", ShooterConstants.ROTATION_EXPO_KA);
 
+  private final TunableNumber rotationEncoderMagnetOffset =
+      new TunableNumber("Shooter/ROTATION_MAGNET_OFFSET", ShooterConstants.MAGNET_OFFSET);
+
   private TalonFX shootMotorTop;
   private TalonFX shootMotorBottom;
   private TalonFX angleMotor;
@@ -333,6 +336,13 @@ public class ShooterIOTalonFX implements ShooterIO {
       angleMotor.getConfigurator().apply(rotationMotionMagicConfig);
     }
 
+    if (rotationEncoderMagnetOffset.hasChanged()) {
+      CANcoderConfiguration angleCANCoderConfig = new CANcoderConfiguration();
+      angleEncoder.getConfigurator().refresh(angleCANCoderConfig);
+      angleCANCoderConfig.MagnetSensor.MagnetOffset = rotationEncoderMagnetOffset.get();
+      angleEncoder.getConfigurator().apply(angleCANCoderConfig);
+    }
+
     shooterInputs.coastMode = !coastModeButton.get();
   }
 
@@ -422,7 +432,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     CANcoderConfiguration angleCANCoderConfig = new CANcoderConfiguration();
     angleCANCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
     angleCANCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-    angleCANCoderConfig.MagnetSensor.MagnetOffset = ShooterConstants.MAGNET_OFFSET;
+    angleCANCoderConfig.MagnetSensor.MagnetOffset = rotationEncoderMagnetOffset.get();
 
     StatusCode status = StatusCode.StatusCodeNotInitialized;
     for (int i = 0; i < 5; ++i) {
@@ -491,7 +501,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     }
 
     // FIXME: this shouldn't be neeed; need to debug the position issue
-    angleMotor.setPosition(Units.degreesToRotations(10.4 * 4.0));
+    // angleMotor.setPosition(Units.degreesToRotations(10.4 * 4.0));
 
     FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "AngleMotor", angleMotor);
     FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "AngleCANcoder", angleEncoder);
