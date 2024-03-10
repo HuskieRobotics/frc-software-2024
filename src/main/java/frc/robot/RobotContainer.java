@@ -353,10 +353,13 @@ public class RobotContainer {
     NamedCommands.registerCommand("Shoot", getShootCommand());
     NamedCommands.registerCommand(
         "PrepAutoSubwooferShot",
-        Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)));
+        Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER))
+            .withName("PrepAutoSubwooferShot"));
     // FIXME: consider making this a shoot and prep single named command
     NamedCommands.registerCommand(
-        "PrepAutoShot", Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AUTO)));
+        "PrepAutoShot",
+        Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AUTO))
+            .withName("PrepAutoShot"));
 
     // build auto path commands
 
@@ -403,8 +406,10 @@ public class RobotContainer {
     // shoot
     Command oneNoteAnywhere =
         Commands.sequence(
-            // Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AUTO)),
-            // getShootCommand(),
+            Commands.waitSeconds(1.0),
+            Commands.runOnce(() -> drivetrain.resetPoseToVision(vision::getBestRobotPose)),
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AUTO)),
+            getShootCommand(),
             Commands.run(
                     () -> {
                       drivetrain.drive(1, 0, 0, false, true);
