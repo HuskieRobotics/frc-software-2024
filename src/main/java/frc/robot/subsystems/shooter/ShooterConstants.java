@@ -61,9 +61,12 @@ public class ShooterConstants {
   public static final boolean SHOOT_TOP_INVERTED = false;
   public static final boolean SHOOT_BOTTOM_INVERTED = false;
   public static final double VELOCITY_TOLERANCE = 5.0; // FIXME: tune with real robot
-  public static final double CLOSE_RANGE_VELOCITY = 60;
-  public static final double MID_RANGE_VELOCITY = 80;
-  public static final double FAR_RANGE_VELOCITY = 120;
+  public static final double CLOSE_RANGE_VELOCITY_TOP = 60;
+  public static final double CLOSE_RANGE_VELOCITY_BOTTOM = 60;
+  public static final double MID_RANGE_VELOCITY_TOP = 80;
+  public static final double MID_RANGE_VELOCITY_BOTTOM = 80;
+  public static final double FAR_RANGE_VELOCITY_TOP = 120;
+  public static final double FAR_RANGE_VELOCITY_BOTTOM = 120;
   public static final double SLOW_TO_MID_VELOCITY_DISTANCE_METERS =
       Units.inchesToMeters(106.901) / 2.0;
   public static final double MID_TO_FAST_VELOCITY_DISTANCE_METERS = Units.inchesToMeters(106.901);
@@ -86,12 +89,16 @@ public class ShooterConstants {
   // 0.074951 rotations = 10.4 degrees
 
   // Shooter Presets
-  public static final double SUBWOOFER_VELOCITY = 60;
+  public static final double SUBWOOFER_VELOCITY_TOP = 60;
+  public static final double SUBWOOFER_VELOCITY_BOTTOM = 60;
   public static final double SUBWOOFER_ANGLE = 64;
-  public static final double PODIUM_VELOCITY = 120;
+  public static final double PODIUM_VELOCITY_TOP = 120;
+  public static final double PODIUM_VELOCITY_BOTTOM = 120;
   public static final double PODIUM_ANGLE = 40;
-  public static final double AMP_VELOCITY = 18.0;
+  public static final double AMP_VELOCITY_TOP = 18.0;
+  public static final double AMP_VELOCITY_BOTTOM = 17.0;
   public static final double AMP_ANGLE = 131.4;
-  public static final double PASS_VELOCITY = 80.0;
+  public static final double PASS_VELOCITY_TOP = 80.0;
+  public static final double PASS_VELOCITY_BOTTOM = 80.0;
   public static final double PASS_ANGLE = 12.0;
 }
