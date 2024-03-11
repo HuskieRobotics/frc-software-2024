@@ -5,9 +5,9 @@ import static frc.robot.subsystems.intake.IntakeConstants.*;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -225,20 +225,14 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   private void configureIntakeRollerMotor(TalonFX rollerMotor) {
     TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
-    CurrentLimitsConfigs rollerCurrentLimits = new CurrentLimitsConfigs();
+    TorqueCurrentConfigs rollerTorqueCurrentConfigs = new TorqueCurrentConfigs();
 
-    rollerCurrentLimits.SupplyCurrentLimit =
-        IntakeConstants.ROLLERS_CONTINUOUS_SUPPLY_CURRENT_LIMIT;
-    rollerCurrentLimits.SupplyCurrentThreshold = IntakeConstants.ROLLERS_PEAK_SUPPLY_CURRENT_LIMIT;
-    rollerCurrentLimits.SupplyTimeThreshold = IntakeConstants.ROLLERS_PEAK_SUPPLY_CURRENT_DURATION;
-
-    rollerCurrentLimits.StatorCurrentLimit =
+    rollerTorqueCurrentConfigs.PeakForwardTorqueCurrent =
         IntakeConstants.ROLLERS_CONTINUOUS_STATOR_CURRENT_LIMIT;
+    rollerTorqueCurrentConfigs.PeakReverseTorqueCurrent =
+        -IntakeConstants.ROLLERS_CONTINUOUS_STATOR_CURRENT_LIMIT;
 
-    rollerCurrentLimits.SupplyCurrentLimitEnable = true;
-    rollerCurrentLimits.StatorCurrentLimitEnable = true;
-
-    rollerConfig.CurrentLimits = rollerCurrentLimits;
+    rollerConfig.TorqueCurrent = rollerTorqueCurrentConfigs;
 
     rollerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
@@ -270,14 +264,14 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   private void configureIntakeKickerMotor(TalonFX kickerMotor) {
     TalonFXConfiguration kickerConfig = new TalonFXConfiguration();
-    CurrentLimitsConfigs kickerCurrentLimits = new CurrentLimitsConfigs();
+    TorqueCurrentConfigs kickerTorqueCurrentConfigs = new TorqueCurrentConfigs();
 
-    kickerCurrentLimits.SupplyCurrentLimit = IntakeConstants.KICKER_CONTINUOUS_SUPPLY_CURRENT_LIMIT;
-    kickerCurrentLimits.SupplyCurrentThreshold = IntakeConstants.KICKER_PEAK_SUPPLY_CURRENT_LIMIT;
-    kickerCurrentLimits.SupplyTimeThreshold = IntakeConstants.KICKER_PEAK_SUPPLY_CURRENT_DURATION;
-    kickerCurrentLimits.SupplyCurrentLimitEnable = true;
+    kickerTorqueCurrentConfigs.PeakForwardTorqueCurrent =
+        IntakeConstants.KICKER_PEAK_SUPPLY_CURRENT_LIMIT;
+    kickerTorqueCurrentConfigs.PeakReverseTorqueCurrent =
+        -IntakeConstants.KICKER_PEAK_SUPPLY_CURRENT_LIMIT;
 
-    kickerConfig.CurrentLimits = kickerCurrentLimits;
+    kickerConfig.TorqueCurrent = kickerTorqueCurrentConfigs;
 
     kickerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     kickerConfig.Slot0.kP = kickerMotorKP.get();

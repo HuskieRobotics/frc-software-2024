@@ -12,6 +12,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -373,27 +374,21 @@ public class ShooterIOTalonFX implements ShooterIO {
   private void configShootMotor(TalonFX shootMotor, boolean isInverted, boolean isTopMotor) {
 
     TalonFXConfiguration shootMotorsConfig = new TalonFXConfiguration();
-    CurrentLimitsConfigs shootMotorsCurrentLimits = new CurrentLimitsConfigs();
+    TorqueCurrentConfigs shootMotorTorqueCurrentConfigs = new TorqueCurrentConfigs();
 
     if (isTopMotor) {
-      shootMotorsCurrentLimits.SupplyCurrentLimit =
-          ShooterConstants.SHOOT_MOTOR_TOP_CONTINUOUS_CURRENT_LIMIT;
-      shootMotorsCurrentLimits.SupplyCurrentThreshold =
+      shootMotorTorqueCurrentConfigs.PeakForwardTorqueCurrent =
           ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_LIMIT;
-      shootMotorsCurrentLimits.SupplyTimeThreshold =
-          ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_DURATION;
-      shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
+      shootMotorTorqueCurrentConfigs.PeakReverseTorqueCurrent =
+          -ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_LIMIT;
     } else {
-      shootMotorsCurrentLimits.SupplyCurrentLimit =
-          ShooterConstants.SHOOT_MOTOR_BOTTOM_CONTINUOUS_CURRENT_LIMIT;
-      shootMotorsCurrentLimits.SupplyCurrentThreshold =
+      shootMotorTorqueCurrentConfigs.PeakForwardTorqueCurrent =
           ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_LIMIT;
-      shootMotorsCurrentLimits.SupplyTimeThreshold =
-          ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_DURATION;
-      shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
+      shootMotorTorqueCurrentConfigs.PeakReverseTorqueCurrent =
+          -ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_LIMIT;
     }
 
-    shootMotorsConfig.CurrentLimits = shootMotorsCurrentLimits;
+    shootMotorsConfig.TorqueCurrent = shootMotorTorqueCurrentConfigs;
 
     if (isTopMotor) {
       shootMotorsConfig.Slot0.kP = shootMotorTopKP.get();
