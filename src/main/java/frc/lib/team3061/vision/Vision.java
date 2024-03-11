@@ -155,7 +155,7 @@ public class Vision extends SubsystemBase {
       // only update the pose estimator if the vision subsystem is enabled and vision's estimated
       // pose is within the specified tolerance of the current pose
       if (isEnabled
-          && ios[i].minAmbiguity < 0.5
+          && ios[i].minAmbiguity < AMBIGUITY_THRESHOLD
           && estimatedRobotPose2d
                   .getTranslation()
                   .getDistance(odometry.getEstimatedPosition().getTranslation())
@@ -208,8 +208,11 @@ public class Vision extends SubsystemBase {
     Pose3d robotPoseFromMostRecentData = null;
     double mostRecentTimestamp = 0.0;
     for (int i = 0; i < visionIOs.length; i++) {
-      if (ios[i].estimatedCameraPoseTimestamp > mostRecentTimestamp) {
-        robotPoseFromMostRecentData = ios[i].estimatedCameraPose;
+      if (ios[i].estimatedCameraPoseTimestamp > mostRecentTimestamp
+          && ios[i].minAmbiguity < AMBIGUITY_THRESHOLD) {
+        robotPoseFromMostRecentData =
+            ios[i].estimatedCameraPose.plus(
+                RobotConfig.getInstance().getRobotToCameraTransforms()[i].inverse());
         mostRecentTimestamp = ios[i].estimatedCameraPoseTimestamp;
       }
     }
@@ -285,7 +288,8 @@ public class Vision extends SubsystemBase {
     }
 
     // Adjust standard deviations based on the ambiguity of the pose
-    estStdDevs = estStdDevs.times(stdDevFactorAmbiguity.get() * minAmbiguity / MAXIMUM_AMBIGUITY);
+    estStdDevs =
+        estStdDevs.times(stdDevFactorAmbiguity.get() * minAmbiguity / AMBIGUITY_SCALE_FACTOR);
 
     return estStdDevs;
   }
