@@ -245,8 +245,8 @@ public class Shooter extends SubsystemBase {
   }
 
   public void enableAutoShooter() {
-    // FIXME: should we reset to the WAITING_FOR_NOTE state?
     this.autoShooter = true;
+    this.state = State.WAITING_FOR_NOTE;
   }
 
   public void disableAutoShooter() {
