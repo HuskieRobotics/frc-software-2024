@@ -164,6 +164,9 @@ public class Robot extends LoggedRobot {
     PathPlannerLogging.setLogActivePathCallback(
         poses -> Logger.recordOutput("PathFollowing/activePath", poses.toArray(new Pose2d[0])));
 
+    // Always enable CTRE's signal logging
+    SignalLogger.start();
+
     // Start timers
     disabledTimer.reset();
     disabledTimer.start();
