@@ -232,7 +232,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     rollerTorqueCurrentConfigs.PeakReverseTorqueCurrent =
         -IntakeConstants.ROLLERS_CONTINUOUS_STATOR_CURRENT_LIMIT;
 
-    rollerConfig.TorqueCurrent = rollerTorqueCurrentConfigs;
+    // rollerConfig.TorqueCurrent = rollerTorqueCurrentConfigs;
 
     rollerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
