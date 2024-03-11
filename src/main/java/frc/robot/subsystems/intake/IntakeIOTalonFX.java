@@ -240,7 +240,7 @@ public class IntakeIOTalonFX implements IntakeIO {
 
     rollerConfig.CurrentLimits = rollerCurrentLimits;
 
-    rollerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    rollerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     rollerConfig.Slot0.kP = rollerMotorsKP.get();
     rollerConfig.Slot0.kI = rollerMotorsKI.get();
