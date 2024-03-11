@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.leds.LEDs.ShooterLEDState;
@@ -50,8 +49,6 @@ public class Shooter extends SubsystemBase {
   private State state = State.WAITING_FOR_NOTE;
   private ShootingPosition shootingPosition = ShootingPosition.FIELD;
   private boolean overrideSetpointsForNextShot = false;
-
-  private Trigger coastModeButton = new Trigger(() -> shooterInputs.coastMode);
 
   private static final String BUT_IS = " but is ";
 
@@ -202,28 +199,36 @@ public class Shooter extends SubsystemBase {
 
   private void setRangeVelocity(double distanceToSpeaker) {
     Logger.recordOutput("Shooter/distanceToSpeaker", distanceToSpeaker);
-    double velocity;
+    double topVelocity;
+    double bottomVelocity;
     if (shootingPosition == ShootingPosition.PASS) {
-      velocity = ShooterConstants.PASS_VELOCITY;
+      topVelocity = ShooterConstants.PASS_VELOCITY_TOP;
+      bottomVelocity = ShooterConstants.PASS_VELOCITY_BOTTOM;
     } else if (shootingPosition == ShootingPosition.PODIUM) {
-      velocity = ShooterConstants.PODIUM_VELOCITY;
+      topVelocity = ShooterConstants.PODIUM_VELOCITY_TOP;
+      bottomVelocity = ShooterConstants.PODIUM_VELOCITY_BOTTOM;
     } else if (shootingPosition == ShootingPosition.SUBWOOFER) {
-      velocity = ShooterConstants.SUBWOOFER_VELOCITY;
+      topVelocity = ShooterConstants.SUBWOOFER_VELOCITY_TOP;
+      bottomVelocity = ShooterConstants.SUBWOOFER_VELOCITY_BOTTOM;
     } else if (shootingPosition == ShootingPosition.AMP) {
-      // FIXME: add support for different top and bottom velocities
-      velocity = ShooterConstants.AMP_VELOCITY;
+      topVelocity = ShooterConstants.AMP_VELOCITY_TOP;
+      bottomVelocity = ShooterConstants.AMP_VELOCITY_BOTTOM;
     } else if (shootingPosition == ShootingPosition.STORAGE) {
-      velocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
+      topVelocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
+      bottomVelocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
     } else if (distanceToSpeaker < ShooterConstants.SLOW_TO_MID_VELOCITY_DISTANCE_METERS) {
-      velocity = ShooterConstants.CLOSE_RANGE_VELOCITY;
+      topVelocity = ShooterConstants.CLOSE_RANGE_VELOCITY_TOP;
+      bottomVelocity = ShooterConstants.CLOSE_RANGE_VELOCITY_BOTTOM;
     } else if (distanceToSpeaker < ShooterConstants.MID_TO_FAST_VELOCITY_DISTANCE_METERS) {
-      velocity = ShooterConstants.MID_RANGE_VELOCITY;
+      topVelocity = ShooterConstants.MID_RANGE_VELOCITY_TOP;
+      bottomVelocity = ShooterConstants.MID_RANGE_VELOCITY_BOTTOM;
     } else {
-      velocity = ShooterConstants.FAR_RANGE_VELOCITY;
+      topVelocity = ShooterConstants.FAR_RANGE_VELOCITY_TOP;
+      bottomVelocity = ShooterConstants.FAR_RANGE_VELOCITY_BOTTOM;
     }
 
-    io.setShooterWheelBottomVelocity(velocity);
-    io.setShooterWheelTopVelocity(velocity);
+    io.setShooterWheelTopVelocity(topVelocity);
+    io.setShooterWheelBottomVelocity(bottomVelocity);
   }
 
   public void setShootingPosition(ShootingPosition position) {
@@ -353,27 +358,32 @@ public class Shooter extends SubsystemBase {
 
   private Command getPresetCheckCommand(ShootingPosition position) {
     double angle;
-    double velocity;
+    double topVelocity;
+    double bottomVelocity;
 
     if (position == ShootingPosition.SUBWOOFER) {
       angle = SUBWOOFER_ANGLE;
-      velocity = SUBWOOFER_VELOCITY;
+      topVelocity = SUBWOOFER_VELOCITY_TOP;
+      bottomVelocity = SUBWOOFER_VELOCITY_BOTTOM;
     } else if (position == ShootingPosition.PODIUM) {
       angle = PODIUM_ANGLE;
-      velocity = PODIUM_VELOCITY;
+      topVelocity = PODIUM_VELOCITY_TOP;
+      bottomVelocity = PODIUM_VELOCITY_BOTTOM;
     } else if (position == ShootingPosition.PASS) {
       angle = PASS_ANGLE;
-      velocity = PASS_VELOCITY;
+      topVelocity = PASS_VELOCITY_TOP;
+      bottomVelocity = PASS_VELOCITY_BOTTOM;
     } else { // ShootingPosition.AMP
       angle = AMP_ANGLE;
-      velocity = AMP_VELOCITY;
+      topVelocity = AMP_VELOCITY_TOP;
+      bottomVelocity = AMP_VELOCITY_BOTTOM;
     }
 
     return Commands.sequence(
         Commands.runOnce(() -> this.setShootingPosition(position)),
         Commands.waitSeconds(2.0),
         Commands.runOnce(() -> this.checkAngle(angle)),
-        Commands.runOnce(() -> this.checkVelocity(velocity)));
+        Commands.runOnce(() -> this.checkVelocity(topVelocity, bottomVelocity)));
   }
 
   private void checkAngle(double degrees) {
@@ -398,15 +408,16 @@ public class Shooter extends SubsystemBase {
     }
   }
 
-  private void checkVelocity(double velocity) {
+  private void checkVelocity(double topVelocity, double bottomVelocity) {
     // check bottom motor
-    if (Math.abs(this.shooterInputs.shootMotorBottomVelocityRPS - velocity) > VELOCITY_TOLERANCE) {
-      if (Math.abs(this.shooterInputs.shootMotorBottomVelocityRPS) - Math.abs(velocity) < 0) {
+    if (Math.abs(this.shooterInputs.shootMotorBottomVelocityRPS - bottomVelocity)
+        > VELOCITY_TOLERANCE) {
+      if (Math.abs(this.shooterInputs.shootMotorBottomVelocityRPS) - Math.abs(bottomVelocity) < 0) {
         FaultReporter.getInstance()
             .addFault(
                 SUBSYSTEM_NAME,
                 "Bottom shooter wheel velocity is too low, should be "
-                    + velocity
+                    + bottomVelocity
                     + BUT_IS
                     + this.shooterInputs.shootMotorBottomVelocityRPS);
       } else {
@@ -414,19 +425,19 @@ public class Shooter extends SubsystemBase {
             .addFault(
                 SUBSYSTEM_NAME,
                 "Bottom shooter wheel velocity is too high, should be "
-                    + velocity
+                    + bottomVelocity
                     + BUT_IS
                     + this.shooterInputs.shootMotorBottomVelocityRPS);
       }
     }
     // check top motor
-    if (Math.abs(this.shooterInputs.shootMotorTopVelocityRPS - velocity) > VELOCITY_TOLERANCE) {
-      if (Math.abs(this.shooterInputs.shootMotorTopVelocityRPS) - Math.abs(velocity) < 0) {
+    if (Math.abs(this.shooterInputs.shootMotorTopVelocityRPS - topVelocity) > VELOCITY_TOLERANCE) {
+      if (Math.abs(this.shooterInputs.shootMotorTopVelocityRPS) - Math.abs(topVelocity) < 0) {
         FaultReporter.getInstance()
             .addFault(
                 SUBSYSTEM_NAME,
                 "Top shooter wheel velocity is too low, should be "
-                    + velocity
+                    + topVelocity
                     + BUT_IS
                     + this.shooterInputs.shootMotorTopVelocityRPS);
       } else {
@@ -434,7 +445,7 @@ public class Shooter extends SubsystemBase {
             .addFault(
                 SUBSYSTEM_NAME,
                 "Top shooter wheel velocity is too high, should be "
-                    + velocity
+                    + topVelocity
                     + BUT_IS
                     + this.shooterInputs.shootMotorTopVelocityRPS);
       }
