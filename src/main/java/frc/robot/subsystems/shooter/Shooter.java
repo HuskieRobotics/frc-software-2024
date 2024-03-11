@@ -453,6 +453,8 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setCoastModeOverride(boolean coast) {
-    io.setCoastMode(coast);
+    if (DriverStation.isDisabled()) {
+      io.setCoastMode(coast);
+    }
   }
 }

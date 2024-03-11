@@ -8,6 +8,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -507,6 +508,18 @@ public class ShooterIOTalonFX implements ShooterIO {
   @Override
   public void setCoastMode(boolean coast) {
     // FIXME: debug later
-    angleMotor.setNeutralMode(coast ? NeutralModeValue.Coast : NeutralModeValue.Brake);
+    MotorOutputConfigs angleMotorConfig = new MotorOutputConfigs();
+    angleMotor.getConfigurator().refresh(angleMotorConfig);
+    angleMotorConfig.NeutralMode = coast ? NeutralModeValue.Coast : NeutralModeValue.Brake;
+
+    StatusCode status = StatusCode.StatusCodeNotInitialized;
+    for (int i = 0; i < 5; ++i) {
+      status = angleMotor.getConfigurator().apply(angleMotorConfig);
+      if (status.isOK()) break;
+    }
+    if (!status.isOK()) {
+      configAlert.set(true);
+      configAlert.setText(status.toString());
+    }
   }
 }
