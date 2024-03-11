@@ -306,6 +306,7 @@ public class Intake extends SubsystemBase {
 
   public void enableAutomation() {
     automationEnabled = true;
+    this.intakeState = IntakeState.EMPTY;
   }
 
   public void disableAutomation() {
