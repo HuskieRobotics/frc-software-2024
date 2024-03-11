@@ -121,6 +121,7 @@ public class Shooter extends SubsystemBase {
     if (state == State.WAITING_FOR_NOTE) {
       if (intake.hasNote()) {
         state = State.AIMING_AT_SPEAKER;
+        leds.setShooterLEDState(ShooterLEDState.AIMING_AT_SPEAKER);
       }
       this.moveToIntakePosition();
       this.setIdleVelocity();

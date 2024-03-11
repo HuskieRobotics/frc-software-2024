@@ -176,10 +176,10 @@ public abstract class LEDs extends SubsystemBase {
       strobe(Section.FULL, Color.kGreen, STROBE_SLOW_DURATION);
     } else if (shooterLEDState == ShooterLEDState.AIMING_AT_SPEAKER) {
       // Aiming at speaker
-      solid(Section.FULL, Color.kGreen);
+      solid(Section.FULL, Color.kBlue);
     } else if (shooterLEDState == ShooterLEDState.IS_READY_TO_SHOOT) {
       // Ready to shoot
-      solid(Section.FULL, Color.kBlue);
+      solid(Section.FULL, Color.kGreen);
     } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
       // Has game piece
       strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
