@@ -27,15 +27,17 @@ public class Shooter extends SubsystemBase {
   private InterpolatingDoubleTreeMap angleTreeMap;
   private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
 
+  private final TunableNumber testingMode = new TunableNumber("Shooter/TestingMode", 0);
+
   private final TunableNumber angleManualControlVoltage =
       new TunableNumber("Shooter/ManualControlVoltage", ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE);
   private final TunableNumber topWheelVelocity = new TunableNumber("Shooter/Top Wheel Velocity", 0);
   private final TunableNumber bottomWheelVelocity =
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber pivotAngle = new TunableNumber("Shooter/Angle", 10.0);
-  private final double[] populationRealAngles = {64, 54, 45, 40, 33, 30, 28};
+  private final double[] populationRealAngles = {64, 54, 44, 40, 37.5, 35, 33, 30, 28};
   private final double[] populationDistances = {
-    1.3597, 1.9693, 2.5789, 3.1885, 3.7981, 4.4077, 5.0173
+    1.3597, 1.9693, 2.36, 2.72, 3.05, 3.37, 3.7, 4.4077, 5.0173
   };
 
   private boolean autoShooter = true;
@@ -85,7 +87,7 @@ public class Shooter extends SubsystemBase {
 
     this.resetToInitialState();
 
-    if (TESTING) {
+    if (testingMode.get() == 1) {
       ShuffleboardTab tab = Shuffleboard.getTab(SUBSYSTEM_NAME);
       tab.add(SUBSYSTEM_NAME, this);
     }
@@ -108,7 +110,7 @@ public class Shooter extends SubsystemBase {
     Logger.recordOutput("Shooter/AngleAutomated", this.autoShooter);
     Logger.recordOutput("Shooter/IntakeAutomated", this.intakeEnabled);
 
-    if (TESTING) {
+    if (testingMode.get() == 1) {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
       io.setAngle(pivotAngle.get());
