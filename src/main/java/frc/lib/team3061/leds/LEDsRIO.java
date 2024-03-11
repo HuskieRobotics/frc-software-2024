@@ -89,6 +89,8 @@ public class LEDsRIO extends LEDs {
 
     // Convert final values to correct range
 
-    return new int[] {hue / 2, (int) Math.round(saturation * 255 / 2), (int) Math.round(cMax * 255)};
+    return new int[] {
+      hue / 2, (int) Math.round(saturation * 255 / 2), (int) Math.round(cMax * 255)
+    };
   }
 }
