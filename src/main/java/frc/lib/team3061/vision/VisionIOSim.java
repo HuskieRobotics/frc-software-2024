@@ -94,7 +94,7 @@ public class VisionIOSim implements VisionIO {
             this.tagsSeen[estimate.targetsUsed.get(i).getFiducialId()] = true;
           }
           inputs.tagsSeen = this.tagsSeen;
-          inputs.lastCameraTimestamp = estimate.timestampSeconds;
+          inputs.lastCameraTimestamp = camera.getLatestResult().getTimestampSeconds();
           inputs.poseFromMultiTag = estimate.strategy == PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
 
           inputs.ambiguity = 0;
