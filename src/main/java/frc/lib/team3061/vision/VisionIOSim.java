@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import java.util.Optional;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -13,7 +14,6 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 /**
  * PhotonVision-compatible simulated implementation of the VisionIO interface. Only a single
@@ -80,37 +80,36 @@ public class VisionIOSim implements VisionIO {
     this.visionSim.update(poseSupplier.get());
 
     Optional<EstimatedRobotPose> visionEstimate = this.photonEstimator.update();
-    double latestTimestamp = camera.getLatestResult().getTimestampSeconds();
 
     this.cyclesWithNoResults += 1;
 
-    boolean newResult = Math.abs(latestTimestamp - this.lastTimestamp) > 1e-5;
-    if (newResult) {
-      double minAmbiguity = 10.0;
-      // getMultiTagResult()
-      for (PhotonTrackedTarget target : camera.getLatestResult().getTargets()) {
-        if (target.getPoseAmbiguity() < minAmbiguity) {
-          minAmbiguity = target.getPoseAmbiguity();
-        }
-      }
-      inputs.minAmbiguity = minAmbiguity;
+    visionEstimate.ifPresent(
+        estimate -> {
+          inputs.estimatedCameraPose = estimate.estimatedPose;
+          inputs.estimatedCameraPoseTimestamp = estimate.timestampSeconds;
+          for (int i = 0; i < this.tagsSeen.length; i++) {
+            this.tagsSeen[i] = false;
+          }
+          for (int i = 0; i < estimate.targetsUsed.size(); i++) {
+            this.tagsSeen[estimate.targetsUsed.get(i).getFiducialId()] = true;
+          }
+          inputs.tagsSeen = this.tagsSeen;
+          inputs.lastCameraTimestamp = estimate.timestampSeconds;
+          inputs.poseFromMultiTag = estimate.strategy == PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
 
-      visionEstimate.ifPresent(
-          estimate -> {
-            inputs.estimatedCameraPose = estimate.estimatedPose;
-            inputs.estimatedCameraPoseTimestamp = estimate.timestampSeconds;
-            for (int i = 0; i < this.tagsSeen.length; i++) {
-              this.tagsSeen[i] = false;
-            }
-            for (int i = 0; i < estimate.targetsUsed.size(); i++) {
-              this.tagsSeen[estimate.targetsUsed.get(i).getFiducialId()] = true;
-            }
-            inputs.tagsSeen = this.tagsSeen;
-            inputs.lastCameraTimestamp = latestTimestamp;
-            this.lastTimestamp = latestTimestamp;
-            this.cyclesWithNoResults = 0;
-          });
-    }
+          inputs.ambiguity = 0;
+          for (int i = 0; i < estimate.targetsUsed.size(); i++) {
+            inputs.ambiguity += estimate.targetsUsed.get(i).getPoseAmbiguity();
+          }
+          inputs.ambiguity /= estimate.targetsUsed.size();
+
+          // the following may be needed instead
+          Logger.recordOutput(
+              "VisionTest/multiAmbiguity",
+              camera.getLatestResult().getMultiTagResult().estimatedPose.ambiguity);
+
+          this.cyclesWithNoResults = 0;
+        });
 
     // if no tags have been seen for the specified number of cycles, clear the array
     if (this.cyclesWithNoResults == EXPIRATION_COUNT) {
