@@ -16,7 +16,7 @@ public class LEDsRIO extends LEDs {
     buffer = new AddressableLEDBuffer(ACTUAL_LENGTH);
     // leds.setBitTiming(500, 200, 1200, 1300);
     isGRB = true;
-    competitionBrightness = false;
+    competitionBrightness = true;
 
     leds.setLength(ACTUAL_LENGTH);
     leds.setData(buffer);

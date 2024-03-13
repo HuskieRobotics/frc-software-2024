@@ -96,7 +96,7 @@ public class Drivetrain extends SubsystemBase {
   private ChassisSpeeds prevSpeeds = new ChassisSpeeds();
   private double[] prevSteerVelocitiesRevPerMin = new double[4];
 
-  private DriverStation.Alliance alliance = DriverStation.Alliance.Blue;
+  private DriverStation.Alliance alliance = DriverStation.Alliance.Red;
 
   /**
    * Creates a new Drivetrain subsystem.

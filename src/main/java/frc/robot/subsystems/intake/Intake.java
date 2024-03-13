@@ -170,7 +170,7 @@ public class Intake extends SubsystemBase {
   }
 
   private void runShootingState() {
-    if (!inputs.isShooterIRBlocked) {
+    if (!inputs.isShooterIRBlocked && !inputs.isKickerIRBlocked) {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
@@ -306,6 +306,7 @@ public class Intake extends SubsystemBase {
 
   public void enableAutomation() {
     automationEnabled = true;
+    this.intakeState = IntakeState.EMPTY;
   }
 
   public void disableAutomation() {

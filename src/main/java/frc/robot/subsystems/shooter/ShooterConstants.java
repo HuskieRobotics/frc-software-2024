@@ -95,9 +95,9 @@ public class ShooterConstants {
   public static final double PODIUM_VELOCITY_TOP = 120;
   public static final double PODIUM_VELOCITY_BOTTOM = 120;
   public static final double PODIUM_ANGLE = 40;
-  public static final double AMP_VELOCITY_TOP = 18.0;
-  public static final double AMP_VELOCITY_BOTTOM = 17.0;
-  public static final double AMP_ANGLE = 131.4;
+  public static final double AMP_VELOCITY_TOP = 20.0;
+  public static final double AMP_VELOCITY_BOTTOM = 10.0;
+  public static final double AMP_ANGLE = 129;
   public static final double PASS_VELOCITY_TOP = 80.0;
   public static final double PASS_VELOCITY_BOTTOM = 80.0;
   public static final double PASS_ANGLE = 12.0;
