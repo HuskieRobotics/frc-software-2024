@@ -44,7 +44,7 @@ public class NameRobotConfig extends RobotConfig {
   /* Angle Motor PID Values */
   private static final double ANGLE_KP = 100.0;
   private static final double ANGLE_KI = 0.0;
-  private static final double ANGLE_KD = 3.9628;
+  private static final double ANGLE_KD = 0.39628; // was 3.9628;
 
   private static final double ANGLE_KS = 0.24719;
   private static final double ANGLE_KV = 2.5845; // rps
