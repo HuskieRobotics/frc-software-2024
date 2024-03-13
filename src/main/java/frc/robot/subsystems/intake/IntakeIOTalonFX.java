@@ -232,6 +232,8 @@ public class IntakeIOTalonFX implements IntakeIO {
     rollerTorqueCurrentConfigs.PeakReverseTorqueCurrent =
         -IntakeConstants.ROLLERS_CONTINUOUS_STATOR_CURRENT_LIMIT;
 
+    // FIXME: need to limit intake current but not so much that we can't intake a note; perhaps
+    // switch to voltage control where we can use more sophisticated current limiting?
     // rollerConfig.TorqueCurrent = rollerTorqueCurrentConfigs;
 
     rollerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;

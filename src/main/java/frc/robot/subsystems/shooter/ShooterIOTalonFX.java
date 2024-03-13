@@ -502,7 +502,6 @@ public class ShooterIOTalonFX implements ShooterIO {
 
   @Override
   public void setCoastMode(boolean coast) {
-    // FIXME: debug later
     MotorOutputConfigs angleMotorConfig = new MotorOutputConfigs();
     angleMotor.getConfigurator().refresh(angleMotorConfig);
     angleMotorConfig.NeutralMode = coast ? NeutralModeValue.Coast : NeutralModeValue.Brake;
