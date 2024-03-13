@@ -31,6 +31,7 @@ import frc.lib.team3061.vision.Vision;
 import frc.lib.team3061.vision.VisionConstants;
 import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
+import frc.lib.team3061.vision.VisionIOSim;
 import frc.lib.team6328.util.NoteVisualizer;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
@@ -252,7 +253,22 @@ public class RobotContainer {
     shooter = new Shooter(new ShooterIOTalonFX(), intake);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
-    vision = new Vision(new VisionIO[] {new VisionIO() {}});
+    // vision = new Vision(new VisionIO[] {new VisionIO() {}});
+
+    AprilTagFieldLayout layout;
+    try {
+      layout = new AprilTagFieldLayout(VisionConstants.APRILTAG_FIELD_LAYOUT_PATH);
+    } catch (IOException e) {
+      layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
+    }
+    vision =
+        new Vision(
+            new VisionIO[] {
+              new VisionIOSim(
+                  layout,
+                  drivetrain::getPose,
+                  RobotConfig.getInstance().getRobotToCameraTransforms()[0])
+            });
   }
 
   private void createPracticeBoardSubsystem() {

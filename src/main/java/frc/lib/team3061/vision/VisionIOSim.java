@@ -13,6 +13,7 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 /**
  * PhotonVision-compatible simulated implementation of the VisionIO interface. Only a single
@@ -48,7 +49,7 @@ public class VisionIOSim implements VisionIO {
       AprilTagFieldLayout layout, Supplier<Pose2d> poseSupplier, Transform3d robotToCamera) {
     this.photonEstimator =
         new PhotonPoseEstimator(
-            layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, robotToCamera);
+            layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, new Transform3d());
     this.poseSupplier = poseSupplier;
 
     this.visionSim = new VisionSystemSim(CAMERA_NAME);
@@ -62,7 +63,7 @@ public class VisionIOSim implements VisionIO {
 
     this.cameraSim = new PhotonCameraSim(camera, cameraProp);
 
-    visionSim.addCamera(cameraSim, robotToCamera);
+    visionSim.addCamera(cameraSim, new Transform3d());
     cameraSim.enableDrawWireframe(true);
 
     // the index of the array corresponds to the tag ID; so, add one since there is no tag ID 0
@@ -85,6 +86,15 @@ public class VisionIOSim implements VisionIO {
 
     boolean newResult = Math.abs(latestTimestamp - this.lastTimestamp) > 1e-5;
     if (newResult) {
+      double minAmbiguity = 10.0;
+      // getMultiTagResult()
+      for (PhotonTrackedTarget target : camera.getLatestResult().getTargets()) {
+        if (target.getPoseAmbiguity() < minAmbiguity) {
+          minAmbiguity = target.getPoseAmbiguity();
+        }
+      }
+      inputs.minAmbiguity = minAmbiguity;
+
       visionEstimate.ifPresent(
           estimate -> {
             inputs.estimatedCameraPose = estimate.estimatedPose;

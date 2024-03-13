@@ -58,6 +58,7 @@ public class VisionIOPhotonVision implements VisionIO {
     boolean newResult = Math.abs(latestTimestamp - this.lastTimestamp) > 1e-5;
     if (newResult) {
       double minAmbiguity = 10.0;
+      // getMultiTagResult()
       for (PhotonTrackedTarget target : camera.getLatestResult().getTargets()) {
         if (target.getPoseAmbiguity() < minAmbiguity) {
           minAmbiguity = target.getPoseAmbiguity();
