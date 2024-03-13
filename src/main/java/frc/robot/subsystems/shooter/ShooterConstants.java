@@ -81,6 +81,7 @@ public class ShooterConstants {
   public static final boolean ANGLE_MOTOR_INVERTED = true;
   public static final double MAGNET_OFFSET = -0.805;
   public static final double SENSOR_TO_MECHANISM_RATIO = 4.0;
+  // FIXME: tune on practice field and reduce this value
   public static final double ANGLE_TOLERANCE_DEGREES = 5.0;
   public static final double SHOOTER_STORAGE_ANGLE = 10.4;
   public static final double ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE = 1.0;
