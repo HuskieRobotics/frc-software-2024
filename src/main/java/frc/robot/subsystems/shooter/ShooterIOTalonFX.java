@@ -8,9 +8,11 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -114,6 +116,9 @@ public class ShooterIOTalonFX implements ShooterIO {
       new TunableNumber("Shooter/ROTATION_EXPO_KV", ShooterConstants.ROTATION_EXPO_KV);
   private final TunableNumber rotationMotorExpoKA =
       new TunableNumber("Shooter/ROTATION_EXPO_KA", ShooterConstants.ROTATION_EXPO_KA);
+
+  private final TunableNumber rotationEncoderMagnetOffset =
+      new TunableNumber("Shooter/ROTATION_MAGNET_OFFSET", ShooterConstants.MAGNET_OFFSET);
 
   private TalonFX shootMotorTop;
   private TalonFX shootMotorBottom;
@@ -333,6 +338,13 @@ public class ShooterIOTalonFX implements ShooterIO {
       angleMotor.getConfigurator().apply(rotationMotionMagicConfig);
     }
 
+    if (rotationEncoderMagnetOffset.hasChanged()) {
+      CANcoderConfiguration angleCANCoderConfig = new CANcoderConfiguration();
+      angleEncoder.getConfigurator().refresh(angleCANCoderConfig);
+      angleCANCoderConfig.MagnetSensor.MagnetOffset = rotationEncoderMagnetOffset.get();
+      angleEncoder.getConfigurator().apply(angleCANCoderConfig);
+    }
+
     shooterInputs.coastMode = !coastModeButton.get();
   }
 
@@ -362,27 +374,21 @@ public class ShooterIOTalonFX implements ShooterIO {
   private void configShootMotor(TalonFX shootMotor, boolean isInverted, boolean isTopMotor) {
 
     TalonFXConfiguration shootMotorsConfig = new TalonFXConfiguration();
-    CurrentLimitsConfigs shootMotorsCurrentLimits = new CurrentLimitsConfigs();
+    TorqueCurrentConfigs shootMotorTorqueCurrentConfigs = new TorqueCurrentConfigs();
 
     if (isTopMotor) {
-      shootMotorsCurrentLimits.SupplyCurrentLimit =
-          ShooterConstants.SHOOT_MOTOR_TOP_CONTINUOUS_CURRENT_LIMIT;
-      shootMotorsCurrentLimits.SupplyCurrentThreshold =
+      shootMotorTorqueCurrentConfigs.PeakForwardTorqueCurrent =
           ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_LIMIT;
-      shootMotorsCurrentLimits.SupplyTimeThreshold =
-          ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_DURATION;
-      shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
+      shootMotorTorqueCurrentConfigs.PeakReverseTorqueCurrent =
+          -ShooterConstants.SHOOT_MOTOR_TOP_PEAK_CURRENT_LIMIT;
     } else {
-      shootMotorsCurrentLimits.SupplyCurrentLimit =
-          ShooterConstants.SHOOT_MOTOR_BOTTOM_CONTINUOUS_CURRENT_LIMIT;
-      shootMotorsCurrentLimits.SupplyCurrentThreshold =
+      shootMotorTorqueCurrentConfigs.PeakForwardTorqueCurrent =
           ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_LIMIT;
-      shootMotorsCurrentLimits.SupplyTimeThreshold =
-          ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_DURATION;
-      shootMotorsCurrentLimits.SupplyCurrentLimitEnable = true;
+      shootMotorTorqueCurrentConfigs.PeakReverseTorqueCurrent =
+          -ShooterConstants.SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_LIMIT;
     }
 
-    shootMotorsConfig.CurrentLimits = shootMotorsCurrentLimits;
+    shootMotorsConfig.TorqueCurrent = shootMotorTorqueCurrentConfigs;
 
     if (isTopMotor) {
       shootMotorsConfig.Slot0.kP = shootMotorTopKP.get();
@@ -422,7 +428,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     CANcoderConfiguration angleCANCoderConfig = new CANcoderConfiguration();
     angleCANCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
     angleCANCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-    angleCANCoderConfig.MagnetSensor.MagnetOffset = ShooterConstants.MAGNET_OFFSET;
+    angleCANCoderConfig.MagnetSensor.MagnetOffset = rotationEncoderMagnetOffset.get();
 
     StatusCode status = StatusCode.StatusCodeNotInitialized;
     for (int i = 0; i < 5; ++i) {
@@ -490,16 +496,24 @@ public class ShooterIOTalonFX implements ShooterIO {
       configAlert.setText(status.toString());
     }
 
-    // FIXME: this shouldn't be neeed; need to debug the position issue
-    angleMotor.setPosition(Units.degreesToRotations(10.4 * 4.0));
-
     FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "AngleMotor", angleMotor);
     FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "AngleCANcoder", angleEncoder);
   }
 
   @Override
   public void setCoastMode(boolean coast) {
-    // FIXME: debug later
-    // angleMotor.setNeutralMode(coast ? NeutralModeValue.Coast : NeutralModeValue.Brake);
+    MotorOutputConfigs angleMotorConfig = new MotorOutputConfigs();
+    angleMotor.getConfigurator().refresh(angleMotorConfig);
+    angleMotorConfig.NeutralMode = coast ? NeutralModeValue.Coast : NeutralModeValue.Brake;
+
+    StatusCode status = StatusCode.StatusCodeNotInitialized;
+    for (int i = 0; i < 5; ++i) {
+      status = angleMotor.getConfigurator().apply(angleMotorConfig);
+      if (status.isOK()) break;
+    }
+    if (!status.isOK()) {
+      configAlert.set(true);
+      configAlert.setText(status.toString());
+    }
   }
 }

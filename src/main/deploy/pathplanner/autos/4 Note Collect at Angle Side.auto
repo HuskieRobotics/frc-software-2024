@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.32,
-      "y": 6.26
+      "x": 0.81,
+      "y": 6.64
     },
-    "rotation": -160.0
+    "rotation": -120.0
   },
   "command": {
     "type": "sequential",
@@ -14,19 +14,7 @@
         {
           "type": "named",
           "data": {
-            "name": "PrepAutoShot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "5 Note Amp Side 1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "5 Note Amp Side 2"
+            "name": "PrepAutoSubwooferShot"
           }
         },
         {
@@ -36,15 +24,9 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "PrepAutoShot"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "5 Note Amp Side 3"
+            "pathName": "4 Note Amp - 1"
           }
         },
         {
@@ -54,15 +36,9 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "PrepAutoShot"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "5 Note Amp Side 4"
+            "pathName": "4 Note Amp - 2"
           }
         },
         {
@@ -72,21 +48,9 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "PrepAutoShot"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "5 Note Amp Side 5"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "5 Note Amp Side 6"
+            "pathName": "4 Note Amp - 3"
           }
         },
         {

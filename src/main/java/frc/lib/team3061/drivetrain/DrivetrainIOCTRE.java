@@ -6,6 +6,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
@@ -235,15 +236,24 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
     // configure current limits
     for (SwerveModule swerveModule : this.Modules) {
-      CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
-      swerveModule.getDriveMotor().getConfigurator().refresh(currentLimits);
-      currentLimits.SupplyCurrentLimit = SwerveConstants.DRIVE_CONTINUOUS_CURRENT_LIMIT;
-      currentLimits.SupplyCurrentThreshold = SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
-      currentLimits.SupplyTimeThreshold = SwerveConstants.DRIVE_PEAK_CURRENT_DURATION;
-      currentLimits.SupplyCurrentLimitEnable = SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
-      swerveModule.getDriveMotor().getConfigurator().apply(currentLimits);
 
-      currentLimits = new CurrentLimitsConfigs();
+      if (getDriveClosedLoopOutputType() == ClosedLoopOutputType.TorqueCurrentFOC) {
+        TorqueCurrentConfigs torqueCurrentConfigs = new TorqueCurrentConfigs();
+        swerveModule.getDriveMotor().getConfigurator().refresh(torqueCurrentConfigs);
+        torqueCurrentConfigs.PeakForwardTorqueCurrent = SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
+        torqueCurrentConfigs.PeakReverseTorqueCurrent = -SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
+        swerveModule.getDriveMotor().getConfigurator().apply(torqueCurrentConfigs);
+      } else {
+        CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
+        swerveModule.getDriveMotor().getConfigurator().refresh(currentLimits);
+        currentLimits.SupplyCurrentLimit = SwerveConstants.DRIVE_CONTINUOUS_CURRENT_LIMIT;
+        currentLimits.SupplyCurrentThreshold = SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
+        currentLimits.SupplyTimeThreshold = SwerveConstants.DRIVE_PEAK_CURRENT_DURATION;
+        currentLimits.SupplyCurrentLimitEnable = SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+        swerveModule.getDriveMotor().getConfigurator().apply(currentLimits);
+      }
+
+      CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
       swerveModule.getSteerMotor().getConfigurator().refresh(currentLimits);
       currentLimits.SupplyCurrentLimit = SwerveConstants.ANGLE_CONTINUOUS_CURRENT_LIMIT;
       currentLimits.SupplyCurrentThreshold = SwerveConstants.ANGLE_PEAK_CURRENT_LIMIT;

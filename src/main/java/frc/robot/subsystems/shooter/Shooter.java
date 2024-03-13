@@ -3,13 +3,12 @@ package frc.robot.subsystems.shooter;
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.leds.LEDs.ShooterLEDState;
@@ -27,20 +26,17 @@ public class Shooter extends SubsystemBase {
   private InterpolatingDoubleTreeMap angleTreeMap;
   private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
 
+  private final TunableNumber testingMode = new TunableNumber("Shooter/TestingMode", 0);
+
+  private final TunableNumber angleManualControlVoltage =
+      new TunableNumber("Shooter/ManualControlVoltage", ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE);
   private final TunableNumber topWheelVelocity = new TunableNumber("Shooter/Top Wheel Velocity", 0);
   private final TunableNumber bottomWheelVelocity =
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber pivotAngle = new TunableNumber("Shooter/Angle", 10.0);
-  private final double[] populationRealAngles = {60.2, 39.3, 46.1, 38.7, 33, 28.8, 26.8};
-  private final double[] populationRobotAngles = {53.17, 33.5, 39, 31.82, 28, 23, 20};
+  private final double[] populationRealAngles = {64, 54, 44, 40, 37.5, 35, 33, 30, 28};
   private final double[] populationDistances = {
-    Units.inchesToMeters(53.53),
-    Units.inchesToMeters(119.194),
-    Units.inchesToMeters(88.53),
-    Units.inchesToMeters(113.53),
-    Units.inchesToMeters(137.53),
-    Units.inchesToMeters(161.53),
-    Units.inchesToMeters(185.53)
+    1.3597, 1.9693, 2.36, 2.72, 3.05, 3.37, 3.7, 4.4077, 5.0173
   };
 
   private boolean autoShooter = true;
@@ -55,8 +51,6 @@ public class Shooter extends SubsystemBase {
   private State state = State.WAITING_FOR_NOTE;
   private ShootingPosition shootingPosition = ShootingPosition.FIELD;
   private boolean overrideSetpointsForNextShot = false;
-
-  private Trigger coastModeButton = new Trigger(() -> shooterInputs.coastMode);
 
   private static final String BUT_IS = " but is ";
 
@@ -90,20 +84,17 @@ public class Shooter extends SubsystemBase {
 
     this.resetToInitialState();
 
-    if (TESTING) {
+    if (testingMode.get() == 1) {
       ShuffleboardTab tab = Shuffleboard.getTab(SUBSYSTEM_NAME);
       tab.add(SUBSYSTEM_NAME, this);
     }
-
-    coastModeButton.onTrue(Commands.runOnce(() -> io.setCoastMode(true)).ignoringDisable(true));
-    coastModeButton.onFalse(Commands.runOnce(() -> io.setCoastMode(false)).ignoringDisable(true));
 
     FaultReporter.getInstance().registerSystemCheck(SUBSYSTEM_NAME, getSystemCheckCommand());
   }
 
   private void populateAngleMap() {
     for (int i = 0; i < populationRealAngles.length; i++) {
-      angleTreeMap.put(populationDistances[i], populationRobotAngles[i]);
+      angleTreeMap.put(populationDistances[i], populationRealAngles[i]);
     }
   }
 
@@ -113,8 +104,10 @@ public class Shooter extends SubsystemBase {
     Logger.processInputs(SUBSYSTEM_NAME, shooterInputs);
     Logger.recordOutput("Shooter/State", this.state.toString());
     Logger.recordOutput("Shooter/ShootingPosition", this.shootingPosition.toString());
+    Logger.recordOutput("Shooter/AngleAutomated", this.autoShooter);
+    Logger.recordOutput("Shooter/IntakeAutomated", this.intakeEnabled);
 
-    if (TESTING) {
+    if (testingMode.get() == 1) {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
       io.setAngle(pivotAngle.get());
@@ -127,8 +120,10 @@ public class Shooter extends SubsystemBase {
     if (state == State.WAITING_FOR_NOTE) {
       if (intake.hasNote()) {
         state = State.AIMING_AT_SPEAKER;
+        leds.setShooterLEDState(ShooterLEDState.AIMING_AT_SPEAKER);
       }
-
+      this.moveToIntakePosition();
+      this.setIdleVelocity();
       leds.setShooterLEDState(ShooterLEDState.WAITING_FOR_GAME_PIECE);
     } else if (state == State.AIMING_AT_SPEAKER) {
       if (!intake.hasNote()) {
@@ -166,9 +161,7 @@ public class Shooter extends SubsystemBase {
   private void resetToInitialState() {
     this.state = State.WAITING_FOR_NOTE;
     this.shootingPosition = ShootingPosition.FIELD;
-    this.overrideSetpointsForNextShot = false;
-
-    setIdleVelocity();
+    this.overrideSetpointsForNextShot = DriverStation.isAutonomousEnabled();
   }
 
   private void setIdleVelocity() {
@@ -200,27 +193,44 @@ public class Shooter extends SubsystemBase {
     }
   }
 
+  private void moveToIntakePosition() {
+    if (autoShooter) {
+      io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
+    }
+  }
+
   private void setRangeVelocity(double distanceToSpeaker) {
-    double velocity;
+    Logger.recordOutput("Shooter/distanceToSpeaker", distanceToSpeaker);
+    double topVelocity;
+    double bottomVelocity;
     if (shootingPosition == ShootingPosition.PASS) {
-      velocity = ShooterConstants.PASS_VELOCITY;
+      topVelocity = ShooterConstants.PASS_VELOCITY_TOP;
+      bottomVelocity = ShooterConstants.PASS_VELOCITY_BOTTOM;
     } else if (shootingPosition == ShootingPosition.PODIUM) {
-      velocity = ShooterConstants.PODIUM_VELOCITY;
+      topVelocity = ShooterConstants.PODIUM_VELOCITY_TOP;
+      bottomVelocity = ShooterConstants.PODIUM_VELOCITY_BOTTOM;
     } else if (shootingPosition == ShootingPosition.SUBWOOFER) {
-      velocity = ShooterConstants.SUBWOOFER_VELOCITY;
+      topVelocity = ShooterConstants.SUBWOOFER_VELOCITY_TOP;
+      bottomVelocity = ShooterConstants.SUBWOOFER_VELOCITY_BOTTOM;
     } else if (shootingPosition == ShootingPosition.AMP) {
-      // FIXME: add support for different top and bottom velocities
-      velocity = ShooterConstants.AMP_VELOCITY;
+      topVelocity = ShooterConstants.AMP_VELOCITY_TOP;
+      bottomVelocity = ShooterConstants.AMP_VELOCITY_BOTTOM;
     } else if (shootingPosition == ShootingPosition.STORAGE) {
-      velocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
-    } else if (distanceToSpeaker < ShooterConstants.VELOCITY_ZONE_SWITCH_DISTANCE) {
-      velocity = ShooterConstants.CLOSE_RANGE_VELOCITY;
+      topVelocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
+      bottomVelocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
+    } else if (distanceToSpeaker < ShooterConstants.SLOW_TO_MID_VELOCITY_DISTANCE_METERS) {
+      topVelocity = ShooterConstants.CLOSE_RANGE_VELOCITY_TOP;
+      bottomVelocity = ShooterConstants.CLOSE_RANGE_VELOCITY_BOTTOM;
+    } else if (distanceToSpeaker < ShooterConstants.MID_TO_FAST_VELOCITY_DISTANCE_METERS) {
+      topVelocity = ShooterConstants.MID_RANGE_VELOCITY_TOP;
+      bottomVelocity = ShooterConstants.MID_RANGE_VELOCITY_BOTTOM;
     } else {
-      velocity = ShooterConstants.FAR_RANGE_VELOCITY;
+      topVelocity = ShooterConstants.FAR_RANGE_VELOCITY_TOP;
+      bottomVelocity = ShooterConstants.FAR_RANGE_VELOCITY_BOTTOM;
     }
 
-    io.setShooterWheelBottomVelocity(velocity);
-    io.setShooterWheelTopVelocity(velocity);
+    io.setShooterWheelTopVelocity(topVelocity);
+    io.setShooterWheelBottomVelocity(bottomVelocity);
   }
 
   public void setShootingPosition(ShootingPosition position) {
@@ -244,6 +254,7 @@ public class Shooter extends SubsystemBase {
 
   public void enableAutoShooter() {
     this.autoShooter = true;
+    this.state = State.WAITING_FOR_NOTE;
   }
 
   public void disableAutoShooter() {
@@ -259,7 +270,8 @@ public class Shooter extends SubsystemBase {
         isAimedAtSpeaker
             || this.shootingPosition == ShootingPosition.AMP
             || this.shootingPosition == ShootingPosition.AUTO
-            || this.shootingPosition == ShootingPosition.PASS;
+            || this.shootingPosition == ShootingPosition.PASS
+            || DriverStation.isAutonomousEnabled();
 
     boolean topWheelAtSetpoint = isTopShootAtSetpoint();
     boolean bottomWheelAtSetpoint = isBottomShootAtSetpoint();
@@ -273,7 +285,8 @@ public class Shooter extends SubsystemBase {
     return alignedToShoot
         && topWheelAtSetpoint
         && bottomWheelAtSetpoint
-        && (!autoShooter || angleAtSetpoint);
+        && (!autoShooter || angleAtSetpoint)
+        && this.state == State.PREPARING_TO_SHOOT;
   }
 
   public boolean isTopShootAtSetpoint() {
@@ -325,7 +338,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setAngleMotorVoltage(double voltage) {
-    io.setAngleMotorVoltage(voltage);
+    io.setAngleMotorVoltage(voltage * angleManualControlVoltage.get());
   }
 
   private Command getSystemCheckCommand() {
@@ -347,27 +360,32 @@ public class Shooter extends SubsystemBase {
 
   private Command getPresetCheckCommand(ShootingPosition position) {
     double angle;
-    double velocity;
+    double topVelocity;
+    double bottomVelocity;
 
     if (position == ShootingPosition.SUBWOOFER) {
       angle = SUBWOOFER_ANGLE;
-      velocity = SUBWOOFER_VELOCITY;
+      topVelocity = SUBWOOFER_VELOCITY_TOP;
+      bottomVelocity = SUBWOOFER_VELOCITY_BOTTOM;
     } else if (position == ShootingPosition.PODIUM) {
       angle = PODIUM_ANGLE;
-      velocity = PODIUM_VELOCITY;
+      topVelocity = PODIUM_VELOCITY_TOP;
+      bottomVelocity = PODIUM_VELOCITY_BOTTOM;
     } else if (position == ShootingPosition.PASS) {
       angle = PASS_ANGLE;
-      velocity = PASS_VELOCITY;
+      topVelocity = PASS_VELOCITY_TOP;
+      bottomVelocity = PASS_VELOCITY_BOTTOM;
     } else { // ShootingPosition.AMP
       angle = AMP_ANGLE;
-      velocity = AMP_VELOCITY;
+      topVelocity = AMP_VELOCITY_TOP;
+      bottomVelocity = AMP_VELOCITY_BOTTOM;
     }
 
     return Commands.sequence(
         Commands.runOnce(() -> this.setShootingPosition(position)),
         Commands.waitSeconds(2.0),
         Commands.runOnce(() -> this.checkAngle(angle)),
-        Commands.runOnce(() -> this.checkVelocity(velocity)));
+        Commands.runOnce(() -> this.checkVelocity(topVelocity, bottomVelocity)));
   }
 
   private void checkAngle(double degrees) {
@@ -392,15 +410,16 @@ public class Shooter extends SubsystemBase {
     }
   }
 
-  private void checkVelocity(double velocity) {
+  private void checkVelocity(double topVelocity, double bottomVelocity) {
     // check bottom motor
-    if (Math.abs(this.shooterInputs.shootMotorBottomVelocityRPS - velocity) > VELOCITY_TOLERANCE) {
-      if (Math.abs(this.shooterInputs.shootMotorBottomVelocityRPS) - Math.abs(velocity) < 0) {
+    if (Math.abs(this.shooterInputs.shootMotorBottomVelocityRPS - bottomVelocity)
+        > VELOCITY_TOLERANCE) {
+      if (Math.abs(this.shooterInputs.shootMotorBottomVelocityRPS) - Math.abs(bottomVelocity) < 0) {
         FaultReporter.getInstance()
             .addFault(
                 SUBSYSTEM_NAME,
                 "Bottom shooter wheel velocity is too low, should be "
-                    + velocity
+                    + bottomVelocity
                     + BUT_IS
                     + this.shooterInputs.shootMotorBottomVelocityRPS);
       } else {
@@ -408,19 +427,19 @@ public class Shooter extends SubsystemBase {
             .addFault(
                 SUBSYSTEM_NAME,
                 "Bottom shooter wheel velocity is too high, should be "
-                    + velocity
+                    + bottomVelocity
                     + BUT_IS
                     + this.shooterInputs.shootMotorBottomVelocityRPS);
       }
     }
     // check top motor
-    if (Math.abs(this.shooterInputs.shootMotorTopVelocityRPS - velocity) > VELOCITY_TOLERANCE) {
-      if (Math.abs(this.shooterInputs.shootMotorTopVelocityRPS) - Math.abs(velocity) < 0) {
+    if (Math.abs(this.shooterInputs.shootMotorTopVelocityRPS - topVelocity) > VELOCITY_TOLERANCE) {
+      if (Math.abs(this.shooterInputs.shootMotorTopVelocityRPS) - Math.abs(topVelocity) < 0) {
         FaultReporter.getInstance()
             .addFault(
                 SUBSYSTEM_NAME,
                 "Top shooter wheel velocity is too low, should be "
-                    + velocity
+                    + topVelocity
                     + BUT_IS
                     + this.shooterInputs.shootMotorTopVelocityRPS);
       } else {
@@ -428,7 +447,7 @@ public class Shooter extends SubsystemBase {
             .addFault(
                 SUBSYSTEM_NAME,
                 "Top shooter wheel velocity is too high, should be "
-                    + velocity
+                    + topVelocity
                     + BUT_IS
                     + this.shooterInputs.shootMotorTopVelocityRPS);
       }
@@ -441,5 +460,15 @@ public class Shooter extends SubsystemBase {
 
   public void intakeDisabled() {
     this.intakeEnabled = false;
+  }
+
+  public boolean getCoastEnableOverride() {
+    return shooterInputs.coastMode;
+  }
+
+  public void setCoastModeOverride(boolean coast) {
+    if (DriverStation.isDisabled()) {
+      io.setCoastMode(coast);
+    }
   }
 }

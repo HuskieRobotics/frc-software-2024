@@ -11,7 +11,7 @@ public class ShooterConstants {
   }
 
   public static final boolean DEBUGGING = false;
-  public static final boolean TESTING = true;
+  public static final boolean TESTING = false;
   public static final String SUBSYSTEM_NAME = "Shooter";
 
   public static final int TOP_SHOOTER_MOTOR_ID = 27;
@@ -36,13 +36,13 @@ public class ShooterConstants {
   public static final double BOTTOM_SHOOT_PID_PEAK_OUTPUT = 1.0;
 
   // Shooter Rotation PID Constants
-  public static final double ROTATION_KP = 75;
+  public static final double ROTATION_KP = 50;
   public static final double ROTATION_KI = 0.0;
-  public static final double ROTATION_KD = 15;
-  public static final double ROTATION_KS = 2.4475;
-  public static final double ROTATION_KG = 0.25;
-  public static final double ROTATION_KV = 2.4669;
-  public static final double ROTATION_KA = 0.74655;
+  public static final double ROTATION_KD = 10;
+  public static final double ROTATION_KS = 0.16206;
+  public static final double ROTATION_KG = 0.22544;
+  public static final double ROTATION_KV = 20.835;
+  public static final double ROTATION_KA = 0.16507;
   public static final double ROTATION_EXPO_KV = 80.0;
   public static final double ROTATION_EXPO_KA = 24.0;
   public static final double ROTATION_PID_PEAK_OUTPUT = 1.0;
@@ -61,9 +61,15 @@ public class ShooterConstants {
   public static final boolean SHOOT_TOP_INVERTED = false;
   public static final boolean SHOOT_BOTTOM_INVERTED = false;
   public static final double VELOCITY_TOLERANCE = 5.0; // FIXME: tune with real robot
-  public static final double CLOSE_RANGE_VELOCITY = 60;
-  public static final double FAR_RANGE_VELOCITY = 120;
-  public static final double VELOCITY_ZONE_SWITCH_DISTANCE = Units.inchesToMeters(106.901) / 2.0;
+  public static final double CLOSE_RANGE_VELOCITY_TOP = 60;
+  public static final double CLOSE_RANGE_VELOCITY_BOTTOM = 60;
+  public static final double MID_RANGE_VELOCITY_TOP = 80;
+  public static final double MID_RANGE_VELOCITY_BOTTOM = 80;
+  public static final double FAR_RANGE_VELOCITY_TOP = 120;
+  public static final double FAR_RANGE_VELOCITY_BOTTOM = 120;
+  public static final double SLOW_TO_MID_VELOCITY_DISTANCE_METERS =
+      Units.inchesToMeters(106.901) / 2.0;
+  public static final double MID_TO_FAST_VELOCITY_DISTANCE_METERS = Units.inchesToMeters(106.901);
 
   // Angle Motor
   public static final double ANGLE_MOTOR_CONTINUOUS_CURRENT_LIMIT = 15;
@@ -73,9 +79,10 @@ public class ShooterConstants {
   public static final double MOTION_MAGIC_CRUISE_VELOCITY = 0;
   public static final double ANGLE_MOTOR_GEAR_RATIO = 45.0;
   public static final boolean ANGLE_MOTOR_INVERTED = true;
-  public static final double MAGNET_OFFSET = -0.899334111;
+  public static final double MAGNET_OFFSET = -0.805;
   public static final double SENSOR_TO_MECHANISM_RATIO = 4.0;
-  public static final double ANGLE_TOLERANCE_DEGREES = 1.0;
+  // FIXME: tune on practice field and reduce this value
+  public static final double ANGLE_TOLERANCE_DEGREES = 5.0;
   public static final double SHOOTER_STORAGE_ANGLE = 10.4;
   public static final double ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE = 1.0;
   public static final double UPPER_ANGLE_LIMIT = 135.0;
@@ -83,12 +90,16 @@ public class ShooterConstants {
   // 0.074951 rotations = 10.4 degrees
 
   // Shooter Presets
-  public static final double SUBWOOFER_VELOCITY = 40;
-  public static final double SUBWOOFER_ANGLE = 53.17;
-  public static final double PODIUM_VELOCITY = 60;
-  public static final double PODIUM_ANGLE = 33.5;
-  public static final double AMP_VELOCITY = 18.0;
-  public static final double AMP_ANGLE = 131.4;
-  public static final double PASS_VELOCITY = 80.0; // FIXME tune with real robot
-  public static final double PASS_ANGLE = 12.0; // FIXME tune with real robot
+  public static final double SUBWOOFER_VELOCITY_TOP = 60;
+  public static final double SUBWOOFER_VELOCITY_BOTTOM = 60;
+  public static final double SUBWOOFER_ANGLE = 64;
+  public static final double PODIUM_VELOCITY_TOP = 120;
+  public static final double PODIUM_VELOCITY_BOTTOM = 120;
+  public static final double PODIUM_ANGLE = 40;
+  public static final double AMP_VELOCITY_TOP = 20.0;
+  public static final double AMP_VELOCITY_BOTTOM = 10.0;
+  public static final double AMP_ANGLE = 129;
+  public static final double PASS_VELOCITY_TOP = 80.0;
+  public static final double PASS_VELOCITY_BOTTOM = 80.0;
+  public static final double PASS_ANGLE = 12.0;
 }

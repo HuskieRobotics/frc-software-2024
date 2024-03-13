@@ -2,6 +2,7 @@ package frc.robot.subsystems.intake;
 
 import static frc.robot.subsystems.intake.IntakeConstants.*;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -61,6 +62,7 @@ public class Intake extends SubsystemBase {
     automationEnabled = true;
 
     mostRecentIntakeState = null;
+
     checkComplete = false;
 
     leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
@@ -78,6 +80,7 @@ public class Intake extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
     Logger.recordOutput("Intake/State", intakeState.toString());
+    Logger.recordOutput("Intake/AutomationEnabled", automationEnabled);
 
     if (TESTING) {
       io.setRollerVelocity(rollerVelocity.get());
@@ -109,7 +112,7 @@ public class Intake extends SubsystemBase {
   }
 
   private void runEmptyState() {
-    if (isShooterAngleReady.getAsBoolean()) {
+    if (isShooterAngleReady.getAsBoolean() || DriverStation.isAutonomousEnabled()) {
       this.intakeGamePiece();
     } else {
       this.repelGamePiece();
@@ -167,7 +170,7 @@ public class Intake extends SubsystemBase {
   }
 
   private void runShootingState() {
-    if (!inputs.isShooterIRBlocked) {
+    if (!inputs.isShooterIRBlocked && !inputs.isKickerIRBlocked) {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
@@ -303,6 +306,7 @@ public class Intake extends SubsystemBase {
 
   public void enableAutomation() {
     automationEnabled = true;
+    this.intakeState = IntakeState.EMPTY;
   }
 
   public void disableAutomation() {

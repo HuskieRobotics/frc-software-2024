@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.DrivetrainIO.SwerveIOInputs;
-import frc.lib.team3061.leds.LEDs;
 import frc.lib.team6328.util.Alert;
 import frc.lib.team6328.util.Alert.AlertType;
 import frc.lib.team6328.util.TunableNumber;
@@ -80,7 +79,6 @@ public class Drivetrain extends SubsystemBase {
   private boolean brakeMode;
   private Timer brakeModeTimer = new Timer();
   private static final double BREAK_MODE_DELAY_SEC = 10.0;
-  private static final double LEDS_FALLEN_ANGLE_DEGREES = 60.0; // Threshold to detect falls
 
   private DriveMode driveMode = DriveMode.NORMAL;
 
@@ -98,7 +96,7 @@ public class Drivetrain extends SubsystemBase {
   private ChassisSpeeds prevSpeeds = new ChassisSpeeds();
   private double[] prevSteerVelocitiesRevPerMin = new double[4];
 
-  private DriverStation.Alliance alliance = DriverStation.Alliance.Blue;
+  private DriverStation.Alliance alliance = DriverStation.Alliance.Red;
 
   /**
    * Creates a new Drivetrain subsystem.
@@ -462,12 +460,6 @@ public class Drivetrain extends SubsystemBase {
     Logger.processInputs(SUBSYSTEM_NAME + "/FR", this.inputs.swerve[1]);
     Logger.processInputs(SUBSYSTEM_NAME + "/BL", this.inputs.swerve[2]);
     Logger.processInputs(SUBSYSTEM_NAME + "/BR", this.inputs.swerve[3]);
-
-    // Check for fallen robot
-    LEDs.getInstance()
-        .setFallen(
-            Math.abs(this.inputs.gyro.pitchDeg) > LEDS_FALLEN_ANGLE_DEGREES
-                || Math.abs(this.inputs.gyro.rollDeg) > LEDS_FALLEN_ANGLE_DEGREES);
 
     // update the brake mode based on the robot's velocity and state (enabled/disabled)
     updateBrakeMode();

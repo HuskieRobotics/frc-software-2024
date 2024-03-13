@@ -16,46 +16,19 @@
     },
     {
       "anchor": {
-        "x": 3.075150410952451,
-        "y": 6.974815754142787
+        "x": 2.9,
+        "y": 7.012917912091748
       },
       "prevControl": {
-        "x": -0.5563256349837453,
-        "y": 6.884028852994383
-      },
-      "nextControl": {
-        "x": 3.4866439657691353,
-        "y": 6.985103093013204
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.3961860455049235,
-        "y": 6.295851388695259
-      },
-      "prevControl": {
-        "x": 2.715093550487854,
-        "y": 6.481023488362767
+        "x": 0.32357979407901893,
+        "y": 5.70954620582227
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.6,
-      "rotationDegrees": -178.7705173809666,
-      "rotateFast": false
-    },
-    {
-      "waypointRelativePos": 0.9,
-      "rotationDegrees": 180.0,
-      "rotateFast": true
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -66,8 +39,8 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -158.8752808539275,
-    "rotateFast": false
+    "rotation": -147.13220004167053,
+    "rotateFast": true
   },
   "reversed": false,
   "folder": "4 Note Source-Side Wing",

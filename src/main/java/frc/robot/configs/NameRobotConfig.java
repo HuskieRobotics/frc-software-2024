@@ -36,53 +36,47 @@ public class NameRobotConfig extends RobotConfig {
 
   private static final double TRACKWIDTH_METERS = 0.57785; // 22.75
   private static final double WHEELBASE_METERS = 0.57785; // 22.75
-  private static final double WHEEL_DIAMETER_METERS = 0.09659072671; // FIXME: measure and update
+  private static final double WHEEL_DIAMETER_METERS = 0.09849016753330445;
   private static final double ROBOT_WIDTH_WITH_BUMPERS =
       0.88265; // meters //34.75 in , measure the actual bumpers
   private static final double ROBOT_LENGTH_WITH_BUMPERS = 0.88265; // meters // 34.75 in same above
 
   /* Angle Motor PID Values */
-  private static final double ANGLE_KP = 100.0; // FIXME: Values taken from nova, need to be updated
-  private static final double ANGLE_KI = 0.0; // FIXME: Values taken from nova, need to be updated
-  private static final double ANGLE_KD = 0.05; // FIXME: Values taken from nova, need to be updated
+  private static final double ANGLE_KP = 100.0;
+  private static final double ANGLE_KI = 0.0;
+  private static final double ANGLE_KD = 3.9628;
 
-  private static final double ANGLE_KS =
-      0.1891233333; // FIXME: Values taken from nova, need to be updated
-  private static final double ANGLE_KV = // FIXME: Values taken from nova, need to be updated
-      0.4399866667
-          * 2
-          * Math.PI; // convert from V/(radians/s) to V/(rotations/s) // FIXME: Values taken from
-  // nova, need to be updated
-  private static final double ANGLE_KA =
-      0.001663333333; // FIXME: Values taken from nova, need to be updated
+  private static final double ANGLE_KS = 0.24719;
+  private static final double ANGLE_KV = 2.5845; // rps
+  private static final double ANGLE_KA = 0.030892;
 
   /* Drive Motor PID Values */
-  private static final double DRIVE_KP = 8.0; // FIXME: Values taken from nova, need to be updated
-  private static final double DRIVE_KI = 0.0; // FIXME: Values taken from nova, need to be updated
-  private static final double DRIVE_KD = 0.0; // FIXME: Values taken from nova, need to be updated
+  private static final double DRIVE_KP = 10.0;
+  private static final double DRIVE_KI = 0.0;
+  private static final double DRIVE_KD = 0.0;
 
-  private static final double DRIVE_KS = 5.0; // FIXME: Values taken from nova, need to be updated
-  private static final double DRIVE_KV = 0.0; // FIXME: Values taken from nova, need to be updated
-  private static final double DRIVE_KA = 0.0; // FIXME: Values taken from nova, need to be updated
+  private static final double DRIVE_KS = 0.23819;
+  private static final double DRIVE_KV = 0.0;
+  private static final double DRIVE_KA = 0.0;
 
   private static final double MAX_VELOCITY_METERS_PER_SECOND =
-      3.5; // FIXME: Values taken from nova, need to be updated
+      4.5; // FIXME: confirm max velocity with real robot
   private static final double MAX_COAST_VELOCITY_METERS_PER_SECOND =
       0.05; // FIXME: Values taken from nova, need to be updated
   private static final double SLOW_MODE_MULTIPLIER =
       0.75; // FIXME: Values taken from nova, need to be updated
 
   private static final double MAX_DRIVE_ACCELERATION_METERS_PER_SECOND_SQUARED =
-      11.365; // FIXME: Values taken from nova, need to be updated
+      9.467; // from Choreo estimate
   private static final double MAX_TURN_ACCELERATION_RADIANS_PER_SECOND_SQUARED =
-      36.0; // FIXME: Values taken from nova, need to be updated
+      33.436; // from Choreo estimate
 
   private static final String CAN_BUS_NAME = "canbus1";
 
-  private static final String CAMERA_NAME_0 = "OV2311F";
-  private static final String CAMERA_NAME_1 = "OV2311R";
-  private static final String CAMERA_NAME_2 = "OV2311L";
-  private static final String CAMERA_NAME_3 = "OV2311B";
+  private static final String CAMERA_NAME_0 = "OV2311FR";
+  private static final String CAMERA_NAME_1 = "OV2311BR";
+  private static final String CAMERA_NAME_2 = "OV2311FL";
+  private static final String CAMERA_NAME_3 = "OV2311BL";
 
   // Front right camera
   private static final Transform3d ROBOT_TO_CAMERA_0 =
@@ -146,7 +140,7 @@ public class NameRobotConfig extends RobotConfig {
   private static final double DRIVE_FACING_ANGLE_KD = 0.1;
   private static final double DRIVE_FACING_ANGLE_KI = 0.0;
 
-  private static final int LED_COUNT = 85;
+  private static final int LED_COUNT = 35;
 
   @Override
   public boolean getPhoenix6Licensed() {

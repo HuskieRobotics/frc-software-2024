@@ -9,7 +9,6 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -32,9 +31,11 @@ import frc.lib.team3061.vision.Vision;
 import frc.lib.team3061.vision.VisionConstants;
 import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
+import frc.lib.team3061.vision.VisionIOSim;
 import frc.lib.team6328.util.NoteVisualizer;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
+import frc.robot.commands.TeleopSwerveAimAtSpeaker;
 import frc.robot.configs.GenericDrivetrainRobotConfig;
 import frc.robot.configs.NameRobotConfig;
 import frc.robot.configs.PracticeBoardConfig;
@@ -252,7 +253,22 @@ public class RobotContainer {
     shooter = new Shooter(new ShooterIOTalonFX(), intake);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
-    vision = new Vision(new VisionIO[] {new VisionIO() {}});
+    // vision = new Vision(new VisionIO[] {new VisionIO() {}});
+
+    AprilTagFieldLayout layout;
+    try {
+      layout = new AprilTagFieldLayout(VisionConstants.APRILTAG_FIELD_LAYOUT_PATH);
+    } catch (IOException e) {
+      layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
+    }
+    vision =
+        new Vision(
+            new VisionIO[] {
+              new VisionIOSim(
+                  layout,
+                  drivetrain::getPose,
+                  RobotConfig.getInstance().getRobotToCameraTransforms()[0])
+            });
   }
 
   private void createPracticeBoardSubsystem() {
@@ -353,10 +369,13 @@ public class RobotContainer {
     NamedCommands.registerCommand("Shoot", getShootCommand());
     NamedCommands.registerCommand(
         "PrepAutoSubwooferShot",
-        Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)));
+        Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER))
+            .withName("PrepAutoSubwooferShot"));
     // FIXME: consider making this a shoot and prep single named command
     NamedCommands.registerCommand(
-        "PrepAutoShot", Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AUTO)));
+        "PrepAutoShot",
+        Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AUTO))
+            .withName("PrepAutoShot"));
 
     // build auto path commands
 
@@ -398,22 +417,29 @@ public class RobotContainer {
      * shoot initial note and leave robot starting zone
      *
      */
+    Command oneNoteSourceSide = new PathPlannerAuto("1 Note Auto");
+    autoChooser.addOption("1 Note Source Side", oneNoteSourceSide);
 
     // FIXME: add commands to wait for the shooter wheel to reach the desired velocity and then
     // shoot
     Command oneNoteAnywhere =
-        Commands.run(
-                () -> {
-                  drivetrain.drive(1, 0, 0, false, true);
-                },
-                drivetrain)
-            .withTimeout(2.5)
-            .andThen(
-                Commands.runOnce(
+        Commands.sequence(
+            Commands.waitSeconds(1.0),
+            Commands.runOnce(() -> drivetrain.resetPoseToVision(vision::getBestRobotPose)),
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AUTO)),
+            getShootCommand(),
+            Commands.run(
                     () -> {
-                      drivetrain.drive(0, 0, 0, false, false);
+                      drivetrain.drive(1, 0, 0, false, true);
                     },
-                    drivetrain));
+                    drivetrain)
+                .withTimeout(2.5)
+                .andThen(
+                    Commands.runOnce(
+                        () -> {
+                          drivetrain.drive(0, 0, 0, false, false);
+                        },
+                        drivetrain)));
     autoChooser.addOption("One Note Anywhere", oneNoteAnywhere);
 
     /************ 2 Notes ************
@@ -446,13 +472,16 @@ public class RobotContainer {
     Command fourNoteSourceSideWing = new PathPlannerAuto("4 Note Source-Side Wing");
     autoChooser.addOption("4 Note Source-Side Wing", fourNoteSourceSideWing);
 
+    Command fourNoteAmpSideAlignShot = new PathPlannerAuto("4 Note Collect at Angle Side");
+    autoChooser.addOption("4 Note Amp Side Align Shot With Collection", fourNoteAmpSideAlignShot);
+
     /************ 5 Notes ************
      *
      * 5 notes (initial, 3 in wing, and second center note from amp side)
      *
      */
-    Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Amp Side");
-    autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
+    // Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Amp Side");
+    // autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
 
     /************ Drive Velocity Tuning ************
      *
@@ -534,6 +563,12 @@ public class RobotContainer {
                     Commands.runOnce(shooter::intakeDisabled))
                 .withName("disable intake automation"));
 
+    Trigger coastModeButton = new Trigger(shooter::getCoastEnableOverride);
+    coastModeButton.onTrue(
+        Commands.runOnce(() -> shooter.setCoastModeOverride(true)).ignoringDisable(true));
+    coastModeButton.onFalse(
+        Commands.runOnce(() -> shooter.setCoastModeOverride(false)).ignoringDisable(true));
+
     oi.getRunIntakeButton()
         .and(() -> !intake.automationEnabled())
         .whileTrue(
@@ -592,32 +627,9 @@ public class RobotContainer {
                 .withName("lock 180"));
 
     oi.getAimSpeakerButton()
-        .onTrue(
-            Commands.either(
-                    Commands.parallel(
-                        Commands.runOnce(drivetrain::disableAimToSpeaker, drivetrain),
-                        Commands.runOnce(shooter::cancelPrepareToShoot, shooter)),
-                    Commands.parallel(
-                        Commands.runOnce(shooter::prepareToShoot, shooter),
-                        Commands.runOnce(drivetrain::enableAimToSpeaker),
-                        new TeleopSwerve(
-                                drivetrain,
-                                oi::getTranslateX,
-                                oi::getTranslateY,
-                                () -> {
-                                  Transform2d translation =
-                                      new Transform2d(
-                                          Field2d.getInstance().getAllianceSpeakerCenter().getX()
-                                              - drivetrain.getPose().getX(),
-                                          Field2d.getInstance().getAllianceSpeakerCenter().getY()
-                                              - drivetrain.getPose().getY(),
-                                          new Rotation2d());
-                                  return new Rotation2d(
-                                      Math.atan2(translation.getY(), translation.getX()));
-                                })
-                            .until(() -> !intake.hasNote())),
-                    drivetrain::isAimToSpeakerEnabled)
-                .withName("toggle aim to speaker"));
+        .toggleOnTrue(
+            new TeleopSwerveAimAtSpeaker(
+                drivetrain, shooter, intake, oi::getTranslateX, oi::getTranslateY));
 
     // field-relative toggle
     oi.getFieldRelativeButton()

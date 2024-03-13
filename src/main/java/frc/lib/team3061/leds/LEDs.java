@@ -35,8 +35,6 @@ public abstract class LEDs extends SubsystemBase {
 
   // Robot state tracking
   private int loopCycleCount = 0;
-  private boolean distraction = false;
-  private boolean fallen = false;
   private boolean endgameAlert = false;
   private boolean autoFinished = false;
   private double autoFinishedTime = 0.0;
@@ -69,7 +67,7 @@ public abstract class LEDs extends SubsystemBase {
   protected static final int LENGTH = MIRROR_LEDS ? ACTUAL_LENGTH / 2 : ACTUAL_LENGTH;
   private static final int STATIC_LENGTH = LENGTH / 2;
   private static final int STATIC_SECTION_LENGTH = STATIC_LENGTH / 3;
-  private static final boolean PRIDE_LEDS = true;
+  private static final boolean PRIDE_LEDS = false;
   private static final int MIN_LOOP_CYCLE_COUNT = 10;
   private static final double STROBE_FAST_DURATION = 0.1;
   private static final double STROBE_SLOW_DURATION = 0.2;
@@ -137,7 +135,7 @@ public abstract class LEDs extends SubsystemBase {
 
       } else if (lowBatteryAlert) {
         // Low battery
-        solid(Section.FULL, Color.kOrangeRed);
+        solid(Section.FULL, new Color(255, 20, 0));
 
       } else if (PRIDE_LEDS) {
         // Pride stripes
@@ -147,8 +145,6 @@ public abstract class LEDs extends SubsystemBase {
         // Default pattern
         updateToDisabledPattern();
       }
-    } else if (fallen) {
-      strobe(Section.FULL, Color.kWhite, STROBE_FAST_DURATION);
     } else if (DriverStation.isAutonomous()) {
       updateToAutoPattern();
     } else { // teleop
@@ -166,38 +162,37 @@ public abstract class LEDs extends SubsystemBase {
     if (demoMode) {
       wave(
           Section.FULL,
-          Color.kDarkOrange,
+          new Color(255, 30, 0),
           Color.kDarkBlue,
           WAVE_SLOW_CYCLE_LENGTH,
-          WAVE_SLOW_DURATION);
+          WAVE_MEDIUM_DURATION);
     }
 
-    if (distraction) {
-      // Distraction
-      strobe(Section.SHOULDER, Color.kWhite, STROBE_SLOW_DURATION);
-    } else if (endgameAlert) {
+    if (endgameAlert) {
       // Endgame alert
       strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.SHOOTING) {
       // Actively shooting
-      rainbow(Section.FULL, RAINBOW_CYCLE_LENGTH, RAINBOW_DURATION);
+      strobe(Section.FULL, Color.kGreen, STROBE_SLOW_DURATION);
     } else if (shooterLEDState == ShooterLEDState.AIMING_AT_SPEAKER) {
       // Aiming at speaker
-      solid(Section.FULL, Color.kGreen);
+      solid(Section.FULL, Color.kBlue);
     } else if (shooterLEDState == ShooterLEDState.IS_READY_TO_SHOOT) {
       // Ready to shoot
-      solid(Section.FULL, Color.kBlue);
+      solid(Section.FULL, Color.kGreen);
     } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
       // Has game piece
       strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
-      // Waiting for game piece
       wave(
           Section.FULL,
           Color.kBlue,
           new Color(255, 20, 0),
           WAVE_FAST_CYCLE_LENGTH,
           WAVE_SLOW_DURATION);
+    } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
+      // Has game piece
+      strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.MANUAL_REPEL) {
       // Manual repel
       strobe(Section.FULL, Color.kDeepPink, STROBE_SLOW_DURATION);
@@ -236,7 +231,7 @@ public abstract class LEDs extends SubsystemBase {
     } else {
       wave(
           Section.FULL,
-          Color.kDarkOrange,
+          new Color(255, 30, 0),
           Color.kDarkBlue,
           WAVE_SLOW_CYCLE_LENGTH,
           WAVE_SLOW_DURATION);
@@ -295,14 +290,6 @@ public abstract class LEDs extends SubsystemBase {
     if (DriverStation.isEStopped()) {
       estopped = true;
     }
-  }
-
-  public void setDistraction(boolean distraction) {
-    this.distraction = distraction;
-  }
-
-  public void setFallen(boolean fallen) {
-    this.fallen = fallen;
   }
 
   public void setEndgameAlert(boolean endgameAlert) {
