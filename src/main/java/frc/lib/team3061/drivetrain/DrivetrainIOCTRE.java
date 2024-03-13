@@ -416,14 +416,18 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
         module.getDriveMotor().getDeviceEnable().getValue() == DeviceEnableValue.Enabled;
     inputs.driveDistanceMeters = position.distanceMeters;
     inputs.driveVelocityMetersPerSec = state.speedMetersPerSecond;
+
+    // Retrieve the closed loop reference status signals directly from the motor in this method
+    // instead of retrieving in advance because the status signal returned depends on the current
+    // control mode.
     inputs.driveVelocityReferenceMetersPerSec =
         Conversions.falconRPSToMechanismMPS(
-            signals.driveVelocityReferenceStatusSignal.getValue(),
+            module.getDriveMotor().getClosedLoopReference().getValueAsDouble(),
             RobotConfig.getInstance().getWheelDiameterMeters() * Math.PI,
             RobotConfig.getInstance().getSwerveConstants().getDriveGearRatio());
     inputs.driveVelocityErrorMetersPerSec =
         Conversions.falconRPSToMechanismMPS(
-            signals.driveVelocityErrorStatusSignal.getValue(),
+            module.getDriveMotor().getClosedLoopError().getValueAsDouble(),
             RobotConfig.getInstance().getWheelDiameterMeters() * Math.PI,
             RobotConfig.getInstance().getSwerveConstants().getDriveGearRatio());
     inputs.driveAccelerationMetersPerSecPerSec =
@@ -444,12 +448,16 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     // motor accounts for the gear ratio; so, pass a gear ratio of 1 to just convert from rotations
     // to degrees.
     inputs.steerPositionDeg = position.angle.getDegrees();
+
+    // Retrieve the closed loop reference status signals directly from the motor in this method
+    // instead of retrieving in advance because the status signal returned depends on the current
+    // control mode.
     inputs.steerPositionReferenceDeg =
         Conversions.falconRotationsToMechanismDegrees(
-            signals.steerPositionReferenceStatusSignal.getValue(), 1);
+            module.getSteerMotor().getClosedLoopReference().getValueAsDouble(), 1);
     inputs.steerPositionErrorDeg =
         Conversions.falconRotationsToMechanismDegrees(
-            signals.steerPositionErrorStatusSignal.getValue(), 1);
+            module.getSteerMotor().getClosedLoopError().getValueAsDouble(), 1);
     inputs.steerVelocityRevPerMin =
         Conversions.falconRPSToMechanismRPM(signals.steerVelocityStatusSignal.getValue(), 1);
     inputs.steerAccelerationMetersPerSecPerSec =
