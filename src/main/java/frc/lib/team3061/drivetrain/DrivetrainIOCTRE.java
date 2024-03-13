@@ -17,6 +17,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants.SteerFeedbackType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.signals.DeviceEnableValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -411,6 +412,8 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     SwerveModulePosition position = module.getPosition(false);
     SwerveModuleState state = module.getCurrentState();
 
+    inputs.driveEnabled =
+        module.getDriveMotor().getDeviceEnable().getValue() == DeviceEnableValue.Enabled;
     inputs.driveDistanceMeters = position.distanceMeters;
     inputs.driveVelocityMetersPerSec = state.speedMetersPerSecond;
     inputs.driveVelocityReferenceMetersPerSec =
@@ -435,6 +438,8 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
     inputs.steerAbsolutePositionDeg = module.getCANcoder().getAbsolutePosition().getValue() * 360.0;
 
+    inputs.steerEnabled =
+        module.getSteerMotor().getDeviceEnable().getValue() == DeviceEnableValue.Enabled;
     // since we are using the FusedCANcoder feature, the position and velocity signal for the angle
     // motor accounts for the gear ratio; so, pass a gear ratio of 1 to just convert from rotations
     // to degrees.
