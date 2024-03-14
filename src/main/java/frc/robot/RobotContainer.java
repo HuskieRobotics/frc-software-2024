@@ -429,8 +429,8 @@ public class RobotContainer {
      * 5 notes (initial, 3 in wing, and second center note from amp side)
      *
      */
-    // Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Amp Side");
-    // autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
+    Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Amp Side");
+    autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
 
     /************ Start Point ************
      *

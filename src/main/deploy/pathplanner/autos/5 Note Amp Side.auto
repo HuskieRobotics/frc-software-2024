@@ -14,7 +14,13 @@
         {
           "type": "named",
           "data": {
-            "name": "PrepAutoShot"
+            "name": "PrepAutoSubwooferShot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         },
         {
@@ -36,12 +42,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "PrepAutoShot"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "5 Note Amp Side 3"
@@ -54,12 +54,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "PrepAutoShot"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "5 Note Amp Side 4"
@@ -69,12 +63,6 @@
           "type": "named",
           "data": {
             "name": "Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "PrepAutoShot"
           }
         },
         {
