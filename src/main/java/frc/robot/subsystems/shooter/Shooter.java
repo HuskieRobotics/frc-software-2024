@@ -36,7 +36,15 @@ public class Shooter extends SubsystemBase {
   private final TunableNumber pivotAngle = new TunableNumber("Shooter/Angle", 10.0);
   private final double[] populationRealAngles = {64, 54, 44, 40, 37.5, 35, 33, 30, 28};
   private final double[] populationDistances = {
-    1.3597, 1.9693, 2.36, 2.72, 3.05, 3.37, 3.7, 4.4077, 5.0173
+    1.3597 + .06,
+    1.9693 + .06,
+    2.36 + .06,
+    2.72 + .06,
+    3.05 + .06,
+    3.37 + .06,
+    3.7 + .06,
+    4.4077 + .06,
+    5.0173 + .06
   };
 
   private boolean autoShooter = true;
@@ -110,6 +118,13 @@ public class Shooter extends SubsystemBase {
     Logger.recordOutput("Shooter/IntakeAutomated", this.intakeEnabled);
     Logger.recordOutput("Shooter/ScaleDownVelocity", this.scaleDownShooterVelocity);
 
+    double distanceToSpeaker =
+        Field2d.getInstance()
+            .getAllianceSpeakerCenter()
+            .minus(RobotOdometry.getInstance().getEstimatedPosition())
+            .getTranslation()
+            .getNorm();
+    Logger.recordOutput("Shooter/distanceToSpeaker", distanceToSpeaker);
     if (testingMode.get() == 1) {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
@@ -309,7 +324,7 @@ public class Shooter extends SubsystemBase {
   public boolean isTopShootAtSetpoint() {
     if (Math.abs(
             shooterInputs.shootMotorTopVelocityRPS
-                - shooterInputs.shootMotorBottomReferenceVelocityRPS)
+                - shooterInputs.shootMotorTopReferenceVelocityRPS)
         < VELOCITY_TOLERANCE) {
       topAtSetpointIterationCount++;
       if (topAtSetpointIterationCount >= ShooterConstants.SET_POINT_COUNT) {
