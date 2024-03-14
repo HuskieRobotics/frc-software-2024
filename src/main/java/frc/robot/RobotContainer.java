@@ -645,6 +645,7 @@ public class RobotContainer {
     oi.getResetPoseToVisionButton()
         .onTrue(
             Commands.runOnce(() -> drivetrain.resetPoseToVision(() -> vision.getBestRobotPose()))
+                .ignoringDisable(true)
                 .withName("reset pose to vision"));
 
     // x-stance
