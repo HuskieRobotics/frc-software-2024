@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import frc.lib.team6328.util.Alert;
 import frc.lib.team6328.util.Alert.AlertType;
 import java.util.Optional;
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -73,10 +72,9 @@ public class VisionIOPhotonVision implements VisionIO {
           }
           inputs.ambiguity /= estimate.targetsUsed.size();
 
-          // the following may be needed instead
-          Logger.recordOutput(
-              "VisionTest/multiAmbiguity",
-              camera.getLatestResult().getMultiTagResult().estimatedPose.ambiguity);
+          if (inputs.poseFromMultiTag) {
+            inputs.ambiguity = 0.2;
+          }
 
           this.cyclesWithNoResults = 0;
         });
