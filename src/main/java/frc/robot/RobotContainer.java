@@ -382,36 +382,6 @@ public class RobotContainer {
     // add commands to the auto chooser
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
 
-    /************ Start Point ************
-     *
-     * useful for initializing the pose of the robot to a known location
-     *
-     */
-
-    Command startPoint =
-        Commands.runOnce(
-            () ->
-                drivetrain.resetPose(
-                    PathPlannerPath.fromPathFile("Start Point").getPreviewStartingHolonomicPose()),
-            drivetrain);
-    autoChooser.addOption("Start Point", startPoint);
-
-    /************ Distance Test ************
-     *
-     * used for empirically determining the wheel diameter
-     *
-     */
-    Command distanceTestPathCommand = new PathPlannerAuto("DistanceTest");
-    autoChooser.addOption("Distance Path", distanceTestPathCommand);
-
-    /************ Auto Tuning ************
-     *
-     * useful for tuning the autonomous PID controllers
-     *
-     */
-    Command tuningCommand = new PathPlannerAuto("Tuning");
-    autoChooser.addOption("Auto Tuning", tuningCommand);
-
     /************ 1 Note Anywhere ************
      *
      * shoot initial note and leave robot starting zone
@@ -450,8 +420,9 @@ public class RobotContainer {
     Command fourNoteSourceSideWing = new PathPlannerAuto("4 Note Source-Side Wing");
     autoChooser.addOption("4 Note Source-Side Wing", fourNoteSourceSideWing);
 
-    Command fourNoteAmpSideAlignShot = new PathPlannerAuto("4 Note Collect at Angle Side");
-    autoChooser.addOption("4 Note Amp Side Align Shot With Collection", fourNoteAmpSideAlignShot);
+    // Command fourNoteAmpSideAlignShot = new PathPlannerAuto("4 Note Collect at Angle Side");
+    // autoChooser.addOption("4 Note Amp Side Align Shot With Collection",
+    // fourNoteAmpSideAlignShot);
 
     /************ 5 Notes ************
      *
@@ -460,6 +431,36 @@ public class RobotContainer {
      */
     // Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Amp Side");
     // autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
+
+    /************ Start Point ************
+     *
+     * useful for initializing the pose of the robot to a known location
+     *
+     */
+
+    Command startPoint =
+        Commands.runOnce(
+            () ->
+                drivetrain.resetPose(
+                    PathPlannerPath.fromPathFile("Start Point").getPreviewStartingHolonomicPose()),
+            drivetrain);
+    autoChooser.addOption("Start Point", startPoint);
+
+    /************ Distance Test ************
+     *
+     * used for empirically determining the wheel diameter
+     *
+     */
+    Command distanceTestPathCommand = new PathPlannerAuto("DistanceTest");
+    autoChooser.addOption("Distance Path", distanceTestPathCommand);
+
+    /************ Auto Tuning ************
+     *
+     * useful for tuning the autonomous PID controllers
+     *
+     */
+    Command tuningCommand = new PathPlannerAuto("Tuning");
+    autoChooser.addOption("Auto Tuning", tuningCommand);
 
     /************ Drive Velocity Tuning ************
      *
