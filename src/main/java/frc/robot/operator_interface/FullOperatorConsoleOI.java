@@ -205,6 +205,6 @@ public class FullOperatorConsoleOI implements OperatorInterface {
 
   @Override
   public Trigger getScaleDownShooterVelocityButton() {
-    return operatorPanelButtons[9];
+    return operatorPanelButtons[8];
   }
 }
