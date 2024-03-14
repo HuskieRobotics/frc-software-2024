@@ -366,7 +366,7 @@ public class RobotContainer {
         "disableXStance", Commands.runOnce(drivetrain::disableXstance, drivetrain));
     NamedCommands.registerCommand("wait5Seconds", Commands.waitSeconds(5.0));
 
-    NamedCommands.registerCommand("Shoot", getShootCommand());
+    NamedCommands.registerCommand("Shoot", getAutoShootCommand());
     NamedCommands.registerCommand(
         "PrepAutoSubwooferShot",
         Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER))
@@ -739,6 +739,10 @@ public class RobotContainer {
                 .withName("shooter manual down stop"));
 
     oi.getShootButton().whileTrue(getShootCommand());
+  }
+
+  private Command getAutoShootCommand() {
+    return getShootCommand().withTimeout(1.0);
   }
 
   private Command getShootCommand() {
