@@ -14,13 +14,7 @@
         {
           "type": "named",
           "data": {
-            "name": "PrepAutoShot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "3 Note Start"
+            "name": "PrepAutoSubwooferShot"
           }
         },
         {
@@ -30,9 +24,9 @@
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "PrepAutoShot"
+            "pathName": "3 Note Start"
           }
         },
         {
@@ -51,12 +45,6 @@
           "type": "named",
           "data": {
             "name": "Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "PrepAutoShot"
           }
         },
         {
