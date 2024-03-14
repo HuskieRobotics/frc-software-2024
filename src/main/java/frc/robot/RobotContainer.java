@@ -740,6 +740,11 @@ public class RobotContainer {
                 .withName("shooter manual down stop"));
 
     oi.getShootButton().whileTrue(getShootCommand());
+
+    oi.getScaleDownShooterVelocityButton()
+        .onTrue(Commands.runOnce(shooter::enableScaleDownShooterVelocity));
+    oi.getScaleDownShooterVelocityButton()
+        .onFalse(Commands.runOnce(shooter::disableScaleDownShooterVelocity));
   }
 
   private Command getAutoShootCommand() {

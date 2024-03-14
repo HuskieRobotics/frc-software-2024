@@ -52,6 +52,8 @@ public class Shooter extends SubsystemBase {
   private ShootingPosition shootingPosition = ShootingPosition.FIELD;
   private boolean overrideSetpointsForNextShot = false;
 
+  private boolean scaleDownShooterVelocity = false;
+
   private static final String BUT_IS = " but is ";
 
   // FIXME: consider having 1-2 set distances with fixed angles for auto shots (near subwoofer, near
@@ -106,6 +108,7 @@ public class Shooter extends SubsystemBase {
     Logger.recordOutput("Shooter/ShootingPosition", this.shootingPosition.toString());
     Logger.recordOutput("Shooter/AngleAutomated", this.autoShooter);
     Logger.recordOutput("Shooter/IntakeAutomated", this.intakeEnabled);
+    Logger.recordOutput("Shooter/ScaleDownVelocity", this.scaleDownShooterVelocity);
 
     if (testingMode.get() == 1) {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
@@ -229,6 +232,12 @@ public class Shooter extends SubsystemBase {
       bottomVelocity = ShooterConstants.FAR_RANGE_VELOCITY_BOTTOM;
     }
 
+    // if we are testing in the pits, scale down the velocity to safe levels
+    if (scaleDownShooterVelocity) {
+      topVelocity *= 0.1;
+      bottomVelocity *= 0.1;
+    }
+
     io.setShooterWheelTopVelocity(topVelocity);
     io.setShooterWheelBottomVelocity(bottomVelocity);
   }
@@ -259,6 +268,14 @@ public class Shooter extends SubsystemBase {
 
   public void disableAutoShooter() {
     this.autoShooter = false;
+  }
+
+  public void enableScaleDownShooterVelocity() {
+    this.scaleDownShooterVelocity = true;
+  }
+
+  public void disableScaleDownShooterVelocity() {
+    this.scaleDownShooterVelocity = false;
   }
 
   public BooleanSupplier getShooterAngleReadySupplier() {

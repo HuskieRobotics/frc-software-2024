@@ -125,6 +125,10 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
+  public default Trigger getScaleDownShooterVelocityButton() {
+    return new Trigger(() -> false);
+  }
+
   // climber
 
   public default Trigger getClimberDeployButton() {
