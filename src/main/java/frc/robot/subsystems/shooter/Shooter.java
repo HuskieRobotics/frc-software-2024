@@ -148,7 +148,6 @@ public class Shooter extends SubsystemBase {
         this.resetToInitialState();
       } else if (overrideSetpointsForNextShot) {
         state = State.PREPARING_TO_SHOOT;
-        leds.setShooterLEDState(ShooterLEDState.IS_READY_TO_SHOOT);
       } else {
         double distanceToSpeaker =
             Field2d.getInstance()
@@ -158,7 +157,6 @@ public class Shooter extends SubsystemBase {
                 .getNorm();
         this.adjustAngle(distanceToSpeaker);
         this.setIdleVelocity();
-        leds.setShooterLEDState(ShooterLEDState.IS_READY_TO_SHOOT);
       }
     } else if (state == State.PREPARING_TO_SHOOT) {
       if (!intake.hasNote()) {
@@ -294,7 +292,9 @@ public class Shooter extends SubsystemBase {
   }
 
   public BooleanSupplier getShooterAngleReadySupplier() {
-    return this::isAngleAtSetpoint;
+    return () -> {
+      return shooterInputs.angleEncoderAngleDegrees < MAX_INTAKE_ANGLE;
+    };
   }
 
   public boolean isShooterReadyToShoot(boolean isAimedAtSpeaker) {

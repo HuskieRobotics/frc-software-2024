@@ -84,6 +84,7 @@ public class ShooterConstants {
   // FIXME: tune on practice field and reduce this value
   public static final double ANGLE_TOLERANCE_DEGREES = 5.0;
   public static final double SHOOTER_STORAGE_ANGLE = 10.4;
+  public static final double MAX_INTAKE_ANGLE = 27.0;
   public static final double ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE = 1.0;
   public static final double UPPER_ANGLE_LIMIT = 135.0;
 
@@ -97,7 +98,7 @@ public class ShooterConstants {
   public static final double PODIUM_VELOCITY_BOTTOM = 120;
   public static final double PODIUM_ANGLE = 40;
   public static final double AMP_VELOCITY_TOP = 21.0;
-  public static final double AMP_VELOCITY_BOTTOM = 11.0;
+  public static final double AMP_VELOCITY_BOTTOM = 9.0;
   public static final double AMP_ANGLE = 129;
   public static final double PASS_VELOCITY_TOP = 60.0;
   public static final double PASS_VELOCITY_BOTTOM = 60.0;
