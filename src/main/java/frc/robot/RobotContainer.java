@@ -787,6 +787,8 @@ public class RobotContainer {
   public void periodic() {
     if (this.isReadyToShoot()) {
       LEDs.getInstance().setShooterLEDState(ShooterLEDState.IS_READY_TO_SHOOT);
+    } else if (this.intake.hasNote()) {
+      LEDs.getInstance().setShooterLEDState(ShooterLEDState.AIMING_AT_SPEAKER);
     }
   }
 
