@@ -92,10 +92,7 @@ public abstract class LEDs extends SubsystemBase {
             () -> {
               synchronized (this) {
                 breath(
-                    Section.STATIC_LOW,
-                    Color.kWhite,
-                    Color.kBlack,
-                    System.currentTimeMillis() / 1000.0);
+                    Section.FULL, Color.kWhite, Color.kBlack, System.currentTimeMillis() / 1000.0);
                 this.updateLEDs();
               }
             });
