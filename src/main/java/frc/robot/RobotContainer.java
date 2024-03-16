@@ -36,6 +36,7 @@ import frc.lib.team6328.util.NoteVisualizer;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.TeleopSwerveAimAtSpeaker;
+import frc.robot.commands.TeleopSwerveAimToPass;
 import frc.robot.configs.GenericDrivetrainRobotConfig;
 import frc.robot.configs.NameRobotConfig;
 import frc.robot.configs.PracticeBoardConfig;
@@ -367,6 +368,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("wait5Seconds", Commands.waitSeconds(5.0));
 
     NamedCommands.registerCommand("Shoot", getAutoShootCommand());
+    NamedCommands.registerCommand("Stop And Shoot", getAutoStopAndShootCommand());
     NamedCommands.registerCommand(
         "PrepAutoSubwooferShot",
         Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER))
@@ -750,6 +752,13 @@ public class RobotContainer {
 
   private Command getAutoShootCommand() {
     return getShootCommand().withTimeout(1.0);
+  }
+
+  private Command getAutoStopAndShootCommand() {
+    return Commands.sequence(
+        Commands.runOnce(drivetrain::stop, drivetrain),
+        Commands.waitSeconds(.2),
+        getShootCommand().withTimeout(1.0));
   }
 
   private Command getShootCommand() {
