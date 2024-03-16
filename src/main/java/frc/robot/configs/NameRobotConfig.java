@@ -15,7 +15,7 @@ public class NameRobotConfig extends RobotConfig {
   private static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1;
   private static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2;
   private static final int FRONT_LEFT_MODULE_STEER_ENCODER = 22;
-  private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = 0.361572;
+  private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = 0.42993;
 
   private static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 3;
   private static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 4;
