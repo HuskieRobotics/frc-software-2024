@@ -710,8 +710,12 @@ public class RobotContainer {
                 .withName("store shooter"));
 
     oi.getShootFullFieldButton()
-        .onTrue(
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.PASS), shooter)
+        .toggleOnTrue(
+            Commands.sequence(
+                    Commands.runOnce(
+                        () -> shooter.setShootingPosition(ShootingPosition.PASS), shooter),
+                    new TeleopSwerveAimToPass(
+                        drivetrain, shooter, intake, oi::getTranslateX, oi::getTranslateY))
                 .withName("prepare to pass"));
 
     oi.getShooterAngleUpButton()
