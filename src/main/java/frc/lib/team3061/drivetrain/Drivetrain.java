@@ -98,6 +98,8 @@ public class Drivetrain extends SubsystemBase {
 
   private DriverStation.Alliance alliance = DriverStation.Alliance.Red;
 
+  private Pose2d prevRobotPose = new Pose2d();
+
   /**
    * Creates a new Drivetrain subsystem.
    *
@@ -280,6 +282,7 @@ public class Drivetrain extends SubsystemBase {
    */
   public void resetPose(Pose2d pose) {
     this.io.resetPose(pose);
+    this.prevRobotPose = pose;
   }
 
   /**
@@ -288,7 +291,9 @@ public class Drivetrain extends SubsystemBase {
    * estimator.
    */
   public void resetPoseRotationToGyro() {
-    this.io.resetPose(new Pose2d(this.getPose().getTranslation(), this.getRotation()));
+    Pose2d newPose = new Pose2d(this.getPose().getTranslation(), this.getRotation());
+    this.io.resetPose(newPose);
+    this.prevRobotPose = newPose;
   }
 
   /**
@@ -303,6 +308,7 @@ public class Drivetrain extends SubsystemBase {
     if (pose != null) {
       noPoseAlert.set(false);
       this.io.resetPose(pose.toPose2d());
+      this.prevRobotPose = pose.toPose2d();
     } else {
       noPoseAlert.set(true);
     }
@@ -460,6 +466,15 @@ public class Drivetrain extends SubsystemBase {
     Logger.processInputs(SUBSYSTEM_NAME + "/FR", this.inputs.swerve[1]);
     Logger.processInputs(SUBSYSTEM_NAME + "/BL", this.inputs.swerve[2]);
     Logger.processInputs(SUBSYSTEM_NAME + "/BR", this.inputs.swerve[3]);
+
+    // check for teleportation
+    if (this.inputs.drivetrain.robotPose.minus(prevRobotPose).getTranslation().getNorm() > 0.2) {
+      this.resetPose(prevRobotPose);
+      Logger.recordOutput(SUBSYSTEM_NAME + "/Teleported", true);
+    } else {
+      this.prevRobotPose = this.inputs.drivetrain.robotPose;
+      Logger.recordOutput(SUBSYSTEM_NAME + "/Teleported", false);
+    }
 
     // update the brake mode based on the robot's velocity and state (enabled/disabled)
     updateBrakeMode();
