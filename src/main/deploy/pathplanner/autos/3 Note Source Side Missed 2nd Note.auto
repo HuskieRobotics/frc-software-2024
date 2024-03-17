@@ -1,0 +1,19 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "3 Note Missed 2nd Note"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "3 Note Source Side",
+  "choreoAuto": false
+}

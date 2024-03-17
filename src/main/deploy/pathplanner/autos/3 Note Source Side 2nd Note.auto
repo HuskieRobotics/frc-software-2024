@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7029193205305838,
+      "y": 4.367267881455193
+    },
+    "rotation": 121.08840984705458
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "PrepAutoSubwooferShot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "3 Note Start"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "3 Note Source Side",
+  "choreoAuto": false
+}

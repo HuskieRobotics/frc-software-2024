@@ -406,9 +406,13 @@ public class RobotContainer {
      */
 
     Command threeNoteSourceSide =
-        Commands.parallel(
+        Commands.sequence(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.THREE_NOTE_AUTO)),
-            new PathPlannerAuto("3 Note Source Side"));
+            new PathPlannerAuto("3 Note Source Side 2nd Note"),
+            Commands.either(
+                new PathPlannerAuto("3 Note Source Side Score 2nd Note"),
+                new PathPlannerAuto("3 Note Source Side Missed 2nd Note"),
+                intake::hasNote));
     autoChooser.addOption("3 Note Source Side", threeNoteSourceSide);
 
     /************ 4 Notes ************
