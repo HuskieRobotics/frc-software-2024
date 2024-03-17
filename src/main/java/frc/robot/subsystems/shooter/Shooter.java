@@ -69,6 +69,7 @@ public class Shooter extends SubsystemBase {
   public enum ShootingPosition {
     FIELD,
     FOUR_NOTE_AUTO,
+    THREE_NOTE_AUTO,
     PASS,
     PODIUM,
     SUBWOOFER,
@@ -211,6 +212,8 @@ public class Shooter extends SubsystemBase {
         io.setAngle(ShooterConstants.AMP_ANGLE);
       } else if (shootingPosition == ShootingPosition.FOUR_NOTE_AUTO) {
         io.setAngle(ShooterConstants.FOUR_NOTE_ANGLE);
+      } else if (shootingPosition == ShootingPosition.THREE_NOTE_AUTO) {
+        io.setAngle(ShooterConstants.THREE_NOTE_ANGLE);
       } else if (shootingPosition == ShootingPosition.STORAGE) {
         io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
       } else {
@@ -244,6 +247,9 @@ public class Shooter extends SubsystemBase {
     } else if (shootingPosition == ShootingPosition.FOUR_NOTE_AUTO) {
       topVelocity = ShooterConstants.FOUR_NOTE_VELOCITY;
       bottomVelocity = ShooterConstants.FOUR_NOTE_VELOCITY;
+    } else if (shootingPosition == ShootingPosition.THREE_NOTE_AUTO) {
+      topVelocity = ShooterConstants.THREE_NOTE_VELOCITY;
+      bottomVelocity = ShooterConstants.THREE_NOTE_VELOCITY;
     } else if (shootingPosition == ShootingPosition.STORAGE) {
       topVelocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
       bottomVelocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;

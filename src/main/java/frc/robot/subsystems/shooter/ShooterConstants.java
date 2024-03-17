@@ -105,4 +105,6 @@ public class ShooterConstants {
   public static final double PASS_ANGLE = 63.0;
   public static final double FOUR_NOTE_VELOCITY = 80.0;
   public static final double FOUR_NOTE_ANGLE = 45.0;
+  public static final double THREE_NOTE_VELOCITY = 120.0;
+  public static final double THREE_NOTE_ANGLE = 40;
 }

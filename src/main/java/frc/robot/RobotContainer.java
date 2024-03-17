@@ -393,7 +393,10 @@ public class RobotContainer {
      *
      */
 
-    Command twoNoteSourceSide = new PathPlannerAuto("2 Note Source Side");
+    Command twoNoteSourceSide =
+        Commands.parallel(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.THREE_NOTE_AUTO)),
+            new PathPlannerAuto("2 Note Source Side"));
     autoChooser.addOption("2 Note Source Side", twoNoteSourceSide);
 
     /************ 3 Notes ************
@@ -402,7 +405,10 @@ public class RobotContainer {
      *
      */
 
-    Command threeNoteSourceSide = new PathPlannerAuto("3 Note Source Side");
+    Command threeNoteSourceSide =
+        Commands.parallel(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.THREE_NOTE_AUTO)),
+            new PathPlannerAuto("3 Note Source Side"));
     autoChooser.addOption("3 Note Source Side", threeNoteSourceSide);
 
     /************ 4 Notes ************
@@ -417,7 +423,10 @@ public class RobotContainer {
             new PathPlannerAuto("4 Note Amp-Side Wing"));
     autoChooser.addOption("4 Note Amp-Side Wing", fourNoteAmpSideWing);
 
-    Command fourNoteSourceSideWing = new PathPlannerAuto("4 Note Source-Side Wing");
+    Command fourNoteSourceSideWing =
+        Commands.parallel(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.FOUR_NOTE_AUTO)),
+            new PathPlannerAuto("4 Note Source-Side Wing"));
     autoChooser.addOption("4 Note Source-Side Wing", fourNoteSourceSideWing);
 
     // Command fourNoteAmpSideAlignShot = new PathPlannerAuto("4 Note Collect at Angle Side");
