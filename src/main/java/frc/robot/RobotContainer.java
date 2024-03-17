@@ -412,6 +412,10 @@ public class RobotContainer {
             Commands.either(
                 new PathPlannerAuto("3 Note Source Side Score 2nd Note"),
                 new PathPlannerAuto("3 Note Source Side Missed 2nd Note"),
+                intake::hasNote),
+            Commands.either(
+                new PathPlannerAuto("3 Note Source Side Score 3rd Note"),
+                new PathPlannerAuto("3 Note Source Side Missed 3rd Note"),
                 intake::hasNote));
     autoChooser.addOption("3 Note Source Side", threeNoteSourceSide);
 
