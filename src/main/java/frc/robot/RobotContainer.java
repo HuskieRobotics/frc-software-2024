@@ -373,11 +373,6 @@ public class RobotContainer {
         "PrepAutoSubwooferShot",
         Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER))
             .withName("PrepAutoSubwooferShot"));
-    // FIXME: consider making this a shoot and prep single named command
-    NamedCommands.registerCommand(
-        "PrepAutoShot",
-        Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AUTO))
-            .withName("PrepAutoShot"));
 
     // build auto path commands
 
@@ -416,7 +411,10 @@ public class RobotContainer {
      * 4 note starting from the source side
      *
      */
-    Command fourNoteAmpSideWing = new PathPlannerAuto("4 Note Amp-Side Wing");
+    Command fourNoteAmpSideWing =
+        Commands.parallel(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.FOUR_NOTE_AUTO)),
+            new PathPlannerAuto("4 Note Amp-Side Wing"));
     autoChooser.addOption("4 Note Amp-Side Wing", fourNoteAmpSideWing);
 
     Command fourNoteSourceSideWing = new PathPlannerAuto("4 Note Source-Side Wing");
