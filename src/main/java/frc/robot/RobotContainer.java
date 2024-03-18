@@ -609,8 +609,13 @@ public class RobotContainer {
 
     oi.getAimSpeakerButton()
         .toggleOnTrue(
-            new TeleopSwerveAimAtSpeaker(
-                drivetrain, shooter, intake, oi::getTranslateX, oi::getTranslateY));
+            Commands.sequence(
+                Commands.runOnce(
+                        () -> drivetrain.resetPoseToVision(() -> vision.getBestRobotPose()))
+                    .ignoringDisable(true)
+                    .withName("reset pose to vision"),
+                new TeleopSwerveAimAtSpeaker(
+                    drivetrain, shooter, intake, oi::getTranslateX, oi::getTranslateY)));
 
     // field-relative toggle
     oi.getFieldRelativeButton()
