@@ -49,11 +49,11 @@ public class ShooterConstants {
 
   // Shoot Motors
   public static final double SHOOT_MOTOR_TOP_CONTINUOUS_CURRENT_LIMIT = 30;
-  public static final double SHOOT_MOTOR_TOP_PEAK_CURRENT_LIMIT = 40;
+  public static final double SHOOT_MOTOR_TOP_PEAK_CURRENT_LIMIT = 60;
   public static final double SHOOT_MOTOR_TOP_PEAK_CURRENT_DURATION = 0.1;
 
   public static final double SHOOT_MOTOR_BOTTOM_CONTINUOUS_CURRENT_LIMIT = 30;
-  public static final double SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_LIMIT = 40;
+  public static final double SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_LIMIT = 60;
   public static final double SHOOT_MOTOR_BOTTOM_PEAK_CURRENT_DURATION = 0.1;
 
   public static final double SHOOT_MOTORS_GEAR_RATIO = 0.5;
@@ -84,6 +84,7 @@ public class ShooterConstants {
   // FIXME: tune on practice field and reduce this value
   public static final double ANGLE_TOLERANCE_DEGREES = 5.0;
   public static final double SHOOTER_STORAGE_ANGLE = 10.4;
+  public static final double MAX_INTAKE_ANGLE = 27.0;
   public static final double ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE = 1.0;
   public static final double UPPER_ANGLE_LIMIT = 135.0;
 
@@ -96,10 +97,10 @@ public class ShooterConstants {
   public static final double PODIUM_VELOCITY_TOP = 120;
   public static final double PODIUM_VELOCITY_BOTTOM = 120;
   public static final double PODIUM_ANGLE = 40;
-  public static final double AMP_VELOCITY_TOP = 20.0;
-  public static final double AMP_VELOCITY_BOTTOM = 10.0;
+  public static final double AMP_VELOCITY_TOP = 21.0;
+  public static final double AMP_VELOCITY_BOTTOM = 9.0;
   public static final double AMP_ANGLE = 129;
-  public static final double PASS_VELOCITY_TOP = 80.0;
-  public static final double PASS_VELOCITY_BOTTOM = 80.0;
-  public static final double PASS_ANGLE = 12.0;
+  public static final double PASS_VELOCITY_TOP = 60.0;
+  public static final double PASS_VELOCITY_BOTTOM = 60.0;
+  public static final double PASS_ANGLE = 63.0;
 }

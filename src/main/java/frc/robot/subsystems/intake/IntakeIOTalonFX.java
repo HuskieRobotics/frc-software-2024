@@ -169,8 +169,11 @@ public class IntakeIOTalonFX implements IntakeIO {
     inputs.rollerVelocityRPS = rollerVelocityStatusSignal.getValueAsDouble();
     inputs.kickerVelocityRPS = kickerVelocityStatusSignal.getValueAsDouble();
 
-    inputs.rollerReferenceVelocityRPS = rollerReferenceVelocityStatusSignal.getValueAsDouble();
-    inputs.kickerReferenceVelocityRPS = kickerReferenceVelocityStatusSignal.getValueAsDouble();
+    // Retrieve the closed loop reference status signals directly from the motor in this method
+    // instead of retrieving in advance because the status signal returned depends on the current
+    // control mode.
+    inputs.rollerReferenceVelocityRPS = rollerMotor.getClosedLoopReference().getValueAsDouble();
+    inputs.kickerReferenceVelocityRPS = kickerMotor.getClosedLoopReference().getValueAsDouble();
 
     inputs.rollerTempCelsius = rollerTemperatureStatusSignal.getValueAsDouble();
     inputs.kickerTempCelsius = kickerTemperatureStatusSignal.getValueAsDouble();

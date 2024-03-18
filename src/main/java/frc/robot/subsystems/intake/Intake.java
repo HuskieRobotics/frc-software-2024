@@ -162,7 +162,9 @@ public class Intake extends SubsystemBase {
   }
 
   private void runNoteInShooterState() {
-    if (!inputs.isShooterIRBlocked) {
+    // only transition to the empty state if the note is not in the kicker or the shooter (for amp
+    // shots, the note can move such that it isn't detected by the shooter IR sensor)
+    if (!this.hasNote()) {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
@@ -170,7 +172,7 @@ public class Intake extends SubsystemBase {
   }
 
   private void runShootingState() {
-    if (!inputs.isShooterIRBlocked && !inputs.isKickerIRBlocked) {
+    if (!this.hasNote()) {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();

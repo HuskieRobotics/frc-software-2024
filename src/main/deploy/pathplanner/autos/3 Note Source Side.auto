@@ -14,13 +14,7 @@
         {
           "type": "named",
           "data": {
-            "name": "PrepAutoShot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "3 Note Start"
+            "name": "PrepAutoSubwooferShot"
           }
         },
         {
@@ -30,15 +24,9 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "PrepAutoShot"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "3 Note First Note"
+            "pathName": "3 Note Start"
           }
         },
         {
@@ -50,13 +38,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "PrepAutoShot"
+            "name": "Stop And Shoot"
           }
         },
         {
@@ -74,7 +56,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "Stop And Shoot"
           }
         },
         {

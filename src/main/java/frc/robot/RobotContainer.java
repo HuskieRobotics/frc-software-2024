@@ -36,6 +36,7 @@ import frc.lib.team6328.util.NoteVisualizer;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.TeleopSwerveAimAtSpeaker;
+import frc.robot.commands.TeleopSwerveAimToPass;
 import frc.robot.configs.GenericDrivetrainRobotConfig;
 import frc.robot.configs.NameRobotConfig;
 import frc.robot.configs.PracticeBoardConfig;
@@ -330,7 +331,7 @@ public class RobotContainer {
                     && DriverStation.getMatchTime() <= Math.round(endgameAlert1.get()))
         .onTrue(
             Commands.run(() -> LEDs.getInstance().setEndgameAlert(true))
-                .withTimeout(1.5)
+                .withTimeout(1)
                 .andThen(
                     Commands.run(() -> LEDs.getInstance().setEndgameAlert(false))
                         .withTimeout(1.0)));
@@ -342,9 +343,9 @@ public class RobotContainer {
         .onTrue(
             Commands.sequence(
                 Commands.run(() -> LEDs.getInstance().setEndgameAlert(true)).withTimeout(0.5),
-                Commands.run(() -> LEDs.getInstance().setEndgameAlert(false)).withTimeout(0.5),
+                Commands.run(() -> LEDs.getInstance().setEndgameAlert(false)).withTimeout(0.25),
                 Commands.run(() -> LEDs.getInstance().setEndgameAlert(true)).withTimeout(0.5),
-                Commands.run(() -> LEDs.getInstance().setEndgameAlert(false)).withTimeout(1.0)));
+                Commands.run(() -> LEDs.getInstance().setEndgameAlert(false)).withTimeout(0.25)));
 
     // interrupt all commands by running a command that requires every subsystem. This is used to
     // recover to a known state if the robot becomes "stuck" in a command.
@@ -366,7 +367,8 @@ public class RobotContainer {
         "disableXStance", Commands.runOnce(drivetrain::disableXstance, drivetrain));
     NamedCommands.registerCommand("wait5Seconds", Commands.waitSeconds(5.0));
 
-    NamedCommands.registerCommand("Shoot", getShootCommand());
+    NamedCommands.registerCommand("Shoot", getAutoShootCommand());
+    NamedCommands.registerCommand("Stop And Shoot", getAutoStopAndShootCommand());
     NamedCommands.registerCommand(
         "PrepAutoSubwooferShot",
         Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER))
@@ -382,36 +384,6 @@ public class RobotContainer {
     // add commands to the auto chooser
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
 
-    /************ Start Point ************
-     *
-     * useful for initializing the pose of the robot to a known location
-     *
-     */
-
-    Command startPoint =
-        Commands.runOnce(
-            () ->
-                drivetrain.resetPose(
-                    PathPlannerPath.fromPathFile("Start Point").getPreviewStartingHolonomicPose()),
-            drivetrain);
-    autoChooser.addOption("Start Point", startPoint);
-
-    /************ Distance Test ************
-     *
-     * used for empirically determining the wheel diameter
-     *
-     */
-    Command distanceTestPathCommand = new PathPlannerAuto("DistanceTest");
-    autoChooser.addOption("Distance Path", distanceTestPathCommand);
-
-    /************ Auto Tuning ************
-     *
-     * useful for tuning the autonomous PID controllers
-     *
-     */
-    Command tuningCommand = new PathPlannerAuto("Tuning");
-    autoChooser.addOption("Auto Tuning", tuningCommand);
-
     /************ 1 Note Anywhere ************
      *
      * shoot initial note and leave robot starting zone
@@ -419,28 +391,6 @@ public class RobotContainer {
      */
     Command oneNoteSourceSide = new PathPlannerAuto("1 Note Auto");
     autoChooser.addOption("1 Note Source Side", oneNoteSourceSide);
-
-    // FIXME: add commands to wait for the shooter wheel to reach the desired velocity and then
-    // shoot
-    Command oneNoteAnywhere =
-        Commands.sequence(
-            Commands.waitSeconds(1.0),
-            Commands.runOnce(() -> drivetrain.resetPoseToVision(vision::getBestRobotPose)),
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AUTO)),
-            getShootCommand(),
-            Commands.run(
-                    () -> {
-                      drivetrain.drive(1, 0, 0, false, true);
-                    },
-                    drivetrain)
-                .withTimeout(2.5)
-                .andThen(
-                    Commands.runOnce(
-                        () -> {
-                          drivetrain.drive(0, 0, 0, false, false);
-                        },
-                        drivetrain)));
-    autoChooser.addOption("One Note Anywhere", oneNoteAnywhere);
 
     /************ 2 Notes ************
      *
@@ -472,16 +422,47 @@ public class RobotContainer {
     Command fourNoteSourceSideWing = new PathPlannerAuto("4 Note Source-Side Wing");
     autoChooser.addOption("4 Note Source-Side Wing", fourNoteSourceSideWing);
 
-    Command fourNoteAmpSideAlignShot = new PathPlannerAuto("4 Note Collect at Angle Side");
-    autoChooser.addOption("4 Note Amp Side Align Shot With Collection", fourNoteAmpSideAlignShot);
+    // Command fourNoteAmpSideAlignShot = new PathPlannerAuto("4 Note Collect at Angle Side");
+    // autoChooser.addOption("4 Note Amp Side Align Shot With Collection",
+    // fourNoteAmpSideAlignShot);
 
     /************ 5 Notes ************
      *
      * 5 notes (initial, 3 in wing, and second center note from amp side)
      *
      */
-    // Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Amp Side");
-    // autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
+    Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Amp Side");
+    autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
+
+    /************ Start Point ************
+     *
+     * useful for initializing the pose of the robot to a known location
+     *
+     */
+
+    Command startPoint =
+        Commands.runOnce(
+            () ->
+                drivetrain.resetPose(
+                    PathPlannerPath.fromPathFile("Start Point").getPreviewStartingHolonomicPose()),
+            drivetrain);
+    autoChooser.addOption("Start Point", startPoint);
+
+    /************ Distance Test ************
+     *
+     * used for empirically determining the wheel diameter
+     *
+     */
+    Command distanceTestPathCommand = new PathPlannerAuto("DistanceTest");
+    autoChooser.addOption("Distance Path", distanceTestPathCommand);
+
+    /************ Auto Tuning ************
+     *
+     * useful for tuning the autonomous PID controllers
+     *
+     */
+    Command tuningCommand = new PathPlannerAuto("Tuning");
+    autoChooser.addOption("Auto Tuning", tuningCommand);
 
     /************ Drive Velocity Tuning ************
      *
@@ -666,6 +647,7 @@ public class RobotContainer {
     oi.getResetPoseToVisionButton()
         .onTrue(
             Commands.runOnce(() -> drivetrain.resetPoseToVision(() -> vision.getBestRobotPose()))
+                .ignoringDisable(true)
                 .withName("reset pose to vision"));
 
     // x-stance
@@ -728,8 +710,12 @@ public class RobotContainer {
                 .withName("store shooter"));
 
     oi.getShootFullFieldButton()
-        .onTrue(
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.PASS), shooter)
+        .toggleOnTrue(
+            Commands.sequence(
+                    Commands.runOnce(
+                        () -> shooter.setShootingPosition(ShootingPosition.PASS), shooter),
+                    new TeleopSwerveAimToPass(
+                        drivetrain, shooter, intake, oi::getTranslateX, oi::getTranslateY))
                 .withName("prepare to pass"));
 
     oi.getShooterAngleUpButton()
@@ -761,6 +747,22 @@ public class RobotContainer {
                 .withName("shooter manual down stop"));
 
     oi.getShootButton().whileTrue(getShootCommand());
+
+    oi.getScaleDownShooterVelocityButton()
+        .onTrue(Commands.runOnce(shooter::enableScaleDownShooterVelocity));
+    oi.getScaleDownShooterVelocityButton()
+        .onFalse(Commands.runOnce(shooter::disableScaleDownShooterVelocity));
+  }
+
+  private Command getAutoShootCommand() {
+    return getShootCommand().withTimeout(1.0);
+  }
+
+  private Command getAutoStopAndShootCommand() {
+    return Commands.sequence(
+        Commands.runOnce(drivetrain::stop, drivetrain),
+        Commands.waitSeconds(.2),
+        getShootCommand().withTimeout(1.0));
   }
 
   private Command getShootCommand() {
@@ -798,6 +800,8 @@ public class RobotContainer {
   public void periodic() {
     if (this.isReadyToShoot()) {
       LEDs.getInstance().setShooterLEDState(ShooterLEDState.IS_READY_TO_SHOOT);
+    } else if (this.intake.hasNote()) {
+      LEDs.getInstance().setShooterLEDState(ShooterLEDState.AIMING_AT_SPEAKER);
     }
   }
 

@@ -15,7 +15,7 @@ public class NameRobotConfig extends RobotConfig {
   private static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1;
   private static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2;
   private static final int FRONT_LEFT_MODULE_STEER_ENCODER = 22;
-  private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = 0.361572;
+  private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = 0.480469;
 
   private static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 3;
   private static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 4;
@@ -44,7 +44,7 @@ public class NameRobotConfig extends RobotConfig {
   /* Angle Motor PID Values */
   private static final double ANGLE_KP = 100.0;
   private static final double ANGLE_KI = 0.0;
-  private static final double ANGLE_KD = 3.9628;
+  private static final double ANGLE_KD = 0.05; // 0.39628; // was 3.9628;
 
   private static final double ANGLE_KS = 0.24719;
   private static final double ANGLE_KV = 2.5845; // rps

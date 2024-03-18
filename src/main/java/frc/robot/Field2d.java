@@ -5,6 +5,7 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -217,6 +218,20 @@ public class Field2d {
       return FieldConstants.BlueSpeaker.blueCenterSpeakerOpening;
     } else {
       return FieldConstants.RedSpeaker.redCenterSpeakerOpening;
+    }
+  }
+
+  public Pose2d getAlliancePassPose() {
+    if (alliance == Alliance.Blue) {
+      Transform2d offset =
+          FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.minus(
+              new Pose2d(FieldConstants.blueAmpCenter, new Rotation2d()).div(2));
+      return FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.plus(offset);
+    } else {
+      Transform2d offset =
+          FieldConstants.RedSpeaker.redCenterSpeakerOpening.minus(
+              new Pose2d(FieldConstants.redAmpCenter, new Rotation2d()).div(2));
+      return new Pose2d(FieldConstants.redAmpCenter, new Rotation2d()).plus(offset);
     }
   }
 

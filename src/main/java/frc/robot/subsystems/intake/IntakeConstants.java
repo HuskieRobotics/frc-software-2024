@@ -32,8 +32,11 @@ public class IntakeConstants {
   public static final double INTAKE_VELOCITY_ROLLERS_RPS = 40.0;
   public static final double REPEL_VELOCITY_ROLLERS_RPS = -40.0;
 
-  // match the linear speed of the kicker wheel to that of the intake rollers
-  public static final double KICKER_INTAKING_VELOCITY_RPS = INTAKE_VELOCITY_ROLLERS_RPS / 4;
+  // ideally, we would match the linear speed of the kicker wheel to that of the intake rollers,
+  // however, there is a potential to move the note too far such that it contacts the shooter wheels
+  // and is shot prematurely. To mitigate this risk, we will run the kicker at a slower linear
+  // velocity than the intake.
+  public static final double KICKER_INTAKING_VELOCITY_RPS = INTAKE_VELOCITY_ROLLERS_RPS / 5;
   public static final double KICKER_SHOOTING_VELOCITY_VOLTAGE = 12.0;
 
   public static final double ROLLER_VELOCITY_TOLERANCE = 1.0;

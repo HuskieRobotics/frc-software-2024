@@ -16,37 +16,31 @@
     },
     {
       "anchor": {
-        "x": 2.7313136444454704,
-        "y": 2.7258644195318693
+        "x": 2.395357207776027,
+        "y": 3.628042137600862
       },
       "prevControl": {
-        "x": 4.234419979256624,
-        "y": 1.8988492285696699
+        "x": 3.902988659057887,
+        "y": 1.8286110505870279
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.65,
-      "rotationDegrees": 158.464298629306,
-      "rotateFast": true
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.88,
+    "maxVelocity": 2.85,
     "maxAcceleration": 11.805,
     "maxAngularVelocity": 537.0,
     "maxAngularAcceleration": 2303.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 141.51289155640453,
-    "rotateFast": false
+    "rotation": 137.19697044549739,
+    "rotateFast": true
   },
   "reversed": false,
   "folder": "3 Note Source Side",
@@ -54,5 +48,5 @@
     "rotation": -178.79954269614583,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }
