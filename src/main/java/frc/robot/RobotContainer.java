@@ -387,42 +387,29 @@ public class RobotContainer {
     Command oneNoteSourceSide = new PathPlannerAuto("1 Note Auto");
     autoChooser.addOption("1 Note Source Side", oneNoteSourceSide);
 
-    /************ 2 Notes ************
+    /************ 4 Note Source Side ************
      *
-     * 2 notes (initial and second center note from source side)
-     *
-     */
-
-    Command twoNoteSourceSide =
-        Commands.parallel(
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.THREE_NOTE_AUTO)),
-            new PathPlannerAuto("2 Note Source Side"));
-    autoChooser.addOption("2 Note Source Side", twoNoteSourceSide);
-
-    /************ 3 Notes ************
-     *
-     * 3 notes (initial and first and second center notes from source side)
+     * 4 notes (initial and first three center notes from source side)
      *
      */
 
-    Command threeNoteSourceSide =
+    Command fourNoteSourceSide =
         Commands.sequence(
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.THREE_NOTE_AUTO)),
-            new PathPlannerAuto("3 Note Source Side 2nd Note"),
+            new PathPlannerAuto("Collect 2nd"),
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_AUTO)),
             Commands.either(
-                new PathPlannerAuto("3 Note Source Side Score 2nd Note"),
-                new PathPlannerAuto("3 Note Source Side Missed 2nd Note"),
+                new PathPlannerAuto("Score 2nd Collect 3rd"),
+                new PathPlannerAuto("Missed 2nd Collect 3rd"),
                 intake::hasNote),
             Commands.either(
-                new PathPlannerAuto("3 Note Source Side Score 3rd Note"),
-                new PathPlannerAuto("3 Note Source Side Missed 3rd Note"),
+                new PathPlannerAuto("Score 3rd Collect 4th"),
+                new PathPlannerAuto("Missed 3rd Collect 4th"),
                 intake::hasNote));
-    autoChooser.addOption("3 Note Source Side", threeNoteSourceSide);
+    autoChooser.addOption("4 Note Source Side", fourNoteSourceSide);
 
-    /************ 4 Notes ************
+    /************ 4 Note Amp Side ************
      *
      * 4 note starting from the amp side
-     * 4 note starting from the source side
      *
      */
     Command fourNoteAmpSideWing =
@@ -430,16 +417,6 @@ public class RobotContainer {
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.FOUR_NOTE_AUTO)),
             new PathPlannerAuto("4 Note Amp-Side Wing"));
     autoChooser.addOption("4 Note Amp-Side Wing", fourNoteAmpSideWing);
-
-    Command fourNoteSourceSideWing =
-        Commands.parallel(
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.FOUR_NOTE_AUTO)),
-            new PathPlannerAuto("4 Note Source-Side Wing"));
-    autoChooser.addOption("4 Note Source-Side Wing", fourNoteSourceSideWing);
-
-    // Command fourNoteAmpSideAlignShot = new PathPlannerAuto("4 Note Collect at Angle Side");
-    // autoChooser.addOption("4 Note Amp Side Align Shot With Collection",
-    // fourNoteAmpSideAlignShot);
 
     /************ 5 Notes ************
      *
