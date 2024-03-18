@@ -8,12 +8,12 @@
         {
           "type": "path",
           "data": {
-            "pathName": "3 Note Missed 2nd Note"
+            "pathName": "Missed 2nd Collect 3rd"
           }
         }
       ]
     }
   },
-  "folder": "3 Note Source Side",
+  "folder": "Source Side Notes",
   "choreoAuto": false
 }

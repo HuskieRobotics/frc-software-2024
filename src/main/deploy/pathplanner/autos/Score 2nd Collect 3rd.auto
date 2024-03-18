@@ -1,37 +1,31 @@
 {
   "version": 1.0,
-  "startingPose": {
-    "position": {
-      "x": 0.7029193205305838,
-      "y": 4.367267881455193
-    },
-    "rotation": 121.08840984705458
-  },
+  "startingPose": null,
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "PrepAutoSubwooferShot"
+            "pathName": "Score 2nd"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "Stop And Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "3 Note Start"
+            "pathName": "Collect 3rd"
           }
         }
       ]
     }
   },
-  "folder": "3 Note Source Side",
+  "folder": "Source Side Notes",
   "choreoAuto": false
 }

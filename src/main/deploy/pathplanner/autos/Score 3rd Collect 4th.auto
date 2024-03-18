@@ -8,7 +8,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "3 Note Second Shot"
+            "pathName": "Score 3rd"
           }
         },
         {
@@ -20,12 +20,12 @@
         {
           "type": "path",
           "data": {
-            "pathName": "3 Note Third Note"
+            "pathName": "Collect 4th"
           }
         }
       ]
     }
   },
-  "folder": "3 Note Source Side",
+  "folder": "Source Side Notes",
   "choreoAuto": false
 }

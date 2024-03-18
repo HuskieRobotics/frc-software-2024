@@ -26,13 +26,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "3 Note Start"
+            "pathName": "Collect 2nd"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "3 Note First Shot"
+            "pathName": "Score 2nd"
           }
         },
         {
@@ -44,13 +44,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "3 Note Second Note"
+            "pathName": "Collect 3rd"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "3 Note Second Shot"
+            "pathName": "Score 3rd"
           }
         },
         {
