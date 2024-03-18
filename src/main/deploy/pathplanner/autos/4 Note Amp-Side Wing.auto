@@ -70,6 +70,12 @@
           "data": {
             "pathName": "Coast to center"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Coast to center"
+          }
         }
       ]
     }
