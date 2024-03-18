@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.button.*;
 /** Interface for all driver and operator controls. */
 public interface OperatorInterface {
 
+  // drivetrain, generic
+
   public default double getTranslateX() {
     return 0.0;
   }
@@ -73,11 +75,100 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getInterruptAll() {
+  // drivetrain, game-specific
+
+  public default Trigger getAimSpeakerButton() {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getLockToSpeakerButton() {
+  public default Trigger getAlignAndIntakeNoteFromSourceButton() {
+    return new Trigger(() -> false);
+  }
+
+  // intake
+
+  public default Trigger getIntakeAutomationSwitch() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getRunIntakeButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getOuttakeAllButton() {
+    return new Trigger(() -> false);
+  }
+
+  // shooter
+
+  public default Trigger getShootButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getShootFullFieldButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getPrepareToScoreAmpButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getPrepareToScoreSubwooferButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getPrepareToScorePodiumButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getShooterAngleDownButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getAimAutomationSwitch() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getShooterAngleUpButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getStoreShooterButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getScaleDownShooterVelocityButton() {
+    return new Trigger(() -> false);
+  }
+
+  // climber
+
+  public default Trigger getClimberDeployButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getFinishClimbButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getEnableManualClimberButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getDisableManualClimberButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getClimberUpButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getClimberDownButton() {
+    return new Trigger(() -> false);
+  }
+
+  // miscellaneous
+  public default Trigger getInterruptAll() {
     return new Trigger(() -> false);
   }
 }

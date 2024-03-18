@@ -18,7 +18,8 @@ public interface VisionIO {
     double estimatedCameraPoseTimestamp = 0.0;
     boolean[] tagsSeen = new boolean[] {};
     double lastCameraTimestamp = 0.0;
-    double minAmbiguity = 0.0;
+    double ambiguity = 0.0;
+    boolean poseFromMultiTag = false;
   }
 
   /**

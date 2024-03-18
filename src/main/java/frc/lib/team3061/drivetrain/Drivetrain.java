@@ -15,6 +15,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -28,11 +29,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.DrivetrainIO.SwerveIOInputs;
-import frc.lib.team3061.leds.LEDs;
 import frc.lib.team6328.util.Alert;
 import frc.lib.team6328.util.Alert.AlertType;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
+import frc.robot.Field2d;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -78,13 +79,14 @@ public class Drivetrain extends SubsystemBase {
   private boolean brakeMode;
   private Timer brakeModeTimer = new Timer();
   private static final double BREAK_MODE_DELAY_SEC = 10.0;
-  private static final double LEDS_FALLEN_ANGLE_DEGREES = 60.0; // Threshold to detect falls
 
   private DriveMode driveMode = DriveMode.NORMAL;
 
   private boolean isTurbo;
 
   private boolean isMoveToPoseEnabled;
+
+  private boolean isAimToSpeakerEnabled;
 
   private Alert noPoseAlert =
       new Alert("Attempted to reset pose from vision, but no pose was found.", AlertType.WARNING);
@@ -94,7 +96,9 @@ public class Drivetrain extends SubsystemBase {
   private ChassisSpeeds prevSpeeds = new ChassisSpeeds();
   private double[] prevSteerVelocitiesRevPerMin = new double[4];
 
-  private DriverStation.Alliance alliance = DriverStation.Alliance.Blue;
+  private DriverStation.Alliance alliance = DriverStation.Alliance.Red;
+
+  private Pose2d prevRobotPose = new Pose2d();
 
   /**
    * Creates a new Drivetrain subsystem.
@@ -112,6 +116,8 @@ public class Drivetrain extends SubsystemBase {
     this.isTurbo = true;
 
     this.isMoveToPoseEnabled = true;
+
+    this.isAimToSpeakerEnabled = false;
 
     ShuffleboardTab tabMain = Shuffleboard.getTab("MAIN");
     tabMain
@@ -276,6 +282,7 @@ public class Drivetrain extends SubsystemBase {
    */
   public void resetPose(Pose2d pose) {
     this.io.resetPose(pose);
+    this.prevRobotPose = pose;
   }
 
   /**
@@ -284,7 +291,9 @@ public class Drivetrain extends SubsystemBase {
    * estimator.
    */
   public void resetPoseRotationToGyro() {
-    this.io.resetPose(new Pose2d(this.getPose().getTranslation(), this.getRotation()));
+    Pose2d newPose = new Pose2d(this.getPose().getTranslation(), this.getRotation());
+    this.io.resetPose(newPose);
+    this.prevRobotPose = newPose;
   }
 
   /**
@@ -299,6 +308,7 @@ public class Drivetrain extends SubsystemBase {
     if (pose != null) {
       noPoseAlert.set(false);
       this.io.resetPose(pose.toPose2d());
+      this.prevRobotPose = pose.toPose2d();
     } else {
       noPoseAlert.set(true);
     }
@@ -457,11 +467,14 @@ public class Drivetrain extends SubsystemBase {
     Logger.processInputs(SUBSYSTEM_NAME + "/BL", this.inputs.swerve[2]);
     Logger.processInputs(SUBSYSTEM_NAME + "/BR", this.inputs.swerve[3]);
 
-    // Check for fallen robot
-    LEDs.getInstance()
-        .setFallen(
-            Math.abs(this.inputs.gyro.pitchDeg) > LEDS_FALLEN_ANGLE_DEGREES
-                || Math.abs(this.inputs.gyro.rollDeg) > LEDS_FALLEN_ANGLE_DEGREES);
+    // check for teleportation
+    if (this.inputs.drivetrain.robotPose.minus(prevRobotPose).getTranslation().getNorm() > 0.2) {
+      this.resetPose(prevRobotPose);
+      Logger.recordOutput(SUBSYSTEM_NAME + "/Teleported", true);
+    } else {
+      this.prevRobotPose = this.inputs.drivetrain.robotPose;
+      Logger.recordOutput(SUBSYSTEM_NAME + "/Teleported", false);
+    }
 
     // update the brake mode based on the robot's velocity and state (enabled/disabled)
     updateBrakeMode();
@@ -941,9 +954,11 @@ public class Drivetrain extends SubsystemBase {
    * stopped moving for the specified period of time, and brake mode is enabled, disable it.
    */
   private void updateBrakeMode() {
-    if (DriverStation.isEnabled() && !brakeMode) {
-      brakeMode = true;
-      setBrakeMode(true);
+    if (DriverStation.isEnabled()) {
+      if (!brakeMode) {
+        brakeMode = true;
+        setBrakeMode(true);
+      }
       brakeModeTimer.restart();
 
     } else if (!DriverStation.isEnabled()) {
@@ -964,6 +979,30 @@ public class Drivetrain extends SubsystemBase {
 
   private void setBrakeMode(boolean enable) {
     this.io.setBrakeMode(enable);
+  }
+
+  public void enableAimToSpeaker() {
+    this.isAimToSpeakerEnabled = true;
+  }
+
+  public void disableAimToSpeaker() {
+    this.isAimToSpeakerEnabled = false;
+  }
+
+  public boolean isAimToSpeakerEnabled() {
+    return this.isAimToSpeakerEnabled;
+  }
+
+  public boolean isAimedAtSpeaker() {
+    Transform2d translation =
+        new Transform2d(
+            Field2d.getInstance().getAllianceSpeakerCenter().getX() - this.getPose().getX(),
+            Field2d.getInstance().getAllianceSpeakerCenter().getY() - this.getPose().getY(),
+            new Rotation2d());
+    return Math.abs(
+            Math.atan2(translation.getY(), translation.getX())
+                - this.getPose().getRotation().getRadians())
+        < ANGLE_TO_SPEAKER_TOLERANCE;
   }
 
   private enum DriveMode {

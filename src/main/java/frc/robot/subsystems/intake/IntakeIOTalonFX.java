@@ -5,10 +5,11 @@ import static frc.robot.subsystems.intake.IntakeConstants.*;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -32,6 +33,7 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   private VelocityTorqueCurrentFOC rollerVelocityRequest;
   private VelocityTorqueCurrentFOC kickerVelocityRequest;
+  private VoltageOut kickerVoltageRequest;
 
   private StatusSignal<Double> rollerVelocityStatusSignal;
   private StatusSignal<Double> kickerVelocityStatusSignal;
@@ -99,6 +101,7 @@ public class IntakeIOTalonFX implements IntakeIO {
 
     rollerVelocityRequest = new VelocityTorqueCurrentFOC(0);
     kickerVelocityRequest = new VelocityTorqueCurrentFOC(0);
+    kickerVoltageRequest = new VoltageOut(0);
 
     rollerVelocityStatusSignal = rollerMotor.getVelocity();
     kickerVelocityStatusSignal = kickerMotor.getVelocity();
@@ -166,8 +169,11 @@ public class IntakeIOTalonFX implements IntakeIO {
     inputs.rollerVelocityRPS = rollerVelocityStatusSignal.getValueAsDouble();
     inputs.kickerVelocityRPS = kickerVelocityStatusSignal.getValueAsDouble();
 
-    inputs.rollerReferenceVelocityRPS = rollerReferenceVelocityStatusSignal.getValueAsDouble();
-    inputs.kickerReferenceVelocityRPS = kickerReferenceVelocityStatusSignal.getValueAsDouble();
+    // Retrieve the closed loop reference status signals directly from the motor in this method
+    // instead of retrieving in advance because the status signal returned depends on the current
+    // control mode.
+    inputs.rollerReferenceVelocityRPS = rollerMotor.getClosedLoopReference().getValueAsDouble();
+    inputs.kickerReferenceVelocityRPS = kickerMotor.getClosedLoopReference().getValueAsDouble();
 
     inputs.rollerTempCelsius = rollerTemperatureStatusSignal.getValueAsDouble();
     inputs.kickerTempCelsius = kickerTemperatureStatusSignal.getValueAsDouble();
@@ -215,24 +221,25 @@ public class IntakeIOTalonFX implements IntakeIO {
     kickerMotor.setControl(kickerVelocityRequest.withVelocity(rps));
   }
 
+  @Override
+  public void setKickerVoltage(double voltage) {
+    kickerMotor.setControl(kickerVoltageRequest.withOutput(voltage));
+  }
+
   private void configureIntakeRollerMotor(TalonFX rollerMotor) {
     TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
-    CurrentLimitsConfigs rollerCurrentLimits = new CurrentLimitsConfigs();
+    TorqueCurrentConfigs rollerTorqueCurrentConfigs = new TorqueCurrentConfigs();
 
-    rollerCurrentLimits.SupplyCurrentLimit =
-        IntakeConstants.ROLLERS_CONTINUOUS_SUPPLY_CURRENT_LIMIT;
-    rollerCurrentLimits.SupplyCurrentThreshold = IntakeConstants.ROLLERS_PEAK_SUPPLY_CURRENT_LIMIT;
-    rollerCurrentLimits.SupplyTimeThreshold = IntakeConstants.ROLLERS_PEAK_SUPPLY_CURRENT_DURATION;
-
-    rollerCurrentLimits.StatorCurrentLimit =
+    rollerTorqueCurrentConfigs.PeakForwardTorqueCurrent =
         IntakeConstants.ROLLERS_CONTINUOUS_STATOR_CURRENT_LIMIT;
+    rollerTorqueCurrentConfigs.PeakReverseTorqueCurrent =
+        -IntakeConstants.ROLLERS_CONTINUOUS_STATOR_CURRENT_LIMIT;
 
-    rollerCurrentLimits.SupplyCurrentLimitEnable = true;
-    rollerCurrentLimits.StatorCurrentLimitEnable = true;
+    // FIXME: need to limit intake current but not so much that we can't intake a note; perhaps
+    // switch to voltage control where we can use more sophisticated current limiting?
+    // rollerConfig.TorqueCurrent = rollerTorqueCurrentConfigs;
 
-    rollerConfig.CurrentLimits = rollerCurrentLimits;
-
-    rollerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    rollerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     rollerConfig.Slot0.kP = rollerMotorsKP.get();
     rollerConfig.Slot0.kI = rollerMotorsKI.get();
@@ -262,18 +269,14 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   private void configureIntakeKickerMotor(TalonFX kickerMotor) {
     TalonFXConfiguration kickerConfig = new TalonFXConfiguration();
-    CurrentLimitsConfigs kickerCurrentLimits = new CurrentLimitsConfigs();
+    TorqueCurrentConfigs kickerTorqueCurrentConfigs = new TorqueCurrentConfigs();
 
-    kickerCurrentLimits.SupplyCurrentLimit = IntakeConstants.KICKER_CONTINUOUS_SUPPLY_CURRENT_LIMIT;
-    kickerCurrentLimits.SupplyCurrentThreshold = IntakeConstants.KICKER_PEAK_SUPPLY_CURRENT_LIMIT;
-    kickerCurrentLimits.SupplyTimeThreshold = IntakeConstants.KICKER_PEAK_SUPPLY_CURRENT_DURATION;
+    kickerTorqueCurrentConfigs.PeakForwardTorqueCurrent =
+        IntakeConstants.KICKER_PEAK_SUPPLY_CURRENT_LIMIT;
+    kickerTorqueCurrentConfigs.PeakReverseTorqueCurrent =
+        -IntakeConstants.KICKER_PEAK_SUPPLY_CURRENT_LIMIT;
 
-    kickerCurrentLimits.StatorCurrentLimit = IntakeConstants.KICKER_CONTINUOUS_STATOR_CURRENT_LIMIT;
-
-    kickerCurrentLimits.StatorCurrentLimitEnable = true;
-    kickerCurrentLimits.SupplyCurrentLimitEnable = true;
-
-    kickerConfig.CurrentLimits = kickerCurrentLimits;
+    kickerConfig.TorqueCurrent = kickerTorqueCurrentConfigs;
 
     kickerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     kickerConfig.Slot0.kP = kickerMotorKP.get();

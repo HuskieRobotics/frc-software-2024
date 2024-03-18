@@ -2,15 +2,21 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7543128599770712,
-      "y": 6.637696878997361
+      "x": 0.9,
+      "y": 6.651395848246243
     },
-    "rotation": -121.4295656148386
+    "rotation": -137.74274047967788
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "PrepAutoSubwooferShot"
+          }
+        },
         {
           "type": "named",
           "data": {
@@ -48,12 +54,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Note 3 - Shoot 3"
@@ -63,6 +63,12 @@
           "type": "named",
           "data": {
             "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Coast to center"
           }
         }
       ]
