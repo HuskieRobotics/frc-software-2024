@@ -167,7 +167,7 @@ public abstract class LEDs extends SubsystemBase {
 
     if (endgameAlert) {
       // Endgame alert
-      strobe(Section.FULL, Color.kRed, STROBE_SLOW_DURATION);
+      strobe(Section.FULL, Color.kYellow, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.SHOOTING) {
       // Actively shooting
       strobe(Section.FULL, Color.kGreen, STROBE_SLOW_DURATION);

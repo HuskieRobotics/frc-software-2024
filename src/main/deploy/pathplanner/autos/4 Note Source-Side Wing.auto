@@ -38,7 +38,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Stop And Shoot"
+            "name": "Shoot"
           }
         },
         {
@@ -50,7 +50,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Stop And Shoot"
+            "name": "Shoot"
           }
         },
         {
@@ -62,7 +62,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Stop And Shoot"
+            "name": "Shoot"
           }
         }
       ]
