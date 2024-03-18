@@ -864,29 +864,31 @@ public class Drivetrain extends SubsystemBase {
         angleTarget = 0;
         break;
       case CLOCKWISE:
+        velocityTarget = (RobotConfig.getInstance().getTrackwidth()/2)*Math.sqrt(2)*Math.PI;
         return Commands.parallel(
                 Commands.run(() -> this.drive(0, 0, -Math.PI, false, false), this),
                 Commands.waitSeconds(1)
                     .andThen(
                         Commands.runOnce(
                             () -> {
-                              checkSwerveModule(0, 135, ANGLE_CHECK_TOLERANCE, -0.38 * Math.PI, VELOCITY_CHECK_TOLERANCE);
-                              checkSwerveModule(1, 45, ANGLE_CHECK_TOLERANCE, -0.38 * Math.PI, VELOCITY_CHECK_TOLERANCE);
-                              checkSwerveModule(2, 45, ANGLE_CHECK_TOLERANCE, 0.38 * Math.PI, VELOCITY_CHECK_TOLERANCE);
-                              checkSwerveModule(3, 135, ANGLE_CHECK_TOLERANCE, 0.38 * Math.PI, VELOCITY_CHECK_TOLERANCE);
+                              checkSwerveModule(0, 135, ANGLE_CHECK_TOLERANCE, -velocityTarget, VELOCITY_CHECK_TOLERANCE);
+                              checkSwerveModule(1, 45, ANGLE_CHECK_TOLERANCE, -velocityTarget, VELOCITY_CHECK_TOLERANCE);
+                              checkSwerveModule(2, 45, ANGLE_CHECK_TOLERANCE, velocityTarget, VELOCITY_CHECK_TOLERANCE);
+                              checkSwerveModule(3, 135, ANGLE_CHECK_TOLERANCE, velocityTarget, VELOCITY_CHECK_TOLERANCE);
                             })))
             .withTimeout(1);
       case COUNTERCLOCKWISE:
+        velocityTarget = (RobotConfig.getInstance().getTrackwidth()/2)*Math.sqrt(2)*Math.PI;
         return Commands.parallel(
                 Commands.run(() -> this.drive(0, 0, Math.PI, false, false), this),
                 Commands.waitSeconds(1)
                     .andThen(
                         Commands.runOnce(
                             () -> {
-                              checkSwerveModule(0, 135, ANGLE_CHECK_TOLERANCE, .38 * Math.PI, VELOCITY_CHECK_TOLERANCE);
-                              checkSwerveModule(1, 45, ANGLE_CHECK_TOLERANCE, .38 * Math.PI, VELOCITY_CHECK_TOLERANCE);
-                              checkSwerveModule(2, 45, ANGLE_CHECK_TOLERANCE, -.38 * Math.PI, VELOCITY_CHECK_TOLERANCE);
-                              checkSwerveModule(3, 135, ANGLE_CHECK_TOLERANCE, -.38 * Math.PI, VELOCITY_CHECK_TOLERANCE);
+                              checkSwerveModule(0, 135, ANGLE_CHECK_TOLERANCE, velocityTarget, VELOCITY_CHECK_TOLERANCE);
+                              checkSwerveModule(1, 45, ANGLE_CHECK_TOLERANCE, velocityTarget, VELOCITY_CHECK_TOLERANCE);
+                              checkSwerveModule(2, 45, ANGLE_CHECK_TOLERANCE, -velocityTarget, VELOCITY_CHECK_TOLERANCE);
+                              checkSwerveModule(3, 135, ANGLE_CHECK_TOLERANCE, -velocityTarget, VELOCITY_CHECK_TOLERANCE);
                             })))
             .withTimeout(1);
       default:
