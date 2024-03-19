@@ -47,6 +47,9 @@ public class IntakeIOTalonFX implements IntakeIO {
   private StatusSignal<Double> rollerReferenceVelocityStatusSignal;
   private StatusSignal<Double> kickerReferenceVelocityStatusSignal;
 
+  private StatusSignal<Double> rollerClosedLoopErrorStatusSignal;
+  private StatusSignal<Double> kickerClosedLoopErrorStatusSignal;
+
   private StatusSignal<Double> rollerTemperatureStatusSignal;
   private StatusSignal<Double> kickerTemperatureStatusSignal;
 
@@ -103,24 +106,6 @@ public class IntakeIOTalonFX implements IntakeIO {
     kickerVelocityRequest = new VelocityTorqueCurrentFOC(0);
     kickerVoltageRequest = new VoltageOut(0);
 
-    rollerVelocityStatusSignal = rollerMotor.getVelocity();
-    kickerVelocityStatusSignal = kickerMotor.getVelocity();
-
-    rollerStatorCurrentStatusSignal = rollerMotor.getStatorCurrent();
-    kickerStatorCurrentStatusSignal = kickerMotor.getStatorCurrent();
-
-    rollerSupplyCurrentStatusSignal = rollerMotor.getSupplyCurrent();
-    kickerSupplyCurrentStatusSignal = kickerMotor.getSupplyCurrent();
-
-    rollerReferenceVelocityStatusSignal = rollerMotor.getClosedLoopReference();
-    kickerReferenceVelocityStatusSignal = kickerMotor.getClosedLoopReference();
-
-    rollerTemperatureStatusSignal = rollerMotor.getDeviceTemp();
-    kickerTemperatureStatusSignal = kickerMotor.getDeviceTemp();
-
-    rollerVoltageStatusSignal = rollerMotor.getMotorVoltage();
-    kickerVoltageStatusSignal = kickerMotor.getMotorVoltage();
-
     this.rollerMotorSim =
         new VelocitySystemSim(
             rollerMotor,
@@ -147,10 +132,12 @@ public class IntakeIOTalonFX implements IntakeIO {
         rollerStatorCurrentStatusSignal,
         rollerSupplyCurrentStatusSignal,
         rollerReferenceVelocityStatusSignal,
+        rollerClosedLoopErrorStatusSignal,
         kickerSupplyCurrentStatusSignal,
         kickerStatorCurrentStatusSignal,
         kickerVelocityStatusSignal,
         kickerReferenceVelocityStatusSignal,
+        kickerClosedLoopErrorStatusSignal,
         rollerTemperatureStatusSignal,
         kickerTemperatureStatusSignal,
         rollerVoltageStatusSignal,
@@ -172,8 +159,11 @@ public class IntakeIOTalonFX implements IntakeIO {
     // Retrieve the closed loop reference status signals directly from the motor in this method
     // instead of retrieving in advance because the status signal returned depends on the current
     // control mode.
-    inputs.rollerReferenceVelocityRPS = rollerMotor.getClosedLoopReference().getValueAsDouble();
-    inputs.kickerReferenceVelocityRPS = kickerMotor.getClosedLoopReference().getValueAsDouble();
+    inputs.rollerReferenceVelocityRPS = rollerReferenceVelocityStatusSignal.getValueAsDouble();
+    inputs.kickerReferenceVelocityRPS = kickerReferenceVelocityStatusSignal.getValueAsDouble();
+
+    inputs.rollerClosedLoopErrorRPS = rollerClosedLoopErrorStatusSignal.getValueAsDouble();
+    inputs.kickerClosedLoopErrorRPS = kickerClosedLoopErrorStatusSignal.getValueAsDouble();
 
     inputs.rollerTempCelsius = rollerTemperatureStatusSignal.getValueAsDouble();
     inputs.kickerTempCelsius = kickerTemperatureStatusSignal.getValueAsDouble();
@@ -264,6 +254,17 @@ public class IntakeIOTalonFX implements IntakeIO {
       configAlert.setText(status.toString());
     }
 
+    // set the roller velocity to set the control mode before retrieving the closed-loop status
+    // signals because the status signal returned depends on the current control mode.
+    this.setRollerVelocity(0.0);
+    rollerVelocityStatusSignal = rollerMotor.getVelocity();
+    rollerStatorCurrentStatusSignal = rollerMotor.getStatorCurrent();
+    rollerSupplyCurrentStatusSignal = rollerMotor.getSupplyCurrent();
+    rollerReferenceVelocityStatusSignal = rollerMotor.getClosedLoopReference();
+    rollerClosedLoopErrorStatusSignal = rollerMotor.getClosedLoopError();
+    rollerTemperatureStatusSignal = rollerMotor.getDeviceTemp();
+    rollerVoltageStatusSignal = rollerMotor.getMotorVoltage();
+
     FaultReporter.getInstance().registerHardware("INTAKE", "IntakeRoller", rollerMotor);
   }
 
@@ -300,6 +301,17 @@ public class IntakeIOTalonFX implements IntakeIO {
       configAlert.set(true);
       configAlert.setText(status.toString());
     }
+
+    // set the kick velocity to set the control mode before retrieving the closed-loop status
+    // signals because the status signal returned depends on the current control mode.
+    this.setKickerVelocity(0.0);
+    kickerVelocityStatusSignal = kickerMotor.getVelocity();
+    kickerStatorCurrentStatusSignal = kickerMotor.getStatorCurrent();
+    kickerSupplyCurrentStatusSignal = kickerMotor.getSupplyCurrent();
+    kickerReferenceVelocityStatusSignal = kickerMotor.getClosedLoopReference();
+    kickerClosedLoopErrorStatusSignal = kickerMotor.getClosedLoopError();
+    kickerTemperatureStatusSignal = kickerMotor.getDeviceTemp();
+    kickerVoltageStatusSignal = kickerMotor.getMotorVoltage();
 
     FaultReporter.getInstance().registerHardware("INTAKE", "IntakeKicker", kickerMotor);
   }
