@@ -70,6 +70,7 @@ public class Shooter extends SubsystemBase {
     FIELD,
     FOUR_NOTE_AUTO,
     SOURCE_SIDE_AUTO,
+    SOURCE_SIDE_UNDER_STAGE_AUTO,
     PASS,
     PODIUM,
     SUBWOOFER,
@@ -211,9 +212,11 @@ public class Shooter extends SubsystemBase {
       } else if (shootingPosition == ShootingPosition.AMP) {
         io.setAngle(ShooterConstants.AMP_ANGLE);
       } else if (shootingPosition == ShootingPosition.FOUR_NOTE_AUTO) {
-        io.setAngle(ShooterConstants.FOUR_NOTE_ANGLE);
+        io.setAngle(ShooterConstants.FOUR_NOTE_AUTO_ANGLE);
       } else if (shootingPosition == ShootingPosition.SOURCE_SIDE_AUTO) {
-        io.setAngle(ShooterConstants.THREE_NOTE_ANGLE);
+        io.setAngle(ShooterConstants.SOURCE_SIDE_AUTO_ANGLE);
+      } else if (shootingPosition == ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO) {
+        io.setAngle(ShooterConstants.SOURCE_SIDE_UNDER_STAGE_AUTO_ANGLE);
       } else if (shootingPosition == ShootingPosition.STORAGE) {
         io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
       } else {
@@ -245,11 +248,14 @@ public class Shooter extends SubsystemBase {
       topVelocity = ShooterConstants.AMP_VELOCITY_TOP;
       bottomVelocity = ShooterConstants.AMP_VELOCITY_BOTTOM;
     } else if (shootingPosition == ShootingPosition.FOUR_NOTE_AUTO) {
-      topVelocity = ShooterConstants.FOUR_NOTE_VELOCITY;
-      bottomVelocity = ShooterConstants.FOUR_NOTE_VELOCITY;
+      topVelocity = ShooterConstants.FOUR_NOTE_AUTO_VELOCITY;
+      bottomVelocity = ShooterConstants.FOUR_NOTE_AUTO_VELOCITY;
     } else if (shootingPosition == ShootingPosition.SOURCE_SIDE_AUTO) {
-      topVelocity = ShooterConstants.THREE_NOTE_VELOCITY;
-      bottomVelocity = ShooterConstants.THREE_NOTE_VELOCITY;
+      topVelocity = ShooterConstants.SOURCE_SIDE_AUTO_VELOCITY;
+      bottomVelocity = ShooterConstants.SOURCE_SIDE_AUTO_VELOCITY;
+    } else if (shootingPosition == ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO) {
+      topVelocity = ShooterConstants.SOURCE_SIDE_UNDER_STAGE_AUTO_VELOCITY;
+      bottomVelocity = ShooterConstants.SOURCE_SIDE_UNDER_STAGE_AUTO_VELOCITY;
     } else if (shootingPosition == ShootingPosition.STORAGE) {
       topVelocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
       bottomVelocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;

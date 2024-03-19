@@ -103,8 +103,10 @@ public class ShooterConstants {
   public static final double PASS_VELOCITY_TOP = 60.0;
   public static final double PASS_VELOCITY_BOTTOM = 60.0;
   public static final double PASS_ANGLE = 63.0;
-  public static final double FOUR_NOTE_VELOCITY = 80.0;
-  public static final double FOUR_NOTE_ANGLE = 45.0;
-  public static final double THREE_NOTE_VELOCITY = 120.0;
-  public static final double THREE_NOTE_ANGLE = 40;
+  public static final double FOUR_NOTE_AUTO_VELOCITY = 80.0; // FIXME: tune
+  public static final double FOUR_NOTE_AUTO_ANGLE = 45.0; // FIXME: tune
+  public static final double SOURCE_SIDE_AUTO_VELOCITY = 120.0; // FIXME: tune
+  public static final double SOURCE_SIDE_AUTO_ANGLE = 40; // FIXME: tune
+  public static final double SOURCE_SIDE_UNDER_STAGE_AUTO_VELOCITY = 120.0; // FIXME: tune
+  public static final double SOURCE_SIDE_UNDER_STAGE_AUTO_ANGLE = 40; // FIXME: tune
 }

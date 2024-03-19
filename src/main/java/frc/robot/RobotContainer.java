@@ -412,7 +412,9 @@ public class RobotContainer {
                                 ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO)),
                     new PathPlannerAuto("Score 3rd Collect 4th")),
                 new PathPlannerAuto("Missed 3rd Collect 4th"),
-                intake::hasNote));
+                intake::hasNote),
+            Commands.either(
+                new PathPlannerAuto("Score 4th Center"), Commands.none(), intake::hasNote));
     autoChooser.addOption("4 Note Source Side", fourNoteSourceSide);
 
     /************ 4 Note Amp Side ************
