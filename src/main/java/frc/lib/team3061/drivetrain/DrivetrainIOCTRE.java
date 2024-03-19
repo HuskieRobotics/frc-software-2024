@@ -317,8 +317,7 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     inputs.drivetrain.swerveReferenceStates = this.getState().ModuleTargets;
 
     // log poses, 3D geometry, and swerve module states, gyro offset
-    inputs.drivetrain.robotPose =
-        new Pose2d(this.getState().Pose.getTranslation(), this.getState().Pose.getRotation());
+    inputs.drivetrain.robotPose = this.getState().Pose;
     inputs.drivetrain.robotPose3D = new Pose3d(inputs.drivetrain.robotPose);
 
     inputs.drivetrain.targetVXMetersPerSec = this.targetChassisSpeeds.vxMetersPerSecond;
@@ -655,14 +654,18 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   }
 
   public Pose2d getEstimatedPosition() {
-    return this.m_odometry.getEstimatedPosition();
+    return this.getState().Pose;
   }
 
+  // FIXME: we cannot interact directly with the m_odometry object when not protected by the thread
+  // lock. At the moment this method is never invoked, but we still need to address this issue.
   public void resetPosition(
       Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d poseMeters) {
     this.m_odometry.resetPosition(gyroAngle, modulePositions, poseMeters);
   }
 
+  // FIXME: we cannot interact directly with the m_odometry object when not protected by the thread
+  // lock. At the moment this method is never invoked, but we still need to address this issue.
   public Pose2d updateWithTime(
       double currentTimeSeconds, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
     return this.m_odometry.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
