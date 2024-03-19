@@ -27,6 +27,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.swerve.Conversions;
 import frc.lib.team3061.drivetrain.swerve.SwerveConstants;
@@ -236,7 +237,8 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
         backRight);
 
     // configure current limits
-    for (SwerveModule swerveModule : this.Modules) {
+    for (int i = 0; i < this.Modules.length; i++) {
+      SwerveModule swerveModule = this.Modules[i];
 
       // set torque current configs for closed loop control with TorqueCurrentFOC
       // set current limits for everything else
@@ -252,6 +254,10 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
       config.CurrentLimits.StatorCurrentLimitEnable = SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
       swerveModule.getDriveMotor().getConfigurator().apply(config);
 
+      FaultReporter.getInstance()
+          .registerHardware(
+              DrivetrainConstants.SUBSYSTEM_NAME, "Drive Motor " + i, swerveModule.getDriveMotor());
+
       CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
       swerveModule.getSteerMotor().getConfigurator().refresh(currentLimits);
       currentLimits.SupplyCurrentLimit = SwerveConstants.ANGLE_CONTINUOUS_CURRENT_LIMIT;
@@ -261,6 +267,10 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
       currentLimits.StatorCurrentLimit = SwerveConstants.ANGLE_PEAK_CURRENT_LIMIT;
       currentLimits.StatorCurrentLimitEnable = SwerveConstants.ANGLE_ENABLE_CURRENT_LIMIT;
       swerveModule.getSteerMotor().getConfigurator().apply(currentLimits);
+
+      FaultReporter.getInstance()
+          .registerHardware(
+              DrivetrainConstants.SUBSYSTEM_NAME, "Steer Motor " + i, swerveModule.getSteerMotor());
     }
 
     this.pitchStatusSignal = this.m_pigeon2.getPitch().clone();
