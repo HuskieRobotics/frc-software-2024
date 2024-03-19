@@ -12,108 +12,82 @@ import frc.lib.team3061.drivetrain.swerve.SwerveConstants;
  * these methods, refer to the documentation in the RobotConfig class.
  */
 public class SimRobotConfig extends RobotConfig {
-  private static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1;
-  private static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2;
-  private static final int FRONT_LEFT_MODULE_STEER_ENCODER = 22;
-  private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = 0.480469;
 
-  private static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 3;
-  private static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 4;
-  private static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 23;
-  private static final double FRONT_RIGHT_MODULE_STEER_OFFSET_ROT = 0.025146;
+  private static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 13;
+  private static final int FRONT_LEFT_MODULE_STEER_MOTOR = 12;
+  private static final int FRONT_LEFT_MODULE_STEER_ENCODER = 14;
+  private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = 0.27409;
+
+  private static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 16;
+  private static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 15;
+  private static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 17;
+  private static final double FRONT_RIGHT_MODULE_STEER_OFFSET_ROT = -0.390381;
 
   private static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 7;
-  private static final int BACK_LEFT_MODULE_STEER_MOTOR = 8;
-  private static final int BACK_LEFT_MODULE_STEER_ENCODER = 24;
-  private static final double BACK_LEFT_MODULE_STEER_OFFSET_ROT = 0.323242;
+  private static final int BACK_LEFT_MODULE_STEER_MOTOR = 6;
+  private static final int BACK_LEFT_MODULE_STEER_ENCODER = 8;
+  private static final double BACK_LEFT_MODULE_STEER_OFFSET_ROT = 0.827393;
 
-  private static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 5;
-  private static final int BACK_RIGHT_MODULE_STEER_MOTOR = 6;
-  private static final int BACK_RIGHT_MODULE_STEER_ENCODER = 25;
-  private static final double BACK_RIGHT_MODULE_STEER_OFFSET_ROT = -0.335693;
+  private static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 10;
+  private static final int BACK_RIGHT_MODULE_STEER_MOTOR = 9;
+  private static final int BACK_RIGHT_MODULE_STEER_ENCODER = 11;
+  private static final double BACK_RIGHT_MODULE_STEER_OFFSET_ROT = -0.336670;
 
-  private static final int GYRO_ID = 26;
+  private static final int GYRO_ID = 3;
 
-  private static final double TRACKWIDTH_METERS = 0.57785; // 22.75
-  private static final double WHEELBASE_METERS = 0.57785; // 22.75
-  private static final double WHEEL_DIAMETER_METERS = 0.09849016753330445;
-  private static final double ROBOT_WIDTH_WITH_BUMPERS =
-      0.88265; // meters //34.75 in , measure the actual bumpers
-  private static final double ROBOT_LENGTH_WITH_BUMPERS = 0.88265; // meters // 34.75 in same above
+  private static final double TRACKWIDTH_METERS = 0.523875; // 20.625
+  private static final double WHEELBASE_METERS = 0.52705; // 20.75
+  private static final double WHEEL_DIAMETER_METERS = 0.09845567409;
+  private static final double ROBOT_WIDTH_WITH_BUMPERS = 0.8382; // meters //33 in
+  private static final double ROBOT_LENGTH_WITH_BUMPERS = 0.8382; // meters // 33 in
 
   /* Angle Motor PID Values */
   private static final double ANGLE_KP = 100.0;
   private static final double ANGLE_KI = 0.0;
-  private static final double ANGLE_KD = 0.05; // 0.39628; // was 3.9628;
+  private static final double ANGLE_KD = 0.05;
 
-  private static final double ANGLE_KS = 0.24719;
-  private static final double ANGLE_KV = 2.5845; // rps
-  private static final double ANGLE_KA = 0.030892;
+  private static final double ANGLE_KS = 0.1891233333;
+  private static final double ANGLE_KV =
+      0.4399866667 * 2 * Math.PI; // convert from V/(radians/s) to V/(rotations/s)
+  private static final double ANGLE_KA = 0.001663333333;
 
   /* Drive Motor PID Values */
-  private static final double DRIVE_KP = 10.0;
+  private static final double DRIVE_KP = 0.005;
   private static final double DRIVE_KI = 0.0;
   private static final double DRIVE_KD = 0.0;
 
-  private static final double DRIVE_KS = 0.23819;
-  private static final double DRIVE_KV = 0.0;
-  private static final double DRIVE_KA = 0.0;
+  private static final double DRIVE_KS = 0.4004375;
+  private static final double DRIVE_KV = 2.7637325;
+  private static final double DRIVE_KA = 0.0139575;
 
-  private static final double MAX_VELOCITY_METERS_PER_SECOND =
-      4.5; // FIXME: confirm max velocity with real robot
-  private static final double MAX_COAST_VELOCITY_METERS_PER_SECOND =
-      0.05; // FIXME: Values taken from nova, need to be updated
-  private static final double SLOW_MODE_MULTIPLIER =
-      0.75; // FIXME: Values taken from nova, need to be updated
+  private static final double MAX_VELOCITY_METERS_PER_SECOND = 3.5;
+  private static final double MAX_COAST_VELOCITY_METERS_PER_SECOND = 0.05;
+  private static final double SLOW_MODE_MULTIPLIER = 0.75;
 
-  private static final double MAX_DRIVE_ACCELERATION_METERS_PER_SECOND_SQUARED =
-      9.467; // from Choreo estimate
-  private static final double MAX_TURN_ACCELERATION_RADIANS_PER_SECOND_SQUARED =
-      33.436; // from Choreo estimate
+  private static final double MAX_DRIVE_ACCELERATION_METERS_PER_SECOND_SQUARED = 11.365;
+  private static final double MAX_TURN_ACCELERATION_RADIANS_PER_SECOND_SQUARED = 36.0;
 
   private static final String CAN_BUS_NAME = "canbus1";
 
-  private static final String CAMERA_NAME_0 = "OV2311FR";
-  private static final String CAMERA_NAME_1 = "OV2311BR";
-  private static final String CAMERA_NAME_2 = "OV2311FL";
-  private static final String CAMERA_NAME_3 = "OV2311BL";
+  private static final String CAMERA_NAME_0 = "OV2311";
 
-  // Front right camera
+  private static final String CAMERA_NAME_1 = "OV2311R";
+
   private static final Transform3d ROBOT_TO_CAMERA_0 =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(11.064),
-              Units.inchesToMeters(-10.778),
-              Units.inchesToMeters(8.189)),
-          new Rotation3d(0, Units.degreesToRadians(-30), Units.degreesToRadians(0)));
-  // pitch 45 degrees
+              Units.inchesToMeters(-10.406),
+              Units.inchesToMeters(6.603),
+              Units.inchesToMeters(49.240)),
+          new Rotation3d(0, Units.degreesToRadians(25), Units.degreesToRadians(30)));
 
-  // Back right camera
   private static final Transform3d ROBOT_TO_CAMERA_1 =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(-10.778),
-              Units.inchesToMeters(-11.064),
-              Units.inchesToMeters(8.189)),
-          new Rotation3d(0, Units.degreesToRadians(-30), Units.degreesToRadians(-90)));
-
-  // Front left camera
-  private static final Transform3d ROBOT_TO_CAMERA_2 =
-      new Transform3d(
-          new Translation3d(
-              Units.inchesToMeters(10.778),
-              Units.inchesToMeters(11.064),
-              Units.inchesToMeters(8.189)),
-          new Rotation3d(0, Units.degreesToRadians(-30), Units.degreesToRadians(90)));
-
-  // Back left camera
-  private static final Transform3d ROBOT_TO_CAMERA_3 =
-      new Transform3d(
-          new Translation3d(
-              Units.inchesToMeters(-11.064),
-              Units.inchesToMeters(10.778),
-              Units.inchesToMeters(8.189)),
-          new Rotation3d(0, Units.degreesToRadians(-30), Units.degreesToRadians(180)));
+              Units.inchesToMeters(-10.406),
+              Units.inchesToMeters(-6.603),
+              Units.inchesToMeters(49.240)),
+          new Rotation3d(0, Units.degreesToRadians(25), Units.degreesToRadians(-30)));
 
   private static final double AUTO_MAX_SPEED_METERS_PER_SECOND = 3.5;
   private static final double AUTO_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 10;
@@ -136,11 +110,11 @@ public class SimRobotConfig extends RobotConfig {
   private static final double SQUARING_SPEED_METERS_PER_SECOND = 1.0;
 
   // Drive Facing Angle constants
-  private static final double DRIVE_FACING_ANGLE_KP = 6.0;
+  private static final double DRIVE_FACING_ANGLE_KP = 7.0;
   private static final double DRIVE_FACING_ANGLE_KD = 0.1;
   private static final double DRIVE_FACING_ANGLE_KI = 0.0;
 
-  private static final int LED_COUNT = 35;
+  private static final int LED_COUNT = 85;
 
   @Override
   public boolean getPhoenix6Licensed() {
@@ -209,7 +183,7 @@ public class SimRobotConfig extends RobotConfig {
 
   @Override
   public SwerveConstants getSwerveConstants() {
-    return SwerveConstants.MK4I_L3_PLUS_CONSTANTS;
+    return SwerveConstants.MK4I_L2_CONSTANTS;
   }
 
   @Override
@@ -284,9 +258,7 @@ public class SimRobotConfig extends RobotConfig {
 
   @Override
   public Transform3d[] getRobotToCameraTransforms() {
-    return new Transform3d[] {
-      ROBOT_TO_CAMERA_0, ROBOT_TO_CAMERA_1, ROBOT_TO_CAMERA_2, ROBOT_TO_CAMERA_3
-    };
+    return new Transform3d[] {ROBOT_TO_CAMERA_0, ROBOT_TO_CAMERA_1};
   }
 
   @Override
@@ -361,7 +333,7 @@ public class SimRobotConfig extends RobotConfig {
 
   @Override
   public String[] getCameraNames() {
-    return new String[] {CAMERA_NAME_0, CAMERA_NAME_1, CAMERA_NAME_2, CAMERA_NAME_3};
+    return new String[] {CAMERA_NAME_0, CAMERA_NAME_1};
   }
 
   @Override
@@ -447,11 +419,6 @@ public class SimRobotConfig extends RobotConfig {
   }
 
   @Override
-  public double getOdometryUpdateFrequency() {
-    return 250.0;
-  }
-
-  @Override
   public LED_HARDWARE getLEDHardware() {
     return LED_HARDWARE.RIO;
   }
@@ -459,15 +426,5 @@ public class SimRobotConfig extends RobotConfig {
   @Override
   public int getLEDCount() {
     return LED_COUNT;
-  }
-
-  @Override
-  public SWERVE_CONTROL_MODE getSwerveSteerControlMode() {
-    return SWERVE_CONTROL_MODE.VOLTAGE;
-  }
-
-  @Override
-  public SWERVE_CONTROL_MODE getSwerveDriveControlMode() {
-    return SWERVE_CONTROL_MODE.TORQUE_CURRENT_FOC;
   }
 }
