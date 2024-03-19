@@ -367,12 +367,8 @@ public class RobotContainer {
         "disableXStance", Commands.runOnce(drivetrain::disableXstance, drivetrain));
     NamedCommands.registerCommand("wait5Seconds", Commands.waitSeconds(5.0));
 
-    NamedCommands.registerCommand("Shoot", getAutoShootCommand());
+    NamedCommands.registerCommand("Shoot Now", getAutoShootNowCommand());
     NamedCommands.registerCommand("Stop And Shoot", getAutoStopAndShootCommand());
-    NamedCommands.registerCommand(
-        "PrepAutoSubwooferShot",
-        Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER))
-            .withName("PrepAutoSubwooferShot"));
 
     // build auto path commands
 
@@ -756,8 +752,8 @@ public class RobotContainer {
         .onFalse(Commands.runOnce(shooter::disableScaleDownShooterVelocity));
   }
 
-  private Command getAutoShootCommand() {
-    return getShootCommand().withTimeout(1.0);
+  private Command getAutoShootNowCommand() {
+    return Commands.runOnce(intake::shoot, intake);
   }
 
   private Command getAutoStopAndShootCommand() {

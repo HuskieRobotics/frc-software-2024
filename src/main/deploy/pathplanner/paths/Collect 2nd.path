@@ -49,6 +49,11 @@
       "waypointRelativePos": 1.0,
       "rotationDegrees": 141.51,
       "rotateFast": true
+    },
+    {
+      "waypointRelativePos": 1.25,
+      "rotationDegrees": 141.51,
+      "rotateFast": false
     }
   ],
   "constraintZones": [],
@@ -63,7 +68,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Shoot"
+                "name": "Shoot Now"
               }
             }
           ]
