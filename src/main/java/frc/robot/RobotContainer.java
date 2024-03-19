@@ -379,12 +379,15 @@ public class RobotContainer {
     // add commands to the auto chooser
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
 
-    /************ 1 Note Anywhere ************
+    /************ 1 Note Source Side ************
      *
      * shoot initial note and leave robot starting zone
      *
      */
-    Command oneNoteSourceSide = new PathPlannerAuto("1 Note Auto");
+    Command oneNoteSourceSide =
+        Commands.sequence(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_AUTO)),
+            new PathPlannerAuto("1 Note Auto"));
     autoChooser.addOption("1 Note Source Side", oneNoteSourceSide);
 
     /************ 4 Note Source Side ************

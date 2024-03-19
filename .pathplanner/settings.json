@@ -14,8 +14,8 @@
     "Source Side Notes",
     "Tuning"
   ],
-  "defaultMaxVel": 3.88,
-  "defaultMaxAccel": 11.805,
+  "defaultMaxVel": 3.0,
+  "defaultMaxAccel": 11.8,
   "defaultMaxAngVel": 537.0,
   "defaultMaxAngAccel": 2303.0,
   "maxModuleSpeed": 3.88
