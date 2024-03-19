@@ -28,37 +28,19 @@
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.65,
-      "rotationDegrees": 158.46,
-      "rotateFast": true
-    }
-  ],
-  "constraintZones": [
-    {
-      "name": "slow for shot",
-      "minWaypointRelativePos": 0.55,
-      "maxWaypointRelativePos": 1.0,
-      "constraints": {
-        "maxVelocity": 2.0,
-        "maxAcceleration": 11.805,
-        "maxAngularVelocity": 537.0,
-        "maxAngularAcceleration": 2303.0
-      }
-    }
-  ],
+  "rotationTargets": [],
+  "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
-    "maxAcceleration": 11.805,
+    "maxAcceleration": 11.8,
     "maxAngularVelocity": 537.0,
     "maxAngularAcceleration": 2303.0
   },
   "goalEndState": {
     "velocity": 0,
     "rotation": 141.51,
-    "rotateFast": false
+    "rotateFast": true
   },
   "reversed": false,
   "folder": "Source Side",
@@ -66,5 +48,5 @@
     "rotation": -178.79954269614583,
     "velocity": 0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }
