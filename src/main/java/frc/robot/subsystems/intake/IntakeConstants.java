@@ -59,4 +59,6 @@ public class IntakeConstants {
 
   public static final double ROLLERS_SENSOR_TO_MECHANISM_RATIO = 15.0 / 12.0;
   public static final double KICKER_SENSOR_TO_MECHANISM_RATIO = 5.0;
+
+  public static final double IN_BETWEEN_TIMEOUT_SECONDS = 1.0;
 }

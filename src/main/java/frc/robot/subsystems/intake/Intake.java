@@ -10,6 +10,7 @@ import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.leds.LEDs.IntakeLEDState;
 import frc.lib.team6328.util.TunableNumber;
+import frc.robot.Constants;
 import java.util.ArrayList;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -31,6 +32,7 @@ public class Intake extends SubsystemBase {
 
   private IntakeState intakeState;
   private boolean automationEnabled;
+  private int intakeAndKickerTimeout;
 
   // system tests
   private IntakeState mostRecentIntakeState;
@@ -48,6 +50,7 @@ public class Intake extends SubsystemBase {
     EMPTY,
     NOTE_IN_INTAKE,
     NOTE_IN_INTAKE_AND_KICKER,
+    NOTE_IN_BETWEEN_INTAKE_AND_KICKER,
     NOTE_IN_KICKER,
     NOTE_IN_KICKER_AND_SHOOTER,
     NOTE_IN_SHOOTER,
@@ -64,6 +67,8 @@ public class Intake extends SubsystemBase {
     mostRecentIntakeState = null;
 
     checkComplete = false;
+
+    intakeAndKickerTimeout = 0;
 
     leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
     this.intakeGamePiece();
@@ -100,6 +105,8 @@ public class Intake extends SubsystemBase {
       runNoteInIntakeState();
     } else if (intakeState == IntakeState.NOTE_IN_INTAKE_AND_KICKER) {
       runNoteInIntakeAndKickerState();
+    } else if (intakeState == IntakeState.NOTE_IN_BETWEEN_INTAKE_AND_KICKER) {
+      runNoteInBetweenIntakeAndKickerState();
     } else if (intakeState == IntakeState.NOTE_IN_KICKER) {
       runNoteInKickerState();
     } else if (intakeState == IntakeState.NOTE_IN_KICKER_AND_SHOOTER) {
@@ -134,14 +141,29 @@ public class Intake extends SubsystemBase {
       intakeState = IntakeState.NOTE_IN_INTAKE_AND_KICKER;
       this.transitionGamePiece();
     } else if (!inputs.isRollerIRBlocked) {
-      intakeState = IntakeState.EMPTY;
-      leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
-      this.intakeGamePiece();
+      intakeState = IntakeState.NOTE_IN_BETWEEN_INTAKE_AND_KICKER;
+      this.transitionGamePiece();
+      intakeAndKickerTimeout = 0;
     }
   }
 
   private void runNoteInIntakeAndKickerState() {
     if (!inputs.isRollerIRBlocked) {
+      intakeState = IntakeState.NOTE_IN_KICKER;
+      this.transitionGamePiece();
+      this.repelGamePiece();
+    }
+  }
+
+  private void runNoteInBetweenIntakeAndKickerState() {
+    this.intakeAndKickerTimeout++;
+
+    if (intakeAndKickerTimeout
+        > IntakeConstants.IN_BETWEEN_TIMEOUT_SECONDS / Constants.LOOP_PERIOD_SECS) {
+      intakeState = IntakeState.EMPTY;
+      leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
+      this.intakeGamePiece();
+    } else if (inputs.isKickerIRBlocked) {
       intakeState = IntakeState.NOTE_IN_KICKER;
       this.transitionGamePiece();
       this.repelGamePiece();
