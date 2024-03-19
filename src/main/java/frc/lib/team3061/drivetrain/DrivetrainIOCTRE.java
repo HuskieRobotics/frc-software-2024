@@ -429,9 +429,6 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     inputs.driveDistanceMeters = position.distanceMeters;
     inputs.driveVelocityMetersPerSec = state.speedMetersPerSecond;
 
-    // Retrieve the closed loop reference status signals directly from the motor in this method
-    // instead of retrieving in advance because the status signal returned depends on the current
-    // control mode.
     inputs.driveVelocityReferenceMetersPerSec =
         Conversions.falconRPSToMechanismMPS(
             signals.driveVelocityReferenceStatusSignal.getValueAsDouble(),
@@ -461,9 +458,6 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     // to degrees.
     inputs.steerPositionDeg = position.angle.getDegrees();
 
-    // Retrieve the closed loop reference status signals directly from the motor in this method
-    // instead of retrieving in advance because the status signal returned depends on the current
-    // control mode.
     inputs.steerPositionReferenceDeg =
         Conversions.falconRotationsToMechanismDegrees(
             signals.steerPositionReferenceStatusSignal.getValueAsDouble(), 1);
@@ -611,7 +605,9 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
   private void updateClosedLoopStatusSignals(boolean isOpenLoop) {
     if (isOpenLoop != prevIsOpenLoop) {
-      // if the control mode has changed, we need to fetch new closed-loop status signals
+      // if the control mode has changed, we need to fetch new closed-loop status signals because
+      // the status signal returned depends on the current control mode.
+
       for (int i = 0; i < this.swerveModulesSignals.length; i++) {
         SwerveModuleSignals signals = this.swerveModulesSignals[i];
         signals.driveVelocityErrorStatusSignal =
