@@ -757,10 +757,11 @@ public class RobotContainer {
   }
 
   private Command getAutoStopAndShootCommand() {
-    return Commands.sequence(
-        Commands.runOnce(drivetrain::stop, drivetrain),
-        Commands.waitSeconds(.2),
-        getShootCommand().withTimeout(1.0));
+    return Commands.parallel(
+            new TeleopSwerveAimAtSpeaker(drivetrain, shooter, intake, () -> 0.0, () -> 0.0),
+            getShootCommand())
+        .withTimeout(1.0)
+        .andThen(Commands.runOnce(intake::shoot, intake));
   }
 
   private Command getShootCommand() {
