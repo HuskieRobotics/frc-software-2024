@@ -31,7 +31,6 @@ import frc.lib.team3061.vision.Vision;
 import frc.lib.team3061.vision.VisionConstants;
 import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
-import frc.lib.team3061.vision.VisionIOSim;
 import frc.lib.team6328.util.NoteVisualizer;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
@@ -41,6 +40,7 @@ import frc.robot.configs.GenericDrivetrainRobotConfig;
 import frc.robot.configs.NameRobotConfig;
 import frc.robot.configs.PracticeBoardConfig;
 import frc.robot.configs.PracticeRobotConfig;
+import frc.robot.configs.SimRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.intake.Intake;
@@ -165,6 +165,8 @@ public class RobotContainer {
         config = new PracticeRobotConfig();
         break;
       case ROBOT_SIMBOT_CTRE:
+        config = new SimRobotConfig();
+        break;
       case ROBOT_COMPETITION:
         config = new NameRobotConfig();
         break;
@@ -254,22 +256,22 @@ public class RobotContainer {
     shooter = new Shooter(new ShooterIOTalonFX(), intake);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
-    // vision = new Vision(new VisionIO[] {new VisionIO() {}});
+    vision = new Vision(new VisionIO[] {new VisionIO() {}});
 
-    AprilTagFieldLayout layout;
-    try {
-      layout = new AprilTagFieldLayout(VisionConstants.APRILTAG_FIELD_LAYOUT_PATH);
-    } catch (IOException e) {
-      layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
-    }
-    vision =
-        new Vision(
-            new VisionIO[] {
-              new VisionIOSim(
-                  layout,
-                  drivetrain::getPose,
-                  RobotConfig.getInstance().getRobotToCameraTransforms()[0])
-            });
+    // AprilTagFieldLayout layout;
+    // try {
+    //   layout = new AprilTagFieldLayout(VisionConstants.APRILTAG_FIELD_LAYOUT_PATH);
+    // } catch (IOException e) {
+    //   layout = new AprilTagFieldLayout(new ArrayList<>(), 16.4592, 8.2296);
+    // }
+    // vision =
+    //     new Vision(
+    //         new VisionIO[] {
+    //           new VisionIOSim(
+    //               layout,
+    //               drivetrain::getPose,
+    //               RobotConfig.getInstance().getRobotToCameraTransforms()[0])
+    //         });
   }
 
   private void createPracticeBoardSubsystem() {
@@ -418,11 +420,11 @@ public class RobotContainer {
      * 4 note starting from the amp side
      *
      */
-    Command fourNoteAmpSideWing =
+    Command fourNoteCenter =
         Commands.parallel(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
-            new PathPlannerAuto("4 Note Amp-Side Wing"));
-    autoChooser.addOption("4 Note Amp-Side Wing", fourNoteAmpSideWing);
+            new PathPlannerAuto("4 Note Center"));
+    autoChooser.addOption("4 Note Center", fourNoteCenter);
 
     /************ 5 Notes ************
      *
