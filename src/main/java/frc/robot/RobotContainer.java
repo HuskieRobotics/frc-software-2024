@@ -395,14 +395,19 @@ public class RobotContainer {
 
     Command fourNoteSourceSide =
         Commands.sequence(
-            new PathPlannerAuto("Collect 2nd"),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_AUTO)),
+            new PathPlannerAuto("Collect 2nd"),
             Commands.either(
                 new PathPlannerAuto("Score 2nd Collect 3rd"),
                 new PathPlannerAuto("Missed 2nd Collect 3rd"),
                 intake::hasNote),
             Commands.either(
-                new PathPlannerAuto("Score 3rd Collect 4th"),
+                Commands.parallel(
+                    Commands.runOnce(
+                        () ->
+                            shooter.setShootingPosition(
+                                ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO)),
+                    new PathPlannerAuto("Score 3rd Collect 4th")),
                 new PathPlannerAuto("Missed 3rd Collect 4th"),
                 intake::hasNote));
     autoChooser.addOption("4 Note Source Side", fourNoteSourceSide);
