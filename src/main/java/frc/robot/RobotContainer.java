@@ -422,7 +422,7 @@ public class RobotContainer {
      */
     Command fourNoteAmpSideWing =
         Commands.parallel(
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.FOUR_NOTE_AUTO)),
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
             new PathPlannerAuto("4 Note Amp-Side Wing"));
     autoChooser.addOption("4 Note Amp-Side Wing", fourNoteAmpSideWing);
 
