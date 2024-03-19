@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.95,
-        "y": 4.15
+        "x": 1.4110605038070538,
+        "y": 5.533938695057623
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.4652892054599276,
-        "y": 6.808658167079367
+        "x": 2.2135419743223204,
+        "y": 5.504015183175715
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.560210760231948,
-        "y": 6.721118276359775
+        "x": 2.896189567815182,
+        "y": 5.533938695057623
       },
       "prevControl": {
-        "x": 5.955312763706097,
-        "y": 6.867018094225762
+        "x": 1.896189567815182,
+        "y": 5.533938695057623
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,21 +32,21 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.88,
+    "maxVelocity": 2.0,
     "maxAcceleration": 11.805,
     "maxAngularVelocity": 537.0,
     "maxAngularAcceleration": 2303.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -179.01223960036032,
-    "rotateFast": true
+    "rotation": -178.2798945883375,
+    "rotateFast": false
   },
   "reversed": false,
-  "folder": "4 Note Amp-Side Wing",
+  "folder": "4 Note Amp Side",
   "previewStartingState": {
-    "rotation": 142.9504422102705,
+    "rotation": -178.39938639124986,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }
