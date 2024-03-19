@@ -218,6 +218,9 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   private TorqueCurrentFOC[] driveCurrentRequests = new TorqueCurrentFOC[4];
   private TorqueCurrentFOC[] steerCurrentRequests = new TorqueCurrentFOC[4];
 
+  // track to determine when to fetch new closed-loop status signals
+  private boolean prevIsOpenLoop = true;
+
   /**
    * Creates a new Drivetrain subsystem.
    *
@@ -431,12 +434,12 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     // control mode.
     inputs.driveVelocityReferenceMetersPerSec =
         Conversions.falconRPSToMechanismMPS(
-            module.getDriveMotor().getClosedLoopReference().getValueAsDouble(),
+            signals.driveVelocityReferenceStatusSignal.getValueAsDouble(),
             RobotConfig.getInstance().getWheelDiameterMeters() * Math.PI,
             RobotConfig.getInstance().getSwerveConstants().getDriveGearRatio());
     inputs.driveVelocityErrorMetersPerSec =
         Conversions.falconRPSToMechanismMPS(
-            module.getDriveMotor().getClosedLoopError().getValueAsDouble(),
+            signals.driveVelocityErrorStatusSignal.getValueAsDouble(),
             RobotConfig.getInstance().getWheelDiameterMeters() * Math.PI,
             RobotConfig.getInstance().getSwerveConstants().getDriveGearRatio());
     inputs.driveAccelerationMetersPerSecPerSec =
@@ -463,10 +466,10 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     // control mode.
     inputs.steerPositionReferenceDeg =
         Conversions.falconRotationsToMechanismDegrees(
-            module.getSteerMotor().getClosedLoopReference().getValueAsDouble(), 1);
+            signals.steerPositionReferenceStatusSignal.getValueAsDouble(), 1);
     inputs.steerPositionErrorDeg =
         Conversions.falconRotationsToMechanismDegrees(
-            module.getSteerMotor().getClosedLoopError().getValueAsDouble(), 1);
+            signals.steerPositionErrorStatusSignal.getValueAsDouble(), 1);
     inputs.steerVelocityRevPerMin =
         Conversions.falconRPSToMechanismRPM(signals.steerVelocityStatusSignal.getValue(), 1);
     inputs.steerAccelerationMetersPerSecPerSec =
@@ -511,6 +514,8 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
               .withVelocityY(yVelocity)
               .withRotationalRate(rotationalVelocity));
     }
+
+    this.updateClosedLoopStatusSignals(isOpenLoop);
   }
 
   @Override
@@ -539,6 +544,8 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
               .withVelocityY(yVelocity)
               .withTargetDirection(targetDirection));
     }
+
+    this.updateClosedLoopStatusSignals(isOpenLoop);
   }
 
   @Override
@@ -573,6 +580,8 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
               .withVelocityY(yVelocity)
               .withRotationalRate(rotationalVelocity));
     }
+
+    this.updateClosedLoopStatusSignals(isOpenLoop);
   }
 
   @Override
@@ -595,6 +604,26 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
               .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo)
               .withSpeeds(speeds)
               .withCenterOfRotation(this.centerOfRotation));
+    }
+
+    this.updateClosedLoopStatusSignals(isOpenLoop);
+  }
+
+  private void updateClosedLoopStatusSignals(boolean isOpenLoop) {
+    if (isOpenLoop != prevIsOpenLoop) {
+      // if the control mode has changed, we need to fetch new closed-loop status signals
+      for (int i = 0; i < this.swerveModulesSignals.length; i++) {
+        SwerveModuleSignals signals = this.swerveModulesSignals[i];
+        signals.driveVelocityErrorStatusSignal =
+            this.Modules[i].getDriveMotor().getClosedLoopError().clone();
+        signals.driveVelocityReferenceStatusSignal =
+            this.Modules[i].getDriveMotor().getClosedLoopReference().clone();
+        signals.steerPositionErrorStatusSignal =
+            this.Modules[i].getSteerMotor().getClosedLoopError().clone();
+        signals.steerPositionReferenceStatusSignal =
+            this.Modules[i].getSteerMotor().getClosedLoopReference().clone();
+      }
+      prevIsOpenLoop = isOpenLoop;
     }
   }
 
