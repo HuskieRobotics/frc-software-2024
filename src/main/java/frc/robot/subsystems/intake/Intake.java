@@ -10,6 +10,7 @@ import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.leds.LEDs.IntakeLEDState;
 import frc.lib.team6328.util.TunableNumber;
+import frc.robot.Constants;
 import java.util.ArrayList;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -140,10 +141,9 @@ public class Intake extends SubsystemBase {
       intakeState = IntakeState.NOTE_IN_INTAKE_AND_KICKER;
       this.transitionGamePiece();
     } else if (!inputs.isRollerIRBlocked) {
-      intakeState = IntakeState.EMPTY;
+      intakeState = IntakeState.NOTE_IN_BETWEEN_INTAKE_AND_KICKER;
+      this.transitionGamePiece();
       intakeAndKickerTimeout = 0;
-      leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
-      this.intakeGamePiece();
     }
   }
 
@@ -158,7 +158,8 @@ public class Intake extends SubsystemBase {
   private void runNoteInBetweenIntakeAndKickerState() {
     this.intakeAndKickerTimeout++;
 
-    if (intakeAndKickerTimeout > IntakeConstants.IN_BETWEEN_TIMEOUT_SECONDS * 50) {
+    if (intakeAndKickerTimeout
+        > IntakeConstants.IN_BETWEEN_TIMEOUT_SECONDS / Constants.LOOP_PERIOD_SECS) {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
