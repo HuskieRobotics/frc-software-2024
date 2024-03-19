@@ -302,7 +302,7 @@ public class IntakeIOTalonFX implements IntakeIO {
       configAlert.setText(status.toString());
     }
 
-    // set the kick velocity to set the control mode before retrieving the closed-loop status
+    // set the kicker velocity to set the control mode before retrieving the closed-loop status
     // signals because the status signal returned depends on the current control mode.
     this.setKickerVelocity(0.0);
     kickerVelocityStatusSignal = kickerMotor.getVelocity();

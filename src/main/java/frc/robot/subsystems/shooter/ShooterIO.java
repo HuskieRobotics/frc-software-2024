@@ -12,7 +12,7 @@ public interface ShooterIO {
     double shootMotorTopSupplyCurrentAmps = 0.0;
     double shootMotorTopVelocityRPS = 0.0;
     double shootMotorTopReferenceVelocityRPS = 0.0;
-    double shootMotorTopClosedLoopReferenceRPS = 0.0;
+    double shootMotorTopClosedLoopErrorRPS = 0.0;
     double shootMotorTopTemperatureCelsius = 0.0;
     double shootMotorTopVoltage = 0.0;
 
@@ -21,7 +21,7 @@ public interface ShooterIO {
     double shootMotorBottomSupplyCurrentAmps = 0.0;
     double shootMotorBottomVelocityRPS = 0.0;
     double shootMotorBottomReferenceVelocityRPS = 0.0;
-    double shootMotorBottomClosedLoopReferenceRPS = 0.0;
+    double shootMotorBottomClosedLoopErrorRPS = 0.0;
     double shootMotorBottomTemperatureCelsius = 0.0;
     double shootMotorBottomVoltage = 0.0;
 
@@ -30,7 +30,7 @@ public interface ShooterIO {
     double angleMotorSupplyCurrentAmps = 0.0;
     double angleMotorVoltage = 0.0;
     double angleMotorReferenceAngleDegrees = 0.0;
-    double angleMotorClosedLoopReferenceDegrees = 0.0;
+    double angleMotorClosedLoopErrorDegrees = 0.0;
     double angleEncoderAngleDegrees = 0.0;
     double angleMotorTemperatureCelsius = 0.0;
     double angleMotorClosedLoopReferenceSlope = 0.0;
