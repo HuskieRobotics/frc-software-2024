@@ -105,9 +105,9 @@ public class ShooterConstants {
   public static final double PASS_ANGLE = 63.0;
 
   // auto shot
-  public static final double SHOOTER_AUTO_SHOT_ANGLE_DEG = 30.0; // FIXME: tune
-  public static final double SHOOTER_AUTO_SHOT_VELOCITY_RPS = 120.0; // FIXME: tune
-  public static final double SHOOTER_AUTO_SHOT_DISTANCE_METERS = 5.0; // FIXME: tune
+  public static final double SHOOTER_AUTO_SHOT_ANGLE_DEG = 28.0;
+  public static final double SHOOTER_AUTO_SHOT_VELOCITY_RPS = 120.0;
+  public static final double SHOOTER_AUTO_SHOT_DISTANCE_METERS = 5.06;
   public static final double SHOOTER_AUTO_SHOT_TOLERANCE_METERS = 0.1; // FIXME: tune
   public static final double SHOOTER_AUTO_SHOT_TIME_DELAY_SECS = 0.09;
 }
