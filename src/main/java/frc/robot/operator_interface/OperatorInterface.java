@@ -117,6 +117,10 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
+  public default Trigger getAutoShotSwitch() {
+    return new Trigger(() -> false);
+  }
+
   public default Trigger getShooterAngleUpButton() {
     return new Trigger(() -> false);
   }

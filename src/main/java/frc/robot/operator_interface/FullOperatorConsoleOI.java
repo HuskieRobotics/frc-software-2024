@@ -194,6 +194,12 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
+  public Trigger getAutoShotSwitch() {
+    // FIXME: bind to a switch
+    return new Trigger(() -> true);
+  }
+
+  @Override
   public Trigger getStoreShooterButton() {
     return operatorPanelButtons[2];
   }
