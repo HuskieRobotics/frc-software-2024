@@ -41,6 +41,7 @@ public class ShooterIOTalonFX implements ShooterIO {
   private VelocityTorqueCurrentFOC shootMotorBottomVelocityRequest;
   private MotionMagicExpoVoltage angleMotorPositionRequest;
   private VoltageOut angleMotorVoltageRequest;
+  private VoltageOut deflectorMotorVoltageRequest;
 
   // Using StatusSignal to get the stator current of the motors
   private StatusSignal<Double> shootMotorTopStatorCurrentStatusSignal;
@@ -68,6 +69,13 @@ public class ShooterIOTalonFX implements ShooterIO {
   private StatusSignal<Double> shootMotorTopVoltageStatusSignal;
   private StatusSignal<Double> shootMotorBottomVoltageStatusSignal;
   private StatusSignal<Double> angleMotorVoltageStatusSignal;
+
+  private StatusSignal<Double> deflectorMotorVoltageStatusSignal;
+  private StatusSignal<Double> deflectorMotorStatorCurrentStatusSignal;
+  private StatusSignal<Double> deflectorMotorSupplyCurrentStatusSignal;
+  private StatusSignal<Double> deflectorMotorTemperatureStatusSignal;
+  private StatusSignal<Double> deflectorMotorReferencePositionStatusSignal;
+  private StatusSignal<Double> deflectorMotorClosedLoopReferenceSlopeStatusSignal;
 
   private StatusSignal<Double> angleMotorClosedLoopReferenceSlopeStatusSignal;
 
@@ -117,12 +125,22 @@ public class ShooterIOTalonFX implements ShooterIO {
   private final TunableNumber rotationMotorExpoKA =
       new TunableNumber("Shooter/ROTATION_EXPO_KA", ShooterConstants.ROTATION_EXPO_KA);
 
+  private final TunableNumber deflectorMotorKP =
+      new TunableNumber("Shooter/DEFLECTOR_KP", ShooterConstants.DEFLECTOR_KP);
+  private final TunableNumber deflectorMotorKI =
+      new TunableNumber("Shooter/DEFLECTOR_KI", ShooterConstants.DEFLECTOR_KI);
+  private final TunableNumber deflectorMotorKD =
+      new TunableNumber("Shooter/DEFLECTOR_KD", ShooterConstants.DEFLECTOR_KD);
+  private final TunableNumber deflectorMotorKS =
+      new TunableNumber("Shooter/DEFLECTOR_KS", ShooterConstants.DEFLECTOR_KS);
+
   private final TunableNumber rotationEncoderMagnetOffset =
       new TunableNumber("Shooter/ROTATION_MAGNET_OFFSET", ShooterConstants.MAGNET_OFFSET);
 
   private TalonFX shootMotorTop;
   private TalonFX shootMotorBottom;
   private TalonFX angleMotor;
+  private TalonFX deflectorMotor;
   private CANcoder angleEncoder;
 
   private DigitalInput coastModeButton;
@@ -139,12 +157,15 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotor = new TalonFX(ANGLE_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
     angleEncoder = new CANcoder(ANGLE_ENCODER_ID, RobotConfig.getInstance().getCANBusName());
 
+    deflectorMotor = new TalonFX(DEFLECTOR_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
+
     coastModeButton = new DigitalInput(COAST_BUTTON_ID);
 
     shootMotorTopVelocityRequest = new VelocityTorqueCurrentFOC(0);
     shootMotorBottomVelocityRequest = new VelocityTorqueCurrentFOC(0);
     angleMotorPositionRequest = new MotionMagicExpoVoltage(0);
     angleMotorVoltageRequest = new VoltageOut(0);
+
 
     shootMotorTopVelocityStatusSignal = shootMotorTop.getVelocity();
     shootMotorBottomVelocityStatusSignal = shootMotorBottom.getVelocity();

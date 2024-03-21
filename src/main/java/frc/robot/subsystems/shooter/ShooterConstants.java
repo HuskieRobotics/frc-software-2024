@@ -18,6 +18,7 @@ public class ShooterConstants {
   public static final int BOTTOM_SHOOTER_MOTOR_ID = 28;
   public static final int ANGLE_MOTOR_ID = 29;
   public static final int ANGLE_ENCODER_ID = 9;
+  public static final int DEFLECTOR_MOTOR_ID = 30; // not decided yet?
 
   public static final int COAST_BUTTON_ID = 5;
 
@@ -34,6 +35,12 @@ public class ShooterConstants {
   public static final double BOTTOM_SHOOT_KD = 0.0;
   public static final double BOTTOM_SHOOT_KS = 7.0;
   public static final double BOTTOM_SHOOT_PID_PEAK_OUTPUT = 1.0;
+
+  public static final double DEFLECTOR_KP = 0.0;
+  public static final double DEFLECTOR_KI = 0.0;
+  public static final double DEFLECTOR_KD = 0.0;
+  public static final double DEFLECTOR_KS = 0.0;
+  public static final double DEFLECTOR_PID_PEAK_OUTPUT = 1.0;
 
   // Shooter Rotation PID Constants
   public static final double ROTATION_KP = 50;
