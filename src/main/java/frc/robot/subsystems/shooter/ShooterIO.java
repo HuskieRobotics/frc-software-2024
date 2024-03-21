@@ -41,7 +41,6 @@ public interface ShooterIO {
     double deflectorMotorVoltage = 0.0;
     double deflectorMotorReferenceAngleDegrees = 0.0;
     double deflectorMotorClosedLoopReferenceDegrees = 0.0;
-    double deflectorEncoderAngleDegrees = 0.0;
     double deflectorMotorTemperatureCelsius = 0.0;
     double deflectorMotorClosedLoopReferenceSlope = 0.0;
 

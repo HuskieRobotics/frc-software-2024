@@ -78,6 +78,15 @@ public class ShooterConstants {
       Units.inchesToMeters(106.901) / 2.0;
   public static final double MID_TO_FAST_VELOCITY_DISTANCE_METERS = Units.inchesToMeters(106.901);
 
+  // Deflector Motor
+  public static final double DEFLECTOR_DEPLOY_VOLTAGE = 0;
+  public static final double DEFLECTOR_RETRACT_VOLTAGE = 0;
+  public static final double DEFLECTOR_MOTOR_CONTINUOUS_CURRENT_LIMIT = 0;
+  public static final double DEFLECTOR_MOTOR_PEAK_CURRENT_LIMIT = 0;
+  public static final double DEFLECTOR_MOTOR_PEAK_CURRENT_DURATION = 0;
+  public static final boolean DEFLECTOR_MOTOR_INVERTED = false;
+  public static final boolean ENABLE_CURRENT_LIMIT = true;
+
   // Angle Motor
   public static final double ANGLE_MOTOR_CONTINUOUS_CURRENT_LIMIT = 15;
   public static final double ANGLE_MOTOR_PEAK_CURRENT_LIMIT = 20;

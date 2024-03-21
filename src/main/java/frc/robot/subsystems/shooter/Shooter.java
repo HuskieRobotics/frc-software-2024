@@ -170,6 +170,9 @@ public class Shooter extends SubsystemBase {
                 .getNorm();
         this.adjustAngle(distanceToSpeaker);
         this.setRangeVelocity(distanceToSpeaker);
+        if (shootingPosition == ShootingPosition.AMP) {
+          deployDeflector();
+        }
       }
     }
   }
@@ -177,6 +180,7 @@ public class Shooter extends SubsystemBase {
   private void resetToInitialState() {
     this.state = State.WAITING_FOR_NOTE;
     this.shootingPosition = ShootingPosition.FIELD;
+    this.retractDeflector();
     this.overrideSetpointsForNextShot = DriverStation.isAutonomousEnabled();
   }
 
@@ -502,5 +506,13 @@ public class Shooter extends SubsystemBase {
     if (DriverStation.isDisabled()) {
       io.setCoastMode(coast);
     }
+  }
+
+  public void deployDeflector() {
+    io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_DEPLOY_VOLTAGE);
+  }
+
+  public void retractDeflector() {
+    io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_RETRACT_VOLTAGE);
   }
 }

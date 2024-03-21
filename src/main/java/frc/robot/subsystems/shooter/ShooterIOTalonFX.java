@@ -166,7 +166,6 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotorPositionRequest = new MotionMagicExpoVoltage(0);
     angleMotorVoltageRequest = new VoltageOut(0);
 
-
     shootMotorTopVelocityStatusSignal = shootMotorTop.getVelocity();
     shootMotorBottomVelocityStatusSignal = shootMotorBottom.getVelocity();
     angleMotorPositionStatusSignal = angleMotor.getPosition();
@@ -522,6 +521,40 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "AngleMotor", angleMotor);
     FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "AngleCANcoder", angleEncoder);
+  }
+
+  public void configDeflectorMotor() {
+    TalonFXConfiguration deflectorMotorConfig = new TalonFXConfiguration();
+    CurrentLimitsConfigs deflectorMotorCurrentLimits = new CurrentLimitsConfigs();
+    deflectorMotorCurrentLimits.SupplyCurrentLimit =
+        ShooterConstants.DEFLECTOR_MOTOR_CONTINUOUS_CURRENT_LIMIT;
+    deflectorMotorCurrentLimits.SupplyCurrentThreshold =
+        ShooterConstants.DEFLECTOR_MOTOR_PEAK_CURRENT_LIMIT;
+    deflectorMotorCurrentLimits.SupplyCurrentLimitEnable = ShooterConstants.ENABLE_CURRENT_LIMIT;
+    deflectorMotorConfig.CurrentLimits = deflectorMotorCurrentLimits;
+
+    deflectorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    deflectorMotorConfig.Slot0.kP = deflectorMotorKP.get();
+    deflectorMotorConfig.Slot0.kI = deflectorMotorKI.get();
+    deflectorMotorConfig.Slot0.kD = deflectorMotorKD.get();
+    deflectorMotorConfig.Slot0.kS = deflectorMotorKS.get();
+
+    deflectorMotorConfig.MotorOutput.Inverted =
+        ShooterConstants.DEFLECTOR_MOTOR_INVERTED
+            ? InvertedValue.Clockwise_Positive
+            : InvertedValue.CounterClockwise_Positive;
+
+    StatusCode status = StatusCode.StatusCodeNotInitialized;
+    for (int i = 0; i < 5; ++i) {
+      status = deflectorMotor.getConfigurator().apply(deflectorMotorConfig);
+      if (status.isOK()) break;
+    }
+    if (!status.isOK()) {
+      configAlert.set(true);
+      configAlert.setText(status.toString());
+    }
+
+    FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "DeflectorMotor", deflectorMotor);
   }
 
   @Override
