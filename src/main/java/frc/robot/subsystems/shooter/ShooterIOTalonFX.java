@@ -390,6 +390,11 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotor.setControl(angleMotorVoltageRequest.withOutput(voltage));
   }
 
+  @Override
+  public void setDeflectorMotorVoltage(double voltage) {
+    deflectorMotor.setControl(deflectorMotorVoltageRequest.withOutput(voltage));
+  }
+
   private void configShootMotor(TalonFX shootMotor, boolean isInverted, boolean isTopMotor) {
 
     TalonFXConfiguration shootMotorsConfig = new TalonFXConfiguration();
