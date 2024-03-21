@@ -52,7 +52,6 @@ public class Shooter extends SubsystemBase {
   };
 
   private boolean automatedShooter = true;
-  private boolean autoShot = true;
 
   private boolean intakeEnabled = true;
   private final LEDs leds;
@@ -118,7 +117,6 @@ public class Shooter extends SubsystemBase {
     Logger.recordOutput("Shooter/State", this.state.toString());
     Logger.recordOutput("Shooter/ShootingPosition", this.shootingPosition.toString());
     Logger.recordOutput("Shooter/AngleAutomated", this.automatedShooter);
-    Logger.recordOutput("Shooter/AutoShot", this.autoShot);
     Logger.recordOutput("Shooter/IntakeAutomated", this.intakeEnabled);
     Logger.recordOutput("Shooter/ScaleDownVelocity", this.scaleDownShooterVelocity);
 
@@ -292,18 +290,6 @@ public class Shooter extends SubsystemBase {
     this.automatedShooter = false;
   }
 
-  public void enableAutoShot() {
-    this.autoShot = true;
-  }
-
-  public void disableAutoShot() {
-    this.autoShot = false;
-  }
-
-  public boolean isAutoShotEnabled() {
-    return this.autoShot;
-  }
-
   public void enableScaleDownShooterVelocity() {
     this.scaleDownShooterVelocity = true;
   }
@@ -347,7 +333,7 @@ public class Shooter extends SubsystemBase {
   }
 
   private boolean isAtShootingDistance() {
-    if (this.autoShot) {
+    if (this.shootingPosition == ShootingPosition.AUTO_SHOT) {
       // project the robot pose into the future based on the current velocity
       Pose2d robotPose = RobotOdometry.getInstance().getEstimatedPosition();
       robotPose =

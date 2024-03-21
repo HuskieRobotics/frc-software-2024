@@ -69,6 +69,10 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
+  public default Trigger getAimAndShootSpeakerButton() {
+    return new Trigger(() -> false);
+  }
+
   public default Trigger getAlignAndIntakeNoteFromSourceButton() {
     return new Trigger(() -> false);
   }
@@ -114,10 +118,6 @@ public interface OperatorInterface {
   }
 
   public default Trigger getAimAutomationSwitch() {
-    return new Trigger(() -> false);
-  }
-
-  public default Trigger getAutoShotSwitch() {
     return new Trigger(() -> false);
   }
 
