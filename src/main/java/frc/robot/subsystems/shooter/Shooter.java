@@ -193,6 +193,10 @@ public class Shooter extends SubsystemBase {
     io.setShooterWheelTopVelocity(velocity);
   }
 
+  private double getAngleForDistance(double distanceToSpeaker) {
+    return 56.599 * (Math.atan(1.651 / (0.6395 * distanceToSpeaker)));
+  }
+
   private void adjustAngle(double distanceToSpeaker) {
     if (automatedShooter) {
       if (shootingPosition == ShootingPosition.PASS) {
@@ -208,7 +212,7 @@ public class Shooter extends SubsystemBase {
       } else if (shootingPosition == ShootingPosition.AUTO_SHOT) {
         io.setAngle(ShooterConstants.SHOOTER_AUTO_SHOT_ANGLE_DEG);
       } else {
-        io.setAngle(angleTreeMap.get(distanceToSpeaker));
+        io.setAngle(getAngleForDistance(distanceToSpeaker));
       }
     }
   }
