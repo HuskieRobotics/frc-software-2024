@@ -131,7 +131,7 @@ public class RobotContainer {
       drivetrain = new Drivetrain(new DrivetrainIO() {});
 
       intake = new Intake(new IntakeIO() {});
-      shooter = new Shooter(new ShooterIO() {}, intake);
+      shooter = new Shooter(new ShooterIO() {}, intake, drivetrain);
       intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
       String[] cameraNames = config.getCameraNames();
@@ -177,7 +177,7 @@ public class RobotContainer {
     drivetrain = new Drivetrain(new DrivetrainIOCTRE());
 
     intake = new Intake(new IntakeIOTalonFX());
-    shooter = new Shooter(new ShooterIOTalonFX(), intake);
+    shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
     String[] cameraNames = config.getCameraNames();
@@ -225,7 +225,7 @@ public class RobotContainer {
                 brModule));
 
     intake = new Intake(new IntakeIOTalonFX());
-    shooter = new Shooter(new ShooterIOTalonFX(), intake);
+    shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
     if (Constants.getRobot() == Constants.RobotType.ROBOT_SIMBOT) {
@@ -251,7 +251,7 @@ public class RobotContainer {
     drivetrain = new Drivetrain(drivetrainIO);
 
     intake = new Intake(new IntakeIOTalonFX());
-    shooter = new Shooter(new ShooterIOTalonFX(), intake);
+    shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
     // vision = new Vision(new VisionIO[] {new VisionIO() {}});
@@ -276,7 +276,7 @@ public class RobotContainer {
     // change the following to connect the subsystem being tested to actual hardware
     drivetrain = new Drivetrain(new DrivetrainIO() {});
     intake = new Intake(new IntakeIO() {});
-    shooter = new Shooter(new ShooterIO() {}, intake);
+    shooter = new Shooter(new ShooterIO() {}, intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
   }
@@ -609,8 +609,21 @@ public class RobotContainer {
 
     oi.getAimSpeakerButton()
         .toggleOnTrue(
-            new TeleopSwerveAimAtSpeaker(
-                drivetrain, shooter, intake, oi::getTranslateX, oi::getTranslateY));
+            Commands.parallel(
+                new TeleopSwerveAimAtSpeaker(
+                    drivetrain, shooter, intake, oi::getTranslateX, oi::getTranslateY),
+                Commands.runOnce(
+                    () -> shooter.setShootingPosition(ShootingPosition.FIELD), shooter)));
+
+    oi.getAimAndShootSpeakerButton()
+        .toggleOnTrue(
+            Commands.parallel(
+                new TeleopSwerveAimAtSpeaker(
+                    drivetrain, shooter, intake, oi::getTranslateX, oi::getTranslateY),
+                Commands.sequence(
+                    Commands.runOnce(
+                        () -> shooter.setShootingPosition(ShootingPosition.AUTO_SHOT), shooter),
+                    getShootCommand())));
 
     // field-relative toggle
     oi.getFieldRelativeButton()
@@ -682,11 +695,11 @@ public class RobotContainer {
 
     oi.getAimAutomationSwitch()
         .onTrue(
-            Commands.runOnce(shooter::enableAutoShooter, shooter)
+            Commands.runOnce(shooter::enableAutomatedShooter, shooter)
                 .withName("enable shooter automation"));
     oi.getAimAutomationSwitch()
         .onFalse(
-            Commands.runOnce(shooter::disableAutoShooter, shooter)
+            Commands.runOnce(shooter::disableAutomatedShooter, shooter)
                 .withName("disable shooter automation"));
 
     oi.getPrepareToScoreAmpButton()
