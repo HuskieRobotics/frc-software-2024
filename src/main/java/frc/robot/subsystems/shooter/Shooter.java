@@ -317,7 +317,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public BooleanSupplier getShooterAngleReadySupplier() {
-    return () -> shooterInputs.angleEncoderAngleDegrees < MAX_INTAKE_ANGLE;
+    return () -> shooterInputs.angleEncoderAngleDegrees < SUBWOOFER_ANGLE;
   }
 
   public boolean isShooterReadyToShoot(boolean isAimedAtSpeaker) {
