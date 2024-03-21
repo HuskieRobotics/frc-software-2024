@@ -1,12 +1,16 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import frc.lib.team3061.drivetrain.Drivetrain;
 import frc.robot.Field2d;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 /**
  * This command, when executed, instructs the drivetrain subsystem to drive based on the specified
@@ -24,6 +28,7 @@ import java.util.function.DoubleSupplier;
 public class TeleopSwerveAimAtSpeaker extends TeleopSwerve {
   private final Shooter shooter;
   private final Intake intake;
+  private final Drivetrain drivetrain;
 
   /**
    * Create a new TeleopSwerve command object.
@@ -46,18 +51,30 @@ public class TeleopSwerveAimAtSpeaker extends TeleopSwerve {
         drivetrain,
         translationXSupplier,
         translationYSupplier,
-        () -> {
-          Transform2d translation =
-              new Transform2d(
-                  Field2d.getInstance().getAllianceSpeakerCenter().getX()
-                      - drivetrain.getPose().getX(),
-                  Field2d.getInstance().getAllianceSpeakerCenter().getY()
-                      - drivetrain.getPose().getY(),
-                  new Rotation2d());
-          return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
-        });
+        calculateTargetRotation(drivetrain));
     this.shooter = shooter;
     this.intake = intake;
+    this.drivetrain = drivetrain;
+  }
+
+  private static Supplier<Rotation2d> calculateTargetRotation(Drivetrain drivetrain) {
+    // project the robot pose into the future based on the current velocity
+    return () -> {
+      Pose2d futureRobotPose = drivetrain.getPose();
+      futureRobotPose =
+          futureRobotPose.exp(
+              new Twist2d(
+                  drivetrain.getVelocityX() * ShooterConstants.SHOOTER_AUTO_SHOT_TIME_DELAY_SECS,
+                  drivetrain.getVelocityY() * ShooterConstants.SHOOTER_AUTO_SHOT_TIME_DELAY_SECS,
+                  drivetrain.getVelocityT() * ShooterConstants.SHOOTER_AUTO_SHOT_TIME_DELAY_SECS));
+
+      Transform2d translation =
+          new Transform2d(
+              Field2d.getInstance().getAllianceSpeakerCenter().getX() - futureRobotPose.getX(),
+              Field2d.getInstance().getAllianceSpeakerCenter().getY() - futureRobotPose.getY(),
+              new Rotation2d());
+      return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
+    };
   }
 
   @Override
