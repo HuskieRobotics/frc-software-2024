@@ -75,7 +75,8 @@ public class Shooter extends SubsystemBase {
     PODIUM,
     SUBWOOFER,
     AMP,
-    STORAGE, AMP_SIDE_AUTO
+    STORAGE,
+    AMP_SIDE_AUTO
   }
 
   private enum State {
@@ -221,8 +222,7 @@ public class Shooter extends SubsystemBase {
         io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
       } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO) {
         io.setAngle(ShooterConstants.AMP_SIDE_SIX_NOTE_ANGLE);
-      }
-      else {
+      } else {
         io.setAngle(angleTreeMap.get(distanceToSpeaker));
       }
     }
@@ -264,7 +264,7 @@ public class Shooter extends SubsystemBase {
       bottomVelocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
     } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO) {
       topVelocity = ShooterConstants.AMP_SIDE_SIX_NOTE_VELOCITY;
-      bottomVelocity = ShooterConstants.AMP_SIDE_SIX_NOTE_VELOCITY; 
+      bottomVelocity = ShooterConstants.AMP_SIDE_SIX_NOTE_VELOCITY;
     } else if (distanceToSpeaker < ShooterConstants.SLOW_TO_MID_VELOCITY_DISTANCE_METERS) {
       topVelocity = ShooterConstants.CLOSE_RANGE_VELOCITY_TOP;
       bottomVelocity = ShooterConstants.CLOSE_RANGE_VELOCITY_BOTTOM;
