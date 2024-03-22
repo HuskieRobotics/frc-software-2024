@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -34,6 +35,7 @@ import frc.lib.team6328.util.Alert.AlertType;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
 import frc.robot.Field2d;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -1003,14 +1005,22 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public boolean isAimedAtSpeaker() {
+    Pose2d futureRobotPose = this.getPose();
+    futureRobotPose =
+        futureRobotPose.exp(
+            new Twist2d(
+                this.getVelocityX() * ShooterConstants.SHOOTER_AUTO_SHOT_TIME_DELAY_SECS,
+                this.getVelocityY() * ShooterConstants.SHOOTER_AUTO_SHOT_TIME_DELAY_SECS,
+                this.getVelocityT() * ShooterConstants.SHOOTER_AUTO_SHOT_TIME_DELAY_SECS));
+
     Transform2d translation =
         new Transform2d(
-            Field2d.getInstance().getAllianceSpeakerCenter().getX() - this.getPose().getX(),
-            Field2d.getInstance().getAllianceSpeakerCenter().getY() - this.getPose().getY(),
+            Field2d.getInstance().getAllianceSpeakerCenter().getX() - futureRobotPose.getX(),
+            Field2d.getInstance().getAllianceSpeakerCenter().getY() - futureRobotPose.getY(),
             new Rotation2d());
     return Math.abs(
             Math.atan2(translation.getY(), translation.getX())
-                - this.getPose().getRotation().getRadians())
+                - futureRobotPose.getRotation().getRadians())
         < ANGLE_TO_SPEAKER_TOLERANCE;
   }
 
