@@ -460,6 +460,13 @@ public class RobotContainer {
     Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Amp Side");
     autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
 
+    /*
+     * 6 Note Auto
+     */
+
+     Command sixNoteAmpSide  = new PathPlannerAuto("6 Note Amp Side");
+     autoChooser.addOption("6 Note Amp Side", sixNoteAmpSide);
+
     /************ Start Point ************
      *
      * useful for initializing the pose of the robot to a known location
