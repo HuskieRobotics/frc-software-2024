@@ -423,33 +423,45 @@ public class RobotContainer {
             Commands.either(
                 new PathPlannerAuto("Amp Score 2nd Collect 3rd"),
                 new PathPlannerAuto("Amp Missed 2nd Collect 3rd"),
-                intake::hasNote));
+                intake::hasNote),
+            Commands.either(
+                Commands.parallel(
+                    Commands.runOnce(
+                        () ->
+                            shooter.setShootingPosition(
+                                ShootingPosition.AMP_SIDE_AUTO)),
+                    new PathPlannerAuto("Amp Score 3rd Collect 4th")),
+                new PathPlannerAuto("Amp Missed 3rd Collect 4th"),
+                intake::hasNote),
+            Commands.either(
+                Commands.parallel(
+                    Commands.runOnce(
+                        () ->
+                            shooter.setShootingPosition(
+                                ShootingPosition.AMP_SIDE_AUTO)),
+                    new PathPlannerAuto("Amp Shoot 4th Collect 5th")),
+                new PathPlannerAuto("Amp Missed 4th Collect 5th"),
+                intake::hasNote),
+            Commands.either(
+                Commands.parallel(
+                    Commands.runOnce(
+                        () ->
+                            shooter.setShootingPosition(
+                                ShootingPosition.SUBWOOFER)),
+                    new PathPlannerAuto("")),
+                new PathPlannerAuto("Missed 3rd Collect 4th"),
+                intake::hasNote),
+            Commands.either(
+                new PathPlannerAuto("Score 4th Center"), Commands.none(), intake::hasNote));
+    autoChooser.addOption("4 Note Source Side", fourNoteSourceSide);
+
+           
+
+                        
 
     autoChooser.addOption("6 Note Amp Side", sixNoteAmpSide);
 
-    /* FIXME
-      Command fourNoteAmpSide =
-          Commands.sequence(
-              Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
-              new PathPlannerAuto("Collect 2nd"),
-              Commands.either(
-                  new PathPlannerAuto("Score 2nd Collect 3rd"),
-                  new PathPlannerAuto("Missed 2nd Collect 3rd"),
-                  intake::hasNote),
-              Commands.either(
-                  Commands.parallel(
-                      Commands.runOnce(
-                          () ->
-                              shooter.setShootingPosition(
-                                  ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO)),
-                      new PathPlannerAuto("Score 3rd Collect 4th")),
-                  new PathPlannerAuto("Missed 3rd Collect 4th"),
-                  intake::hasNote),
-              Commands.either(
-                  new PathPlannerAuto("Score 4th Center"), Commands.none(), intake::hasNote));
-      autoChooser.addOption("4 Note Amp Side", fourNoteAmpSide);
-
-    */
+    
 
     /************ 4 Notes ************
      * /************ 4 Note Amp Side ************
