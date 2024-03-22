@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 2.887570138776641,
+      "y": 6.977901955803912
+    },
+    "rotation": 180.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Score 4th"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop And Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Collect 5th"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Amp Side Notes",
+  "choreoAuto": false
+}

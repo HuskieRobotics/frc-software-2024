@@ -1,0 +1,25 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 2.890488006126615,
+      "y": 6.989425029301866
+    },
+    "rotation": -179.657183385545
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Missed 4th Note"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Amp Side Notes",
+  "choreoAuto": false
+}
