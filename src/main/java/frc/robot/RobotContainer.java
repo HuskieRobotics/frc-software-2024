@@ -40,7 +40,6 @@ import frc.robot.configs.GenericDrivetrainRobotConfig;
 import frc.robot.configs.NameRobotConfig;
 import frc.robot.configs.PracticeBoardConfig;
 import frc.robot.configs.PracticeRobotConfig;
-import frc.robot.configs.SimRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.intake.Intake;
@@ -164,10 +163,8 @@ public class RobotContainer {
       case ROBOT_PRACTICE:
         config = new PracticeRobotConfig();
         break;
-      case ROBOT_SIMBOT_CTRE:
-        config = new SimRobotConfig();
-        break;
       case ROBOT_COMPETITION:
+      case ROBOT_SIMBOT_CTRE:
         config = new NameRobotConfig();
         break;
       case ROBOT_PRACTICE_BOARD:
