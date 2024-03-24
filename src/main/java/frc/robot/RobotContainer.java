@@ -402,13 +402,10 @@ public class RobotContainer {
                 new PathPlannerAuto("Score 2nd Collect 3rd"),
                 new PathPlannerAuto("Missed 2nd Collect 3rd"),
                 intake::hasNote),
+            Commands.runOnce(
+                () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO)),
             Commands.either(
-                Commands.parallel(
-                    Commands.runOnce(
-                        () ->
-                            shooter.setShootingPosition(
-                                ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO)),
-                    new PathPlannerAuto("Score 3rd Collect 4th")),
+                new PathPlannerAuto("Score 3rd Collect 4th"),
                 new PathPlannerAuto("Missed 3rd Collect 4th"),
                 intake::hasNote),
             Commands.either(
@@ -438,10 +435,9 @@ public class RobotContainer {
 
     autoChooser.addOption("6 Note Amp Side", sixNoteAmpSide);
 
-    /************ 4 Notes ************
-     * /************ 4 Note Amp Side ************
+    /************ 4 Note Amp Side ************
      *
-     * 4 note starting from the amp side
+     * 4 note (initial and three notes near the speaker)
      *
      */
     Command fourNoteCenter =
