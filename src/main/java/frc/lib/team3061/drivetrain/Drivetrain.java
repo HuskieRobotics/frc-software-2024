@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -994,15 +995,39 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public boolean isAimedAtSpeaker() {
-    Transform2d translation =
+    // calculate the transforms 7 inches inside of the left and right side of the speaker opening
+    // and the corresponding angles
+    Transform2d speakerOpeningLeftSide =
         new Transform2d(
             Field2d.getInstance().getAllianceSpeakerCenter().getX() - this.getPose().getX(),
-            Field2d.getInstance().getAllianceSpeakerCenter().getY() - this.getPose().getY(),
+            Field2d.getInstance().getAllianceSpeakerCenter().getY()
+                + Units.inchesToMeters(13.6875)
+                - this.getPose().getY(),
             new Rotation2d());
-    return Math.abs(
-            Math.atan2(translation.getY(), translation.getX())
-                - this.getPose().getRotation().getRadians())
-        < ANGLE_TO_SPEAKER_TOLERANCE;
+    Transform2d speakerOpeningRightSide =
+        new Transform2d(
+            Field2d.getInstance().getAllianceSpeakerCenter().getX() - this.getPose().getX(),
+            Field2d.getInstance().getAllianceSpeakerCenter().getY()
+                - Units.inchesToMeters(13.6875)
+                - this.getPose().getY(),
+            new Rotation2d());
+    double angleToLeftSide =
+        Math.atan2(speakerOpeningLeftSide.getY(), speakerOpeningLeftSide.getX());
+    double angleToRightSide =
+        Math.atan2(speakerOpeningRightSide.getY(), speakerOpeningRightSide.getX());
+
+    // if the robot is rotated between the two calculated angles, it is aimed at the speaker
+    boolean aimed =
+        (this.getPose().getRotation().getRadians() < angleToLeftSide
+                && this.getPose().getRotation().getRadians() > angleToRightSide)
+            || (this.getPose().getRotation().getRadians() > angleToLeftSide
+                && this.getPose().getRotation().getRadians() < angleToRightSide);
+
+    Logger.recordOutput(SUBSYSTEM_NAME + "/AimToSpeaker/LeftAngle", angleToLeftSide);
+    Logger.recordOutput(SUBSYSTEM_NAME + "/AimToSpeaker/RightAngle", angleToRightSide);
+    Logger.recordOutput(SUBSYSTEM_NAME + "/AimToSpeaker/Aimed", aimed);
+
+    return aimed;
   }
 
   private enum DriveMode {
