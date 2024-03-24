@@ -11,7 +11,7 @@ import frc.lib.team3061.drivetrain.swerve.SwerveConstants;
  * Refer to the README for how to represent your robot's configuration. For more information on
  * these methods, refer to the documentation in the RobotConfig class.
  */
-public class NameRobotConfig extends RobotConfig {
+public class ArtemisRobotConfig extends RobotConfig {
   private static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1;
   private static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2;
   private static final int FRONT_LEFT_MODULE_STEER_ENCODER = 22;
