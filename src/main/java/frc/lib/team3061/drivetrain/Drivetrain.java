@@ -469,7 +469,7 @@ public class Drivetrain extends SubsystemBase {
     Logger.processInputs(SUBSYSTEM_NAME + "/BR", this.inputs.swerve[3]);
 
     // check for teleportation
-    if (this.inputs.drivetrain.robotPose.minus(prevRobotPose).getTranslation().getNorm() > 0.2) {
+    if (this.inputs.drivetrain.robotPose.minus(prevRobotPose).getTranslation().getNorm() > 0.4) {
       this.resetPose(prevRobotPose);
       Logger.recordOutput(SUBSYSTEM_NAME + "/Teleported", true);
     } else {
