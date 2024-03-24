@@ -1,12 +1,6 @@
 {
   "version": 1.0,
-  "startingPose": {
-    "position": {
-      "x": 2.9062276306370793,
-      "y": 5.550603828480384
-    },
-    "rotation": 180.0
-  },
+  "startingPose": null,
   "command": {
     "type": "sequential",
     "data": {
@@ -14,19 +8,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Amp Score 5th"
+            "pathName": "Amp Score 6th"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Shoot Now"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Amp Collect 6th"
+            "name": "Stop And Shoot"
           }
         }
       ]

@@ -412,9 +412,16 @@ public class RobotContainer {
                 new PathPlannerAuto("Score 4th Center"), Commands.none(), intake::hasNote));
     autoChooser.addOption("4 Note Source Side", fourNoteSourceSide);
 
+    /************ 6 Note Amp Side ************
+     *
+     * 6 notes (initial, first two center notes from amp side, three notes near the speaker)
+     *
+     */
+
     Command sixNoteAmpSide =
         Commands.sequence(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
+            getAutoStopAndShootCommand(),
             new PathPlannerAuto("Amp Collect 2nd"),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO)),
             Commands.either(
@@ -429,13 +436,13 @@ public class RobotContainer {
                 intake::hasNote),
             Commands.either(
                 new PathPlannerAuto("Amp Score 5th Collect 6th"),
-                new PathPlannerAuto("Missed 5th Collect 6th"),
+                new PathPlannerAuto("Amp Missed 5th Collect 6th"),
                 intake::hasNote),
-            new PathPlannerAuto("Amp Shoot 6th"));
+            new PathPlannerAuto("Amp Score 6th"));
 
     autoChooser.addOption("6 Note Amp Side", sixNoteAmpSide);
 
-    /************ 4 Note Amp Side ************
+    /************ 4 Note Near Speaker ************
      *
      * 4 note (initial and three notes near the speaker)
      *
@@ -445,21 +452,6 @@ public class RobotContainer {
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
             new PathPlannerAuto("4 Note Center"));
     autoChooser.addOption("4 Note Center", fourNoteCenter);
-
-    /************ 5 Notes ************
-     *
-     * 5 notes (initial, 3 in wing, and second center note from amp side)
-     *
-     */
-    Command fiveNoteAmpSide = new PathPlannerAuto("5 Note Amp Side");
-    autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
-
-    /*
-     * 6 Note Auto
-     */
-
-    // Command sixNoteAmpSide = new PathPlannerAuto("6 Note Amp Side");
-    // autoChooser.addOption("6 Note Amp Side", sixNoteAmpSide);
 
     /************ Start Point ************
      *
