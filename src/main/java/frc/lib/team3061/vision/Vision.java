@@ -145,8 +145,8 @@ public class Vision extends SubsystemBase {
 
   private void processNewVisionData(int i) {
     // only process the vision data if the timestamp is newer than the last one
-    if (this.lastTimestamps[i] < ios[i].lastCameraTimestamp) {
-      this.lastTimestamps[i] = ios[i].lastCameraTimestamp;
+    if (this.lastTimestamps[i] < ios[i].estimatedCameraPoseTimestamp) {
+      this.lastTimestamps[i] = ios[i].estimatedCameraPoseTimestamp;
       Pose3d estimatedRobotPose3d =
           ios[i].estimatedCameraPose.plus(
               RobotConfig.getInstance().getRobotToCameraTransforms()[i].inverse());
@@ -185,7 +185,7 @@ public class Vision extends SubsystemBase {
     // if no tags have been seen for the specified number of cycles, "zero" the robot pose
     // such that old data is not seen in AdvantageScope
     if (cyclesWithNoResults[i] == EXPIRATION_COUNT) {
-      Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/RobotPose", new Pose2d());
+      Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/RobotPose2d", new Pose2d());
     }
   }
 
