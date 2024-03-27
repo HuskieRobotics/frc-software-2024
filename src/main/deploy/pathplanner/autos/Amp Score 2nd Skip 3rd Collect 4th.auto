@@ -8,7 +8,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Amp Score 3rd"
+            "pathName": "Amp Score 2nd"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Score 3rd 0.2"
           }
         }
       ]

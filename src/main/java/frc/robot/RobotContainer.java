@@ -406,6 +406,8 @@ public class RobotContainer {
                 new PathPlannerAuto("Score 3rd Collect 4th"),
                 new PathPlannerAuto("Missed 3rd Collect 4th"),
                 intake::hasNoteForAuto),
+            Commands.runOnce(
+                () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO)),
             new PathPlannerAuto("Score 4th Center"));
     autoChooser.addOption("4 Note Source Side", fourNoteSourceSide);
 
@@ -423,7 +425,6 @@ public class RobotContainer {
                 new PathPlannerAuto("Amp Score 2nd Collect 3rd"),
                 new PathPlannerAuto("Amp Missed 2nd Collect 3rd"),
                 intake::hasNoteForAuto),
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO)),
             new PathPlannerAuto("Amp Score 3rd Collect 4th"),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
             new PathPlannerAuto("4 note center"));
