@@ -8,8 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.682545546909275,
-        "y": 6.408848454060545
+        "x": 2.880225620973841,
+        "y": 6.259957882733563
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.08,
+        "y": 6.6
+      },
+      "prevControl": {
+        "x": 2.779247526185731,
+        "y": 6.085653173248438
+      },
+      "nextControl": {
+        "x": 7.124396431005989,
+        "y": 7.8038229218738335
       },
       "isLocked": false,
       "linkedName": null
@@ -20,8 +36,8 @@
         "y": 7.435010506384649
       },
       "prevControl": {
-        "x": 3.1394462788925583,
-        "y": 7.3976955226637715
+        "x": 5.622969543078916,
+        "y": 7.382169931183083
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,33 +46,51 @@
   ],
   "rotationTargets": [
     {
+      "waypointRelativePos": 1.1,
+      "rotationDegrees": -164.05,
+      "rotateFast": true
+    },
+    {
       "waypointRelativePos": 0.1,
       "rotationDegrees": 180.0,
       "rotateFast": true
     },
     {
-      "waypointRelativePos": 0.7,
+      "waypointRelativePos": 0.6,
       "rotationDegrees": 180.0,
       "rotateFast": true
     },
     {
-      "waypointRelativePos": 0.05,
+      "waypointRelativePos": 1.8,
       "rotationDegrees": 180.0,
       "rotateFast": true
     },
     {
-      "waypointRelativePos": 0.15,
-      "rotationDegrees": 180.0,
-      "rotateFast": true
-    },
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": 180.0,
+      "waypointRelativePos": 1,
+      "rotationDegrees": -164.05,
       "rotateFast": true
     }
   ],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.9,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Shoot Now"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 11.8,

@@ -418,10 +418,8 @@ public class RobotContainer {
 
     Command sixNoteAmpSide =
         Commands.sequence(
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
-            getAutoStopAndShootCommand(),
-            new PathPlannerAuto("Amp Collect 2nd"),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO)),
+            new PathPlannerAuto("Amp Collect 2nd"),
             Commands.either(
                 new PathPlannerAuto("Amp Score 2nd Collect 3rd"),
                 new PathPlannerAuto("Amp Missed 2nd Collect 3rd"),
