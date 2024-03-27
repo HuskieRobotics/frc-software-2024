@@ -2,6 +2,8 @@ package frc.robot.subsystems.shooter;
 
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -10,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
+import frc.lib.team3061.drivetrain.Drivetrain;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.leds.LEDs.ShooterLEDState;
 import frc.lib.team3061.util.RobotOdometry;
@@ -23,6 +26,7 @@ public class Shooter extends SubsystemBase {
 
   private ShooterIO io;
   private Intake intake;
+  private Drivetrain drivetrain;
   private InterpolatingDoubleTreeMap angleTreeMap;
   private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
 
@@ -47,7 +51,7 @@ public class Shooter extends SubsystemBase {
     5.0173 + .06
   };
 
-  private boolean autoShooter = true;
+  private boolean automatedShooter = true;
 
   private boolean intakeEnabled = true;
   private final LEDs leds;
@@ -64,9 +68,8 @@ public class Shooter extends SubsystemBase {
 
   private static final String BUT_IS = " but is ";
 
-  // FIXME: consider having 1-2 set distances with fixed angles for auto shots (near subwoofer, near
-  // podium) and create a shooter preset for these
   public enum ShootingPosition {
+    AUTO_SHOT,
     FIELD,
     FOUR_NOTE_AUTO,
     SOURCE_SIDE_AUTO,
@@ -85,13 +88,12 @@ public class Shooter extends SubsystemBase {
     PREPARING_TO_SHOOT
   }
 
-  public Shooter(ShooterIO io, Intake intake) {
+  public Shooter(ShooterIO io, Intake intake, Drivetrain drivetrain) {
     this.io = io;
     this.intake = intake;
+    this.drivetrain = drivetrain;
     this.angleTreeMap = new InterpolatingDoubleTreeMap();
     populateAngleMap();
-
-    this.autoShooter = true;
 
     this.leds = LEDs.getInstance();
 
@@ -117,7 +119,7 @@ public class Shooter extends SubsystemBase {
     Logger.processInputs(SUBSYSTEM_NAME, shooterInputs);
     Logger.recordOutput("Shooter/State", this.state.toString());
     Logger.recordOutput("Shooter/ShootingPosition", this.shootingPosition.toString());
-    Logger.recordOutput("Shooter/AngleAutomated", this.autoShooter);
+    Logger.recordOutput("Shooter/AngleAutomated", this.automatedShooter);
     Logger.recordOutput("Shooter/IntakeAutomated", this.intakeEnabled);
     Logger.recordOutput("Shooter/ScaleDownVelocity", this.scaleDownShooterVelocity);
 
@@ -202,8 +204,12 @@ public class Shooter extends SubsystemBase {
     }
   }
 
+  private double getAngleForDistance(double distanceToSpeaker) {
+    return 56.599 * (Math.atan(1.651 / (0.6395 * distanceToSpeaker)));
+  }
+
   private void adjustAngle(double distanceToSpeaker) {
-    if (autoShooter) {
+    if (automatedShooter) {
       if (shootingPosition == ShootingPosition.PASS) {
         io.setAngle(ShooterConstants.PASS_ANGLE);
       } else if (shootingPosition == ShootingPosition.PODIUM) {
@@ -223,13 +229,13 @@ public class Shooter extends SubsystemBase {
       } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO) {
         io.setAngle(ShooterConstants.AMP_SIDE_SIX_NOTE_ANGLE);
       } else {
-        io.setAngle(angleTreeMap.get(distanceToSpeaker));
+        io.setAngle(getAngleForDistance(distanceToSpeaker));
       }
     }
   }
 
   private void moveToIntakePosition() {
-    if (autoShooter) {
+    if (automatedShooter) {
       io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
     }
   }
@@ -305,13 +311,13 @@ public class Shooter extends SubsystemBase {
     }
   }
 
-  public void enableAutoShooter() {
-    this.autoShooter = true;
+  public void enableAutomatedShooter() {
+    this.automatedShooter = true;
     this.state = State.WAITING_FOR_NOTE;
   }
 
-  public void disableAutoShooter() {
-    this.autoShooter = false;
+  public void disableAutomatedShooter() {
+    this.automatedShooter = false;
   }
 
   public void enableScaleDownShooterVelocity() {
@@ -336,16 +342,51 @@ public class Shooter extends SubsystemBase {
     boolean bottomWheelAtSetpoint = isBottomShootAtSetpoint();
     boolean angleAtSetpoint = isAngleAtSetpoint();
 
+    boolean atShootingDistance = isAtShootingDistance();
+
     Logger.recordOutput("Shooter/AlignedToShoot", alignedToShoot);
     Logger.recordOutput("Shooter/TopWheelAtSetpoint", topWheelAtSetpoint);
     Logger.recordOutput("Shooter/BottomWheelAtSetpoint", bottomWheelAtSetpoint);
     Logger.recordOutput("Shooter/AngleAtSetpoint", angleAtSetpoint);
+    Logger.recordOutput("Shooter/AtShootingDistance", atShootingDistance);
 
     return alignedToShoot
         && topWheelAtSetpoint
         && bottomWheelAtSetpoint
-        && (!autoShooter || angleAtSetpoint)
+        && (!automatedShooter || angleAtSetpoint)
+        && atShootingDistance
         && this.state == State.PREPARING_TO_SHOOT;
+  }
+
+  private boolean isAtShootingDistance() {
+    if (this.shootingPosition == ShootingPosition.AUTO_SHOT) {
+      // project the robot pose into the future based on the current velocity
+      Pose2d robotPose = RobotOdometry.getInstance().getEstimatedPosition();
+      robotPose =
+          robotPose.exp(
+              new Twist2d(
+                  drivetrain.getVelocityX() * SHOOTER_AUTO_SHOT_TIME_DELAY_SECS,
+                  drivetrain.getVelocityY() * SHOOTER_AUTO_SHOT_TIME_DELAY_SECS,
+                  drivetrain.getVelocityT() * SHOOTER_AUTO_SHOT_TIME_DELAY_SECS));
+
+      Logger.recordOutput("Shooter/futureRobotPose", robotPose);
+
+      double distanceToSpeaker =
+          Field2d.getInstance()
+              .getAllianceSpeakerCenter()
+              .minus(robotPose)
+              .getTranslation()
+              .getNorm();
+
+      Logger.recordOutput("Shooter/futureDistanceToSpeaker", distanceToSpeaker);
+
+      return Math.abs(distanceToSpeaker - ShooterConstants.SHOOTER_AUTO_SHOT_DISTANCE_METERS)
+          < ShooterConstants.SHOOTER_AUTO_SHOT_TOLERANCE_METERS;
+    } else {
+      // if auto shot is disabled, always return true since the distance to the speaker is
+      // irrelevant
+      return true;
+    }
   }
 
   public boolean isTopShootAtSetpoint() {
@@ -393,7 +434,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean isAutomated() {
-    return autoShooter;
+    return automatedShooter;
   }
 
   public void setAngleMotorVoltage(double voltage) {

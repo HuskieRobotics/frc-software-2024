@@ -590,21 +590,30 @@ public class Drivetrain extends SubsystemBase {
   }
 
   /**
-   * Returns the desired velocity of the drivetrain in the x direction (units of m/s)
+   * Returns the measured velocity of the drivetrain in the x direction (units of m/s)
    *
-   * @return the desired velocity of the drivetrain in the x direction (units of m/s)
+   * @return the measured velocity of the drivetrain in the x direction (units of m/s)
    */
   public double getVelocityX() {
     return this.inputs.drivetrain.measuredVXMetersPerSec;
   }
 
   /**
-   * Returns the desired velocity of the drivetrain in the y direction (units of m/s)
+   * Returns the measured velocity of the drivetrain in the y direction (units of m/s)
    *
-   * @return the desired velocity of the drivetrain in the y direction (units of m/s)
+   * @return the measured velocity of the drivetrain in the y direction (units of m/s)
    */
   public double getVelocityY() {
     return this.inputs.drivetrain.measuredVYMetersPerSec;
+  }
+
+  /**
+   * Returns the measured rotational velocity of the drivetrain (units of rad/s)
+   *
+   * @return the measured rotational velocity of the drivetrain (units of rad/s)
+   */
+  public double getVelocityT() {
+    return this.inputs.drivetrain.measuredAngularVelocityRadPerSec;
   }
 
   /**
