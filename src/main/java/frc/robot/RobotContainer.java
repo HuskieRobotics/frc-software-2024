@@ -609,21 +609,27 @@ public class RobotContainer {
 
     oi.getAimSpeakerButton()
         .toggleOnTrue(
-            Commands.parallel(
-                new TeleopSwerveAimAtSpeaker(
-                    drivetrain, shooter, intake, oi::getTranslateX, oi::getTranslateY),
+            Commands.sequence(
                 Commands.runOnce(
-                    () -> shooter.setShootingPosition(ShootingPosition.FIELD), shooter)));
+                    () -> drivetrain.resetPoseToVision(() -> vision.getBestRobotPose())),
+                Commands.parallel(
+                    new TeleopSwerveAimAtSpeaker(
+                        drivetrain, shooter, intake, oi::getTranslateX, oi::getTranslateY),
+                    Commands.runOnce(
+                        () -> shooter.setShootingPosition(ShootingPosition.FIELD), shooter))));
 
     oi.getAimAndShootSpeakerButton()
         .toggleOnTrue(
-            Commands.parallel(
-                new TeleopSwerveAimAtSpeaker(
-                    drivetrain, shooter, intake, oi::getTranslateX, oi::getTranslateY),
-                Commands.sequence(
-                    Commands.runOnce(
-                        () -> shooter.setShootingPosition(ShootingPosition.AUTO_SHOT), shooter),
-                    getShootCommand())));
+            Commands.sequence(
+                Commands.runOnce(
+                    () -> drivetrain.resetPoseToVision(() -> vision.getBestRobotPose())),
+                Commands.parallel(
+                    new TeleopSwerveAimAtSpeaker(
+                        drivetrain, shooter, intake, oi::getTranslateX, oi::getTranslateY),
+                    Commands.sequence(
+                        Commands.runOnce(
+                            () -> shooter.setShootingPosition(ShootingPosition.AUTO_SHOT), shooter),
+                        getShootCommand()))));
 
     // field-relative toggle
     oi.getFieldRelativeButton()
