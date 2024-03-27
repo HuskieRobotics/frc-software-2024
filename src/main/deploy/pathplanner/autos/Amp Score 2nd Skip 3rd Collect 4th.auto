@@ -8,13 +8,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Amp Score 2nd"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Amp Score 3rd 0.2"
+            "pathName": "Amp Score 2nd Subwoofer"
           }
         }
       ]

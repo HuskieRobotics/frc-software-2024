@@ -20,13 +20,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "4 note center - 1 note"
+            "pathName": "4 note center - 1 note slow"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "4 note center - 1 shot"
+            "pathName": "4 note center - 1 shot slow"
           }
         },
         {
@@ -38,13 +38,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "4 note center - 2 note"
+            "pathName": "4 note center - 2 note slow"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "4 note center - 2 note subwoofer"
+            "pathName": "4 note center - 2 note slow subwoofer"
           }
         },
         {
@@ -56,7 +56,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "4 note center - 3 note"
+            "pathName": "4 note center - 3 note slow"
           }
         },
         {

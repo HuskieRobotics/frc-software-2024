@@ -454,7 +454,7 @@ public class RobotContainer {
     Command fourNoteCenter =
         Commands.parallel(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
-            new PathPlannerAuto("4 note center"));
+            new PathPlannerAuto("4 note center slow"));
     autoChooser.addOption("4 Note Center", fourNoteCenter);
 
     /************ Start Point ************
