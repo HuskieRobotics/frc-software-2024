@@ -399,15 +399,14 @@ public class RobotContainer {
             Commands.either(
                 new PathPlannerAuto("Score 2nd Collect 3rd"),
                 new PathPlannerAuto("Missed 2nd Collect 3rd"),
-                intake::hasNote),
+                intake::hasNoteForAuto),
             Commands.runOnce(
                 () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO)),
             Commands.either(
                 new PathPlannerAuto("Score 3rd Collect 4th"),
                 new PathPlannerAuto("Missed 3rd Collect 4th"),
-                intake::hasNote),
-            Commands.either(
-                new PathPlannerAuto("Score 4th Center"), Commands.none(), intake::hasNote));
+                intake::hasNoteForAuto),
+            new PathPlannerAuto("Score 4th Center"));
     autoChooser.addOption("4 Note Source Side", fourNoteSourceSide);
 
     /************ 6 Note Amp Side ************
@@ -423,20 +422,28 @@ public class RobotContainer {
             Commands.either(
                 new PathPlannerAuto("Amp Score 2nd Collect 3rd"),
                 new PathPlannerAuto("Amp Missed 2nd Collect 3rd"),
-                intake::hasNote),
+                intake::hasNoteForAuto),
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO)),
             new PathPlannerAuto("Amp Score 3rd Collect 4th"),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
-            Commands.either(
-                new PathPlannerAuto("Amp Score 4th Collect 5th"),
-                new PathPlannerAuto("Amp Missed 4th Collect 5th"),
-                intake::hasNote),
-            Commands.either(
-                new PathPlannerAuto("Amp Score 5th Collect 6th"),
-                new PathPlannerAuto("Amp Missed 5th Collect 6th"),
-                intake::hasNote),
-            new PathPlannerAuto("Amp Score 6th"));
+            new PathPlannerAuto("4 note center"));
 
     autoChooser.addOption("6 Note Amp Side", sixNoteAmpSide);
+
+    Command fiveNoteAmpSide =
+        Commands.sequence(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO)),
+            new PathPlannerAuto("Amp Collect 2nd"),
+            Commands.either(
+                new PathPlannerAuto("Amp Score 2nd Skip 3rd Collect 4th"),
+                Commands.sequence(
+                    new PathPlannerAuto("Amp Missed 2nd Collect 3rd"),
+                    new PathPlannerAuto("Amp Score 3rd Collect 4th")),
+                intake::hasNoteForAuto),
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
+            new PathPlannerAuto("4 note center"));
+
+    autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
 
     /************ 4 Note Near Speaker ************
      *
@@ -446,7 +453,7 @@ public class RobotContainer {
     Command fourNoteCenter =
         Commands.parallel(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
-            new PathPlannerAuto("4 Note Center"));
+            new PathPlannerAuto("4 note center"));
     autoChooser.addOption("4 Note Center", fourNoteCenter);
 
     /************ Start Point ************
@@ -774,10 +781,12 @@ public class RobotContainer {
   }
 
   private Command getAutoStopAndShootCommand() {
-    return Commands.parallel(
-            new TeleopSwerveAimAtSpeaker(drivetrain, shooter, intake, () -> 0.0, () -> 0.0),
-            getShootCommand())
-        .withTimeout(1.0)
+    return Commands.sequence(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.FIELD)),
+            Commands.parallel(
+                    new TeleopSwerveAimAtSpeaker(drivetrain, shooter, intake, () -> 0.0, () -> 0.0),
+                    getShootCommand())
+                .withTimeout(1.0))
         .andThen(Commands.runOnce(intake::shoot, intake));
   }
 
