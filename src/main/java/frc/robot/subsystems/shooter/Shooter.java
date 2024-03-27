@@ -218,6 +218,8 @@ public class Shooter extends SubsystemBase {
         io.setAngle(ShooterConstants.SUBWOOFER_ANGLE);
       } else if (shootingPosition == ShootingPosition.AMP) {
         io.setAngle(ShooterConstants.AMP_ANGLE);
+      } else if (shootingPosition == ShootingPosition.AUTO_SHOT) {
+        io.setAngle(ShooterConstants.SHOOTER_AUTO_SHOT_ANGLE_DEG);
       } else if (shootingPosition == ShootingPosition.FOUR_NOTE_AUTO) {
         io.setAngle(ShooterConstants.FOUR_NOTE_AUTO_ANGLE);
       } else if (shootingPosition == ShootingPosition.SOURCE_SIDE_AUTO) {
@@ -256,6 +258,9 @@ public class Shooter extends SubsystemBase {
     } else if (shootingPosition == ShootingPosition.AMP) {
       topVelocity = ShooterConstants.AMP_VELOCITY_TOP;
       bottomVelocity = ShooterConstants.AMP_VELOCITY_BOTTOM;
+    } else if (shootingPosition == ShootingPosition.AUTO_SHOT) {
+      topVelocity = ShooterConstants.SHOOTER_AUTO_SHOT_VELOCITY_RPS;
+      bottomVelocity = ShooterConstants.SHOOTER_AUTO_SHOT_VELOCITY_RPS;
     } else if (shootingPosition == ShootingPosition.FOUR_NOTE_AUTO) {
       topVelocity = ShooterConstants.FOUR_NOTE_AUTO_VELOCITY;
       bottomVelocity = ShooterConstants.FOUR_NOTE_AUTO_VELOCITY;
