@@ -1,0 +1,79 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.3095166699592662,
+      "y": 5.504634921306879
+    },
+    "rotation": 179.75457565420712
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop And Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4 note center - 1 note"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4 note center - 1 shot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop And Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4 note center - 2 note"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4 note center - 2 note subwoofer"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop And Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4 note center - 3 note"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop And Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4 note - center"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

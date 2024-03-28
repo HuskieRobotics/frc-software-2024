@@ -14,7 +14,13 @@
         {
           "type": "named",
           "data": {
-            "name": "PrepAutoShot"
+            "name": "PrepAutoSubwooferShot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         },
         {
@@ -32,13 +38,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "PrepAutoShot"
+            "name": "Stop And Shoot"
           }
         },
         {
@@ -50,13 +50,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "PrepAutoShot"
+            "name": "Stop And Shoot"
           }
         },
         {
@@ -68,13 +62,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "PrepAutoShot"
+            "name": "Stop And Shoot"
           }
         },
         {
@@ -92,7 +80,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "Stop And Shoot"
           }
         }
       ]

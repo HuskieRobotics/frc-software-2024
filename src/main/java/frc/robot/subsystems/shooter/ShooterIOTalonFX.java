@@ -161,9 +161,6 @@ public class ShooterIOTalonFX implements ShooterIO {
     shootMotorTopReferenceVelocityStatusSignal = shootMotorTop.getClosedLoopReference();
     shootMotorBottomReferenceVelocityStatusSignal = shootMotorBottom.getClosedLoopReference();
     angleMotorReferencePositionStatusSignal = angleMotor.getClosedLoopReference();
-    // FIXME: this shouldn't be needed and doesn't work in sim; check if it works on the real robot
-    // and file a bug
-    angleMotorReferencePositionStatusSignal.setUpdateFrequency(100.0);
 
     shootMotorTopTemperatureStatusSignal = shootMotorTop.getDeviceTemp();
     shootMotorBottomTemperatureStatusSignal = shootMotorBottom.getDeviceTemp();
@@ -174,9 +171,6 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotorVoltageStatusSignal = angleMotor.getMotorVoltage();
 
     angleMotorClosedLoopReferenceSlopeStatusSignal = angleMotor.getClosedLoopReferenceSlope();
-    // FIXME: this shouldn't be needed and doesn't work in sim; check if it works on the real robot
-    // and file a bug
-    angleMotorClosedLoopReferenceSlopeStatusSignal.setUpdateFrequency(100.0);
 
     configShootMotor(shootMotorTop, SHOOT_TOP_INVERTED, true);
     configShootMotor(shootMotorBottom, SHOOT_BOTTOM_INVERTED, false);
@@ -238,6 +232,10 @@ public class ShooterIOTalonFX implements ShooterIO {
         angleMotorVoltageStatusSignal,
         angleMotorClosedLoopReferenceSlopeStatusSignal);
 
+    // Retrieve the closed loop reference status signals directly from the motor in this method
+    // instead of retrieving in advance because the status signal returned depends on the current
+    // control mode.
+
     // Updates Top Shooter Motor Inputs
     shooterInputs.shootMotorTopStatorCurrentAmps =
         shootMotorTopStatorCurrentStatusSignal.getValueAsDouble();
@@ -246,7 +244,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     shooterInputs.shootMotorTopVelocityRPS = shootMotorTopVelocityStatusSignal.getValueAsDouble();
     shooterInputs.shootMotorTopReferenceVelocityRPS = this.topWheelVelocity;
     shooterInputs.shootMotorTopClosedLoopReferenceRPS =
-        shootMotorTopReferenceVelocityStatusSignal.getValueAsDouble();
+        shootMotorTop.getClosedLoopReference().getValueAsDouble();
     shooterInputs.shootMotorTopTemperatureCelsius =
         shootMotorTopTemperatureStatusSignal.getValueAsDouble();
     shooterInputs.shootMotorTopVoltage = shootMotorTopVoltageStatusSignal.getValueAsDouble();
@@ -260,7 +258,7 @@ public class ShooterIOTalonFX implements ShooterIO {
         shootMotorBottomVelocityStatusSignal.getValueAsDouble();
     shooterInputs.shootMotorBottomReferenceVelocityRPS = this.bottomWheelVelocity;
     shooterInputs.shootMotorBottomClosedLoopReferenceRPS =
-        shootMotorBottomReferenceVelocityStatusSignal.getValueAsDouble();
+        shootMotorBottom.getClosedLoopReference().getValueAsDouble();
     shooterInputs.shootMotorBottomTemperatureCelsius =
         shootMotorBottomTemperatureStatusSignal.getValueAsDouble();
     shooterInputs.shootMotorBottomVoltage = shootMotorBottomVoltageStatusSignal.getValueAsDouble();
@@ -304,11 +302,11 @@ public class ShooterIOTalonFX implements ShooterIO {
         Units.rotationsToDegrees(angleMotorPositionStatusSignal.getValueAsDouble());
     shooterInputs.angleMotorReferenceAngleDegrees = this.angleSetpoint;
     shooterInputs.angleMotorClosedLoopReferenceDegrees =
-        Units.rotationsToDegrees(angleMotorReferencePositionStatusSignal.getValueAsDouble());
+        Units.rotationsToDegrees(angleMotor.getClosedLoopReference().getValueAsDouble());
     shooterInputs.angleMotorTemperatureCelsius =
         angleMotorTemperatureStatusSignal.getValueAsDouble();
     shooterInputs.angleMotorClosedLoopReferenceSlope =
-        angleMotorClosedLoopReferenceSlopeStatusSignal.getValueAsDouble();
+        angleMotor.getClosedLoopReferenceSlope().getValueAsDouble();
     if (rotationMotorKP.hasChanged()
         || rotationMotorKI.hasChanged()
         || rotationMotorKD.hasChanged()

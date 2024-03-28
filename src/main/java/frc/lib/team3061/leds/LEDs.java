@@ -92,10 +92,7 @@ public abstract class LEDs extends SubsystemBase {
             () -> {
               synchronized (this) {
                 breath(
-                    Section.STATIC_LOW,
-                    Color.kWhite,
-                    Color.kBlack,
-                    System.currentTimeMillis() / 1000.0);
+                    Section.FULL, Color.kWhite, Color.kBlack, System.currentTimeMillis() / 1000.0);
                 this.updateLEDs();
               }
             });
@@ -170,16 +167,16 @@ public abstract class LEDs extends SubsystemBase {
 
     if (endgameAlert) {
       // Endgame alert
-      strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
+      strobe(Section.FULL, Color.kYellow, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.SHOOTING) {
       // Actively shooting
       strobe(Section.FULL, Color.kGreen, STROBE_SLOW_DURATION);
     } else if (shooterLEDState == ShooterLEDState.AIMING_AT_SPEAKER) {
       // Aiming at speaker
-      solid(Section.FULL, Color.kBlue);
+      solid(Section.FULL, Color.kGreen);
     } else if (shooterLEDState == ShooterLEDState.IS_READY_TO_SHOOT) {
       // Ready to shoot
-      solid(Section.FULL, Color.kGreen);
+      solid(Section.FULL, Color.kBlue);
     } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
       // Has game piece
       strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);

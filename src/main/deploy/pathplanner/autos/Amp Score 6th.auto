@@ -1,0 +1,25 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Score 6th"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop And Shoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Amp Side Notes",
+  "choreoAuto": false
+}

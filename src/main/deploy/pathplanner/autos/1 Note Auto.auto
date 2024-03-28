@@ -20,19 +20,13 @@
         {
           "type": "named",
           "data": {
-            "name": "PrepAutoShot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
+            "name": "Stop And Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "One Path Source End"
+            "pathName": "One Note Source End"
           }
         }
       ]
