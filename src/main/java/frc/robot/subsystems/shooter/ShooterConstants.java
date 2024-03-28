@@ -14,7 +14,7 @@ public class ShooterConstants {
   public static final boolean TESTING = false;
   public static final String SUBSYSTEM_NAME = "Shooter";
 
-  public static final boolean USE_MATHEMATICAL_MODEL = true;
+  public static final boolean USE_MATHEMATICAL_MODEL = false;
 
   public static final int TOP_SHOOTER_MOTOR_ID = 27;
   public static final int BOTTOM_SHOOTER_MOTOR_ID = 28;
@@ -123,9 +123,9 @@ public class ShooterConstants {
   public static final double AMP_SIDE_SIX_NOTE_VELOCITY = 120.0;
 
   // auto shot
-  public static final double SHOOTER_AUTO_SHOT_ANGLE_DEG = 28.0;
+  public static final double SHOOTER_AUTO_SHOT_ANGLE_DEG = 29;
   public static final double SHOOTER_AUTO_SHOT_VELOCITY_RPS = 120.0;
-  public static final double SHOOTER_AUTO_SHOT_DISTANCE_METERS = 5.06;
+  public static final double SHOOTER_AUTO_SHOT_DISTANCE_METERS = 5.06+ 0.07;
   public static final double SHOOTER_AUTO_SHOT_TOLERANCE_METERS = 0.1; // FIXME: tune
   public static final double SHOOTER_AUTO_SHOT_TIME_DELAY_SECS = 0.09;
 }
