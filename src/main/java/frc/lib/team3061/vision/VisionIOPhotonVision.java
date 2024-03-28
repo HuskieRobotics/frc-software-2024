@@ -56,6 +56,7 @@ public class VisionIOPhotonVision implements VisionIO {
         estimate -> {
           inputs.estimatedCameraPose = estimate.estimatedPose;
           inputs.estimatedCameraPoseTimestamp = estimate.timestampSeconds;
+          inputs.latencySecs = camera.getLatestResult().getLatencyMillis() / 1000.0;
           for (int i = 0; i < this.tagsSeen.length; i++) {
             this.tagsSeen[i] = false;
           }
@@ -63,7 +64,6 @@ public class VisionIOPhotonVision implements VisionIO {
             this.tagsSeen[estimate.targetsUsed.get(i).getFiducialId()] = true;
           }
           inputs.tagsSeen = this.tagsSeen;
-          inputs.lastCameraTimestamp = camera.getLatestResult().getTimestampSeconds();
           inputs.poseFromMultiTag = estimate.strategy == PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
 
           inputs.ambiguity = 0;

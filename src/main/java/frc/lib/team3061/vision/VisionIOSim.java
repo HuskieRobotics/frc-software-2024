@@ -6,7 +6,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import java.util.Optional;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -31,7 +30,6 @@ public class VisionIOSim implements VisionIO {
   private final PhotonCamera camera = new PhotonCamera(CAMERA_NAME);
   private final PhotonPoseEstimator photonEstimator;
   private final boolean[] tagsSeen;
-  private double lastTimestamp = 0;
   private int cyclesWithNoResults = 0;
 
   private Supplier<Pose2d> poseSupplier;
@@ -49,7 +47,7 @@ public class VisionIOSim implements VisionIO {
       AprilTagFieldLayout layout, Supplier<Pose2d> poseSupplier, Transform3d robotToCamera) {
     this.photonEstimator =
         new PhotonPoseEstimator(
-            layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, new Transform3d());
+            layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, robotToCamera.inverse());
     this.poseSupplier = poseSupplier;
 
     this.visionSim = new VisionSystemSim(CAMERA_NAME);
@@ -76,7 +74,7 @@ public class VisionIOSim implements VisionIO {
    * @param inputs the VisionIOInputs object to update with the latest data from the camera
    */
   @Override
-  public synchronized void updateInputs(VisionIOInputs inputs) {
+  public void updateInputs(VisionIOInputs inputs) {
     this.visionSim.update(poseSupplier.get());
 
     Optional<EstimatedRobotPose> visionEstimate = this.photonEstimator.update();
@@ -94,7 +92,6 @@ public class VisionIOSim implements VisionIO {
             this.tagsSeen[estimate.targetsUsed.get(i).getFiducialId()] = true;
           }
           inputs.tagsSeen = this.tagsSeen;
-          inputs.lastCameraTimestamp = camera.getLatestResult().getTimestampSeconds();
           inputs.poseFromMultiTag = estimate.strategy == PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
 
           inputs.ambiguity = 0;
@@ -103,10 +100,9 @@ public class VisionIOSim implements VisionIO {
           }
           inputs.ambiguity /= estimate.targetsUsed.size();
 
-          // the following may be needed instead
-          Logger.recordOutput(
-              "VisionTest/multiAmbiguity",
-              camera.getLatestResult().getMultiTagResult().estimatedPose.ambiguity);
+          if (inputs.poseFromMultiTag) {
+            inputs.ambiguity = 0.2;
+          }
 
           this.cyclesWithNoResults = 0;
         });

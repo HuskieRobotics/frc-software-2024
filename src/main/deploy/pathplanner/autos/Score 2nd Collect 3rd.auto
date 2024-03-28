@@ -1,0 +1,31 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score 2nd"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop And Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Collect 3rd"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Source Side Notes",
+  "choreoAuto": false
+}
