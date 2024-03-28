@@ -556,7 +556,8 @@ public class RobotContainer {
             Commands.parallel(
                     Commands.runOnce(shooter::intakeEnabled),
                     Commands.runOnce(intake::enableAutomation, intake))
-                .withName("enable intake automation").ignoringDisable(true));
+                .withName("enable intake automation")
+                .ignoringDisable(true));
 
     oi.getIntakeAutomationSwitch()
         .onFalse(
@@ -565,7 +566,8 @@ public class RobotContainer {
                     Commands.runOnce(intake::turnIntakeOff),
                     Commands.runOnce(intake::turnKickerOff),
                     Commands.runOnce(shooter::intakeDisabled))
-                .withName("disable intake automation").ignoringDisable(true));
+                .withName("disable intake automation")
+                .ignoringDisable(true));
 
     Trigger coastModeButton = new Trigger(shooter::getCoastEnableOverride);
     coastModeButton.onTrue(
@@ -710,13 +712,17 @@ public class RobotContainer {
   private void configureVisionCommands() {
     // enable/disable vision
     oi.getVisionIsEnabledSwitch()
-        .onTrue(Commands.runOnce(() -> vision.enable(true)).withName("enable vision").ignoringDisable(true));
+        .onTrue(
+            Commands.runOnce(() -> vision.enable(true))
+                .withName("enable vision")
+                .ignoringDisable(true));
     oi.getVisionIsEnabledSwitch()
         .onFalse(
             Commands.parallel(
                     Commands.runOnce(() -> vision.enable(false), vision),
                     Commands.runOnce(drivetrain::resetPoseRotationToGyro))
-                .withName("disable vision").ignoringDisable(true));
+                .withName("disable vision")
+                .ignoringDisable(true));
   }
 
   private void configureShooterCommands() {
@@ -724,12 +730,14 @@ public class RobotContainer {
 
     oi.getAimAutomationSwitch()
         .onTrue(
-            Commands.runOnce(shooter::enableAutoShooter, shooter)
-                .withName("enable shooter automation").ignoringDisable(true));
+            Commands.runOnce(shooter::enableAutomatedShooter, shooter)
+                .withName("enable shooter automation")
+                .ignoringDisable(true));
     oi.getAimAutomationSwitch()
         .onFalse(
-            Commands.runOnce(shooter::disableAutoShooter, shooter)
-                .withName("disable shooter automation").ignoringDisable(true));
+            Commands.runOnce(shooter::disableAutomatedShooter, shooter)
+                .withName("disable shooter automation")
+                .ignoringDisable(true));
 
     oi.getPrepareToScoreAmpButton()
         .onTrue(
