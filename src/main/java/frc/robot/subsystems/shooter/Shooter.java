@@ -38,17 +38,11 @@ public class Shooter extends SubsystemBase {
   private final TunableNumber bottomWheelVelocity =
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber pivotAngle = new TunableNumber("Shooter/Angle", 10.0);
-  private final double[] populationRealAngles = {64, 54, 44, 40, 37.5, 35, 33, 30, 28};
+  private final double[] populationRealAngles = {
+    64, 58.5, 54, 49.5, 46, 43, 39, 36, 33, 32, 30.5, 29, 27.5
+  };
   private final double[] populationDistances = {
-    1.3597 + .06,
-    1.9693 + .06,
-    2.36 + .06,
-    2.72 + .06,
-    3.05 + .06,
-    3.37 + .06,
-    3.7 + .06,
-    4.4077 + .06,
-    5.0173 + .06
+    1.2, 1.55, 1.87, 2.13, 2.48, 2.75, 3.09, 3.41, 3.74, 4.045, 4.345, 4.62, 4.88
   };
 
   private boolean automatedShooter = true;
@@ -204,7 +198,11 @@ public class Shooter extends SubsystemBase {
   }
 
   private double getAngleForDistance(double distanceToSpeaker) {
-    return 56.599 * (Math.atan(1.651 / (0.6395 * distanceToSpeaker)));
+    if (USE_MATHEMATICAL_MODEL) {
+      return 56.599 * (Math.atan(1.651 / (0.6395 * distanceToSpeaker)));
+    } else {
+      return angleTreeMap.get(distanceToSpeaker);
+    }
   }
 
   private void adjustAngle(double distanceToSpeaker) {

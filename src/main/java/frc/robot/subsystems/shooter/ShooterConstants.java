@@ -14,6 +14,8 @@ public class ShooterConstants {
   public static final boolean TESTING = false;
   public static final String SUBSYSTEM_NAME = "Shooter";
 
+  public static final boolean USE_MATHEMATICAL_MODEL = true;
+
   public static final int TOP_SHOOTER_MOTOR_ID = 27;
   public static final int BOTTOM_SHOOTER_MOTOR_ID = 28;
   public static final int ANGLE_MOTOR_ID = 29;
