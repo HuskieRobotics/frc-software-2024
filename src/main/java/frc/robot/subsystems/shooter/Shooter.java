@@ -38,6 +38,8 @@ public class Shooter extends SubsystemBase {
   private final TunableNumber bottomWheelVelocity =
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber pivotAngle = new TunableNumber("Shooter/Angle", 10.0);
+
+  private final TunableNumber deflectorVoltage = new TunableNumber("Shooter/Deflector Voltage", 0);
   private final double[] populationRealAngles = {64, 54, 44, 40, 37.5, 35, 33, 30, 28};
   private final double[] populationDistances = {
     1.3597 + .06,
@@ -133,6 +135,7 @@ public class Shooter extends SubsystemBase {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
       io.setAngle(pivotAngle.get());
+      io.setDeflectorMotorVoltage(deflectorVoltage.get());
     } else {
       runAngleStateMachine();
     }

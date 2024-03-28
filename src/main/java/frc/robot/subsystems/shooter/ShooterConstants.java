@@ -36,11 +36,6 @@ public class ShooterConstants {
   public static final double BOTTOM_SHOOT_KS = 7.0;
   public static final double BOTTOM_SHOOT_PID_PEAK_OUTPUT = 1.0;
 
-  public static final double DEFLECTOR_KP = 0.0;
-  public static final double DEFLECTOR_KI = 0.0;
-  public static final double DEFLECTOR_KD = 0.0;
-  public static final double DEFLECTOR_KS = 0.0;
-  public static final double DEFLECTOR_PID_PEAK_OUTPUT = 1.0;
 
   // Shooter Rotation PID Constants
   public static final double ROTATION_KP = 50;
@@ -79,13 +74,12 @@ public class ShooterConstants {
   public static final double MID_TO_FAST_VELOCITY_DISTANCE_METERS = Units.inchesToMeters(106.901);
 
   // Deflector Motor
-  public static final double DEFLECTOR_DEPLOY_VOLTAGE = 0;
-  public static final double DEFLECTOR_RETRACT_VOLTAGE = 0;
-  public static final double DEFLECTOR_MOTOR_CONTINUOUS_CURRENT_LIMIT = 0;
-  public static final double DEFLECTOR_MOTOR_PEAK_CURRENT_LIMIT = 0;
-  public static final double DEFLECTOR_MOTOR_PEAK_CURRENT_DURATION = 0;
+  public static final double DEFLECTOR_DEPLOY_VOLTAGE = 1;
+  public static final double DEFLECTOR_RETRACT_VOLTAGE = -0.5;
+  public static final double DEFLECTOR_MOTOR_CONTINUOUS_CURRENT_LIMIT = 10;
+  public static final double DEFLECTOR_MOTOR_PEAK_CURRENT_LIMIT = 15;
+  public static final double DEFLECTOR_MOTOR_PEAK_CURRENT_DURATION = 0.1;
   public static final boolean DEFLECTOR_MOTOR_INVERTED = false;
-  public static final boolean ENABLE_CURRENT_LIMIT = true;
 
   // Angle Motor
   public static final double ANGLE_MOTOR_CONTINUOUS_CURRENT_LIMIT = 15;
@@ -113,9 +107,9 @@ public class ShooterConstants {
   public static final double PODIUM_VELOCITY_TOP = 120;
   public static final double PODIUM_VELOCITY_BOTTOM = 120;
   public static final double PODIUM_ANGLE = 40;
-  public static final double AMP_VELOCITY_TOP = 21.0;
-  public static final double AMP_VELOCITY_BOTTOM = 9.0;
-  public static final double AMP_ANGLE = 129;
+  public static final double AMP_VELOCITY_TOP = 28.0;
+  public static final double AMP_VELOCITY_BOTTOM = 15.0;
+  public static final double AMP_ANGLE = 55;
   public static final double PASS_VELOCITY_TOP = 60.0;
   public static final double PASS_VELOCITY_BOTTOM = 60.0;
   public static final double PASS_ANGLE = 63.0;

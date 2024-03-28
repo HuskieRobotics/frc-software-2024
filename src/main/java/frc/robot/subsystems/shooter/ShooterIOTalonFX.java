@@ -125,15 +125,6 @@ public class ShooterIOTalonFX implements ShooterIO {
   private final TunableNumber rotationMotorExpoKA =
       new TunableNumber("Shooter/ROTATION_EXPO_KA", ShooterConstants.ROTATION_EXPO_KA);
 
-  private final TunableNumber deflectorMotorKP =
-      new TunableNumber("Shooter/DEFLECTOR_KP", ShooterConstants.DEFLECTOR_KP);
-  private final TunableNumber deflectorMotorKI =
-      new TunableNumber("Shooter/DEFLECTOR_KI", ShooterConstants.DEFLECTOR_KI);
-  private final TunableNumber deflectorMotorKD =
-      new TunableNumber("Shooter/DEFLECTOR_KD", ShooterConstants.DEFLECTOR_KD);
-  private final TunableNumber deflectorMotorKS =
-      new TunableNumber("Shooter/DEFLECTOR_KS", ShooterConstants.DEFLECTOR_KS);
-
   private final TunableNumber rotationEncoderMagnetOffset =
       new TunableNumber("Shooter/ROTATION_MAGNET_OFFSET", ShooterConstants.MAGNET_OFFSET);
 
@@ -192,9 +183,12 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     angleMotorClosedLoopReferenceSlopeStatusSignal = angleMotor.getClosedLoopReferenceSlope();
 
+    deflectorMotorVoltageRequest = new VoltageOut(0);
+
     configShootMotor(shootMotorTop, SHOOT_TOP_INVERTED, true);
     configShootMotor(shootMotorBottom, SHOOT_BOTTOM_INVERTED, false);
     configAngleMotor(angleMotor, angleEncoder);
+    configDeflectorMotor();
 
     this.shootMotorBottomSim =
         new VelocitySystemSim(
@@ -530,14 +524,11 @@ public class ShooterIOTalonFX implements ShooterIO {
         ShooterConstants.DEFLECTOR_MOTOR_CONTINUOUS_CURRENT_LIMIT;
     deflectorMotorCurrentLimits.SupplyCurrentThreshold =
         ShooterConstants.DEFLECTOR_MOTOR_PEAK_CURRENT_LIMIT;
-    deflectorMotorCurrentLimits.SupplyCurrentLimitEnable = ShooterConstants.ENABLE_CURRENT_LIMIT;
+    deflectorMotorCurrentLimits.SupplyTimeThreshold = ShooterConstants.DEFLECTOR_MOTOR_PEAK_CURRENT_DURATION;
+    deflectorMotorCurrentLimits.SupplyCurrentLimitEnable = true;
     deflectorMotorConfig.CurrentLimits = deflectorMotorCurrentLimits;
 
     deflectorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    deflectorMotorConfig.Slot0.kP = deflectorMotorKP.get();
-    deflectorMotorConfig.Slot0.kI = deflectorMotorKI.get();
-    deflectorMotorConfig.Slot0.kD = deflectorMotorKD.get();
-    deflectorMotorConfig.Slot0.kS = deflectorMotorKS.get();
 
     deflectorMotorConfig.MotorOutput.Inverted =
         ShooterConstants.DEFLECTOR_MOTOR_INVERTED
