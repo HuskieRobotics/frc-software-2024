@@ -69,6 +69,10 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
+  public default Trigger getAimAndShootSpeakerButton() {
+    return new Trigger(() -> false);
+  }
+
   public default Trigger getAlignAndIntakeNoteFromSourceButton() {
     return new Trigger(() -> false);
   }

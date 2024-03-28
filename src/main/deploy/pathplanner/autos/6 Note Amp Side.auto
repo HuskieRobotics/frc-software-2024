@@ -1,0 +1,109 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Collect 2nd"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Score 2nd"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop And Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Collect 3rd"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Score 3rd"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop And Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Score 3rd 0.2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Collect 4th"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Score 4th"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop And Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Collect 5th"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Score 5th"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop And Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Collect 6th"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Score 6th"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop And Shoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

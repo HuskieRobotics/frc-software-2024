@@ -468,8 +468,9 @@ public class Drivetrain extends SubsystemBase {
     Logger.processInputs(SUBSYSTEM_NAME + "/BR", this.inputs.swerve[3]);
 
     // check for teleportation
-    if (this.inputs.drivetrain.robotPose.minus(prevRobotPose).getTranslation().getNorm() > 0.2) {
+    if (this.inputs.drivetrain.robotPose.minus(prevRobotPose).getTranslation().getNorm() > 0.4) {
       this.resetPose(prevRobotPose);
+      Logger.recordOutput(SUBSYSTEM_NAME + "/TeleportedPose", this.inputs.drivetrain.robotPose);
       Logger.recordOutput(SUBSYSTEM_NAME + "/Teleported", true);
     } else {
       this.prevRobotPose = this.inputs.drivetrain.robotPose;
@@ -588,21 +589,30 @@ public class Drivetrain extends SubsystemBase {
   }
 
   /**
-   * Returns the desired velocity of the drivetrain in the x direction (units of m/s)
+   * Returns the measured velocity of the drivetrain in the x direction (units of m/s)
    *
-   * @return the desired velocity of the drivetrain in the x direction (units of m/s)
+   * @return the measured velocity of the drivetrain in the x direction (units of m/s)
    */
   public double getVelocityX() {
     return this.inputs.drivetrain.measuredVXMetersPerSec;
   }
 
   /**
-   * Returns the desired velocity of the drivetrain in the y direction (units of m/s)
+   * Returns the measured velocity of the drivetrain in the y direction (units of m/s)
    *
-   * @return the desired velocity of the drivetrain in the y direction (units of m/s)
+   * @return the measured velocity of the drivetrain in the y direction (units of m/s)
    */
   public double getVelocityY() {
     return this.inputs.drivetrain.measuredVYMetersPerSec;
+  }
+
+  /**
+   * Returns the measured rotational velocity of the drivetrain (units of rad/s)
+   *
+   * @return the measured rotational velocity of the drivetrain (units of rad/s)
+   */
+  public double getVelocityT() {
+    return this.inputs.drivetrain.measuredAngularVelocityRadPerSec;
   }
 
   /**
@@ -994,6 +1004,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public boolean isAimedAtSpeaker() {
+
     Transform2d translation =
         new Transform2d(
             Field2d.getInstance().getAllianceSpeakerCenter().getX() - this.getPose().getX(),
@@ -1003,6 +1014,40 @@ public class Drivetrain extends SubsystemBase {
             Math.atan2(translation.getY(), translation.getX())
                 - this.getPose().getRotation().getRadians())
         < ANGLE_TO_SPEAKER_TOLERANCE;
+
+    // // calculate the transforms 7 inches inside of the left and right side of the speaker opening
+    // // and the corresponding angles
+    // Transform2d speakerOpeningLeftSide =
+    //     new Transform2d(
+    //         Field2d.getInstance().getAllianceSpeakerCenter().getX() - this.getPose().getX(),
+    //         Field2d.getInstance().getAllianceSpeakerCenter().getY()
+    //             + Units.inchesToMeters(13.6875)
+    //             - this.getPose().getY(),
+    //         new Rotation2d());
+    // Transform2d speakerOpeningRightSide =
+    //     new Transform2d(
+    //         Field2d.getInstance().getAllianceSpeakerCenter().getX() - this.getPose().getX(),
+    //         Field2d.getInstance().getAllianceSpeakerCenter().getY()
+    //             - Units.inchesToMeters(13.6875)
+    //             - this.getPose().getY(),
+    //         new Rotation2d());
+    // double angleToLeftSide =
+    //     Math.atan2(speakerOpeningLeftSide.getY(), speakerOpeningLeftSide.getX());
+    // double angleToRightSide =
+    //     Math.atan2(speakerOpeningRightSide.getY(), speakerOpeningRightSide.getX());
+
+    // // if the robot is rotated between the two calculated angles, it is aimed at the speaker
+    // boolean aimed =
+    //     (this.getPose().getRotation().getRadians() < angleToLeftSide
+    //             && this.getPose().getRotation().getRadians() > angleToRightSide)
+    //         || (this.getPose().getRotation().getRadians() > angleToLeftSide
+    //             && this.getPose().getRotation().getRadians() < angleToRightSide);
+
+    // Logger.recordOutput(SUBSYSTEM_NAME + "/AimToSpeaker/LeftAngle", angleToLeftSide);
+    // Logger.recordOutput(SUBSYSTEM_NAME + "/AimToSpeaker/RightAngle", angleToRightSide);
+    // Logger.recordOutput(SUBSYSTEM_NAME + "/AimToSpeaker/Aimed", aimed);
+
+    // return aimed;
   }
 
   private enum DriveMode {

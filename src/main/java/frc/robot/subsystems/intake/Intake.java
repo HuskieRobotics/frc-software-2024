@@ -209,6 +209,10 @@ public class Intake extends SubsystemBase {
     return inputs.isKickerIRBlocked || inputs.isShooterIRBlocked;
   }
 
+  public boolean hasNoteForAuto() {
+    return inputs.isKickerIRBlocked || inputs.isShooterIRBlocked || inputs.isRollerIRBlocked;
+  }
+
   private void setIntakeState(IntakeState state) {
     this.intakeState = state;
   }

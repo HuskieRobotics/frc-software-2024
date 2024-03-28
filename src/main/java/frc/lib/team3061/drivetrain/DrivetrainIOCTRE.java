@@ -248,8 +248,11 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
       config.CurrentLimits.SupplyCurrentThreshold = SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
       config.CurrentLimits.SupplyTimeThreshold = SwerveConstants.DRIVE_PEAK_CURRENT_DURATION;
       config.CurrentLimits.SupplyCurrentLimitEnable = SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
-      config.CurrentLimits.StatorCurrentLimit = SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
-      config.CurrentLimits.StatorCurrentLimitEnable = SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+
+      if (Constants.getMode() != Constants.Mode.SIM) {
+        config.CurrentLimits.StatorCurrentLimit = SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
+        config.CurrentLimits.StatorCurrentLimitEnable = SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+      }
       swerveModule.getDriveMotor().getConfigurator().apply(config);
 
       CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
@@ -258,8 +261,11 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
       currentLimits.SupplyCurrentThreshold = SwerveConstants.ANGLE_PEAK_CURRENT_LIMIT;
       currentLimits.SupplyTimeThreshold = SwerveConstants.ANGLE_PEAK_CURRENT_DURATION;
       currentLimits.SupplyCurrentLimitEnable = SwerveConstants.ANGLE_ENABLE_CURRENT_LIMIT;
-      currentLimits.StatorCurrentLimit = SwerveConstants.ANGLE_PEAK_CURRENT_LIMIT;
-      currentLimits.StatorCurrentLimitEnable = SwerveConstants.ANGLE_ENABLE_CURRENT_LIMIT;
+
+      if (Constants.getMode() != Constants.Mode.SIM) {
+        currentLimits.StatorCurrentLimit = SwerveConstants.ANGLE_PEAK_CURRENT_LIMIT;
+        currentLimits.StatorCurrentLimitEnable = SwerveConstants.ANGLE_ENABLE_CURRENT_LIMIT;
+      }
       swerveModule.getSteerMotor().getConfigurator().apply(currentLimits);
     }
 
@@ -669,9 +675,7 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   }
 
   private static ClosedLoopOutputType getSteerClosedLoopOutputType() {
-    if (Constants.getMode() == Constants.Mode.SIM) {
-      return ClosedLoopOutputType.Voltage;
-    } else if (RobotConfig.getInstance().getSwerveSteerControlMode()
+    if (RobotConfig.getInstance().getSwerveSteerControlMode()
         == RobotConfig.SWERVE_CONTROL_MODE.TORQUE_CURRENT_FOC) {
       return ClosedLoopOutputType.TorqueCurrentFOC;
     } else {
@@ -680,9 +684,7 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   }
 
   private static ClosedLoopOutputType getDriveClosedLoopOutputType() {
-    if (Constants.getMode() == Constants.Mode.SIM) {
-      return ClosedLoopOutputType.Voltage;
-    } else if (RobotConfig.getInstance().getSwerveDriveControlMode()
+    if (RobotConfig.getInstance().getSwerveDriveControlMode()
         == RobotConfig.SWERVE_CONTROL_MODE.TORQUE_CURRENT_FOC) {
       return ClosedLoopOutputType.TorqueCurrentFOC;
     } else {
