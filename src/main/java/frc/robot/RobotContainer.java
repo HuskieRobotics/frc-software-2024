@@ -425,23 +425,30 @@ public class RobotContainer {
                 new PathPlannerAuto("Amp Score 2nd Collect 3rd"),
                 new PathPlannerAuto("Amp Missed 2nd Collect 3rd"),
                 intake::hasNoteForAuto),
-            new PathPlannerAuto("Amp Score 3rd Collect 4th"),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
+            new PathPlannerAuto("Amp Score 3rd Collect 4th"),
             new PathPlannerAuto("4 note center"));
 
     autoChooser.addOption("6 Note Amp Side", sixNoteAmpSide);
 
+    /************ 5 Note Amp Side ************
+     *
+     * 5 notes (initial, first or second center note from amp side, three notes near the speaker)
+     *
+     */
     Command fiveNoteAmpSide =
         Commands.sequence(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO)),
             new PathPlannerAuto("Amp Collect 2nd"),
             Commands.either(
-                new PathPlannerAuto("Amp Score 2nd Skip 3rd Collect 4th"),
+                Commands.sequence(
+                    Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
+                    new PathPlannerAuto("Amp Score 2nd Skip 3rd Collect 4th")),
                 Commands.sequence(
                     new PathPlannerAuto("Amp Missed 2nd Collect 3rd"),
+                    Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
                     new PathPlannerAuto("Amp Score 3rd Collect 4th")),
                 intake::hasNoteForAuto),
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
             new PathPlannerAuto("4 note center"));
 
     autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
