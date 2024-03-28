@@ -38,6 +38,8 @@ public class Shooter extends SubsystemBase {
   private final TunableNumber bottomWheelVelocity =
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber pivotAngle = new TunableNumber("Shooter/Angle", 10.0);
+  private final TunableNumber deflectorVoltage = new TunableNumber("Shooter/Deflector Voltage", 0);
+
   private final double[] populationRealAngles = {
     64, 58.5, 54, 49.5, 46, 43, 39, 36, 33, 32, 30.5, 29, 27.5
   };
@@ -127,6 +129,7 @@ public class Shooter extends SubsystemBase {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
       io.setAngle(pivotAngle.get());
+      io.setDeflectorMotorVoltage(deflectorVoltage.get());
     } else {
       runAngleStateMachine();
     }
@@ -168,6 +171,9 @@ public class Shooter extends SubsystemBase {
                 .getNorm();
         this.adjustAngle(distanceToSpeaker);
         this.setRangeVelocity(distanceToSpeaker);
+        if (shootingPosition == ShootingPosition.AMP) {
+          deployDeflector();
+        }
       }
     }
   }
@@ -181,6 +187,7 @@ public class Shooter extends SubsystemBase {
     } else {
       this.overrideSetpointsForNextShot = false;
       this.shootingPosition = ShootingPosition.FIELD;
+      this.retractDeflector();
     }
   }
 
@@ -567,5 +574,13 @@ public class Shooter extends SubsystemBase {
     if (DriverStation.isDisabled()) {
       io.setCoastMode(coast);
     }
+  }
+
+  public void deployDeflector() {
+    io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_DEPLOY_VOLTAGE);
+  }
+
+  public void retractDeflector() {
+    io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_RETRACT_VOLTAGE);
   }
 }

@@ -35,6 +35,15 @@ public interface ShooterIO {
     double angleMotorTemperatureCelsius = 0.0;
     double angleMotorClosedLoopReferenceSlope = 0.0;
 
+    // Deflector Motor Inputs
+    double deflectorMotorStatorCurrentAmps = 0.0;
+    double deflectorMotorSupplyCurrentAmps = 0.0;
+    double deflectorMotorVoltage = 0.0;
+    double deflectorMotorReferenceAngleDegrees = 0.0;
+    double deflectorMotorClosedLoopReferenceDegrees = 0.0;
+    double deflectorMotorTemperatureCelsius = 0.0;
+    double deflectorMotorClosedLoopReferenceSlope = 0.0;
+
     // Coast mode
     boolean coastMode = false;
   }
@@ -46,9 +55,11 @@ public interface ShooterIO {
 
   public default void setShooterWheelBottomVelocity(double rps) {}
 
+  public default void setDeflectorMotorVoltage(double voltage) {}
+
   public default void setAngleMotorVoltage(double voltage) {}
 
   public default void setAngle(double angle) {}
 
-  public default void setCoastMode(boolean coast) {}
+  public default void setCoastMode(boolean coast) {} 
 }
