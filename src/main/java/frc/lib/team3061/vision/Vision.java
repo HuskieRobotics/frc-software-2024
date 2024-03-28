@@ -156,7 +156,7 @@ public class Vision extends SubsystemBase {
       // the past, the ambiguity is less than the threshold, and vision's estimated
       // pose is within the specified tolerance of the current pose
       if (isEnabled
-          && ios[i].estimatedCameraPoseTimestamp + ios[i].latencySecs
+          && ios[i].estimatedCameraPoseTimestamp
               < Logger.getRealTimestamp() / 1e6
           && ios[i].ambiguity < AMBIGUITY_THRESHOLD
           && estimatedRobotPose2d
