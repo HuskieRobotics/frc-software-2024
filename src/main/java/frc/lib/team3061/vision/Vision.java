@@ -219,7 +219,12 @@ public class Vision extends SubsystemBase {
         mostRecentTimestamp = ios[i].estimatedCameraPoseTimestamp;
       }
     }
-    return robotPoseFromMostRecentData;
+
+    if(Math.abs(mostRecentTimestamp-Logger.getRealTimestamp()/1e6)>0.5) {
+      return null;
+    } else {
+      return robotPoseFromMostRecentData;
+    }
   }
 
   /**
