@@ -746,15 +746,26 @@ public class RobotContainer {
 
     oi.getPrepareToScoreAmpButton()
         .onTrue(
-            Commands.parallel(
-                    new TeleopSwerve(drivetrain, oi::getTranslateX, oi::getTranslateY, () -> (90)),
-                    Commands.runOnce(
-                            () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter)
-                        .withName("prepare to score amp"))
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP), shooter)
+                .withName("prepare to score amp")
                 .until(
                     () -> {
                       return !intake.hasNote();
-                    }));
+                    }))
+                    ;
+
+    // oi.getPrepareToScoreAmpButton()
+    //     .onTrue(
+    //         Commands.parallel(
+    //                 new TeleopSwerve(drivetrain, oi::getTranslateX, oi::getTranslateY, () ->
+    // (90)),
+    //                 Commands.runOnce(
+    //                         () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter)
+    //                     .withName("prepare to score amp"))
+    //             .until(
+    //                 () -> {
+    //                   return !intake.hasNote();
+    //                 }));
 
     oi.getPrepareToScoreSubwooferButton()
         .onTrue(
