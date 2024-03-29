@@ -152,12 +152,6 @@ public class Vision extends SubsystemBase {
               RobotConfig.getInstance().getRobotToCameraTransforms()[i].inverse());
       Pose2d estimatedRobotPose2d = estimatedRobotPose3d.toPose2d();
 
-      if (ios[i].estimatedCameraPoseTimestamp > Logger.getRealTimestamp() / 1e6) {
-        Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/TimestampInFuture", true);
-      } else {
-        Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/TimestampInFuture", false);
-      }
-
       // only update the pose estimator if the vision subsystem is enabled, the estimated pose is in
       // the past, the ambiguity is less than the threshold, and vision's estimated
       // pose is within the specified tolerance of the current pose
@@ -185,6 +179,10 @@ public class Vision extends SubsystemBase {
           SUBSYSTEM_NAME + "/" + i + "/CameraPose2d", ios[i].estimatedCameraPose.toPose2d());
       Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/RobotPose3d", estimatedRobotPose3d);
       Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/RobotPose2d", estimatedRobotPose2d);
+      Logger.recordOutput(
+          SUBSYSTEM_NAME + "/" + i + "/TimestampDifference",
+          Logger.getRealTimestamp() / 1e6 - ios[i].estimatedCameraPoseTimestamp);
+
       this.cyclesWithNoResults[i] = 0;
     } else {
       this.cyclesWithNoResults[i] += 1;
