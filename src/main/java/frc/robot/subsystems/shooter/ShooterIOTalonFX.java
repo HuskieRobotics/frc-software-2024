@@ -247,7 +247,11 @@ public class ShooterIOTalonFX implements ShooterIO {
         shootMotorTopVoltageStatusSignal,
         shootMotorBottomVoltageStatusSignal,
         angleMotorVoltageStatusSignal,
-        angleMotorClosedLoopReferenceSlopeStatusSignal);
+        angleMotorClosedLoopReferenceSlopeStatusSignal,
+        deflectorMotorStatorCurrentStatusSignal,
+        deflectorMotorSupplyCurrentStatusSignal,
+        deflectorMotorTemperatureStatusSignal,
+        deflectorMotorVoltageStatusSignal);
 
     // Retrieve the closed loop reference status signals directly from the motor in this method
     // instead of retrieving in advance because the status signal returned depends on the current
