@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -101,8 +100,6 @@ public class Robot extends LoggedRobot {
 
         LoggedPowerDistribution.getInstance();
 
-        SignalLogger.setPath("/media/sda1");
-        SignalLogger.start();
         break;
 
       case SIM:
@@ -164,9 +161,6 @@ public class Robot extends LoggedRobot {
     // Logging callback for the active path, this is sent as a list of poses
     PathPlannerLogging.setLogActivePathCallback(
         poses -> Logger.recordOutput("PathFollowing/activePath", poses.toArray(new Pose2d[0])));
-
-    // Always enable CTRE's signal logging
-    SignalLogger.start();
 
     // Due to the nature of how Java works, the first run of a path following command could have a
     // significantly higher delay compared with subsequent runs, as all the classes involved will
