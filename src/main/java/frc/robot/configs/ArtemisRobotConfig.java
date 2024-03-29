@@ -25,7 +25,7 @@ public class ArtemisRobotConfig extends RobotConfig {
   private static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 7;
   private static final int BACK_LEFT_MODULE_STEER_MOTOR = 8;
   private static final int BACK_LEFT_MODULE_STEER_ENCODER = 24;
-  private static final double BACK_LEFT_MODULE_STEER_OFFSET_ROT = -0.020264;//0.323242;
+  private static final double BACK_LEFT_MODULE_STEER_OFFSET_ROT = -0.020264; // 0.323242;
 
   private static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 5;
   private static final int BACK_RIGHT_MODULE_STEER_MOTOR = 6;

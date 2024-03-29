@@ -156,8 +156,7 @@ public class Vision extends SubsystemBase {
       // the past, the ambiguity is less than the threshold, and vision's estimated
       // pose is within the specified tolerance of the current pose
       if (isEnabled
-          && ios[i].estimatedCameraPoseTimestamp
-              < Logger.getRealTimestamp() / 1e6
+          && ios[i].estimatedCameraPoseTimestamp < Logger.getRealTimestamp() / 1e6
           && ios[i].ambiguity < AMBIGUITY_THRESHOLD
           && estimatedRobotPose2d
                   .getTranslation()
@@ -220,7 +219,7 @@ public class Vision extends SubsystemBase {
       }
     }
 
-    if(Math.abs(mostRecentTimestamp-Logger.getRealTimestamp()/1e6)>0.5) {
+    if (Math.abs(mostRecentTimestamp - Logger.getRealTimestamp() / 1e6) > 0.5) {
       return null;
     } else {
       return robotPoseFromMostRecentData;

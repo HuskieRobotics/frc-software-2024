@@ -38,7 +38,6 @@ public class ShooterConstants {
   public static final double BOTTOM_SHOOT_KS = 7.0;
   public static final double BOTTOM_SHOOT_PID_PEAK_OUTPUT = 1.0;
 
-
   // Shooter Rotation PID Constants
   public static final double ROTATION_KP = 50;
   public static final double ROTATION_KI = 0.0;
@@ -125,7 +124,7 @@ public class ShooterConstants {
   // auto shot
   public static final double SHOOTER_AUTO_SHOT_ANGLE_DEG = 29.5;
   public static final double SHOOTER_AUTO_SHOT_VELOCITY_RPS = 120.0;
-  public static final double SHOOTER_AUTO_SHOT_DISTANCE_METERS = 5.06+ 0.07;
+  public static final double SHOOTER_AUTO_SHOT_DISTANCE_METERS = 5.06 + 0.07;
   public static final double SHOOTER_AUTO_SHOT_TOLERANCE_METERS = 0.1; // FIXME: tune
   public static final double SHOOTER_AUTO_SHOT_TIME_DELAY_SECS = 0.09;
 }
