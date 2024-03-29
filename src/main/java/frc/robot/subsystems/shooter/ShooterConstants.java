@@ -76,7 +76,7 @@ public class ShooterConstants {
 
   // Deflector Motor
   public static final double DEFLECTOR_DEPLOY_VOLTAGE = 1;
-  public static final double DEFLECTOR_RETRACT_VOLTAGE = -0.5;
+  public static final double DEFLECTOR_RETRACT_VOLTAGE = -1;
   public static final double DEFLECTOR_MOTOR_CONTINUOUS_CURRENT_LIMIT = 10;
   public static final double DEFLECTOR_MOTOR_PEAK_CURRENT_LIMIT = 15;
   public static final double DEFLECTOR_MOTOR_PEAK_CURRENT_DURATION = 0.1;
