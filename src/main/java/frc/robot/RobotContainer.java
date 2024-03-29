@@ -419,7 +419,6 @@ public class RobotContainer {
 
     Command sixNoteAmpSide =
         Commands.sequence(
-            Commands.runOnce(() -> drivetrain.resetPoseToVision(() -> vision.getBestRobotPose())),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO)),
             new PathPlannerAuto("Amp Collect 2nd"),
             Commands.either(
@@ -439,7 +438,6 @@ public class RobotContainer {
      */
     Command fiveNoteAmpSide =
         Commands.sequence(
-            Commands.runOnce(() -> drivetrain.resetPoseToVision(() -> vision.getBestRobotPose())),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO)),
             new PathPlannerAuto("Amp Collect 2nd"),
             Commands.either(
@@ -693,7 +691,9 @@ public class RobotContainer {
     // reset pose based on vision
     oi.getResetPoseToVisionButton()
         .onTrue(
-            Commands.runOnce(() -> drivetrain.resetPoseToVision(() -> vision.getBestRobotPose()))
+            Commands.repeatingSequence(
+                Commands.none()).until(()->vision.getBestRobotPose() != null).andThen(
+            Commands.runOnce(() -> drivetrain.resetPoseToVision(() -> vision.getBestRobotPose())))
                 .ignoringDisable(true)
                 .withName("reset pose to vision"));
 
@@ -744,8 +744,14 @@ public class RobotContainer {
 
     oi.getPrepareToScoreAmpButton()
         .onTrue(
+            Commands.parallel(
+                new TeleopSwerve(
+                    drivetrain,
+                    oi::getTranslateX,
+                    oi::getTranslateY,
+                    () ->(90)),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP), shooter)
-                .withName("prepare to score amp"));
+                .withName("prepare to score amp")).until(()->{return !intake.hasNote();}));
 
     oi.getPrepareToScoreSubwooferButton()
         .onTrue(
