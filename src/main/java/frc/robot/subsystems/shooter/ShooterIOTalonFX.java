@@ -74,8 +74,6 @@ public class ShooterIOTalonFX implements ShooterIO {
   private StatusSignal<Double> deflectorMotorStatorCurrentStatusSignal;
   private StatusSignal<Double> deflectorMotorSupplyCurrentStatusSignal;
   private StatusSignal<Double> deflectorMotorTemperatureStatusSignal;
-  private StatusSignal<Double> deflectorMotorReferencePositionStatusSignal;
-  private StatusSignal<Double> deflectorMotorClosedLoopReferenceSlopeStatusSignal;
 
   private StatusSignal<Double> angleMotorClosedLoopReferenceSlopeStatusSignal;
 
@@ -182,6 +180,11 @@ public class ShooterIOTalonFX implements ShooterIO {
     angleMotorVoltageStatusSignal = angleMotor.getMotorVoltage();
 
     angleMotorClosedLoopReferenceSlopeStatusSignal = angleMotor.getClosedLoopReferenceSlope();
+
+    deflectorMotorVoltageStatusSignal = deflectorMotor.getMotorVoltage();
+    deflectorMotorStatorCurrentStatusSignal = deflectorMotor.getStatorCurrent();
+    deflectorMotorSupplyCurrentStatusSignal = deflectorMotor.getSupplyCurrent();
+    deflectorMotorTemperatureStatusSignal = deflectorMotor.getDeviceTemp();
 
     deflectorMotorVoltageRequest = new VoltageOut(0);
 
@@ -358,6 +361,15 @@ public class ShooterIOTalonFX implements ShooterIO {
     }
 
     shooterInputs.coastMode = !coastModeButton.get();
+
+    // Updates Deflector Motor Inputs
+    shooterInputs.deflectorMotorStatorCurrentAmps =
+        deflectorMotorStatorCurrentStatusSignal.getValueAsDouble();
+    shooterInputs.deflectorMotorSupplyCurrentAmps =
+        deflectorMotorSupplyCurrentStatusSignal.getValueAsDouble();
+    shooterInputs.deflectorMotorVoltage = deflectorMotorVoltageStatusSignal.getValueAsDouble();
+    shooterInputs.deflectorMotorTemperatureCelsius =
+        deflectorMotorTemperatureStatusSignal.getValueAsDouble();
   }
 
   @Override
@@ -524,7 +536,8 @@ public class ShooterIOTalonFX implements ShooterIO {
         ShooterConstants.DEFLECTOR_MOTOR_CONTINUOUS_CURRENT_LIMIT;
     deflectorMotorCurrentLimits.SupplyCurrentThreshold =
         ShooterConstants.DEFLECTOR_MOTOR_PEAK_CURRENT_LIMIT;
-    deflectorMotorCurrentLimits.SupplyTimeThreshold = ShooterConstants.DEFLECTOR_MOTOR_PEAK_CURRENT_DURATION;
+    deflectorMotorCurrentLimits.SupplyTimeThreshold =
+        ShooterConstants.DEFLECTOR_MOTOR_PEAK_CURRENT_DURATION;
     deflectorMotorCurrentLimits.SupplyCurrentLimitEnable = true;
     deflectorMotorConfig.CurrentLimits = deflectorMotorCurrentLimits;
 
