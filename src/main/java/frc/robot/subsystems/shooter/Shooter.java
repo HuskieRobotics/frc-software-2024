@@ -185,6 +185,8 @@ public class Shooter extends SubsystemBase {
         this.setRangeVelocity(distanceToSpeaker);
         if (shootingPosition == ShootingPosition.AMP) {
           deployDeflector();
+        } else {
+          retractDeflector();
         }
       }
     }
