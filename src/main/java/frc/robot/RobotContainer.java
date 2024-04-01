@@ -392,7 +392,7 @@ public class RobotContainer {
      *
      */
 
-    Command fourNoteSourceSide =
+    Command fourNoteSourceSideBlue =
         Commands.sequence(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_AUTO)),
             new PathPlannerAuto("Collect 2nd"),
@@ -409,7 +409,26 @@ public class RobotContainer {
             Commands.runOnce(
                 () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO)),
             new PathPlannerAuto("Score 4th Center"));
-    autoChooser.addOption("4 Note Source Side", fourNoteSourceSide);
+    autoChooser.addOption("4 Note Source Side Blue", fourNoteSourceSideBlue);
+
+    Command fourNoteSourceSideRed =
+        Commands.sequence(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_AUTO)),
+            new PathPlannerAuto("Collect 2nd Red"),
+            Commands.either(
+                new PathPlannerAuto("Score 2nd Collect 3rd Red"),
+                new PathPlannerAuto("Missed 2nd Collect 3rd Red"),
+                intake::hasNoteForAuto),
+            Commands.runOnce(
+                () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO)),
+            Commands.either(
+                new PathPlannerAuto("Score 3rd Collect 4th Red"),
+                new PathPlannerAuto("Missed 3rd Collect 4th Red"),
+                intake::hasNoteForAuto),
+            Commands.runOnce(
+                () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO)),
+            new PathPlannerAuto("Score 4th Center"));
+    autoChooser.addOption("4 Note Source Side Red", fourNoteSourceSideRed);
 
     /************ 6 Note Amp Side ************
      *
@@ -425,23 +444,30 @@ public class RobotContainer {
                 new PathPlannerAuto("Amp Score 2nd Collect 3rd"),
                 new PathPlannerAuto("Amp Missed 2nd Collect 3rd"),
                 intake::hasNoteForAuto),
-            new PathPlannerAuto("Amp Score 3rd Collect 4th"),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
+            new PathPlannerAuto("Amp Score 3rd Collect 4th"),
             new PathPlannerAuto("4 note center"));
 
     autoChooser.addOption("6 Note Amp Side", sixNoteAmpSide);
 
+    /************ 5 Note Amp Side ************
+     *
+     * 5 notes (initial, first or second center note from amp side, three notes near the speaker)
+     *
+     */
     Command fiveNoteAmpSide =
         Commands.sequence(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO)),
             new PathPlannerAuto("Amp Collect 2nd"),
             Commands.either(
-                new PathPlannerAuto("Amp Score 2nd Skip 3rd Collect 4th"),
+                Commands.sequence(
+                    Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
+                    new PathPlannerAuto("Amp Score 2nd Skip 3rd Collect 4th")),
                 Commands.sequence(
                     new PathPlannerAuto("Amp Missed 2nd Collect 3rd"),
+                    Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
                     new PathPlannerAuto("Amp Score 3rd Collect 4th")),
                 intake::hasNoteForAuto),
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
             new PathPlannerAuto("4 note center"));
 
     autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
@@ -556,6 +582,7 @@ public class RobotContainer {
             Commands.parallel(
                     Commands.runOnce(shooter::intakeEnabled),
                     Commands.runOnce(intake::enableAutomation, intake))
+                .ignoringDisable(true)
                 .withName("enable intake automation"));
 
     oi.getIntakeAutomationSwitch()
@@ -565,6 +592,7 @@ public class RobotContainer {
                     Commands.runOnce(intake::turnIntakeOff),
                     Commands.runOnce(intake::turnKickerOff),
                     Commands.runOnce(shooter::intakeDisabled))
+                .ignoringDisable(true)
                 .withName("disable intake automation"));
 
     Trigger coastModeButton = new Trigger(shooter::getCoastEnableOverride);
@@ -632,27 +660,21 @@ public class RobotContainer {
 
     oi.getAimSpeakerButton()
         .toggleOnTrue(
-            Commands.sequence(
+            Commands.parallel(
+                new TeleopSwerveAimAtSpeaker(
+                    drivetrain, shooter, intake, oi::getTranslateX, oi::getTranslateY),
                 Commands.runOnce(
-                    () -> drivetrain.resetPoseToVision(() -> vision.getBestRobotPose())),
-                Commands.parallel(
-                    new TeleopSwerveAimAtSpeaker(
-                        drivetrain, shooter, intake, oi::getTranslateX, oi::getTranslateY),
-                    Commands.runOnce(
-                        () -> shooter.setShootingPosition(ShootingPosition.FIELD), shooter))));
+                    () -> shooter.setShootingPosition(ShootingPosition.FIELD), shooter)));
 
     oi.getAimAndShootSpeakerButton()
         .toggleOnTrue(
-            Commands.sequence(
-                Commands.runOnce(
-                    () -> drivetrain.resetPoseToVision(() -> vision.getBestRobotPose())),
-                Commands.parallel(
-                    new TeleopSwerveAimAtSpeaker(
-                        drivetrain, shooter, intake, oi::getTranslateX, oi::getTranslateY),
-                    Commands.sequence(
-                        Commands.runOnce(
-                            () -> shooter.setShootingPosition(ShootingPosition.AUTO_SHOT), shooter),
-                        getShootCommand()))));
+            Commands.parallel(
+                new TeleopSwerveAimAtSpeaker(
+                    drivetrain, shooter, intake, oi::getTranslateX, oi::getTranslateY),
+                Commands.sequence(
+                    Commands.runOnce(
+                        () -> shooter.setShootingPosition(ShootingPosition.AUTO_SHOT), shooter),
+                    getShootCommand())));
 
     // field-relative toggle
     oi.getFieldRelativeButton()
@@ -688,7 +710,11 @@ public class RobotContainer {
     // reset pose based on vision
     oi.getResetPoseToVisionButton()
         .onTrue(
-            Commands.runOnce(() -> drivetrain.resetPoseToVision(() -> vision.getBestRobotPose()))
+            Commands.repeatingSequence(Commands.none())
+                .until(() -> vision.getBestRobotPose() != null)
+                .andThen(
+                    Commands.runOnce(
+                        () -> drivetrain.resetPoseToVision(() -> vision.getBestRobotPose())))
                 .ignoringDisable(true)
                 .withName("reset pose to vision"));
 
@@ -710,12 +736,16 @@ public class RobotContainer {
   private void configureVisionCommands() {
     // enable/disable vision
     oi.getVisionIsEnabledSwitch()
-        .onTrue(Commands.runOnce(() -> vision.enable(true)).withName("enable vision"));
+        .onTrue(
+            Commands.runOnce(() -> vision.enable(true))
+                .ignoringDisable(true)
+                .withName("enable vision"));
     oi.getVisionIsEnabledSwitch()
         .onFalse(
             Commands.parallel(
                     Commands.runOnce(() -> vision.enable(false), vision),
                     Commands.runOnce(drivetrain::resetPoseRotationToGyro))
+                .ignoringDisable(true)
                 .withName("disable vision"));
   }
 
@@ -725,16 +755,35 @@ public class RobotContainer {
     oi.getAimAutomationSwitch()
         .onTrue(
             Commands.runOnce(shooter::enableAutomatedShooter, shooter)
+                .ignoringDisable(true)
                 .withName("enable shooter automation"));
     oi.getAimAutomationSwitch()
         .onFalse(
             Commands.runOnce(shooter::disableAutomatedShooter, shooter)
+                .ignoringDisable(true)
                 .withName("disable shooter automation"));
 
     oi.getPrepareToScoreAmpButton()
         .onTrue(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP), shooter)
-                .withName("prepare to score amp"));
+                .withName("prepare to score amp")
+                .until(
+                    () -> {
+                      return !intake.hasNote();
+                    }));
+
+    // oi.getPrepareToScoreAmpButton()
+    //     .onTrue(
+    //         Commands.parallel(
+    //                 new TeleopSwerve(drivetrain, oi::getTranslateX, oi::getTranslateY, () ->
+    // (90)),
+    //                 Commands.runOnce(
+    //                         () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter)
+    //                     .withName("prepare to score amp"))
+    //             .until(
+    //                 () -> {
+    //                   return !intake.hasNote();
+    //                 }));
 
     oi.getPrepareToScoreSubwooferButton()
         .onTrue(

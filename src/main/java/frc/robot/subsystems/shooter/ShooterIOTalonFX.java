@@ -41,6 +41,7 @@ public class ShooterIOTalonFX implements ShooterIO {
   private VelocityTorqueCurrentFOC shootMotorBottomVelocityRequest;
   private MotionMagicExpoVoltage angleMotorPositionRequest;
   private VoltageOut angleMotorVoltageRequest;
+  private VoltageOut deflectorMotorVoltageRequest;
 
   // Using StatusSignal to get the stator current of the motors
   private StatusSignal<Double> shootMotorTopStatorCurrentStatusSignal;
@@ -68,6 +69,11 @@ public class ShooterIOTalonFX implements ShooterIO {
   private StatusSignal<Double> shootMotorTopVoltageStatusSignal;
   private StatusSignal<Double> shootMotorBottomVoltageStatusSignal;
   private StatusSignal<Double> angleMotorVoltageStatusSignal;
+
+  private StatusSignal<Double> deflectorMotorVoltageStatusSignal;
+  private StatusSignal<Double> deflectorMotorStatorCurrentStatusSignal;
+  private StatusSignal<Double> deflectorMotorSupplyCurrentStatusSignal;
+  private StatusSignal<Double> deflectorMotorTemperatureStatusSignal;
 
   private StatusSignal<Double> angleMotorClosedLoopReferenceSlopeStatusSignal;
 
@@ -123,6 +129,7 @@ public class ShooterIOTalonFX implements ShooterIO {
   private TalonFX shootMotorTop;
   private TalonFX shootMotorBottom;
   private TalonFX angleMotor;
+  private TalonFX deflectorMotor;
   private CANcoder angleEncoder;
 
   private DigitalInput coastModeButton;
@@ -138,6 +145,8 @@ public class ShooterIOTalonFX implements ShooterIO {
         new TalonFX(BOTTOM_SHOOTER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
     angleMotor = new TalonFX(ANGLE_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
     angleEncoder = new CANcoder(ANGLE_ENCODER_ID, RobotConfig.getInstance().getCANBusName());
+
+    deflectorMotor = new TalonFX(DEFLECTOR_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
 
     coastModeButton = new DigitalInput(COAST_BUTTON_ID);
 
@@ -172,9 +181,17 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     angleMotorClosedLoopReferenceSlopeStatusSignal = angleMotor.getClosedLoopReferenceSlope();
 
+    deflectorMotorVoltageStatusSignal = deflectorMotor.getMotorVoltage();
+    deflectorMotorStatorCurrentStatusSignal = deflectorMotor.getStatorCurrent();
+    deflectorMotorSupplyCurrentStatusSignal = deflectorMotor.getSupplyCurrent();
+    deflectorMotorTemperatureStatusSignal = deflectorMotor.getDeviceTemp();
+
+    deflectorMotorVoltageRequest = new VoltageOut(0);
+
     configShootMotor(shootMotorTop, SHOOT_TOP_INVERTED, true);
     configShootMotor(shootMotorBottom, SHOOT_BOTTOM_INVERTED, false);
     configAngleMotor(angleMotor, angleEncoder);
+    configDeflectorMotor();
 
     this.shootMotorBottomSim =
         new VelocitySystemSim(
@@ -230,7 +247,11 @@ public class ShooterIOTalonFX implements ShooterIO {
         shootMotorTopVoltageStatusSignal,
         shootMotorBottomVoltageStatusSignal,
         angleMotorVoltageStatusSignal,
-        angleMotorClosedLoopReferenceSlopeStatusSignal);
+        angleMotorClosedLoopReferenceSlopeStatusSignal,
+        deflectorMotorStatorCurrentStatusSignal,
+        deflectorMotorSupplyCurrentStatusSignal,
+        deflectorMotorTemperatureStatusSignal,
+        deflectorMotorVoltageStatusSignal);
 
     // Retrieve the closed loop reference status signals directly from the motor in this method
     // instead of retrieving in advance because the status signal returned depends on the current
@@ -344,6 +365,15 @@ public class ShooterIOTalonFX implements ShooterIO {
     }
 
     shooterInputs.coastMode = !coastModeButton.get();
+
+    // Updates Deflector Motor Inputs
+    shooterInputs.deflectorMotorStatorCurrentAmps =
+        deflectorMotorStatorCurrentStatusSignal.getValueAsDouble();
+    shooterInputs.deflectorMotorSupplyCurrentAmps =
+        deflectorMotorSupplyCurrentStatusSignal.getValueAsDouble();
+    shooterInputs.deflectorMotorVoltage = deflectorMotorVoltageStatusSignal.getValueAsDouble();
+    shooterInputs.deflectorMotorTemperatureCelsius =
+        deflectorMotorTemperatureStatusSignal.getValueAsDouble();
   }
 
   @Override
@@ -367,6 +397,11 @@ public class ShooterIOTalonFX implements ShooterIO {
   @Override
   public void setAngleMotorVoltage(double voltage) {
     angleMotor.setControl(angleMotorVoltageRequest.withOutput(voltage));
+  }
+
+  @Override
+  public void setDeflectorMotorVoltage(double voltage) {
+    deflectorMotor.setControl(deflectorMotorVoltageRequest.withOutput(voltage));
   }
 
   private void configShootMotor(TalonFX shootMotor, boolean isInverted, boolean isTopMotor) {
@@ -496,6 +531,38 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "AngleMotor", angleMotor);
     FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "AngleCANcoder", angleEncoder);
+  }
+
+  public void configDeflectorMotor() {
+    TalonFXConfiguration deflectorMotorConfig = new TalonFXConfiguration();
+    CurrentLimitsConfigs deflectorMotorCurrentLimits = new CurrentLimitsConfigs();
+    deflectorMotorCurrentLimits.SupplyCurrentLimit =
+        ShooterConstants.DEFLECTOR_MOTOR_CONTINUOUS_CURRENT_LIMIT;
+    deflectorMotorCurrentLimits.SupplyCurrentThreshold =
+        ShooterConstants.DEFLECTOR_MOTOR_PEAK_CURRENT_LIMIT;
+    deflectorMotorCurrentLimits.SupplyTimeThreshold =
+        ShooterConstants.DEFLECTOR_MOTOR_PEAK_CURRENT_DURATION;
+    deflectorMotorCurrentLimits.SupplyCurrentLimitEnable = true;
+    deflectorMotorConfig.CurrentLimits = deflectorMotorCurrentLimits;
+
+    deflectorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    deflectorMotorConfig.MotorOutput.Inverted =
+        ShooterConstants.DEFLECTOR_MOTOR_INVERTED
+            ? InvertedValue.Clockwise_Positive
+            : InvertedValue.CounterClockwise_Positive;
+
+    StatusCode status = StatusCode.StatusCodeNotInitialized;
+    for (int i = 0; i < 5; ++i) {
+      status = deflectorMotor.getConfigurator().apply(deflectorMotorConfig);
+      if (status.isOK()) break;
+    }
+    if (!status.isOK()) {
+      configAlert.set(true);
+      configAlert.setText(status.toString());
+    }
+
+    FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "DeflectorMotor", deflectorMotor);
   }
 
   @Override

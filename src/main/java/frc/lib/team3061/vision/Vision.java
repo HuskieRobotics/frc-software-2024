@@ -156,8 +156,6 @@ public class Vision extends SubsystemBase {
       // the past, the ambiguity is less than the threshold, and vision's estimated
       // pose is within the specified tolerance of the current pose
       if (isEnabled
-          && ios[i].estimatedCameraPoseTimestamp + ios[i].latencySecs
-              < Logger.getRealTimestamp() / 1e6
           && ios[i].ambiguity < AMBIGUITY_THRESHOLD
           && estimatedRobotPose2d
                   .getTranslation()
@@ -166,9 +164,10 @@ public class Vision extends SubsystemBase {
         // when updating the pose estimator, specify standard deviations based on the distance
         // from the robot to the AprilTag (the greater the distance, the less confident we are
         // in the measurement)
+        double timeStamp =
+            Math.min(ios[i].estimatedCameraPoseTimestamp, Logger.getRealTimestamp() / 1e6);
         Matrix<N3, N1> stdDev = getStandardDeviations(i, estimatedRobotPose2d, ios[i].ambiguity);
-        odometry.addVisionMeasurement(
-            estimatedRobotPose2d, ios[i].estimatedCameraPoseTimestamp, stdDev);
+        odometry.addVisionMeasurement(estimatedRobotPose2d, timeStamp, stdDev);
         isVisionUpdating = true;
         Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/StdDevX", stdDev.get(0, 0));
         Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/StdDevY", stdDev.get(1, 0));
@@ -180,6 +179,10 @@ public class Vision extends SubsystemBase {
           SUBSYSTEM_NAME + "/" + i + "/CameraPose2d", ios[i].estimatedCameraPose.toPose2d());
       Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/RobotPose3d", estimatedRobotPose3d);
       Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/RobotPose2d", estimatedRobotPose2d);
+      Logger.recordOutput(
+          SUBSYSTEM_NAME + "/" + i + "/TimestampDifference",
+          Logger.getRealTimestamp() / 1e6 - ios[i].estimatedCameraPoseTimestamp);
+
       this.cyclesWithNoResults[i] = 0;
     } else {
       this.cyclesWithNoResults[i] += 1;
@@ -219,7 +222,13 @@ public class Vision extends SubsystemBase {
         mostRecentTimestamp = ios[i].estimatedCameraPoseTimestamp;
       }
     }
-    return robotPoseFromMostRecentData;
+
+    // if the most recent vision data is more than a half second old, don't return the robot pose
+    if (Math.abs(mostRecentTimestamp - Logger.getRealTimestamp() / 1e6) > 0.5) {
+      return null;
+    } else {
+      return robotPoseFromMostRecentData;
+    }
   }
 
   /**

@@ -38,17 +38,25 @@ public class Shooter extends SubsystemBase {
   private final TunableNumber bottomWheelVelocity =
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber pivotAngle = new TunableNumber("Shooter/Angle", 10.0);
-  private final double[] populationRealAngles = {64, 54, 44, 40, 37.5, 35, 33, 30, 28};
+  private final TunableNumber deflectorVoltage = new TunableNumber("Shooter/Deflector Voltage", 0);
+
+  private final double[] populationRealAngles = {
+    64, 58.5, 54, 49.5, 46, 43, 39, 36, 33, 32, 30.5, 29, 27.5
+  };
   private final double[] populationDistances = {
-    1.3597 + .06,
-    1.9693 + .06,
-    2.36 + .06,
-    2.72 + .06,
-    3.05 + .06,
-    3.37 + .06,
-    3.7 + .06,
-    4.4077 + .06,
-    5.0173 + .06
+    1.2 + 0.05,
+    1.55 + 0.05,
+    1.87 + 0.05,
+    2.13 + 0.05,
+    2.48 + 0.05,
+    2.75 + 0.05,
+    3.09 + 0.05,
+    3.41 + 0.05,
+    3.74 + 0.05,
+    4.045 + 0.05,
+    4.345 + 0.05,
+    4.62 + 0.05,
+    4.88 + 0.05
   };
 
   private boolean automatedShooter = true;
@@ -133,6 +141,7 @@ public class Shooter extends SubsystemBase {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
       io.setAngle(pivotAngle.get());
+      io.setDeflectorMotorVoltage(deflectorVoltage.get());
     } else {
       runAngleStateMachine();
     }
@@ -174,6 +183,11 @@ public class Shooter extends SubsystemBase {
                 .getNorm();
         this.adjustAngle(distanceToSpeaker);
         this.setRangeVelocity(distanceToSpeaker);
+        if (shootingPosition == ShootingPosition.AMP) {
+          deployDeflector();
+        } else {
+          retractDeflector();
+        }
       }
     }
   }
@@ -187,6 +201,7 @@ public class Shooter extends SubsystemBase {
     } else {
       this.overrideSetpointsForNextShot = false;
       this.shootingPosition = ShootingPosition.FIELD;
+      this.retractDeflector();
     }
   }
 
@@ -204,7 +219,11 @@ public class Shooter extends SubsystemBase {
   }
 
   private double getAngleForDistance(double distanceToSpeaker) {
-    return 56.599 * (Math.atan(1.651 / (0.6395 * distanceToSpeaker)));
+    if (USE_MATHEMATICAL_MODEL) {
+      return 56.599 * (Math.atan(1.651 / (0.6395 * distanceToSpeaker)));
+    } else {
+      return angleTreeMap.get(distanceToSpeaker);
+    }
   }
 
   private void adjustAngle(double distanceToSpeaker) {
@@ -569,5 +588,13 @@ public class Shooter extends SubsystemBase {
     if (DriverStation.isDisabled()) {
       io.setCoastMode(coast);
     }
+  }
+
+  public void deployDeflector() {
+    io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_DEPLOY_VOLTAGE);
+  }
+
+  public void retractDeflector() {
+    io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_RETRACT_VOLTAGE);
   }
 }
