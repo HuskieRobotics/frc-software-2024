@@ -38,17 +38,25 @@ public class Shooter extends SubsystemBase {
   private final TunableNumber bottomWheelVelocity =
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber pivotAngle = new TunableNumber("Shooter/Angle", 10.0);
-  private final double[] populationRealAngles = {64, 54, 44, 40, 37.5, 35, 33, 30, 28};
+  private final TunableNumber deflectorVoltage = new TunableNumber("Shooter/Deflector Voltage", 0);
+
+  private final double[] populationRealAngles = {
+    64, 58.5, 54, 49.5, 46, 43, 39, 36, 33, 32, 30.5, 29, 27.5
+  };
   private final double[] populationDistances = {
-    1.3597 + .06,
-    1.9693 + .06,
-    2.36 + .06,
-    2.72 + .06,
-    3.05 + .06,
-    3.37 + .06,
-    3.7 + .06,
-    4.4077 + .06,
-    5.0173 + .06
+    1.2 + 0.05,
+    1.55 + 0.05,
+    1.87 + 0.05,
+    2.13 + 0.05,
+    2.48 + 0.05,
+    2.75 + 0.05,
+    3.09 + 0.05,
+    3.41 + 0.05,
+    3.74 + 0.05,
+    4.045 + 0.05,
+    4.345 + 0.05,
+    4.62 + 0.05,
+    4.88 + 0.05
   };
 
   private boolean automatedShooter = true;
@@ -71,12 +79,14 @@ public class Shooter extends SubsystemBase {
   public enum ShootingPosition {
     AUTO_SHOT,
     FIELD,
-    AUTO,
+    SOURCE_SIDE_AUTO,
+    SOURCE_SIDE_UNDER_STAGE_AUTO,
     PASS,
     PODIUM,
     SUBWOOFER,
     AMP,
-    STORAGE
+    STORAGE,
+    AMP_SIDE_AUTO
   }
 
   private enum State {
@@ -131,6 +141,7 @@ public class Shooter extends SubsystemBase {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
       io.setAngle(pivotAngle.get());
+      io.setDeflectorMotorVoltage(deflectorVoltage.get());
     } else {
       runAngleStateMachine();
     }
@@ -172,25 +183,47 @@ public class Shooter extends SubsystemBase {
                 .getNorm();
         this.adjustAngle(distanceToSpeaker);
         this.setRangeVelocity(distanceToSpeaker);
+        if (shootingPosition == ShootingPosition.AMP) {
+          deployDeflector();
+        } else {
+          retractDeflector();
+        }
       }
     }
   }
 
   private void resetToInitialState() {
     this.state = State.WAITING_FOR_NOTE;
-    this.shootingPosition = ShootingPosition.FIELD;
-    this.overrideSetpointsForNextShot = DriverStation.isAutonomousEnabled();
+    if (DriverStation.isAutonomousEnabled()) {
+      // don't reset the shooting position if we are in autonomous as it has been set at the start
+      // of the auto
+      this.overrideSetpointsForNextShot = true;
+    } else {
+      this.overrideSetpointsForNextShot = false;
+      this.shootingPosition = ShootingPosition.FIELD;
+      this.retractDeflector();
+    }
   }
 
   private void setIdleVelocity() {
-    double velocity;
-    if (intakeEnabled) {
-      velocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
-    } else {
-      velocity = 0.0;
+    // don't idle the shooter wheels in autonomous
+    if (!DriverStation.isAutonomous()) {
+      if (intakeEnabled) {
+        io.setShooterWheelBottomVelocity(SHOOTER_IDLE_VELOCITY);
+        io.setShooterWheelTopVelocity(SHOOTER_IDLE_VELOCITY);
+      } else {
+        io.setShooterWheelBottomVelocity(0.0);
+        io.setShooterWheelTopVelocity(0.0);
+      }
     }
-    io.setShooterWheelBottomVelocity(velocity);
-    io.setShooterWheelTopVelocity(velocity);
+  }
+
+  private double getAngleForDistance(double distanceToSpeaker) {
+    if (USE_MATHEMATICAL_MODEL) {
+      return 56.599 * (Math.atan(1.651 / (0.6395 * distanceToSpeaker)));
+    } else {
+      return angleTreeMap.get(distanceToSpeaker);
+    }
   }
 
   private void adjustAngle(double distanceToSpeaker) {
@@ -203,18 +236,24 @@ public class Shooter extends SubsystemBase {
         io.setAngle(ShooterConstants.SUBWOOFER_ANGLE);
       } else if (shootingPosition == ShootingPosition.AMP) {
         io.setAngle(ShooterConstants.AMP_ANGLE);
-      } else if (shootingPosition == ShootingPosition.STORAGE) {
-        io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
       } else if (shootingPosition == ShootingPosition.AUTO_SHOT) {
         io.setAngle(ShooterConstants.SHOOTER_AUTO_SHOT_ANGLE_DEG);
+      } else if (shootingPosition == ShootingPosition.SOURCE_SIDE_AUTO) {
+        io.setAngle(ShooterConstants.SOURCE_SIDE_AUTO_ANGLE);
+      } else if (shootingPosition == ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO) {
+        io.setAngle(ShooterConstants.SOURCE_SIDE_UNDER_STAGE_AUTO_ANGLE);
+      } else if (shootingPosition == ShootingPosition.STORAGE) {
+        io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
+      } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO) {
+        io.setAngle(ShooterConstants.AMP_SIDE_SIX_NOTE_ANGLE);
       } else {
-        io.setAngle(angleTreeMap.get(distanceToSpeaker));
+        io.setAngle(getAngleForDistance(distanceToSpeaker));
       }
     }
   }
 
   private void moveToIntakePosition() {
-    if (automatedShooter) {
+    if (automatedShooter && !DriverStation.isAutonomousEnabled()) {
       io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
     }
   }
@@ -235,12 +274,21 @@ public class Shooter extends SubsystemBase {
     } else if (shootingPosition == ShootingPosition.AMP) {
       topVelocity = ShooterConstants.AMP_VELOCITY_TOP;
       bottomVelocity = ShooterConstants.AMP_VELOCITY_BOTTOM;
-    } else if (shootingPosition == ShootingPosition.STORAGE) {
-      topVelocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
-      bottomVelocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
     } else if (shootingPosition == ShootingPosition.AUTO_SHOT) {
       topVelocity = ShooterConstants.SHOOTER_AUTO_SHOT_VELOCITY_RPS;
       bottomVelocity = ShooterConstants.SHOOTER_AUTO_SHOT_VELOCITY_RPS;
+    } else if (shootingPosition == ShootingPosition.SOURCE_SIDE_AUTO) {
+      topVelocity = ShooterConstants.SOURCE_SIDE_AUTO_VELOCITY;
+      bottomVelocity = ShooterConstants.SOURCE_SIDE_AUTO_VELOCITY;
+    } else if (shootingPosition == ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO) {
+      topVelocity = ShooterConstants.SOURCE_SIDE_UNDER_STAGE_AUTO_VELOCITY;
+      bottomVelocity = ShooterConstants.SOURCE_SIDE_UNDER_STAGE_AUTO_VELOCITY;
+    } else if (shootingPosition == ShootingPosition.STORAGE) {
+      topVelocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
+      bottomVelocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
+    } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO) {
+      topVelocity = ShooterConstants.AMP_SIDE_SIX_NOTE_VELOCITY;
+      bottomVelocity = ShooterConstants.AMP_SIDE_SIX_NOTE_VELOCITY;
     } else if (distanceToSpeaker < ShooterConstants.SLOW_TO_MID_VELOCITY_DISTANCE_METERS) {
       topVelocity = ShooterConstants.CLOSE_RANGE_VELOCITY_TOP;
       bottomVelocity = ShooterConstants.CLOSE_RANGE_VELOCITY_BOTTOM;
@@ -299,18 +347,14 @@ public class Shooter extends SubsystemBase {
   }
 
   public BooleanSupplier getShooterAngleReadySupplier() {
-    return () -> {
-      return shooterInputs.angleEncoderAngleDegrees < MAX_INTAKE_ANGLE;
-    };
+    return () -> shooterInputs.angleEncoderAngleDegrees < MAX_INTAKE_ANGLE;
   }
 
   public boolean isShooterReadyToShoot(boolean isAimedAtSpeaker) {
     boolean alignedToShoot =
         isAimedAtSpeaker
             || this.shootingPosition == ShootingPosition.AMP
-            || this.shootingPosition == ShootingPosition.AUTO
-            || this.shootingPosition == ShootingPosition.PASS
-            || DriverStation.isAutonomousEnabled();
+            || this.shootingPosition == ShootingPosition.PASS;
 
     boolean topWheelAtSetpoint = isTopShootAtSetpoint();
     boolean bottomWheelAtSetpoint = isBottomShootAtSetpoint();
@@ -544,5 +588,13 @@ public class Shooter extends SubsystemBase {
     if (DriverStation.isDisabled()) {
       io.setCoastMode(coast);
     }
+  }
+
+  public void deployDeflector() {
+    io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_DEPLOY_VOLTAGE);
+  }
+
+  public void retractDeflector() {
+    io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_RETRACT_VOLTAGE);
   }
 }
