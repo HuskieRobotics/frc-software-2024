@@ -261,7 +261,7 @@ public class RobotContainer {
     shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
-    noteTargeting = new NoteTargeting(new NoteTargetingIO() {});
+    noteTargeting = new NoteTargeting(new NoteTargetingIOLimelight("test"));
 
     // vision = new Vision(new VisionIO[] {new VisionIO() {}});
 
@@ -675,6 +675,12 @@ public class RobotContainer {
                     new TeleopSwerve(
                         drivetrain, oi::getTranslateX, noteTargeting::getAdjustment, () -> 0.0))
                 .withName("lock 180"));
+    oi.getLock180Button().onFalse(Commands.runOnce(drivetrain::enableFieldRelative));
+
+    // oi.getLock180Button()
+    //     .toggleOnTrue(
+    //         new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, oi::getTranslateX)
+    //             .withName("lock 180"));
 
     oi.getAimSpeakerButton()
         .toggleOnTrue(
