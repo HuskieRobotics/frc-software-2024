@@ -782,6 +782,14 @@ public class RobotContainer {
                         () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter))
                 .until(() -> !intake.hasNote()));
 
+    // oi.getPrepareToScoreAmpButton()
+    //     .onTrue(
+    //         Commands.parallel(
+    //             new DriveToPose(
+    //                 drivetrain, () -> Field2d.getInstance().getAllianceAmpScoringPose()),
+    //             Commands.runOnce(
+    //                 () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter)));
+
     oi.getPrepareToScoreSubwooferButton()
         .onTrue(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER), shooter)

@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.team3061.RobotConfig;
@@ -34,6 +35,8 @@ public class Field2d {
   private Region2d[] regions;
 
   private Alliance alliance;
+
+  private static final double AMP_SCORING_ALIGNMENT_OFFSET = -0.4;
 
   /**
    * Get the singleton instance of the Field2d class.
@@ -240,6 +243,16 @@ public class Field2d {
       return FieldConstants.RedSpeaker.redCenterSpeakerOpening;
     } else {
       return FieldConstants.BlueSpeaker.blueCenterSpeakerOpening;
+    }
+  }
+
+  public Pose2d getAllianceAmpScoringPose() {
+    if (alliance == Alliance.Blue) {
+      return new Pose2d(FieldConstants.blueAmpCenter, new Rotation2d(Units.degreesToRadians(90.0)))
+          .plus(new Transform2d(AMP_SCORING_ALIGNMENT_OFFSET, 0.0, new Rotation2d()));
+    } else {
+      return new Pose2d(FieldConstants.redAmpCenter, new Rotation2d(Units.degreesToRadians(90.0)))
+          .plus(new Transform2d(AMP_SCORING_ALIGNMENT_OFFSET, 0.0, new Rotation2d()));
     }
   }
 }
