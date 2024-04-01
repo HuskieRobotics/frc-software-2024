@@ -766,12 +766,6 @@ public class RobotContainer {
 
     oi.getPrepareToScoreAmpButton()
         .onTrue(
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP), shooter)
-                .withName("prepare to score amp")
-                .until(() -> !intake.hasNote()));
-
-    oi.getPrepareToScoreAmpButton()
-        .onTrue(
             Commands.parallel(
                     new TeleopSwerve(
                         drivetrain,
@@ -780,15 +774,17 @@ public class RobotContainer {
                         () -> new Rotation2d(Units.degreesToRadians(90.0))),
                     Commands.runOnce(
                         () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter))
-                .until(() -> !intake.hasNote()));
+                .until(() -> !intake.hasNote())
+                .withName("prepare to score amp"));
 
     // oi.getPrepareToScoreAmpButton()
     //     .onTrue(
     //         Commands.parallel(
-    //             new DriveToPose(
-    //                 drivetrain, () -> Field2d.getInstance().getAllianceAmpScoringPose()),
-    //             Commands.runOnce(
-    //                 () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter)));
+    //                 new DriveToPose(
+    //                     drivetrain, () -> Field2d.getInstance().getAllianceAmpScoringPose()),
+    //                 Commands.runOnce(
+    //                     () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter))
+    //             .withName("prepare to score amp"));
 
     oi.getPrepareToScoreSubwooferButton()
         .onTrue(
