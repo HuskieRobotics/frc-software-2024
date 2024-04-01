@@ -11,4 +11,6 @@ public class DrivetrainConstants {
   public static final boolean DEBUGGING = false;
   public static final boolean TESTING = false;
   public static final String SUBSYSTEM_NAME = "Drivetrain";
+
+  public static final double ANGLE_TO_SPEAKER_TOLERANCE = Math.PI / 36.0;
 }

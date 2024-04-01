@@ -3,15 +3,20 @@
   "robotLength": 0.88,
   "holonomicMode": true,
   "pathFolders": [
-    "4 Note Amp-Side Wing",
-    "4 Note Source-Side Wing",
+    "1 Note Source Side",
+    "4 Note Amp Side",
+    "5 Note Amp Side",
+    "6 Amp Side",
+    "Source Side",
     "Tuning"
   ],
   "autoFolders": [
+    "Amp Side Notes",
+    "Source Side Notes",
     "Tuning"
   ],
-  "defaultMaxVel": 3.88,
-  "defaultMaxAccel": 11.805,
+  "defaultMaxVel": 2.75,
+  "defaultMaxAccel": 11.8,
   "defaultMaxAngVel": 537.0,
   "defaultMaxAngAccel": 2303.0,
   "maxModuleSpeed": 3.88

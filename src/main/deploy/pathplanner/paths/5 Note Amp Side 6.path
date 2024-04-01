@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.7066101525567983,
+        "y": 4.13
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.5816497535450913,
+        "y": 4.113976955226638
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.25,
+        "y": 4.13
+      },
+      "prevControl": {
+        "x": 1.2686574918604383,
+        "y": 4.113976955226638
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 2.0,
+    "maxAcceleration": 8.0,
+    "maxAngularVelocity": 537.0,
+    "maxAngularAcceleration": 2303.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 125.09039965360586,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "5 Note Amp Side",
+  "previewStartingState": {
+    "rotation": -179.73537278182667,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

@@ -16,8 +16,10 @@ public interface VisionIO {
   public static class VisionIOInputs {
     Pose3d estimatedCameraPose = new Pose3d();
     double estimatedCameraPoseTimestamp = 0.0;
+    double latencySecs = 0.0;
     boolean[] tagsSeen = new boolean[] {};
-    double lastCameraTimestamp = 0.0;
+    double ambiguity = 0.0;
+    boolean poseFromMultiTag = false;
   }
 
   /**

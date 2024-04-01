@@ -6,6 +6,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
@@ -16,6 +17,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants.SteerFeedbackType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.signals.DeviceEnableValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -235,20 +237,35 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
     // configure current limits
     for (SwerveModule swerveModule : this.Modules) {
-      CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
-      swerveModule.getDriveMotor().getConfigurator().refresh(currentLimits);
-      currentLimits.SupplyCurrentLimit = SwerveConstants.DRIVE_CONTINUOUS_CURRENT_LIMIT;
-      currentLimits.SupplyCurrentThreshold = SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
-      currentLimits.SupplyTimeThreshold = SwerveConstants.DRIVE_PEAK_CURRENT_DURATION;
-      currentLimits.SupplyCurrentLimitEnable = SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
-      swerveModule.getDriveMotor().getConfigurator().apply(currentLimits);
 
-      currentLimits = new CurrentLimitsConfigs();
+      // set torque current configs for closed loop control with TorqueCurrentFOC
+      // set current limits for everything else
+      TalonFXConfiguration config = new TalonFXConfiguration();
+      swerveModule.getDriveMotor().getConfigurator().refresh(config);
+      config.TorqueCurrent.PeakForwardTorqueCurrent = SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
+      config.TorqueCurrent.PeakReverseTorqueCurrent = -SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
+      config.CurrentLimits.SupplyCurrentLimit = SwerveConstants.DRIVE_CONTINUOUS_CURRENT_LIMIT;
+      config.CurrentLimits.SupplyCurrentThreshold = SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
+      config.CurrentLimits.SupplyTimeThreshold = SwerveConstants.DRIVE_PEAK_CURRENT_DURATION;
+      config.CurrentLimits.SupplyCurrentLimitEnable = SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+
+      if (Constants.getMode() != Constants.Mode.SIM) {
+        config.CurrentLimits.StatorCurrentLimit = SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
+        config.CurrentLimits.StatorCurrentLimitEnable = SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+      }
+      swerveModule.getDriveMotor().getConfigurator().apply(config);
+
+      CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
       swerveModule.getSteerMotor().getConfigurator().refresh(currentLimits);
       currentLimits.SupplyCurrentLimit = SwerveConstants.ANGLE_CONTINUOUS_CURRENT_LIMIT;
       currentLimits.SupplyCurrentThreshold = SwerveConstants.ANGLE_PEAK_CURRENT_LIMIT;
       currentLimits.SupplyTimeThreshold = SwerveConstants.ANGLE_PEAK_CURRENT_DURATION;
       currentLimits.SupplyCurrentLimitEnable = SwerveConstants.ANGLE_ENABLE_CURRENT_LIMIT;
+
+      if (Constants.getMode() != Constants.Mode.SIM) {
+        currentLimits.StatorCurrentLimit = SwerveConstants.ANGLE_PEAK_CURRENT_LIMIT;
+        currentLimits.StatorCurrentLimitEnable = SwerveConstants.ANGLE_ENABLE_CURRENT_LIMIT;
+      }
       swerveModule.getSteerMotor().getConfigurator().apply(currentLimits);
     }
 
@@ -284,6 +301,11 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
         driveFacingAngleThetaKi.get(),
         driveFacingAngleThetaKd.get());
     this.driveFacingAngleRequest.HeadingController.enableContinuousInput(0, Math.PI * 2);
+
+    // always define 0° (towards the red alliance) as "forward"; the Drivetrain subsystem handles
+    //  the definition of forward based on the current alliance
+    this.driveFacingAngleRequest.ForwardReference = SwerveRequest.ForwardReference.RedAlliance;
+    this.driveFieldCentricRequest.ForwardReference = SwerveRequest.ForwardReference.RedAlliance;
   }
 
   @Override
@@ -396,16 +418,22 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     SwerveModulePosition position = module.getPosition(false);
     SwerveModuleState state = module.getCurrentState();
 
+    inputs.driveEnabled =
+        module.getDriveMotor().getDeviceEnable().getValue() == DeviceEnableValue.Enabled;
     inputs.driveDistanceMeters = position.distanceMeters;
     inputs.driveVelocityMetersPerSec = state.speedMetersPerSecond;
+
+    // Retrieve the closed loop reference status signals directly from the motor in this method
+    // instead of retrieving in advance because the status signal returned depends on the current
+    // control mode.
     inputs.driveVelocityReferenceMetersPerSec =
         Conversions.falconRPSToMechanismMPS(
-            signals.driveVelocityReferenceStatusSignal.getValue(),
+            module.getDriveMotor().getClosedLoopReference().getValueAsDouble(),
             RobotConfig.getInstance().getWheelDiameterMeters() * Math.PI,
             RobotConfig.getInstance().getSwerveConstants().getDriveGearRatio());
     inputs.driveVelocityErrorMetersPerSec =
         Conversions.falconRPSToMechanismMPS(
-            signals.driveVelocityErrorStatusSignal.getValue(),
+            module.getDriveMotor().getClosedLoopError().getValueAsDouble(),
             RobotConfig.getInstance().getWheelDiameterMeters() * Math.PI,
             RobotConfig.getInstance().getSwerveConstants().getDriveGearRatio());
     inputs.driveAccelerationMetersPerSecPerSec =
@@ -420,16 +448,22 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
     inputs.steerAbsolutePositionDeg = module.getCANcoder().getAbsolutePosition().getValue() * 360.0;
 
+    inputs.steerEnabled =
+        module.getSteerMotor().getDeviceEnable().getValue() == DeviceEnableValue.Enabled;
     // since we are using the FusedCANcoder feature, the position and velocity signal for the angle
     // motor accounts for the gear ratio; so, pass a gear ratio of 1 to just convert from rotations
     // to degrees.
     inputs.steerPositionDeg = position.angle.getDegrees();
+
+    // Retrieve the closed loop reference status signals directly from the motor in this method
+    // instead of retrieving in advance because the status signal returned depends on the current
+    // control mode.
     inputs.steerPositionReferenceDeg =
         Conversions.falconRotationsToMechanismDegrees(
-            signals.steerPositionReferenceStatusSignal.getValue(), 1);
+            module.getSteerMotor().getClosedLoopReference().getValueAsDouble(), 1);
     inputs.steerPositionErrorDeg =
         Conversions.falconRotationsToMechanismDegrees(
-            signals.steerPositionErrorStatusSignal.getValue(), 1);
+            module.getSteerMotor().getClosedLoopError().getValueAsDouble(), 1);
     inputs.steerVelocityRevPerMin =
         Conversions.falconRPSToMechanismRPM(signals.steerVelocityStatusSignal.getValue(), 1);
     inputs.steerAccelerationMetersPerSecPerSec =
@@ -641,9 +675,7 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   }
 
   private static ClosedLoopOutputType getSteerClosedLoopOutputType() {
-    if (Constants.getMode() == Constants.Mode.SIM) {
-      return ClosedLoopOutputType.Voltage;
-    } else if (RobotConfig.getInstance().getSwerveSteerControlMode()
+    if (RobotConfig.getInstance().getSwerveSteerControlMode()
         == RobotConfig.SWERVE_CONTROL_MODE.TORQUE_CURRENT_FOC) {
       return ClosedLoopOutputType.TorqueCurrentFOC;
     } else {
@@ -652,9 +684,7 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   }
 
   private static ClosedLoopOutputType getDriveClosedLoopOutputType() {
-    if (Constants.getMode() == Constants.Mode.SIM) {
-      return ClosedLoopOutputType.Voltage;
-    } else if (RobotConfig.getInstance().getSwerveDriveControlMode()
+    if (RobotConfig.getInstance().getSwerveDriveControlMode()
         == RobotConfig.SWERVE_CONTROL_MODE.TORQUE_CURRENT_FOC) {
       return ClosedLoopOutputType.TorqueCurrentFOC;
     } else {
