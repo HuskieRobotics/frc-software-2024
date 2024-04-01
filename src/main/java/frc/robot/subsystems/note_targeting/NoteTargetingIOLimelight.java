@@ -1,4 +1,4 @@
-package frc.robot.subsystems.noteTargeting;
+package frc.robot.subsystems.note_targeting;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;

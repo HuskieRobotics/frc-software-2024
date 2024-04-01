@@ -42,11 +42,12 @@ import frc.robot.configs.PracticeBoardConfig;
 import frc.robot.configs.PracticeRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
-import frc.robot.subsystems.noteTargeting.NoteTargeting;
-import frc.robot.subsystems.noteTargeting.NoteTargetingIOLimelight;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
+import frc.robot.subsystems.note_targeting.NoteTargeting;
+import frc.robot.subsystems.note_targeting.NoteTargetingIO;
+import frc.robot.subsystems.note_targeting.NoteTargetingIOLimelight;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.Shooter.ShootingPosition;
 import frc.robot.subsystems.shooter.ShooterConstants;
@@ -131,10 +132,7 @@ public class RobotContainer {
 
     } else {
       drivetrain = new Drivetrain(new DrivetrainIO() {});
-      noteTargeting =
-          new NoteTargeting(
-              new NoteTargetingIOLimelight("limelight"), new NoteTargetingIOLimelight("test"));
-
+      noteTargeting = new NoteTargeting(new NoteTargetingIO() {});
       intake = new Intake(new IntakeIO() {});
       shooter = new Shooter(new ShooterIO() {}, intake, drivetrain);
       intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
@@ -185,6 +183,8 @@ public class RobotContainer {
     shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
+    noteTargeting = new NoteTargeting(new NoteTargetingIOLimelight("limelight"));
+
     String[] cameraNames = config.getCameraNames();
     VisionIO[] visionIOs = new VisionIO[cameraNames.length];
     AprilTagFieldLayout layout;
@@ -197,10 +197,6 @@ public class RobotContainer {
       visionIOs[i] = new VisionIOPhotonVision(cameraNames[i], layout);
     }
     vision = new Vision(visionIOs);
-
-    noteTargeting =
-        new NoteTargeting(
-            new NoteTargetingIOLimelight("limelight"), new NoteTargetingIOLimelight("test"));
   }
 
   private void createSubsystems() {
@@ -237,6 +233,8 @@ public class RobotContainer {
     shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
+    noteTargeting = new NoteTargeting(new NoteTargetingIO() {});
+
     if (Constants.getRobot() == Constants.RobotType.ROBOT_SIMBOT) {
       vision = new Vision(new VisionIO[] {new VisionIO() {}});
     } else {
@@ -263,6 +261,8 @@ public class RobotContainer {
     shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
+    noteTargeting = new NoteTargeting(new NoteTargetingIO() {});
+
     // vision = new Vision(new VisionIO[] {new VisionIO() {}});
 
     AprilTagFieldLayout layout;
@@ -287,6 +287,8 @@ public class RobotContainer {
     intake = new Intake(new IntakeIO() {});
     shooter = new Shooter(new ShooterIO() {}, intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
+    noteTargeting = new NoteTargeting(new NoteTargetingIO() {});
+
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
   }
 
@@ -668,15 +670,10 @@ public class RobotContainer {
 
     oi.getLock180Button()
         .whileTrue(
-            new TeleopSwerve(
-                    drivetrain,
-                    oi::getTranslateX,
-                    oi::getTranslateY,
-                    () ->
-                        (drivetrain.getPose().getRotation().getDegrees() > -90
-                                && drivetrain.getPose().getRotation().getDegrees() < 90)
-                            ? Rotation2d.fromDegrees(0.0)
-                            : Rotation2d.fromDegrees(180.0))
+            Commands.parallel(
+                    Commands.runOnce(drivetrain::disableFieldRelative),
+                    new TeleopSwerve(
+                        drivetrain, oi::getTranslateX, noteTargeting::getAdjustment, () -> 0.0))
                 .withName("lock 180"));
 
     oi.getAimSpeakerButton()
