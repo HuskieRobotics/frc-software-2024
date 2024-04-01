@@ -338,8 +338,7 @@ public class Drivetrain extends SubsystemBase {
    * @param yVelocity the desired velocity in the y direction (m/s)
    * @param rotationalVelocity the desired rotational velocity (rad/s)
    * @param isOpenLoop true for open-loop control; false for closed-loop control
-   * @param overrideFieldRelative true to force field-relative motion; false to use the current
-   *     setting
+   * @param isFieldRelative true to for field-relative motion; false, for robot-relative
    */
   public void drive(
       double xVelocity,
