@@ -48,4 +48,8 @@ public class NoteTargeting extends SubsystemBase {
     }
     return 0.0;
   }
+
+  public boolean hasTarget() {
+    return inputs.hasTarget;
+  }
 }
