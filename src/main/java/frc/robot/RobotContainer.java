@@ -9,6 +9,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -767,23 +768,19 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP), shooter)
                 .withName("prepare to score amp")
-                .until(
-                    () -> {
-                      return !intake.hasNote();
-                    }));
+                .until(() -> !intake.hasNote()));
 
-    // oi.getPrepareToScoreAmpButton()
-    //     .onTrue(
-    //         Commands.parallel(
-    //                 new TeleopSwerve(drivetrain, oi::getTranslateX, oi::getTranslateY, () ->
-    // (90)),
-    //                 Commands.runOnce(
-    //                         () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter)
-    //                     .withName("prepare to score amp"))
-    //             .until(
-    //                 () -> {
-    //                   return !intake.hasNote();
-    //                 }));
+    oi.getPrepareToScoreAmpButton()
+        .onTrue(
+            Commands.parallel(
+                    new TeleopSwerve(
+                        drivetrain,
+                        oi::getTranslateX,
+                        oi::getTranslateY,
+                        () -> new Rotation2d(Units.degreesToRadians(90.0))),
+                    Commands.runOnce(
+                        () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter))
+                .until(() -> !intake.hasNote()));
 
     oi.getPrepareToScoreSubwooferButton()
         .onTrue(
