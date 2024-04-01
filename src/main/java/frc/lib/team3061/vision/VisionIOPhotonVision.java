@@ -1,7 +1,5 @@
 package frc.lib.team3061.vision;
 
-import static frc.lib.team3061.vision.VisionConstants.*;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.lib.team6328.util.Alert;
@@ -11,7 +9,6 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 /**
  * PhotonVision-based implementation of the VisionIO interface.

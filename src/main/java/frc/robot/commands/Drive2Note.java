@@ -1,26 +1,17 @@
-
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
-
-import frc.robot.RobotContainer;
 import static frc.robot.Constants.*;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.Drivetrain;
 import frc.lib.team6328.util.TunableNumber;
-import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-
 
 public class Drive2Note extends Command {
   private final Drivetrain drivetrain;
@@ -40,13 +31,15 @@ public class Drive2Note extends Command {
     tx = table.getEntry("tx");
     ty = table.getEntry("ty");
     ta = table.getEntry("ta");
-    pid = new ProfiledPIDController(
-                    kP.get(), 
-                    kI.get(), 
-                    kD.get(), 
-                    new TrapezoidProfile.Constraints(thetaMaxVelocity.get(), thetaMaxAcceleration.get()),
-                    LOOP_PERIOD_SECS);
+    pid =
+        new ProfiledPIDController(
+            kP.get(),
+            kI.get(),
+            kD.get(),
+            new TrapezoidProfile.Constraints(thetaMaxVelocity.get(), thetaMaxAcceleration.get()),
+            LOOP_PERIOD_SECS);
   }
+
   private static final TunableNumber thetaMaxVelocity =
       new TunableNumber(
           "DriveToPose/ThetaMaxVelocity",
@@ -62,11 +55,8 @@ public class Drive2Note extends Command {
     // Add the code that should run at the beginning of the command
     Logger.recordOutput("ActiveCommands/DriveToNote", true);
 
-    //create a pid
+    // create a pid
     pid.reset(tx.getDouble(0.0));
-
-
-    
   }
 
   @Override
@@ -75,14 +65,13 @@ public class Drive2Note extends Command {
     double x = tx.getDouble(0.0);
     double y = ty.getDouble(0.0);
     double area = ta.getDouble(0.0);
-    //maybe add a check to see if the target is in view and if area is big enough
+    // maybe add a check to see if the target is in view and if area is big enough
     Logger.recordOutput("Limelight/x", x);
     Logger.recordOutput("Limelight/y", y);
     Logger.recordOutput("Limelight/area", area);
     double turnVelocity = pid.calculate(x, 0.0);
     Logger.recordOutput("DriveToNote/turnVelocity", turnVelocity);
-    drivetrain.drive(0.0, 0.0,turnVelocity,false,false);
-
+    drivetrain.drive(0.0, 0.0, turnVelocity, false, false);
   }
 
   @Override
