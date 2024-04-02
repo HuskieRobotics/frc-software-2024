@@ -73,10 +73,6 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getAlignAndIntakeNoteFromSourceButton() {
-    return new Trigger(() -> false);
-  }
-
   // intake
 
   public default Trigger getIntakeAutomationSwitch() {
@@ -161,6 +157,10 @@ public interface OperatorInterface {
 
   // miscellaneous
   public default Trigger getInterruptAll() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getAlignAndIntakeNote() {
     return new Trigger(() -> false);
   }
 }

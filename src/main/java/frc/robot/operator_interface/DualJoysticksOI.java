@@ -40,7 +40,7 @@ public class DualJoysticksOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getOuttakeAllButton() {
+  public Trigger getAutoNoteAlignButton() {
     return translateJoystickButtons[3];
   }
 

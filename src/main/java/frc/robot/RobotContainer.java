@@ -616,18 +616,6 @@ public class RobotContainer {
                     Commands.runOnce(intake::turnIntakeOff),
                     Commands.runOnce(intake::turnKickerOff))
                 .withName("ManualIntakeOff"));
-
-    oi.getOuttakeAllButton()
-        .and(() -> !intake.automationEnabled())
-        .whileTrue(Commands.run(intake::outtakeAll).withName("ManualOuttakeOn"));
-
-    oi.getOuttakeAllButton()
-        .and(() -> !intake.automationEnabled())
-        .onFalse(
-            Commands.sequence(
-                    Commands.runOnce(intake::turnIntakeOff),
-                    Commands.runOnce(intake::turnKickerOff))
-                .withName("ManualOuttakeOff"));
   }
 
   private void configureDrivetrainCommands() {

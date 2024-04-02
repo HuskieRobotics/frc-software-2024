@@ -73,11 +73,6 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getAlignAndIntakeNoteFromSourceButton() {
-    return translateJoystickButtons[4];
-  }
-
-  @Override
   public Trigger getXStanceButton() {
     return translateJoystickButtons[5];
   }
@@ -106,7 +101,7 @@ public class FullOperatorConsoleOI implements OperatorInterface {
 
   @Override
   public Trigger getOuttakeAllButton() {
-    return rotateJoystickButtons[2];
+    return operatorPanelButtons[1];
   }
 
   @Override
@@ -116,12 +111,17 @@ public class FullOperatorConsoleOI implements OperatorInterface {
 
   @Override
   public Trigger getRunIntakeButton() {
-    return rotateJoystickButtons[4];
+    return translateJoystickButtons[4];
   }
 
   @Override
   public Trigger getResetPoseToVisionButton() {
     return rotateJoystickButtons[5];
+  }
+
+  @Override
+  public Trigger getAlignAndIntakeNote() {
+    return rotateJoystickButtons[2];
   }
 
   // Operator Controller
