@@ -10,6 +10,7 @@ public class NoteTargetingIOLimelight implements NoteTargetingIO {
   private NetworkTableEntry tx;
   private NetworkTableEntry ty;
   private NetworkTableEntry ta;
+  private int noTargetCount;
 
   public NoteTargetingIOLimelight(String paramName) {
     if (paramName.equals("test")) {
@@ -23,6 +24,7 @@ public class NoteTargetingIOLimelight implements NoteTargetingIO {
     }
   }
 
+  @Override
   public void updateInputs(NoteTargetingIOInputs inputs) {
     if (name.equals("test")) {
       inputs.x = 0.0;
@@ -30,10 +32,19 @@ public class NoteTargetingIOLimelight implements NoteTargetingIO {
       inputs.a = 0.0;
       inputs.hasTarget = false;
     } else {
-      inputs.x = tx.getDouble(0.0);
+      inputs.x = -tx.getDouble(0.0);
       inputs.y = ty.getDouble(0.0);
       inputs.a = ta.getDouble(0.0);
-      inputs.hasTarget = ta.getDouble(0.0) > 0;
+      boolean hasTarget = ta.getDouble(0.0) > 0;
+      if (hasTarget) {
+        inputs.hasTarget = true;
+        this.noTargetCount = 0;
+      } else {
+        this.noTargetCount++;
+        if (this.noTargetCount > 10) {
+          inputs.hasTarget = false;
+        }
+      }
     }
   }
 }

@@ -7,7 +7,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class NoteTargeting extends SubsystemBase {
 
-  private final TunableNumber kP = new TunableNumber("NoteTargeting/kP", 0.1);
+  private final TunableNumber kP = new TunableNumber("NoteTargeting/kP", 0.025);
   private final TunableNumber kI = new TunableNumber("NoteTargeting/kI", 0.0);
   private final TunableNumber kD = new TunableNumber("NoteTargeting/kD", 0.0);
   private final NoteTargetingIO io;

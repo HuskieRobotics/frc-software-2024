@@ -40,7 +40,7 @@ public class TeleopSwerveCollectNote extends TeleopSwerve {
       Intake intake,
       NoteTargeting noteTargeting,
       DoubleSupplier translationXSupplier) {
-    super(drivetrain, translationXSupplier, noteTargeting::getAdjustment, () -> 0.0);
+    super(drivetrain, () -> -1.0, noteTargeting::getAdjustment, () -> 0.0);
     this.drivetrain = drivetrain;
     this.intake = intake;
     this.noteTargeting = noteTargeting;

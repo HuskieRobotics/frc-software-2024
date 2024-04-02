@@ -36,6 +36,7 @@ import frc.robot.Constants.Mode;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.TeleopSwerveAimAtSpeaker;
 import frc.robot.commands.TeleopSwerveAimToPass;
+import frc.robot.commands.TeleopSwerveCollectNote;
 import frc.robot.configs.ArtemisRobotConfig;
 import frc.robot.configs.GenericDrivetrainRobotConfig;
 import frc.robot.configs.PracticeBoardConfig;
@@ -451,10 +452,12 @@ public class RobotContainer {
         Commands.sequence(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO)),
             new PathPlannerAuto("Amp Collect 2nd"),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, oi::getTranslateX),
             Commands.either(
                 new PathPlannerAuto("Amp Score 2nd Collect 3rd"),
                 new PathPlannerAuto("Amp Missed 2nd Collect 3rd"),
                 intake::hasNoteForAuto),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, oi::getTranslateX),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
             new PathPlannerAuto("Amp Score 3rd Collect 4th"),
             new PathPlannerAuto("4 note center"));
@@ -470,6 +473,7 @@ public class RobotContainer {
         Commands.sequence(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO)),
             new PathPlannerAuto("Amp Collect 2nd"),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, oi::getTranslateX),
             Commands.either(
                 Commands.sequence(
                     Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
@@ -668,19 +672,19 @@ public class RobotContainer {
     //                     ? Rotation2d.fromDegrees(0.0)
     //                     : Rotation2d.fromDegrees(180.0)));
 
-    oi.getLock180Button()
-        .whileTrue(
-            Commands.parallel(
-                    Commands.runOnce(drivetrain::disableFieldRelative),
-                    new TeleopSwerve(
-                        drivetrain, oi::getTranslateX, noteTargeting::getAdjustment, () -> 0.0))
-                .withName("lock 180"));
-    oi.getLock180Button().onFalse(Commands.runOnce(drivetrain::enableFieldRelative));
-
     // oi.getLock180Button()
     //     .toggleOnTrue(
-    //         new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, oi::getTranslateX)
+    //         Commands.parallel(
+    //                 Commands.runOnce(drivetrain::disableFieldRelative),
+    //                 new TeleopSwerve(
+    //                     drivetrain, oi::getTranslateX, noteTargeting::getAdjustment, () -> 0.0))
     //             .withName("lock 180"));
+    // oi.getLock180Button().onFalse(Commands.runOnce(drivetrain::enableFieldRelative));
+
+    oi.getLock180Button()
+        .toggleOnTrue(
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, oi::getTranslateX)
+                .withName("lock 180"));
 
     oi.getAimSpeakerButton()
         .toggleOnTrue(
