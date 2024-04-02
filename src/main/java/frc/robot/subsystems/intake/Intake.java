@@ -74,6 +74,9 @@ public class Intake extends SubsystemBase {
     this.intakeGamePiece();
 
     FaultReporter.getInstance().registerSystemCheck(SUBSYSTEM_NAME, getSystemCheckCommand());
+
+    ShuffleboardTab tabMain = Shuffleboard.getTab("MAIN");
+    tabMain.addBoolean("Has Note?", this::hasNote).withPosition(6, 0).withSize(1, 1);
   }
 
   public void setShooterAngleReady(BooleanSupplier isShooterAngleReady) {
