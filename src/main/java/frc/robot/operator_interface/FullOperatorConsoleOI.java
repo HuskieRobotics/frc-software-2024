@@ -207,4 +207,10 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   public Trigger getScaleDownShooterVelocityButton() {
     return operatorPanelButtons[8];
   }
+
+  @Override
+  public Trigger getIntakeIRSensorSwitch() {
+    // temporary, not set in feature sheet yet
+    return operatorPanelButtons[3];
+  }
 }

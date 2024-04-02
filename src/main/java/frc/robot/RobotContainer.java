@@ -628,6 +628,11 @@ public class RobotContainer {
                     Commands.runOnce(intake::turnIntakeOff),
                     Commands.runOnce(intake::turnKickerOff))
                 .withName("ManualOuttakeOff"));
+
+    oi.getIntakeIRSensorSwitch().onTrue(
+        Commands.runOnce(() -> intake.setIRSensorsInUse(true)).withName("use main IR sensors"));
+    oi.getIntakeIRSensorSwitch().onFalse(
+        Commands.runOnce(() -> intake.setIRSensorsInUse(false)).withName("use backup IR sensors"));
   }
 
   private void configureDrivetrainCommands() {

@@ -24,9 +24,16 @@ import frc.lib.team6328.util.TunableNumber;
 public class IntakeIOTalonFX implements IntakeIO {
   private TalonFX rollerMotor;
   private TalonFX kickerMotor;
-  private final DigitalInput rollerIRSensor;
-  private final DigitalInput kickerIRSensor;
-  private final DigitalInput shooterIRSensor;
+  private final DigitalInput rollerIRSensor1;
+  private final DigitalInput kickerIRSensor1;
+  private final DigitalInput shooterIRSensor1;
+  private final DigitalInput rollerIRSensor2;
+  private final DigitalInput kickerIRSensor2;
+  private final DigitalInput shooterIRSensor2;
+  private final DigitalInput rollerIRSensorInUse;
+  private final DigitalInput kickerIRSensorInUse;
+  private final DigitalInput shooterIRSensorInUse;
+  private boolean usingMainIRSensors = true;
 
   private Alert configAlert =
       new Alert("Failed to apply configuration for subsystem.", AlertType.ERROR);
@@ -83,9 +90,19 @@ public class IntakeIOTalonFX implements IntakeIO {
       new TunableNumber("Intake/kickerMotorKS", IntakeConstants.INTAKE_KICKER_MOTOR_KS);
 
   public IntakeIOTalonFX() {
-    rollerIRSensor = new DigitalInput(IntakeConstants.INTAKE_ROLLER_IR_SENSOR_ID);
-    kickerIRSensor = new DigitalInput(IntakeConstants.INTAKE_KICKER_IR_SENSOR_ID);
-    shooterIRSensor = new DigitalInput(IntakeConstants.INTAKE_SHOOTER_IR_SENSOR_ID);
+    usingMainIRSensors = true;
+
+    rollerIRSensor1 = new DigitalInput(IntakeConstants.MAIN_INTAKE_ROLLER_IR_SENSOR_ID);
+    kickerIRSensor1 = new DigitalInput(IntakeConstants.MAIN_INTAKE_KICKER_IR_SENSOR_ID);
+    shooterIRSensor1 = new DigitalInput(IntakeConstants.MAIN_INTAKE_SHOOTER_IR_SENSOR_ID);
+
+    rollerIRSensor2 = new DigitalInput(IntakeConstants.BACKUP_INTAKE_ROLLER_IR_SENSOR_ID);
+    kickerIRSensor2 = new DigitalInput(IntakeConstants.BACKUP_INTAKE_KICKER_IR_SENSOR_ID);
+    shooterIRSensor2 = new DigitalInput(IntakeConstants.BACKUP_INTAKE_SHOOTER_IR_SENSOR_ID);
+
+    rollerIRSensorInUse = rollerIRSensor1;
+    kickerIRSensorInUse = kickerIRSensor1;
+    shooterIRSensorInUse = shooterIRSensor1;
 
     // torque current FOC control mode is not support in simulation yet
 
@@ -156,9 +173,11 @@ public class IntakeIOTalonFX implements IntakeIO {
         rollerVoltageStatusSignal,
         kickerVoltageStatusSignal);
 
-    inputs.isRollerIRBlocked = !rollerIRSensor.get();
-    inputs.isKickerIRBlocked = !kickerIRSensor.get();
-    inputs.isShooterIRBlocked = !shooterIRSensor.get();
+    inputs.isRollerIRBlocked = !rollerIRSensorInUse.get();
+    inputs.isKickerIRBlocked = !kickerIRSensorInUse.get();
+    inputs.isShooterIRBlocked = !shooterIRSensorInUse.get();
+
+    inputs.usingMainIRSensors = this.usingMainIRSensors;
 
     inputs.rollerStatorCurrentAmps = rollerStatorCurrentStatusSignal.getValueAsDouble();
     inputs.kickerStatorCurrentAmps = kickerStatorCurrentStatusSignal.getValueAsDouble();
@@ -208,6 +227,18 @@ public class IntakeIOTalonFX implements IntakeIO {
       slot0Configs.kS = rollerMotorsKS.get();
 
       kickerMotor.getConfigurator().apply(slot0Configs);
+    }
+  }
+
+  @Override
+  public void setIRSensorsInUse(boolean isMain) {
+    // realistically, this should not be an IO method because of the lack of hardware,
+    // but it seems more applicable to IO because of the nature of the class selecting which
+    // IR sensor set we are using
+    if (isMain) {
+      usingMainIRSensors = true;
+    } else {
+      usingMainIRSensors = false;
     }
   }
 

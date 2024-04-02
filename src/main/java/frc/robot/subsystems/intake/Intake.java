@@ -80,9 +80,15 @@ public class Intake extends SubsystemBase {
     this.isShooterAngleReady = isShooterAngleReady;
   }
 
+  public void setIRSensorsInUse(boolean isMain) {
+    io.setIRSensorsInUse(isMain);
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+
+    this.setIRSensorsInUse(inputs.usingMainIRSensors);
     Logger.processInputs("Intake", inputs);
     Logger.recordOutput("Intake/State", intakeState.toString());
     Logger.recordOutput("Intake/AutomationEnabled", automationEnabled);
