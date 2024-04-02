@@ -34,6 +34,7 @@ import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.lib.team3061.vision.VisionIOSim;
 import frc.lib.team6328.util.NoteVisualizer;
 import frc.robot.Constants.Mode;
+import frc.robot.commands.DriveToPose;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.TeleopSwerveAimAtSpeaker;
 import frc.robot.commands.TeleopSwerveAimToPass;
@@ -765,25 +766,12 @@ public class RobotContainer {
 
     oi.getPrepareToScoreAmpButton()
         .onTrue(
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP), shooter)
-                .withName("prepare to score amp")
-                .until(
-                    () -> {
-                      return !intake.hasNote();
-                    }));
-
-    // oi.getPrepareToScoreAmpButton()
-    //     .onTrue(
-    //         Commands.parallel(
-    //                 new TeleopSwerve(drivetrain, oi::getTranslateX, oi::getTranslateY, () ->
-    // (90)),
-    //                 Commands.runOnce(
-    //                         () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter)
-    //                     .withName("prepare to score amp"))
-    //             .until(
-    //                 () -> {
-    //                   return !intake.hasNote();
-    //                 }));
+            Commands.parallel(
+                    new DriveToPose(
+                        drivetrain, () -> Field2d.getInstance().getAllianceAmpScoringPose()),
+                    Commands.runOnce(
+                        () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter))
+                .withName("prepare to score amp"));
 
     oi.getPrepareToScoreSubwooferButton()
         .onTrue(
