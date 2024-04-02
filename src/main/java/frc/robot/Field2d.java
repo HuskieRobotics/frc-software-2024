@@ -36,7 +36,7 @@ public class Field2d {
 
   private Alliance alliance;
 
-  private static final double AMP_SCORING_ALIGNMENT_OFFSET = -0.4;
+  private static final double AMP_SCORING_ALIGNMENT_OFFSET = -0.3;
 
   /**
    * Get the singleton instance of the Field2d class.

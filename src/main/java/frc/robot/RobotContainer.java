@@ -9,7 +9,6 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -35,6 +34,7 @@ import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.lib.team3061.vision.VisionIOSim;
 import frc.lib.team6328.util.NoteVisualizer;
 import frc.robot.Constants.Mode;
+import frc.robot.commands.DriveToPose;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.TeleopSwerveAimAtSpeaker;
 import frc.robot.commands.TeleopSwerveAimToPass;
@@ -764,27 +764,27 @@ public class RobotContainer {
                 .ignoringDisable(true)
                 .withName("disable shooter automation"));
 
-    oi.getPrepareToScoreAmpButton()
-        .onTrue(
-            Commands.parallel(
-                    new TeleopSwerve(
-                        drivetrain,
-                        oi::getTranslateX,
-                        oi::getTranslateY,
-                        () -> new Rotation2d(Units.degreesToRadians(90.0))),
-                    Commands.runOnce(
-                        () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter))
-                .until(() -> !intake.hasNote())
-                .withName("prepare to score amp"));
-
     // oi.getPrepareToScoreAmpButton()
     //     .onTrue(
     //         Commands.parallel(
-    //                 new DriveToPose(
-    //                     drivetrain, () -> Field2d.getInstance().getAllianceAmpScoringPose()),
+    //                 new TeleopSwerve(
+    //                     drivetrain,
+    //                     oi::getTranslateX,
+    //                     oi::getTranslateY,
+    //                     () -> new Rotation2d(Units.degreesToRadians(90.0))),
     //                 Commands.runOnce(
     //                     () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter))
+    //             .until(() -> !intake.hasNote())
     //             .withName("prepare to score amp"));
+
+    oi.getPrepareToScoreAmpButton()
+        .onTrue(
+            Commands.parallel(
+                    new DriveToPose(
+                        drivetrain, () -> Field2d.getInstance().getAllianceAmpScoringPose()),
+                    Commands.runOnce(
+                        () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter))
+                .withName("prepare to score amp"));
 
     oi.getPrepareToScoreSubwooferButton()
         .onTrue(

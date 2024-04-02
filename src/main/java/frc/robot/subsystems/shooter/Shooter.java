@@ -201,7 +201,8 @@ public class Shooter extends SubsystemBase {
     } else {
       this.overrideSetpointsForNextShot = false;
       this.shootingPosition = ShootingPosition.FIELD;
-      this.retractDeflector();
+      Commands.sequence(Commands.waitSeconds(0.2), Commands.runOnce(this::retractDeflector))
+          .schedule();
     }
   }
 
