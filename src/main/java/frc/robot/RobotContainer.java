@@ -764,19 +764,6 @@ public class RobotContainer {
                 .ignoringDisable(true)
                 .withName("disable shooter automation"));
 
-    // oi.getPrepareToScoreAmpButton()
-    //     .onTrue(
-    //         Commands.parallel(
-    //                 new TeleopSwerve(
-    //                     drivetrain,
-    //                     oi::getTranslateX,
-    //                     oi::getTranslateY,
-    //                     () -> new Rotation2d(Units.degreesToRadians(90.0))),
-    //                 Commands.runOnce(
-    //                     () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter))
-    //             .until(() -> !intake.hasNote())
-    //             .withName("prepare to score amp"));
-
     oi.getPrepareToScoreAmpButton()
         .onTrue(
             Commands.parallel(

@@ -132,6 +132,7 @@ public class ArtemisRobotConfig extends RobotConfig {
   private static final double DRIVE_TO_POSE_THETA_KD = 0.0;
   private static final double DRIVE_TO_POSE_DRIVE_TOLERANCE_METERS = 0.06;
   private static final double DRIVE_TO_POSE_THETA_TOLERANCE_RADIANS = 0.02;
+  private static final double DRIVE_TO_POSE_MAX_VELOCITY = 1.0;
 
   private static final double SQUARING_SPEED_METERS_PER_SECOND = 1.0;
 
@@ -391,8 +392,7 @@ public class ArtemisRobotConfig extends RobotConfig {
 
   @Override
   public double getDriveToPoseDriveMaxVelocity() {
-    // FIXME: Needs to be a constant
-    return 1.0;
+    return DRIVE_TO_POSE_MAX_VELOCITY;
   }
 
   @Override
