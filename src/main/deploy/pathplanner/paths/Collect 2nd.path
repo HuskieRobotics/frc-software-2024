@@ -60,18 +60,7 @@
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1.0,
-      "rotationDegrees": 134.78,
-      "rotateFast": true
-    },
-    {
-      "waypointRelativePos": 1.5,
-      "rotationDegrees": 134.78,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [
     {
       "name": "New Constraints Zone",
@@ -87,7 +76,7 @@
   ],
   "eventMarkers": [
     {
-      "name": "New Event Marker",
+      "name": "Shoot",
       "waypointRelativePos": 0.9,
       "command": {
         "type": "parallel",
@@ -97,6 +86,40 @@
               "type": "named",
               "data": {
                 "name": "Shoot Now"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Enable Rotation Override",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "EnableRotationOverride"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Disable Rotation Override",
+      "waypointRelativePos": 1.5,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "DisableRotationOverride"
               }
             }
           ]
