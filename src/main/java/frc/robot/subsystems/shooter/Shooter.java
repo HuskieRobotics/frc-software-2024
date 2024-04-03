@@ -40,23 +40,13 @@ public class Shooter extends SubsystemBase {
   private final TunableNumber pivotAngle = new TunableNumber("Shooter/Angle", 10.0);
   private final TunableNumber deflectorVoltage = new TunableNumber("Shooter/Deflector Voltage", 0);
 
+  // FIXME: tune on the competititon field
+  private static final double FIELD_MEASUREMENT_OFFSET = 0.0;
   private final double[] populationRealAngles = {
     64, 58.5, 54, 49.5, 46, 43, 39, 36, 33, 32, 30.5, 29, 27.5
   };
   private final double[] populationDistances = {
-    1.2 + 0.05,
-    1.55 + 0.05,
-    1.87 + 0.05,
-    2.13 + 0.05,
-    2.48 + 0.05,
-    2.75 + 0.05,
-    3.09 + 0.05,
-    3.41 + 0.05,
-    3.74 + 0.05,
-    4.045 + 0.05,
-    4.345 + 0.05,
-    4.62 + 0.05,
-    4.88 + 0.05
+    1.2, 1.55, 1.87, 2.13, 2.48, 2.75, 3.09, 3.41, 3.74, 4.045, 4.345, 4.62, 4.88
   };
 
   private boolean automatedShooter = true;
@@ -116,7 +106,7 @@ public class Shooter extends SubsystemBase {
 
   private void populateAngleMap() {
     for (int i = 0; i < populationRealAngles.length; i++) {
-      angleTreeMap.put(populationDistances[i], populationRealAngles[i]);
+      angleTreeMap.put(populationDistances[i] + FIELD_MEASUREMENT_OFFSET, populationRealAngles[i]);
     }
   }
 

@@ -370,8 +370,10 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("Shoot Now", getAutoShootNowCommand());
     NamedCommands.registerCommand("Stop And Shoot", getAutoStopAndShootCommand());
-    NamedCommands.registerCommand("EnableRotationOverride", Commands.runOnce(drivetrain::enableRotationOverride));
-    NamedCommands.registerCommand("DisableRotationOverride", Commands.runOnce(drivetrain::disableRotationOverride));
+    NamedCommands.registerCommand(
+        "EnableRotationOverride", Commands.runOnce(drivetrain::enableRotationOverride));
+    NamedCommands.registerCommand(
+        "DisableRotationOverride", Commands.runOnce(drivetrain::disableRotationOverride));
 
     // build auto path commands
 
