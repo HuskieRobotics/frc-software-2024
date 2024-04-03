@@ -8,6 +8,7 @@ import static frc.lib.team3061.drivetrain.DrivetrainConstants.*;
 import static frc.robot.Constants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -34,6 +35,7 @@ import frc.lib.team6328.util.Alert.AlertType;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
 import frc.robot.Field2d;
+import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -100,6 +102,8 @@ public class Drivetrain extends SubsystemBase {
 
   private Pose2d prevRobotPose = new Pose2d();
 
+  private boolean isRotationOverrideEnabled = false;
+
   /**
    * Creates a new Drivetrain subsystem.
    *
@@ -162,6 +166,8 @@ public class Drivetrain extends SubsystemBase {
         this::shouldFlipAutoPath,
         this // Reference to this subsystem to set requirements
         );
+
+    PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
@@ -1048,6 +1054,29 @@ public class Drivetrain extends SubsystemBase {
     // Logger.recordOutput(SUBSYSTEM_NAME + "/AimToSpeaker/Aimed", aimed);
 
     // return aimed;
+  }
+
+  public void enableRotationOverride() {
+    this.isRotationOverrideEnabled = true;
+  }
+
+  public void disableRotationOverride() {
+    this.isRotationOverrideEnabled = false;
+  }
+
+  public Optional<Rotation2d> getRotationTargetOverride() {
+    // Some condition that should decide if we want to override rotation
+    if (this.isRotationOverrideEnabled) {
+      Transform2d translation =
+          new Transform2d(
+              Field2d.getInstance().getAllianceSpeakerCenter().getX() - this.getPose().getX(),
+              Field2d.getInstance().getAllianceSpeakerCenter().getY() - this.getPose().getY(),
+              new Rotation2d());
+      return Optional.of(new Rotation2d(Math.atan2(translation.getY(), translation.getX())));
+    } else {
+      // return an empty optional when we don't want to override the path's rotation
+      return Optional.empty();
+    }
   }
 
   private enum DriveMode {
