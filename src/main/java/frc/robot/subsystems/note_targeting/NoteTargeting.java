@@ -23,7 +23,8 @@ public class NoteTargeting extends SubsystemBase {
   }
 
   public void handleLEDs() {
-    // FIXME: add new LED patterns for this feature
+    // FIXME: add new LED patterns for this feature; create two states NOTE_TARGETED and
+    // NO_NOTE_TARGETED (orange pulse when note targeted)
   }
 
   @Override
