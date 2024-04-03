@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import static frc.robot.subsystems.intake.IntakeConstants.*;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -76,7 +77,7 @@ public class Intake extends SubsystemBase {
     FaultReporter.getInstance().registerSystemCheck(SUBSYSTEM_NAME, getSystemCheckCommand());
 
     ShuffleboardTab tabMain = Shuffleboard.getTab("MAIN");
-    tabMain.addBoolean("Has Note?", this::hasNote).withPosition(6, 0).withSize(1, 1);
+    tabMain.addBoolean("Has Note?", this::hasNote).withPosition(9, 1).withSize(1, 1);
   }
 
   public void setShooterAngleReady(BooleanSupplier isShooterAngleReady) {
