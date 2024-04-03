@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.4,
-        "y": 5.55
+        "x": 2.884697312473721,
+        "y": 5.551833593073966
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.3763132980811417,
-        "y": 4.076661971505762
+        "x": 2.5429779487736943,
+        "y": 6.0191709843165455
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.635693998660724,
-        "y": 4.123305701156857
+        "x": 2.1538495292739177,
+        "y": 6.583790480434068
       },
       "prevControl": {
-        "x": 1.3856420440113608,
-        "y": 4.104648209296419
+        "x": 2.3685363507732666,
+        "y": 6.2467253262543245
       },
       "nextControl": null,
       "isLocked": false,
@@ -39,8 +39,8 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0,
-    "rotateFast": false
+    "rotation": -146.90887112131836,
+    "rotateFast": true
   },
   "reversed": false,
   "folder": "6 Amp Side",

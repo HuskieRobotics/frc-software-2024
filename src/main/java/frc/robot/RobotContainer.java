@@ -461,7 +461,12 @@ public class RobotContainer {
             new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> 1.0),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
             new PathPlannerAuto("Amp Score 3rd Collect 4th"),
-            new PathPlannerAuto("4 note center"));
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> 1.0),
+            new PathPlannerAuto("Amp Score 4th Collect 5th"),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> 1.0),
+            new PathPlannerAuto("Amp Score 5th Collect 6th"),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> 1.0),
+            getAutoStopAndShootCommand());
 
     autoChooser.addOption("6 Note Amp Side", sixNoteAmpSide);
 
