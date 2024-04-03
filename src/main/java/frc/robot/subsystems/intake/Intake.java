@@ -71,7 +71,7 @@ public class Intake extends SubsystemBase {
     this.intakeGamePiece();
 
     ShuffleboardTab tabMain = Shuffleboard.getTab("MAIN");
-    tabMain.addBoolean("Has Note?", this::hasNote).withPosition(6, 0).withSize(1, 1);
+    tabMain.addBoolean("Has Note?", this::hasNote).withPosition(9, 1).withSize(1, 1);
 
     FaultReporter.getInstance().registerSystemCheck(SUBSYSTEM_NAME, getSystemCheckCommand());
   }
