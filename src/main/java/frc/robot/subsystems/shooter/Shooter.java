@@ -592,10 +592,18 @@ public class Shooter extends SubsystemBase {
   }
 
   public void deployDeflector() {
-    io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_DEPLOY_VOLTAGE);
+    if (ShooterConstants.DEFLECTOR_ENABLED) {
+      io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_DEPLOY_VOLTAGE);
+    } else {
+      io.setDeflectorMotorVoltage(0.0);
+    }
   }
 
   public void retractDeflector() {
-    io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_RETRACT_VOLTAGE);
+    if (ShooterConstants.DEFLECTOR_ENABLED) {
+      io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_RETRACT_VOLTAGE);
+    } else {
+      io.setDeflectorMotorVoltage(0.0);
+    }
   }
 }
