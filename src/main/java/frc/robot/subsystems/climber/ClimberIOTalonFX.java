@@ -61,6 +61,11 @@ public class ClimberIOTalonFX implements ClimberIO {
         inputs.climberMotorTemperatureCelsius = climberTemperatureStatusSignal.getValueAsDouble();
     }
 
+    @Override
+    public void setClimberVoltage(double voltage) {
+        climberMotor.setControl(climberVoltageRequest.withOutput(voltage));
+    }
+
     private void configureClimberMotor(TalonFX motor) {
         TalonFXConfiguration climberMotorConfig = new TalonFXConfiguration();
         CurrentLimitsConfigs climberMotorCurrentLimits = new CurrentLimitsConfigs();
