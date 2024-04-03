@@ -8,6 +8,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -660,31 +661,23 @@ public class RobotContainer {
         new TeleopSwerve(drivetrain, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
 
     // lock rotation to the nearest 180° while driving
-    // oi.getLock180Button()
-    //     .whileTrue(
-    //         new TeleopSwerve(
-    //             drivetrain,
-    //             oi::getTranslateX,
-    //             oi::getTranslateY,
-    //             () ->
-    //                 (drivetrain.getPose().getRotation().getDegrees() > -90
-    //                         && drivetrain.getPose().getRotation().getDegrees() < 90)
-    //                     ? Rotation2d.fromDegrees(0.0)
-    //                     : Rotation2d.fromDegrees(180.0)));
-
-    // oi.getLock180Button()
-    //     .toggleOnTrue(
-    //         Commands.parallel(
-    //                 Commands.runOnce(drivetrain::disableFieldRelative),
-    //                 new TeleopSwerve(
-    //                     drivetrain, oi::getTranslateX, noteTargeting::getAdjustment, () -> 0.0))
-    //             .withName("lock 180"));
-    // oi.getLock180Button().onFalse(Commands.runOnce(drivetrain::enableFieldRelative));
-
     oi.getLock180Button()
+        .whileTrue(
+            new TeleopSwerve(
+                    drivetrain,
+                    oi::getTranslateX,
+                    oi::getTranslateY,
+                    () ->
+                        (drivetrain.getPose().getRotation().getDegrees() > -90
+                                && drivetrain.getPose().getRotation().getDegrees() < 90)
+                            ? Rotation2d.fromDegrees(0.0)
+                            : Rotation2d.fromDegrees(180.0))
+                .withName("lock 180"));
+
+    oi.getTargetNoteButton()
         .toggleOnTrue(
             new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, oi::getTranslateX)
-                .withName("lock 180"));
+                .withName("target note"));
 
     oi.getAimSpeakerButton()
         .toggleOnTrue(

@@ -77,6 +77,10 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
+  public default Trigger getTargetNoteButton() {
+    return new Trigger(() -> false);
+  }
+
   // intake
 
   public default Trigger getIntakeAutomationSwitch() {
