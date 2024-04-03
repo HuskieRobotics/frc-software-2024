@@ -1,6 +1,10 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.team3061.drivetrain.Drivetrain;
+import frc.robot.Constants;
+import frc.robot.Field2d;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.note_targeting.NoteTargeting;
 import java.util.function.DoubleSupplier;
@@ -40,11 +44,44 @@ public class TeleopSwerveCollectNote extends TeleopSwerve {
       Intake intake,
       NoteTargeting noteTargeting,
       DoubleSupplier translationXSupplier) {
-    super(drivetrain, () -> -1.0, noteTargeting::getAdjustment, () -> 0.0);
+    super(drivetrain, translationXSupplier, noteTargeting::getAdjustment, () -> 0.0);
     this.drivetrain = drivetrain;
     this.intake = intake;
     this.noteTargeting = noteTargeting;
     this.wasFieldRelative = true;
+  }
+
+  public TeleopSwerveCollectNote(
+      Drivetrain drivetrain,
+      Intake intake,
+      NoteTargeting noteTargeting,
+      DoubleSupplier translationXSupplier,
+      DoubleSupplier translationYSupplier) {
+    super(
+        drivetrain,
+        () -> {
+          // the origin of the field is always the corner to the right of the blue alliance driver
+          // station. As a result, "forward" from a field-relative perspective when on the red
+          // alliance, is in the negative x direction. Similarly, "left" from a field-relative
+          // perspective when on the red alliance is in the negative y direction.
+          int allianceMultiplier = Field2d.getInstance().getAlliance() == Alliance.Blue ? 1 : -1;
+
+          ChassisSpeeds chassisSpeeds =
+              ChassisSpeeds.discretize(
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      allianceMultiplier * translationXSupplier.getAsDouble(),
+                      allianceMultiplier * translationYSupplier.getAsDouble(),
+                      0.0,
+                      drivetrain.getRotation()),
+                  Constants.LOOP_PERIOD_SECS);
+          return chassisSpeeds.vxMetersPerSecond;
+        },
+        noteTargeting::getAdjustment,
+        () -> 0.0);
+    this.drivetrain = drivetrain;
+    this.intake = intake;
+    this.noteTargeting = noteTargeting;
+    this.wasFieldRelative = drivetrain.getFieldRelative();
   }
 
   @Override
