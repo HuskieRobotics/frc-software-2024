@@ -5,11 +5,11 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.subsystems.climber.ClimberIO.ClimberIOInputs;
+import frc.robot.subsystems.climber.ClimberConstants;
 
 public class Climber extends SubsystemBase {
     private ClimberIO io;
     private final ClimberIOInputs climberInputs = new ClimberIOInputs();
-    private final String SUBSYSTEM_NAME = "Climber";
 
     private final TunableNumber testingMode = 
         new TunableNumber("Shooter/TestingMode", 0);
@@ -32,6 +32,10 @@ public class Climber extends SubsystemBase {
 
     public void setClimberVoltage() {
         io.setClimberVoltage(climberVoltage.get());
+    }
+
+    public void setCurrentPositionAsZero() {
+        io.setCurrentPositionAsZero();
     }
     
 }

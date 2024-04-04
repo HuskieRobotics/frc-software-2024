@@ -66,6 +66,11 @@ public class ClimberIOTalonFX implements ClimberIO {
         climberMotor.setControl(climberVoltageRequest.withOutput(voltage));
     }
 
+    @Override
+    public void setCurrentPositionAsZero() {
+        climberMotor.setPosition(0.0);
+    }
+
     private void configureClimberMotor(TalonFX motor) {
         TalonFXConfiguration climberMotorConfig = new TalonFXConfiguration();
         CurrentLimitsConfigs climberMotorCurrentLimits = new CurrentLimitsConfigs();
