@@ -383,6 +383,7 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("Shoot Now", getAutoShootNowCommand());
     NamedCommands.registerCommand("Stop And Shoot", getAutoStopAndShootCommand());
+    
 
     // build auto path commands
 
@@ -461,13 +462,15 @@ public class RobotContainer {
                 intake::hasNoteForAuto),
             new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
+            Commands.runOnce(intake::enableQuickShoot, intake),
             new PathPlannerAuto("Amp Score 3rd Collect 4th"),
             new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
             new PathPlannerAuto("Amp Score 4th Collect 5th"),
             new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
             new PathPlannerAuto("Amp Score 5th Collect 6th"),
             new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
-            getAutoStopAndShootCommand());
+            getAutoStopAndShootCommand(),
+            Commands.runOnce(intake::disableQuickShoot, intake));
 
     autoChooser.addOption("6 Note Amp Side", sixNoteAmpSide);
 
@@ -502,7 +505,9 @@ public class RobotContainer {
     Command fourNoteCenter =
         Commands.parallel(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
-            new PathPlannerAuto("4 note center slow"));
+            Commands.runOnce(intake::enableQuickShoot, intake),
+            new PathPlannerAuto("4 note center slow"),
+            Commands.runOnce(intake::disableQuickShoot, intake));
     autoChooser.addOption("4 Note Center", fourNoteCenter);
 
     /************ Start Point ************
