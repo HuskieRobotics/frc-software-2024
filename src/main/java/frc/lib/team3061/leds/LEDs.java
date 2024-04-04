@@ -49,6 +49,7 @@ public abstract class LEDs extends SubsystemBase {
 
   private IntakeLEDState intakeLEDState;
   private ShooterLEDState shooterLEDState;
+  private NoteTargetingLEDState noteTargetingLEDState;
 
   // LED IO
   private final Notifier loadingNotifier;
@@ -180,6 +181,13 @@ public abstract class LEDs extends SubsystemBase {
     } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
       // Has game piece
       strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
+    } else if (noteTargetingLEDState == NoteTargetingLEDState.PURSUING_NOTE) {
+      // Going after note
+      orangePulse(Section.FULL, PULSE_DURATION);
+      // FIXME: re-enable if we tune note detection such that one isn't always seen
+      // } else if (noteTargetingLEDState == NoteTargetingLEDState.NOTE_TARGETED) {
+      //   // Note seen
+      //   solid(Section.FULL, Color.kBlue);
     } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
       wave(
           Section.FULL,
@@ -187,9 +195,6 @@ public abstract class LEDs extends SubsystemBase {
           new Color(255, 20, 0),
           WAVE_FAST_CYCLE_LENGTH,
           WAVE_SLOW_DURATION);
-    } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
-      // Has game piece
-      strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
     } else if (intakeLEDState == IntakeLEDState.MANUAL_REPEL) {
       // Manual repel
       strobe(Section.FULL, Color.kDeepPink, STROBE_SLOW_DURATION);
@@ -323,12 +328,22 @@ public abstract class LEDs extends SubsystemBase {
     // TODO: add implementation for ready to shoot after talking with Jake and Mr. Schmit
   }
 
+  public enum NoteTargetingLEDState {
+    NOTE_TARGETED,
+    NO_NOTE_TARGETED,
+    PURSUING_NOTE
+  }
+
   public void setShooterLEDState(ShooterLEDState state) {
     this.shooterLEDState = state;
   }
 
   public void setIntakeLEDState(IntakeLEDState state) {
     this.intakeLEDState = state;
+  }
+
+  public void setNoteTargetingLEDState(NoteTargetingLEDState state) {
+    this.noteTargetingLEDState = state;
   }
 
   protected abstract void updateLEDs();

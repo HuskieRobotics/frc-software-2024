@@ -32,6 +32,7 @@ import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.DrivetrainIO.SwerveIOInputs;
 import frc.lib.team6328.util.Alert;
 import frc.lib.team6328.util.Alert.AlertType;
+import frc.lib.team6328.util.FieldConstants;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
 import frc.robot.Field2d;
@@ -101,6 +102,8 @@ public class Drivetrain extends SubsystemBase {
   private DriverStation.Alliance alliance = DriverStation.Alliance.Red;
 
   private Pose2d prevRobotPose = new Pose2d();
+  private int teleportedCount = 0;
+  private int constrainPoseToFieldCount = 0;
 
   /**
    * Creates a new Drivetrain subsystem.
@@ -340,8 +343,7 @@ public class Drivetrain extends SubsystemBase {
    * @param yVelocity the desired velocity in the y direction (m/s)
    * @param rotationalVelocity the desired rotational velocity (rad/s)
    * @param isOpenLoop true for open-loop control; false for closed-loop control
-   * @param overrideFieldRelative true to force field-relative motion; false to use the current
-   *     setting
+   * @param isFieldRelative true to for field-relative motion; false, for robot-relative
    */
   public void drive(
       double xVelocity,
@@ -472,12 +474,47 @@ public class Drivetrain extends SubsystemBase {
     // check for teleportation
     if (this.inputs.drivetrain.robotPose.minus(prevRobotPose).getTranslation().getNorm() > 0.4) {
       this.resetPose(prevRobotPose);
+      this.teleportedCount++;
       Logger.recordOutput(SUBSYSTEM_NAME + "/TeleportedPose", this.inputs.drivetrain.robotPose);
-      Logger.recordOutput(SUBSYSTEM_NAME + "/Teleported", true);
+      Logger.recordOutput(SUBSYSTEM_NAME + "/TeleportCount", this.teleportedCount);
     } else {
       this.prevRobotPose = this.inputs.drivetrain.robotPose;
-      Logger.recordOutput(SUBSYSTEM_NAME + "/Teleported", false);
     }
+
+    // check for position outside the field due to slipping
+    if (this.inputs.drivetrain.robotPose.getX() < 0) {
+      this.resetPose(
+          new Pose2d(
+              0,
+              this.inputs.drivetrain.robotPose.getY(),
+              this.inputs.drivetrain.robotPose.getRotation()));
+      this.constrainPoseToFieldCount++;
+    } else if (this.inputs.drivetrain.robotPose.getX() > FieldConstants.fieldLength) {
+      this.resetPose(
+          new Pose2d(
+              FieldConstants.fieldLength,
+              this.inputs.drivetrain.robotPose.getY(),
+              this.inputs.drivetrain.robotPose.getRotation()));
+      this.constrainPoseToFieldCount++;
+    }
+
+    if (this.inputs.drivetrain.robotPose.getY() < 0) {
+      this.resetPose(
+          new Pose2d(
+              this.inputs.drivetrain.robotPose.getX(),
+              0,
+              this.inputs.drivetrain.robotPose.getRotation()));
+      this.constrainPoseToFieldCount++;
+    } else if (this.inputs.drivetrain.robotPose.getY() > FieldConstants.fieldWidth) {
+      this.resetPose(
+          new Pose2d(
+              this.inputs.drivetrain.robotPose.getX(),
+              FieldConstants.fieldWidth,
+              this.inputs.drivetrain.robotPose.getRotation()));
+      this.constrainPoseToFieldCount++;
+    }
+    Logger.recordOutput(
+        SUBSYSTEM_NAME + "/ConstrainPoseToFieldCount", this.constrainPoseToFieldCount);
 
     // update the brake mode based on the robot's velocity and state (enabled/disabled)
     updateBrakeMode();

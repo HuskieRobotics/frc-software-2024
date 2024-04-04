@@ -201,7 +201,8 @@ public class Shooter extends SubsystemBase {
     } else {
       this.overrideSetpointsForNextShot = false;
       this.shootingPosition = ShootingPosition.FIELD;
-      this.retractDeflector();
+      Commands.sequence(Commands.waitSeconds(0.2), Commands.runOnce(this::retractDeflector))
+          .schedule();
     }
   }
 
@@ -253,7 +254,8 @@ public class Shooter extends SubsystemBase {
   }
 
   private void moveToIntakePosition() {
-    if (automatedShooter && !DriverStation.isAutonomousEnabled()) {
+    // FIXME: restore this code when the Limelight is mounted on the hard stop
+    if (automatedShooter) { // } && !DriverStation.isAutonomousEnabled()) {
       io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
     }
   }
@@ -591,10 +593,18 @@ public class Shooter extends SubsystemBase {
   }
 
   public void deployDeflector() {
-    io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_DEPLOY_VOLTAGE);
+    if (ShooterConstants.DEFLECTOR_ENABLED) {
+      io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_DEPLOY_VOLTAGE);
+    } else {
+      io.setDeflectorMotorVoltage(0.0);
+    }
   }
 
   public void retractDeflector() {
-    io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_RETRACT_VOLTAGE);
+    if (ShooterConstants.DEFLECTOR_ENABLED) {
+      io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_RETRACT_VOLTAGE);
+    } else {
+      io.setDeflectorMotorVoltage(0.0);
+    }
   }
 }

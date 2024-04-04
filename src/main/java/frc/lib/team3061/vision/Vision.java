@@ -38,6 +38,7 @@ public class Vision extends SubsystemBase {
   private double[] lastTimestamps;
   private final Pose2d[] detectedAprilTags;
   private int[] cyclesWithNoResults;
+  private int[] updatePoseCount;
 
   private AprilTagFieldLayout layout;
   private Alert noAprilTagLayoutAlert =
@@ -72,6 +73,7 @@ public class Vision extends SubsystemBase {
     this.visionIOs = visionIOs;
     this.lastTimestamps = new double[visionIOs.length];
     this.cyclesWithNoResults = new int[visionIOs.length];
+    this.updatePoseCount = new int[visionIOs.length];
     this.ios = new VisionIOInputsAutoLogged[visionIOs.length];
     for (int i = 0; i < visionIOs.length; i++) {
       this.ios[i] = new VisionIOInputsAutoLogged();
@@ -169,6 +171,8 @@ public class Vision extends SubsystemBase {
         Matrix<N3, N1> stdDev = getStandardDeviations(i, estimatedRobotPose2d, ios[i].ambiguity);
         odometry.addVisionMeasurement(estimatedRobotPose2d, timeStamp, stdDev);
         isVisionUpdating = true;
+        this.updatePoseCount[i]++;
+        Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/UpdatePoseCount", this.updatePoseCount[i]);
         Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/StdDevX", stdDev.get(0, 0));
         Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/StdDevY", stdDev.get(1, 0));
         Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/StdDevT", stdDev.get(2, 0));
