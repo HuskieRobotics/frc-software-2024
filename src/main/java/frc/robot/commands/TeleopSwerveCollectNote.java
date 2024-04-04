@@ -87,6 +87,7 @@ public class TeleopSwerveCollectNote extends TeleopSwerve {
   @Override
   public void initialize() {
     super.initialize();
+    noteTargeting.setTargetingEnabled(true);
     this.wasFieldRelative = drivetrain.getFieldRelative();
     drivetrain.disableFieldRelative();
   }
@@ -105,6 +106,7 @@ public class TeleopSwerveCollectNote extends TeleopSwerve {
       drivetrain.disableFieldRelative();
     }
 
+    noteTargeting.setTargetingEnabled(false);
     super.end(interrupted);
   }
 
