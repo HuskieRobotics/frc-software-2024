@@ -6,12 +6,6 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "Amp Score 4th"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Stop And Shoot"
