@@ -4,7 +4,9 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -20,16 +22,28 @@ import frc.robot.subsystems.shooter.ShooterConstants;
 
 public class ClimberIOTalonFX implements ClimberIO {
     private TalonFX climberMotor;
-    private final String SUBSYSTEM_NAME = "Climber";
 
     private VoltageOut climberVoltageRequest;
+
+    private PositionDutyCycle climberRotationsRequest;
+
+    private final TunableNumber kP = new TunableNumber("Climber/KP", ClimberConstants.KP);
+    private final TunableNumber kI = new TunableNumber("Climber/KI", ClimberConstants.KI);
+    private final TunableNumber kD = new TunableNumber("Climber/KD", ClimberConstants.KD);
+
+    private final TunableNumber kS = new TunableNumber("Climber/KS", ClimberConstants.KS);
+    private final TunableNumber kV = new TunableNumber("Climber/KV", ClimberConstants.KV);
+    private final TunableNumber kA = new TunableNumber("Climber/KA", ClimberConstants.KA);
+    private final TunableNumber kVExpo = new TunableNumber("Climber/KVExpo", ClimberConstants.KV_EXPO);
+    private final TunableNumber kAExpo = new TunableNumber("Climber/KAExpo", ClimberConstants.KA_EXPO);
+    private final TunableNumber kG = new TunableNumber("Climber/KG", ClimberConstants.KG);
 
     private Alert configAlert =
       new Alert("Failed to apply configuration for subsystem.", AlertType.ERROR);
 
     private StatusSignal<Double> climberStatorCurrentStatusSignal;
     private StatusSignal<Double> climberSupplyCurrentStatusSignal;
-    private StatusSignal<Double> climberVoltageStatusSignal;
+    private StatusSignal<Double> climberSetpointStatusSignal;
     private StatusSignal<Double> climberTemperatureStatusSignal;
 
     public ClimberIOTalonFX(TalonFX climberMotor) {
@@ -40,7 +54,7 @@ public class ClimberIOTalonFX implements ClimberIO {
 
         climberStatorCurrentStatusSignal = climberMotor.getStatorCurrent();
         climberSupplyCurrentStatusSignal = climberMotor.getSupplyCurrent();
-        climberVoltageStatusSignal = climberMotor.getMotorVoltage();
+        climberSetpointStatusSignal = climberMotor.getPosition();
         climberTemperatureStatusSignal = climberMotor.getDeviceTemp();
 
         configureClimberMotor(climberMotor);
@@ -51,24 +65,48 @@ public class ClimberIOTalonFX implements ClimberIO {
         BaseStatusSignal.refreshAll(
             climberStatorCurrentStatusSignal, 
             climberSupplyCurrentStatusSignal,
-            climberVoltageStatusSignal, 
+            climberSetpointStatusSignal, 
             climberTemperatureStatusSignal
         );
         
         inputs.climberMotorStatorCurrentAmps = climberStatorCurrentStatusSignal.getValueAsDouble();
         inputs.climberMotorSupplyCurrentAmps = climberSupplyCurrentStatusSignal.getValueAsDouble();
-        inputs.climberMotorVoltage = climberVoltageStatusSignal.getValueAsDouble();
+        inputs.climberMotorVoltage = climberSetpointStatusSignal.getValueAsDouble();
         inputs.climberMotorTemperatureCelsius = climberTemperatureStatusSignal.getValueAsDouble();
-    }
 
+        if (kP.hasChanged()
+            || kI.hasChanged()
+            || kD.hasChanged()
+            || kS.hasChanged()
+            || kA.hasChanged()
+            || kV.hasChanged()
+            || kVExpo.hasChanged()
+            || kAExpo.hasChanged()
+            || kG.hasChanged()) {
+        TalonFXConfiguration config = new TalonFXConfiguration();
+        MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
+
+        this.climberMotor.getConfigurator().refresh(config);
+        config.Slot0.kP = kP.get();
+        config.Slot0.kI = kI.get();
+        config.Slot0.kD = kD.get();
+        config.Slot0.kS = kS.get();
+        config.Slot0.kV = kV.get();
+        config.Slot0.kA = kA.get();
+        motionMagicConfigs.MotionMagicExpo_kV = kVExpo.get();
+        motionMagicConfigs.MotionMagicExpo_kA = kAExpo.get();
+        config.Slot0.kG = kG.get();
+        }
+    }
+    
     @Override
     public void setClimberVoltage(double voltage) {
         climberMotor.setControl(climberVoltageRequest.withOutput(voltage));
     }
 
     @Override
-    public void setCurrentPositionAsZero() {
-        climberMotor.setPosition(0.0);
+    public void setPosition(double rotations) {
+        climberMotor.setControl(climberRotationsRequest.withPosition(rotations));
     }
 
     private void configureClimberMotor(TalonFX motor) {
@@ -100,7 +138,7 @@ public class ClimberIOTalonFX implements ClimberIO {
             configAlert.setText(status.toString());
         }
 
-        FaultReporter.getInstance().registerHardware(SUBSYSTEM_NAME, "ClimberMotor", motor);
+        FaultReporter.getInstance().registerHardware(ClimberConstants.SUBSYSTEM_NAME, "ClimberMotor", motor);
     }
 
 
