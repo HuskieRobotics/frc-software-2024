@@ -32,28 +32,12 @@
     },
     {
       "anchor": {
-        "x": 5.89081473802072,
-        "y": 0.9
+        "x": 5.889180519101779,
+        "y": 0.75
       },
       "prevControl": {
-        "x": 4.89081473802072,
-        "y": 0.9
-      },
-      "nextControl": {
-        "x": 6.89081473802072,
-        "y": 0.9
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 8.28970984956188,
-        "y": 0.9
-      },
-      "prevControl": {
-        "x": 7.288917914185637,
-        "y": 0.9083501994334504
+        "x": 4.763609017958777,
+        "y": 1.3862689206859897
       },
       "nextControl": null,
       "isLocked": false,
@@ -61,19 +45,7 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [
-    {
-      "name": "New Constraints Zone",
-      "minWaypointRelativePos": 2.55,
-      "maxWaypointRelativePos": 3.0,
-      "constraints": {
-        "maxVelocity": 1.5,
-        "maxAcceleration": 11.8,
-        "maxAngularVelocity": 537.0,
-        "maxAngularAcceleration": 2303.0
-      }
-    }
-  ],
+  "constraintZones": [],
   "eventMarkers": [
     {
       "name": "Shoot",
@@ -111,7 +83,7 @@
     },
     {
       "name": "Disable Rotation Override",
-      "waypointRelativePos": 1.5,
+      "waypointRelativePos": 1.25,
       "command": {
         "type": "parallel",
         "data": {

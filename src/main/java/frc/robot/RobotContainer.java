@@ -414,16 +414,19 @@ public class RobotContainer {
         Commands.sequence(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_AUTO)),
             new PathPlannerAuto("Collect 2nd"),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
             Commands.either(
                 new PathPlannerAuto("Score 2nd Collect 3rd"),
                 new PathPlannerAuto("Missed 2nd Collect 3rd"),
                 intake::hasNoteForAuto),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
             Commands.runOnce(
                 () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO)),
             Commands.either(
                 new PathPlannerAuto("Score 3rd Collect 4th"),
                 new PathPlannerAuto("Missed 3rd Collect 4th"),
                 intake::hasNoteForAuto),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
             Commands.runOnce(
                 () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO)),
             new PathPlannerAuto("Score 4th Center"));

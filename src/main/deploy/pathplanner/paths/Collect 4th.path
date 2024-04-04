@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.646357797345225,
-        "y": 4.27846628378442
+        "x": 4.732669757006181,
+        "y": 4.572359570645068
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.28970984956188,
-        "y": 4.036561627625624
+        "x": 5.91905086124987,
+        "y": 4.200019520409411
       },
       "prevControl": {
-        "x": 6.616725271365237,
-        "y": 4.18246144549161
+        "x": 5.3532365073989405,
+        "y": 4.346520781004525
       },
       "nextControl": null,
       "isLocked": false,
@@ -29,19 +29,7 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [
-    {
-      "name": "New Constraints Zone",
-      "minWaypointRelativePos": 0.8,
-      "maxWaypointRelativePos": 1.0,
-      "constraints": {
-        "maxVelocity": 1.5,
-        "maxAcceleration": 11.8,
-        "maxAngularVelocity": 537.0,
-        "maxAngularAcceleration": 2303.0
-      }
-    }
-  ],
+  "constraintZones": [],
   "eventMarkers": [
     {
       "name": "DisableRotationOverride",
