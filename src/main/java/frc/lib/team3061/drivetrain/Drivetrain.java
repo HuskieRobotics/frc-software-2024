@@ -36,7 +36,6 @@ import frc.lib.team6328.util.FieldConstants;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
 import frc.robot.Field2d;
-import frc.robot.subsystems.shooter.ShooterConstants;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -66,6 +65,10 @@ public class Drivetrain extends SubsystemBase {
 
   private final TunableNumber driveCurrent = new TunableNumber("Drivetrain/driveCurrent", 0.0);
   private final TunableNumber steerCurrent = new TunableNumber("Drivetrain/steerCurrent", 0.0);
+
+  private final TunableNumber rotationFutureProjectionSeconds =
+      new TunableNumber(
+          "Drivetrain/rotationFutureProjectionSeconds", ROTATION_FUTURE_PROJECTION_SECONDS);
 
   private final PIDController autoXController =
       new PIDController(autoDriveKp.get(), autoDriveKi.get(), autoDriveKd.get());
@@ -1042,14 +1045,18 @@ public class Drivetrain extends SubsystemBase {
     return this.isAimToSpeakerEnabled;
   }
 
+  public double getRotationFutureProjectionSeconds() {
+    return rotationFutureProjectionSeconds.get();
+  }
+
   public boolean isAimedAtSpeaker() {
     Pose2d futureRobotPose = this.getPose();
     futureRobotPose =
         futureRobotPose.exp(
             new Twist2d(
-                this.getVelocityX() * ShooterConstants.SHOOTER_AUTO_SHOT_TIME_DELAY_SECS,
-                this.getVelocityY() * ShooterConstants.SHOOTER_AUTO_SHOT_TIME_DELAY_SECS,
-                this.getVelocityT() * ShooterConstants.SHOOTER_AUTO_SHOT_TIME_DELAY_SECS));
+                this.getVelocityX() * rotationFutureProjectionSeconds.get(),
+                this.getVelocityY() * rotationFutureProjectionSeconds.get(),
+                this.getVelocityT() * rotationFutureProjectionSeconds.get()));
 
     Transform2d translation =
         new Transform2d(

@@ -8,9 +8,9 @@ import frc.lib.team3061.drivetrain.Drivetrain;
 import frc.robot.Field2d;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterConstants;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * This command, when executed, instructs the drivetrain subsystem to drive based on the specified
@@ -64,15 +64,19 @@ public class TeleopSwerveAimAtSpeaker extends TeleopSwerve {
       futureRobotPose =
           futureRobotPose.exp(
               new Twist2d(
-                  drivetrain.getVelocityX() * ShooterConstants.SHOOTER_AUTO_SHOT_TIME_DELAY_SECS,
-                  drivetrain.getVelocityY() * ShooterConstants.SHOOTER_AUTO_SHOT_TIME_DELAY_SECS,
-                  drivetrain.getVelocityT() * ShooterConstants.SHOOTER_AUTO_SHOT_TIME_DELAY_SECS));
+                  drivetrain.getVelocityX() * drivetrain.getRotationFutureProjectionSeconds(),
+                  drivetrain.getVelocityY() * drivetrain.getRotationFutureProjectionSeconds(),
+                  drivetrain.getVelocityT() * drivetrain.getRotationFutureProjectionSeconds()));
 
       Transform2d translation =
           new Transform2d(
               Field2d.getInstance().getAllianceSpeakerCenter().getX() - futureRobotPose.getX(),
               Field2d.getInstance().getAllianceSpeakerCenter().getY() - futureRobotPose.getY(),
               new Rotation2d());
+      Logger.recordOutput(
+          "TeleopSwerveAimAtSpeaker",
+          futureRobotPose.getRotation().getDegrees()
+              - drivetrain.getPose().getRotation().getDegrees());
       return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
     };
   }
@@ -100,6 +104,6 @@ public class TeleopSwerveAimAtSpeaker extends TeleopSwerve {
 
   @Override
   public boolean isFinished() {
-    return !this.intake.hasNote();
+    return this.intake.isShooting();
   }
 }
