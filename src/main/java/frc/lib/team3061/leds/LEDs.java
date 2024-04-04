@@ -184,9 +184,10 @@ public abstract class LEDs extends SubsystemBase {
     } else if (noteTargetingLEDState == NoteTargetingLEDState.PURSUING_NOTE) {
       // Going after note
       orangePulse(Section.FULL, PULSE_DURATION);
-    } else if (noteTargetingLEDState == NoteTargetingLEDState.NOTE_TARGETED) {
-      // Note seen
-      solid(Section.FULL, Color.kBlue);
+      // FIXME: re-enable if we tune note detection such that one isn't always seen
+      // } else if (noteTargetingLEDState == NoteTargetingLEDState.NOTE_TARGETED) {
+      //   // Note seen
+      //   solid(Section.FULL, Color.kBlue);
     } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
       wave(
           Section.FULL,
