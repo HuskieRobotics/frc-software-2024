@@ -35,7 +35,7 @@ public class NoteTargetingIOLimelight implements NoteTargetingIO {
       inputs.x = -tx.getDouble(0.0);
       inputs.y = ty.getDouble(0.0);
       inputs.a = ta.getDouble(0.0);
-      boolean hasTarget = ta.getDouble(0.0) > 0;
+      boolean hasTarget = (inputs.y < 11) && ta.getDouble(0.0) > 0;
       if (hasTarget) {
         inputs.hasTarget = true;
         this.noTargetCount = 0;
