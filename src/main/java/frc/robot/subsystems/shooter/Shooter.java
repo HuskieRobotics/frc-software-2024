@@ -255,7 +255,7 @@ public class Shooter extends SubsystemBase {
 
   private void moveToIntakePosition() {
     // FIXME: restore this code when the Limelight is mounted on the hard stop
-    if (automatedShooter) { // } && !DriverStation.isAutonomousEnabled()) {
+    if (automatedShooter && !DriverStation.isAutonomousEnabled()) {
       io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
     }
   }
