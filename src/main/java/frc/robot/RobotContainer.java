@@ -534,6 +534,10 @@ public class RobotContainer {
     Command distanceTestPathCommand = new PathPlannerAuto("DistanceTest");
     autoChooser.addOption("Distance Path", distanceTestPathCommand);
 
+    // FIXME: delete after verification
+    Command rotationTestPathCommand = new PathPlannerAuto("Rotation Test");
+    autoChooser.addOption("Rotation Test", rotationTestPathCommand);
+
     /************ Auto Tuning ************
      *
      * useful for tuning the autonomous PID controllers
