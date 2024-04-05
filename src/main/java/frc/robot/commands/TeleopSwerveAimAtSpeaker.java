@@ -10,7 +10,6 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * This command, when executed, instructs the drivetrain subsystem to drive based on the specified
@@ -73,10 +72,7 @@ public class TeleopSwerveAimAtSpeaker extends TeleopSwerve {
               Field2d.getInstance().getAllianceSpeakerCenter().getX() - futureRobotPose.getX(),
               Field2d.getInstance().getAllianceSpeakerCenter().getY() - futureRobotPose.getY(),
               new Rotation2d());
-      Logger.recordOutput(
-          "TeleopSwerveAimAtSpeaker",
-          futureRobotPose.getRotation().getDegrees()
-              - drivetrain.getPose().getRotation().getDegrees());
+
       return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
     };
   }
