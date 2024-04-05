@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -64,6 +65,10 @@ public class Drivetrain extends SubsystemBase {
 
   private final TunableNumber driveCurrent = new TunableNumber("Drivetrain/driveCurrent", 0.0);
   private final TunableNumber steerCurrent = new TunableNumber("Drivetrain/steerCurrent", 0.0);
+
+  private final TunableNumber rotationFutureProjectionSeconds =
+      new TunableNumber(
+          "Drivetrain/rotationFutureProjectionSeconds", ROTATION_FUTURE_PROJECTION_SECONDS);
 
   private final PIDController autoXController =
       new PIDController(autoDriveKp.get(), autoDriveKi.get(), autoDriveKd.get());
@@ -1040,16 +1045,27 @@ public class Drivetrain extends SubsystemBase {
     return this.isAimToSpeakerEnabled;
   }
 
+  public double getRotationFutureProjectionSeconds() {
+    return rotationFutureProjectionSeconds.get();
+  }
+
   public boolean isAimedAtSpeaker() {
+    Pose2d futureRobotPose = this.getPose();
+    futureRobotPose =
+        futureRobotPose.exp(
+            new Twist2d(
+                this.getVelocityX() * rotationFutureProjectionSeconds.get(),
+                this.getVelocityY() * rotationFutureProjectionSeconds.get(),
+                this.getVelocityT() * rotationFutureProjectionSeconds.get()));
 
     Transform2d translation =
         new Transform2d(
-            Field2d.getInstance().getAllianceSpeakerCenter().getX() - this.getPose().getX(),
-            Field2d.getInstance().getAllianceSpeakerCenter().getY() - this.getPose().getY(),
+            Field2d.getInstance().getAllianceSpeakerCenter().getX() - futureRobotPose.getX(),
+            Field2d.getInstance().getAllianceSpeakerCenter().getY() - futureRobotPose.getY(),
             new Rotation2d());
     return Math.abs(
             Math.atan2(translation.getY(), translation.getX())
-                - this.getPose().getRotation().getRadians())
+                - futureRobotPose.getRotation().getRadians())
         < ANGLE_TO_SPEAKER_TOLERANCE;
 
     // // calculate the transforms 7 inches inside of the left and right side of the speaker opening
