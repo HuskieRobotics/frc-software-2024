@@ -78,7 +78,7 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getXStanceButton() {
+  public Trigger getClimberExtendButton() {
     return translateJoystickButtons[5];
   }
 
@@ -115,7 +115,7 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getRunIntakeButton() {
+  public Trigger getClimberRetractButton() {
     return rotateJoystickButtons[4];
   }
 
@@ -125,16 +125,6 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   // Operator Controller
-
-  @Override
-  public Trigger getClimberUpButton() {
-    return new Trigger(operatorController::getLeftBumper);
-  }
-
-  @Override
-  public Trigger getClimberDownButton() {
-    return new Trigger(operatorController::getRightBumper);
-  }
 
   @Override
   public Trigger getShooterAngleDownButton() {
@@ -151,16 +141,6 @@ public class FullOperatorConsoleOI implements OperatorInterface {
     return new Trigger(operatorController::getStartButton);
   }
 
-  @Override
-  public Trigger getEnableManualClimberButton() {
-    return new Trigger(() -> operatorController.getPOV() == 270);
-  }
-
-  @Override
-  public Trigger getDisableManualClimberButton() {
-    return new Trigger(() -> operatorController.getPOV() == 90);
-  }
-
   // Operator Panel
 
   @Override
@@ -169,18 +149,8 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getFinishClimbButton() {
-    return operatorPanelButtons[7];
-  }
-
-  @Override
   public Trigger getPrepareToScorePodiumButton() {
     return operatorPanelButtons[5];
-  }
-
-  @Override
-  public Trigger getClimberDeployButton() {
-    return operatorPanelButtons[8];
   }
 
   @Override
