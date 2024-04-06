@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.551341209127023,
-        "y": 4.176324265030862
+        "x": 6.6395438724307265,
+        "y": 3.6648046089145723
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.13,
-        "y": 4.89
+        "x": 4.7978390520818675,
+        "y": 4.633414272255462
       },
       "prevControl": {
-        "x": 5.685180481472074,
-        "y": 4.100069144582734
+        "x": 6.353019533553941,
+        "y": 3.843483416838196
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Source Score 3rd End"
     }
   ],
   "rotationTargets": [],
@@ -57,7 +57,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 170.68,
+    "rotation": 166.98686779817447,
     "rotateFast": false
   },
   "reversed": false,

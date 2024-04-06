@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.13,
-        "y": 4.89
+        "x": 4.7978390520818675,
+        "y": 4.633414272255462
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.732669757006181,
-        "y": 4.572359570645068
+        "x": 5.400508809088048,
+        "y": 4.31577384290053
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Source Score 3rd End"
     },
     {
       "anchor": {

@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 2.7313136444454704,
-        "y": 2.7258644195318693
+        "x": 4.288662112056496,
+        "y": 2.478236732884464
       },
       "prevControl": {
-        "x": 4.234419979256624,
-        "y": 1.8988492285696699
+        "x": 5.791768446867648,
+        "y": 1.6512215419222647
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Source Score 2nd End"
     }
   ],
   "rotationTargets": [],
@@ -57,7 +57,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 141.51,
+    "rotation": 140.02138807275688,
     "rotateFast": true
   },
   "reversed": false,

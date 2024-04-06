@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.73,
-        "y": 2.73
+        "x": 4.288662112056496,
+        "y": 2.478236732884464
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.554872929190303,
-        "y": 1.885750924279627
+        "x": 4.886574506325569,
+        "y": 2.126100040912093
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Source Score 2nd End"
     },
     {
       "anchor": {
