@@ -121,8 +121,18 @@ public class ShooterConstants {
   public static final double SOURCE_SIDE_AUTO_2_ANGLE = 33; // FIXME: tune
   public static final double SOURCE_SIDE_AUTO_3_4_VELOCITY = 120.0;
   public static final double SOURCE_SIDE_AUTO_3_4_ANGLE = 30.5; // FIXME: tune
-  public static final double AMP_SIDE_SIX_NOTE_ANGLE = 33.0;
-  public static final double AMP_SIDE_SIX_NOTE_VELOCITY = 120.0;
+  public static final double AMP_SIDE_AUTO_1_VELOCITY = 120.0;
+  public static final double AMP_SIDE_AUTO_1_ANGLE = 33.0; // FIXME: tune
+  public static final double AMP_SIDE_AUTO_2_VELOCITY = 120.0;
+  public static final double AMP_SIDE_AUTO_2_ANGLE = 30.0; // FIXME: tune
+  public static final double AMP_SIDE_AUTO_3_VELOCITY = 60.0;
+  public static final double AMP_SIDE_AUTO_3_ANGLE = 64.0; // FIXME: tune
+  public static final double AMP_SIDE_AUTO_4_VELOCITY = 80.0;
+  public static final double AMP_SIDE_AUTO_4_ANGLE = 55.0; // FIXME: tune
+  public static final double AMP_SIDE_AUTO_5_VELOCITY = 80.0;
+  public static final double AMP_SIDE_AUTO_5_ANGLE = 55.0; // FIXME: tune
+  public static final double AMP_SIDE_AUTO_6_VELOCITY = 80.0;
+  public static final double AMP_SIDE_AUTO_6_ANGLE = 55.0; // FIXME: tune
 
   // auto shot
   public static final double SHOOTER_AUTO_SHOT_ANGLE_DEG = 29.5;

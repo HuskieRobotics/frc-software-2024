@@ -444,58 +444,28 @@ public class RobotContainer {
 
     Command sixNoteAmpSide =
         Commands.sequence(
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO)),
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO_1)),
             new PathPlannerAuto("Amp Collect 2nd"),
             new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO_2)),
             Commands.either(
                 new PathPlannerAuto("Amp Score 2nd Collect 3rd"),
                 new PathPlannerAuto("Amp Missed 2nd Collect 3rd"),
                 intake::hasNoteForAuto),
             new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO_3)),
             new PathPlannerAuto("Amp Score 3rd Collect 4th"),
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO_4)),
             new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
             new PathPlannerAuto("Amp Score 4th Collect 5th"),
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO_5)),
             new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
             new PathPlannerAuto("Amp Score 5th Collect 6th"),
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO_6)),
             new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
             getAutoStopAndShootCommand());
 
     autoChooser.addOption("6 Note Amp Side", sixNoteAmpSide);
-
-    /************ 5 Note Amp Side ************
-     *
-     * 5 notes (initial, first or second center note from amp side, three notes near the speaker)
-     *
-     */
-    Command fiveNoteAmpSide =
-        Commands.sequence(
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO)),
-            new PathPlannerAuto("Amp Collect 2nd"),
-            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
-            Commands.either(
-                Commands.sequence(
-                    Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
-                    new PathPlannerAuto("Amp Score 2nd Skip 3rd Collect 4th")),
-                Commands.sequence(
-                    new PathPlannerAuto("Amp Missed 2nd Collect 3rd"),
-                    Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
-                    new PathPlannerAuto("Amp Score 3rd Collect 4th")),
-                intake::hasNoteForAuto),
-            new PathPlannerAuto("4 note center"));
-
-    autoChooser.addOption("5 Note Amp Side", fiveNoteAmpSide);
-
-    /************ 4 Note Near Speaker ************
-     *
-     * 4 note (initial and three notes near the speaker)
-     *
-     */
-    Command fourNoteCenter =
-        Commands.parallel(
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
-            new PathPlannerAuto("4 note center slow"));
-    autoChooser.addOption("4 Note Center", fourNoteCenter);
 
     /************ Start Point ************
      *
