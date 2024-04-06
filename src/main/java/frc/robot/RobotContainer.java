@@ -410,7 +410,7 @@ public class RobotContainer {
      *
      */
 
-    Command fourNoteSourceSideBlue =
+    Command fourNoteSourceSide =
         Commands.sequence(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_AUTO)),
             new PathPlannerAuto("Collect 2nd"),
@@ -430,26 +430,7 @@ public class RobotContainer {
             Commands.runOnce(
                 () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO)),
             new PathPlannerAuto("Score 4th Center"));
-    autoChooser.addOption("4 Note Source Side Blue", fourNoteSourceSideBlue);
-
-    Command fourNoteSourceSideRed =
-        Commands.sequence(
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_AUTO)),
-            new PathPlannerAuto("Collect 2nd Red"),
-            Commands.either(
-                new PathPlannerAuto("Score 2nd Collect 3rd Red"),
-                new PathPlannerAuto("Missed 2nd Collect 3rd Red"),
-                intake::hasNoteForAuto),
-            Commands.runOnce(
-                () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO)),
-            Commands.either(
-                new PathPlannerAuto("Score 3rd Collect 4th Red"),
-                new PathPlannerAuto("Missed 3rd Collect 4th Red"),
-                intake::hasNoteForAuto),
-            Commands.runOnce(
-                () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_UNDER_STAGE_AUTO)),
-            new PathPlannerAuto("Score 4th Center"));
-    autoChooser.addOption("4 Note Source Side Red", fourNoteSourceSideRed);
+    autoChooser.addOption("4 Note Source Side Blue", fourNoteSourceSide);
 
     /************ 6 Note Amp Side ************
      *
