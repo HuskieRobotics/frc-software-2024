@@ -1074,13 +1074,13 @@ public class Drivetrain extends SubsystemBase {
     // The calculated angles will range from –π to π. When we are on the blue alliance one or more
     // of the angles may be very close to -π and other may be very close to π. In order for the
     // algorithm to work, if the angle is close to -π, we add 2π to it.
-    if (angleToLeftSide < Math.PI / 2.0) {
+    if (angleToLeftSide < -Math.PI / 2.0) {
       angleToLeftSide += 2 * Math.PI;
     }
-    if (angleToRightSide < Math.PI / 2.0) {
+    if (angleToRightSide < -Math.PI / 2.0) {
       angleToRightSide += 2 * Math.PI;
     }
-    if (robotAngle < Math.PI / 2.0) {
+    if (robotAngle < -Math.PI / 2.0) {
       robotAngle += 2 * Math.PI;
     }
 
