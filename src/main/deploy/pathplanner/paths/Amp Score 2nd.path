@@ -28,15 +28,27 @@
       "linkedName": "Amp Score 2nd End"
     }
   ],
-  "rotationTargets": [
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [
     {
-      "waypointRelativePos": 0.3,
-      "rotationDegrees": -166.09129194412046,
-      "rotateFast": true
+      "name": "New Event Marker",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "EnableRotationOverride"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
-  "constraintZones": [],
-  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 2.75,
     "maxAcceleration": 11.8,
@@ -46,7 +58,7 @@
   "goalEndState": {
     "velocity": 0,
     "rotation": -170.8139752064971,
-    "rotateFast": false
+    "rotateFast": true
   },
   "reversed": false,
   "folder": "6 Amp Side",
