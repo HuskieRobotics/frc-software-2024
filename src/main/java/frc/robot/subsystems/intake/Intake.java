@@ -138,16 +138,15 @@ public class Intake extends SubsystemBase {
   }
 
   private void runNoteInIntakeState() {
-    if (inputs.isKickerIRBlocked) {
+    if (quickShootingEnabled) {
+      intakeState = IntakeState.SHOOTING;
+      this.transitionGamePiece();
+    } else if (inputs.isKickerIRBlocked) {
       intakeState = IntakeState.NOTE_IN_INTAKE_AND_KICKER;
       this.transitionGamePiece();
     } else if (!inputs.isRollerIRBlocked) {
-      if (quickShootingEnabled) {
-        intakeState = IntakeState.SHOOTING;
-      } else {
-        intakeState = IntakeState.NOTE_IN_BETWEEN_INTAKE_AND_KICKER;
-        intakeAndKickerTimeout = 0;
-      }
+      intakeState = IntakeState.NOTE_IN_BETWEEN_INTAKE_AND_KICKER;
+      intakeAndKickerTimeout = 0;
       this.transitionGamePiece();
     }
   }
@@ -194,6 +193,7 @@ public class Intake extends SubsystemBase {
     if (!this.hasNote()) {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
+      this.turnKickerOff();
       this.intakeGamePiece();
     }
   }
