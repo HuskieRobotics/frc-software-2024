@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 4.08,
-        "y": 6.6047521185951465
+        "x": 4.993182357834665,
+        "y": 6.316687318385498
       },
       "prevControl": {
-        "x": 4.08,
-        "y": 6.600087745630037
+        "x": 4.993182357834665,
+        "y": 6.312022945420389
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Amp Score 2nd End"
     }
   ],
   "rotationTargets": [
@@ -45,7 +45,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -164.05,
+    "rotation": -170.8139752064971,
     "rotateFast": false
   },
   "reversed": false,

@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.08,
-        "y": 6.6
+        "x": 4.993182357834665,
+        "y": 6.316687318385498
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.301464050138553,
-        "y": 6.285008481033911
+        "x": 6.214646407973218,
+        "y": 6.00169579941941
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Amp Score 2nd End"
     },
     {
       "anchor": {
