@@ -180,11 +180,11 @@ public class RobotContainer {
   }
 
   private void createCTRESubsystems() {
-    drivetrain = new Drivetrain(new DrivetrainIOCTRE());
-
     intake = new Intake(new IntakeIOTalonFX());
     shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
+
+    drivetrain = new Drivetrain(new DrivetrainIOCTRE());
 
     noteTargeting = new NoteTargeting(new NoteTargetingIOLimelight("limelight"));
 
