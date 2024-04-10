@@ -16,22 +16,22 @@ public class PracticeRobotConfig extends RobotConfig {
   private static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 13;
   private static final int FRONT_LEFT_MODULE_STEER_MOTOR = 12;
   private static final int FRONT_LEFT_MODULE_STEER_ENCODER = 14;
-  private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = -0.013428 + 0.5;
+  private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = 0.474121;
 
   private static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 16;
   private static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 15;
   private static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 17;
-  private static final double FRONT_RIGHT_MODULE_STEER_OFFSET_ROT = -0.342773;
+  private static final double FRONT_RIGHT_MODULE_STEER_OFFSET_ROT = -0.358398;
 
   private static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 7;
   private static final int BACK_LEFT_MODULE_STEER_MOTOR = 6;
   private static final int BACK_LEFT_MODULE_STEER_ENCODER = 8;
-  private static final double BACK_LEFT_MODULE_STEER_OFFSET_ROT = 0.263184 + 0.5;
+  private static final double BACK_LEFT_MODULE_STEER_OFFSET_ROT = -0.234863;
 
   private static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 10;
   private static final int BACK_RIGHT_MODULE_STEER_MOTOR = 9;
   private static final int BACK_RIGHT_MODULE_STEER_ENCODER = 11;
-  private static final double BACK_RIGHT_MODULE_STEER_OFFSET_ROT = 0.117188;
+  private static final double BACK_RIGHT_MODULE_STEER_OFFSET_ROT = 0.161133;
 
   private static final int GYRO_ID = 3;
 
@@ -68,7 +68,7 @@ public class PracticeRobotConfig extends RobotConfig {
   private static final double MAX_DRIVE_ACCELERATION_METERS_PER_SECOND_SQUARED = 11.365;
   private static final double MAX_TURN_ACCELERATION_RADIANS_PER_SECOND_SQUARED = 36.0;
 
-  private static final String CAN_BUS_NAME = "canbus1";
+  private static final String CAN_BUS_NAME = "";
 
   private static final String CAMERA_NAME_0 = "OV2311L";
   private static final String CAMERA_NAME_1 = "OV2311F";

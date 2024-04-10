@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -67,6 +68,10 @@ public class Drivetrain extends SubsystemBase {
 
   private final TunableNumber driveCurrent = new TunableNumber("Drivetrain/driveCurrent", 0.0);
   private final TunableNumber steerCurrent = new TunableNumber("Drivetrain/steerCurrent", 0.0);
+
+  private final TunableNumber rotationFutureProjectionSeconds =
+      new TunableNumber(
+          "Drivetrain/rotationFutureProjectionSeconds", ROTATION_FUTURE_PROJECTION_SECONDS);
 
   private final PIDController autoXController =
       new PIDController(autoDriveKp.get(), autoDriveKi.get(), autoDriveKd.get());
@@ -1047,29 +1052,40 @@ public class Drivetrain extends SubsystemBase {
     return this.isAimToSpeakerEnabled;
   }
 
+  public double getRotationFutureProjectionSeconds() {
+    return rotationFutureProjectionSeconds.get();
+  }
+
   public boolean isAimedAtSpeaker() {
+    Pose2d futureRobotPose = this.getPose();
+    futureRobotPose =
+        futureRobotPose.exp(
+            new Twist2d(
+                this.getVelocityX() * rotationFutureProjectionSeconds.get(),
+                this.getVelocityY() * rotationFutureProjectionSeconds.get(),
+                this.getVelocityT() * rotationFutureProjectionSeconds.get()));
 
     // calculate the transforms 7 inches inside of the left and right side of the speaker opening
     // and the corresponding angles
     Transform2d speakerOpeningLeftSide =
         new Transform2d(
-            Field2d.getInstance().getAllianceSpeakerCenter().getX() - this.getPose().getX(),
+            Field2d.getInstance().getAllianceSpeakerCenter().getX() - futureRobotPose.getX(),
             Field2d.getInstance().getAllianceSpeakerCenter().getY()
                 + Units.inchesToMeters(13.6875)
-                - this.getPose().getY(),
+                - futureRobotPose.getY(),
             new Rotation2d());
     Transform2d speakerOpeningRightSide =
         new Transform2d(
-            Field2d.getInstance().getAllianceSpeakerCenter().getX() - this.getPose().getX(),
+            Field2d.getInstance().getAllianceSpeakerCenter().getX() - futureRobotPose.getX(),
             Field2d.getInstance().getAllianceSpeakerCenter().getY()
                 - Units.inchesToMeters(13.6875)
-                - this.getPose().getY(),
+                - futureRobotPose.getY(),
             new Rotation2d());
     double angleToLeftSide =
         Math.atan2(speakerOpeningLeftSide.getY(), speakerOpeningLeftSide.getX());
     double angleToRightSide =
         Math.atan2(speakerOpeningRightSide.getY(), speakerOpeningRightSide.getX());
-    double robotAngle = this.getPose().getRotation().getRadians();
+    double robotAngle = futureRobotPose.getRotation().getRadians();
 
     // The calculated angles will range from –π to π. When we are on the blue alliance one or more
     // of the angles may be very close to -π and other may be very close to π. In order for the

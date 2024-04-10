@@ -377,4 +377,8 @@ public class Intake extends SubsystemBase {
   public void shoot() {
     this.intakeState = IntakeState.SHOOTING;
   }
+
+  public boolean isShooting() {
+    return this.intakeState == IntakeState.SHOOTING;
+  }
 }

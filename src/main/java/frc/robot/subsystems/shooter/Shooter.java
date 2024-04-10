@@ -39,11 +39,13 @@ public class Shooter extends SubsystemBase {
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber pivotAngle = new TunableNumber("Shooter/Angle", 10.0);
   private final TunableNumber deflectorVoltage = new TunableNumber("Shooter/Deflector Voltage", 0);
+  private final TunableNumber futureProjectionSeconds =
+      new TunableNumber("Shooter/FutureProjectionSeconds", SHOOTER_AUTO_SHOT_TIME_DELAY_SECS);
 
   // FIXME: tune on the competititon field
   private static final double FIELD_MEASUREMENT_OFFSET = 0.0;
   private final double[] populationRealAngles = {
-    64, 58.5, 54, 49.5, 46, 43, 39, 36, 33, 32, 30.5, 29, 27.5
+    64, 58.5, 54, 49.5, 46, 43, 39, 36, 33, 32, 30.5, 29, 28.5, 28.5
   };
   private final double[] populationDistances = {
     1.2, 1.55, 1.87, 2.13, 2.48, 2.75, 3.09, 3.41, 3.74, 4.045, 4.345, 4.62, 4.88
@@ -410,9 +412,9 @@ public class Shooter extends SubsystemBase {
       robotPose =
           robotPose.exp(
               new Twist2d(
-                  drivetrain.getVelocityX() * SHOOTER_AUTO_SHOT_TIME_DELAY_SECS,
-                  drivetrain.getVelocityY() * SHOOTER_AUTO_SHOT_TIME_DELAY_SECS,
-                  drivetrain.getVelocityT() * SHOOTER_AUTO_SHOT_TIME_DELAY_SECS));
+                  drivetrain.getVelocityX() * futureProjectionSeconds.get(),
+                  drivetrain.getVelocityY() * futureProjectionSeconds.get(),
+                  drivetrain.getVelocityT() * futureProjectionSeconds.get()));
 
       Logger.recordOutput("Shooter/futureRobotPose", robotPose);
 
