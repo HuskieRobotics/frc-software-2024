@@ -467,6 +467,30 @@ public class RobotContainer {
 
     autoChooser.addOption("6 Note Amp Side", sixNoteAmpSide);
 
+    /************ 3 Note Amp Far Side ************
+     *
+     * 3 notes (initial, first two center notes from amp side)
+     *
+     */
+
+    Command threeNoteAmpFarSide =
+        Commands.sequence(
+            Commands.runOnce(
+                () -> shooter.setShootingPosition(ShootingPosition.AMP_FAR_SIDE_AUTO_1)),
+            new PathPlannerAuto("Amp Far Collect 2nd"),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO_2)),
+            Commands.either(
+                new PathPlannerAuto("Amp Score 2nd Collect 3rd"),
+                new PathPlannerAuto("Amp Missed 2nd Collect 3rd"),
+                intake::hasNoteForAuto),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO_3)),
+            new PathPlannerAuto("Amp Far Score 3rd"),
+            getAutoStopAndShootCommand());
+
+    autoChooser.addOption("3 Note Amp Far Side", threeNoteAmpFarSide);
+
     /************ Start Point ************
      *
      * useful for initializing the pose of the robot to a known location

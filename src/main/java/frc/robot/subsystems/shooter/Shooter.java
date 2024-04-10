@@ -80,6 +80,7 @@ public class Shooter extends SubsystemBase {
     AMP_SIDE_AUTO_4,
     AMP_SIDE_AUTO_5,
     AMP_SIDE_AUTO_6,
+    AMP_FAR_SIDE_AUTO_1,
     PASS,
     PODIUM,
     SUBWOOFER,
@@ -257,6 +258,8 @@ public class Shooter extends SubsystemBase {
         io.setAngle(ShooterConstants.AMP_SIDE_AUTO_5_ANGLE);
       } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO_6) {
         io.setAngle(ShooterConstants.AMP_SIDE_AUTO_6_ANGLE);
+      } else if (shootingPosition == ShootingPosition.AMP_FAR_SIDE_AUTO_1) {
+        io.setAngle(ShooterConstants.AMP_FAR_SIDE_AUTO_1_ANGLE);
       } else {
         io.setAngle(getAngleForDistance(distanceToSpeaker));
       }
@@ -318,6 +321,9 @@ public class Shooter extends SubsystemBase {
     } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO_6) {
       topVelocity = ShooterConstants.AMP_SIDE_AUTO_6_VELOCITY;
       bottomVelocity = ShooterConstants.AMP_SIDE_AUTO_6_VELOCITY;
+    } else if (shootingPosition == ShootingPosition.AMP_FAR_SIDE_AUTO_1) {
+      topVelocity = ShooterConstants.AMP_FAR_SIDE_AUTO_1_VELOCITY;
+      bottomVelocity = ShooterConstants.AMP_FAR_SIDE_AUTO_1_VELOCITY;
     } else if (distanceToSpeaker < ShooterConstants.SLOW_TO_MID_VELOCITY_DISTANCE_METERS) {
       topVelocity = ShooterConstants.CLOSE_RANGE_VELOCITY_TOP;
       bottomVelocity = ShooterConstants.CLOSE_RANGE_VELOCITY_BOTTOM;

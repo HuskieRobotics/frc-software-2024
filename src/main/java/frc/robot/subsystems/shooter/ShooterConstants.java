@@ -133,6 +133,8 @@ public class ShooterConstants {
   public static final double AMP_SIDE_AUTO_5_ANGLE = 42.0; // FIXME: tune
   public static final double AMP_SIDE_AUTO_6_VELOCITY = 80.0;
   public static final double AMP_SIDE_AUTO_6_ANGLE = 42.0; // FIXME: tune
+  public static final double AMP_FAR_SIDE_AUTO_1_VELOCITY = 120.0;
+  public static final double AMP_FAR_SIDE_AUTO_1_ANGLE = 33.0; // FIXME: tune
 
   // auto shot
   public static final double SHOOTER_AUTO_SHOT_ANGLE_DEG = 28.5;
