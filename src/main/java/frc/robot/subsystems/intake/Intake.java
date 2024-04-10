@@ -54,7 +54,8 @@ public class Intake extends SubsystemBase {
     NOTE_IN_KICKER,
     NOTE_IN_KICKER_AND_SHOOTER,
     NOTE_IN_SHOOTER,
-    SHOOTING
+    SHOOTING,
+    MULTIPLE_NOTES_IN_INTAKE
   }
 
   public Intake(IntakeIO io) {
@@ -115,6 +116,8 @@ public class Intake extends SubsystemBase {
       runNoteInShooterState();
     } else if (intakeState == IntakeState.SHOOTING) {
       runShootingState();
+    } else if (intakeState == IntakeState.MULTIPLE_NOTES_IN_INTAKE) {
+      runMultipleNotesIntakeState();
     }
   }
 
@@ -152,6 +155,8 @@ public class Intake extends SubsystemBase {
       intakeState = IntakeState.NOTE_IN_KICKER;
       this.transitionGamePiece();
       this.repelGamePiece();
+    } else if (inputs.isRollerIRBlocked && inputs.isKickerIRBlocked && inputs.isShooterIRBlocked) {
+      intakeState = IntakeState.MULTIPLE_NOTES_IN_INTAKE;
     }
   }
 
@@ -180,6 +185,8 @@ public class Intake extends SubsystemBase {
   private void runNoteInKickerAndShooterState() {
     if (!inputs.isKickerIRBlocked) {
       intakeState = IntakeState.NOTE_IN_SHOOTER;
+    } else if (inputs.isRollerIRBlocked && inputs.isKickerIRBlocked && inputs.isShooterIRBlocked) {
+      intakeState = IntakeState.MULTIPLE_NOTES_IN_INTAKE;
     }
   }
 
@@ -190,6 +197,9 @@ public class Intake extends SubsystemBase {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
+      this.turnKickerOff();
+    } else if (inputs.isRollerIRBlocked && inputs.isKickerIRBlocked && inputs.isShooterIRBlocked) {
+      intakeState = IntakeState.MULTIPLE_NOTES_IN_INTAKE;
     }
   }
 
@@ -201,6 +211,18 @@ public class Intake extends SubsystemBase {
       this.turnKickerOff();
     } else {
       leds.setIntakeLEDState(IntakeLEDState.SHOOTING);
+      this.io.setKickerVoltage(KICKER_SHOOTING_VELOCITY_VOLTAGE);
+    }
+  }
+
+  private void runMultipleNotesIntakeState() {
+    if (!inputs.isRollerIRBlocked && !inputs.isKickerIRBlocked && !inputs.isShooterIRBlocked) {
+      intakeState = IntakeState.EMPTY;
+      leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
+      this.intakeGamePiece();
+      this.turnKickerOff();
+    } else {
+      this.intakeGamePiece();
       this.io.setKickerVoltage(KICKER_SHOOTING_VELOCITY_VOLTAGE);
     }
   }
