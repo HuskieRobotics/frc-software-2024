@@ -73,7 +73,7 @@ public class ShooterConstants {
   public static final double FAR_RANGE_VELOCITY_BOTTOM = 120;
   public static final double SLOW_TO_MID_VELOCITY_DISTANCE_METERS =
       Units.inchesToMeters(106.901) / 2.0;
-  public static final double MID_TO_FAST_VELOCITY_DISTANCE_METERS = Units.inchesToMeters(106.901);
+  public static final double MID_TO_FAST_VELOCITY_DISTANCE_METERS = 3.0;
 
   // Deflector Motor
   public static final double DEFLECTOR_DEPLOY_VOLTAGE = 1;
@@ -91,7 +91,7 @@ public class ShooterConstants {
   public static final double MOTION_MAGIC_CRUISE_VELOCITY = 0;
   public static final double ANGLE_MOTOR_GEAR_RATIO = 45.0;
   public static final boolean ANGLE_MOTOR_INVERTED = true;
-  public static final double MAGNET_OFFSET = -0.805;
+  public static final double MAGNET_OFFSET = -0.70727;
   public static final double SENSOR_TO_MECHANISM_RATIO = 4.0;
   // FIXME: tune on practice field and reduce this value
   public static final double ANGLE_TOLERANCE_DEGREES = 1.5;
