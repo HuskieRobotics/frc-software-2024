@@ -14,8 +14,8 @@ public class IntakeConstants {
   public static final int INTAKE_KICKER_MOTOR_ID = 21;
 
   public static final int INTAKE_ROLLER_IR_SENSOR_ID = 3; // want: 3; backup: 1
-  public static final int INTAKE_KICKER_IR_SENSOR_ID = 6; // want:  backup: 6
-  public static final int INTAKE_SHOOTER_IR_SENSOR_ID = 0; // want: 0; backup:
+  public static final int INTAKE_KICKER_IR_SENSOR_ID = 2; // want: 2 backup: 6
+  public static final int INTAKE_SHOOTER_IR_SENSOR_ID = 0; // want: 0; backup: 8
 
   public static final double INTAKE_ROLLER_MOTORS_KP = 10.0;
   public static final double INTAKE_ROLLER_MOTORS_KI = 0.0;
