@@ -324,9 +324,12 @@ public class Shooter extends SubsystemBase {
     } else if (shootingPosition == ShootingPosition.AMP_FAR_SIDE_AUTO_1) {
       topVelocity = ShooterConstants.AMP_FAR_SIDE_AUTO_1_VELOCITY;
       bottomVelocity = ShooterConstants.AMP_FAR_SIDE_AUTO_1_VELOCITY;
-    } else if (distanceToSpeaker < ShooterConstants.SLOW_TO_MID_VELOCITY_DISTANCE_METERS) {
-      topVelocity = ShooterConstants.CLOSE_RANGE_VELOCITY_TOP;
-      bottomVelocity = ShooterConstants.CLOSE_RANGE_VELOCITY_BOTTOM;
+    } else if (distanceToSpeaker < ShooterConstants.SUBWOOFER_TO_NEAR_VELOCITY_DISTANCE_METERS) {
+      topVelocity = ShooterConstants.SUBWOOFER_RANGE_VELOCITY_TOP;
+      bottomVelocity = ShooterConstants.SUBWOOFER_RANGE_VELOCITY_BOTTOM;
+    } else if (distanceToSpeaker < ShooterConstants.NEAR_TO_MID_VELOCITY_DISTANCE_METERS) {
+      topVelocity = ShooterConstants.NEAR_RANGE_VELOCITY_TOP;
+      bottomVelocity = ShooterConstants.NEAR_RANGE_VELOCITY_BOTTOM;
     } else if (distanceToSpeaker < ShooterConstants.MID_TO_FAST_VELOCITY_DISTANCE_METERS) {
       topVelocity = ShooterConstants.MID_RANGE_VELOCITY_TOP;
       bottomVelocity = ShooterConstants.MID_RANGE_VELOCITY_BOTTOM;

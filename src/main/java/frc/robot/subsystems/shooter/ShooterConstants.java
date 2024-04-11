@@ -1,7 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import edu.wpi.first.math.util.Units;
-
 public class ShooterConstants {
 
   private static final String CONSTRUCTOR_EXCEPTION = "constant class";
@@ -65,15 +63,17 @@ public class ShooterConstants {
   public static final boolean SHOOT_TOP_INVERTED = false;
   public static final boolean SHOOT_BOTTOM_INVERTED = false;
   public static final double VELOCITY_TOLERANCE = 5.0; // FIXME: tune with real robot
-  public static final double CLOSE_RANGE_VELOCITY_TOP = 60;
-  public static final double CLOSE_RANGE_VELOCITY_BOTTOM = 60;
-  public static final double MID_RANGE_VELOCITY_TOP = 80;
-  public static final double MID_RANGE_VELOCITY_BOTTOM = 80;
+  public static final double SUBWOOFER_RANGE_VELOCITY_TOP = 60;
+  public static final double SUBWOOFER_RANGE_VELOCITY_BOTTOM = 60;
+  public static final double NEAR_RANGE_VELOCITY_TOP = 80;
+  public static final double NEAR_RANGE_VELOCITY_BOTTOM = 80;
+  public static final double MID_RANGE_VELOCITY_TOP = 100;
+  public static final double MID_RANGE_VELOCITY_BOTTOM = 100;
   public static final double FAR_RANGE_VELOCITY_TOP = 120;
   public static final double FAR_RANGE_VELOCITY_BOTTOM = 120;
-  public static final double SLOW_TO_MID_VELOCITY_DISTANCE_METERS =
-      Units.inchesToMeters(106.901) / 2.0;
-  public static final double MID_TO_FAST_VELOCITY_DISTANCE_METERS = 3.0;
+  public static final double SUBWOOFER_TO_NEAR_VELOCITY_DISTANCE_METERS = 1.81;
+  public static final double NEAR_TO_MID_VELOCITY_DISTANCE_METERS = 2.895;
+  public static final double MID_TO_FAST_VELOCITY_DISTANCE_METERS = 4.071;
 
   // Deflector Motor
   public static final double DEFLECTOR_DEPLOY_VOLTAGE = 1;
