@@ -41,6 +41,10 @@ public class Shooter extends SubsystemBase {
   private final TunableNumber deflectorVoltage = new TunableNumber("Shooter/Deflector Voltage", 0);
   private final TunableNumber futureProjectionSeconds =
       new TunableNumber("Shooter/FutureProjectionSeconds", SHOOTER_AUTO_SHOT_TIME_DELAY_SECS);
+  private final TunableNumber deflectorRetractionDelaySeconds =
+      new TunableNumber(
+          "Shooter/DeflectorRetractionDelaySeconds",
+          ShooterConstants.DEFLECTOR_RETRACTION_DELAY_SECS);
 
   // FIXME: tune on the competititon field
   private static final double FIELD_MEASUREMENT_OFFSET = 0.0;
@@ -200,7 +204,9 @@ public class Shooter extends SubsystemBase {
     } else {
       this.overrideSetpointsForNextShot = false;
       this.shootingPosition = ShootingPosition.FIELD;
-      Commands.sequence(Commands.waitSeconds(0.2), Commands.runOnce(this::retractDeflector))
+      Commands.sequence(
+              Commands.waitSeconds(deflectorRetractionDelaySeconds.get()),
+              Commands.runOnce(this::retractDeflector))
           .schedule();
     }
   }

@@ -82,6 +82,7 @@ public class ShooterConstants {
   public static final double DEFLECTOR_MOTOR_PEAK_CURRENT_LIMIT = 15;
   public static final double DEFLECTOR_MOTOR_PEAK_CURRENT_DURATION = 0.1;
   public static final boolean DEFLECTOR_MOTOR_INVERTED = false;
+  public static final double DEFLECTOR_RETRACTION_DELAY_SECS = 0.2;
 
   // Angle Motor
   public static final double ANGLE_MOTOR_CONTINUOUS_CURRENT_LIMIT = 15;
