@@ -780,8 +780,13 @@ public class RobotContainer {
     oi.getPrepareToScoreAmpButton()
         .onTrue(
             Commands.parallel(
-                    new DriveToPose(
-                        drivetrain, () -> Field2d.getInstance().getAllianceAmpScoringPose()),
+                    Commands.sequence(
+                        new DriveToPose(
+                            drivetrain,
+                            () -> Field2d.getInstance().getAllianceAmpScoringPoseInitial()),
+                        new DriveToPose(
+                            drivetrain,
+                            () -> Field2d.getInstance().getAllianceAmpScoringPoseFinal())),
                     Commands.runOnce(
                         () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter))
                 .withName("prepare to score amp"));
