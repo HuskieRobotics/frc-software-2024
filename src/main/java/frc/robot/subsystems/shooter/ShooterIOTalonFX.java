@@ -364,7 +364,7 @@ public class ShooterIOTalonFX implements ShooterIO {
       angleEncoder.getConfigurator().apply(angleCANCoderConfig);
     }
 
-    shooterInputs.coastMode = !coastModeButton.get();
+    // shooterInputs.coastMode = !coastModeButton.get();
 
     // Updates Deflector Motor Inputs
     shooterInputs.deflectorMotorStatorCurrentAmps =
