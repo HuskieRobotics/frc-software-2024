@@ -36,7 +36,7 @@ public class Field2d {
 
   private Alliance alliance;
 
-  private static final double AMP_SCORING_ALIGNMENT_OFFSET_FINAL = -0.3;
+  private static final double AMP_SCORING_ALIGNMENT_OFFSET_FINAL = -0.2;
   private static final double AMP_SCORING_ALIGNMENT_OFFSET_INITIAL = -1.3;
 
   /**
@@ -260,10 +260,10 @@ public class Field2d {
   public Pose2d getAllianceAmpScoringPoseFinal() {
     if (alliance == Alliance.Blue) {
       return new Pose2d(FieldConstants.blueAmpCenter, new Rotation2d(Units.degreesToRadians(90.0)))
-          .plus(new Transform2d(AMP_SCORING_ALIGNMENT_OFFSET_FINAL, 0.0, new Rotation2d()));
+          .plus(new Transform2d(AMP_SCORING_ALIGNMENT_OFFSET_FINAL, 0.1, new Rotation2d()));
     } else {
       return new Pose2d(FieldConstants.redAmpCenter, new Rotation2d(Units.degreesToRadians(90.0)))
-          .plus(new Transform2d(AMP_SCORING_ALIGNMENT_OFFSET_FINAL, 0.0, new Rotation2d()));
+          .plus(new Transform2d(AMP_SCORING_ALIGNMENT_OFFSET_FINAL, -0.1, new Rotation2d()));
     }
   }
 }
