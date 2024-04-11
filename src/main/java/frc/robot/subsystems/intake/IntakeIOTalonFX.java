@@ -186,6 +186,17 @@ public class IntakeIOTalonFX implements IntakeIO {
     inputs.rollerVoltage = rollerVoltageStatusSignal.getValueAsDouble();
     inputs.kickerVoltage = kickerVoltageStatusSignal.getValueAsDouble();
 
+    inputs.DIO0 = digitalInputs[0].get();
+    inputs.DIO1 = digitalInputs[1].get();
+    inputs.DIO2 = digitalInputs[2].get();
+    inputs.DIO3 = digitalInputs[3].get();
+    inputs.DIO4 = digitalInputs[4].get();
+    inputs.DIO5 = digitalInputs[5].get();
+    inputs.DIO6 = digitalInputs[6].get();
+    inputs.DIO7 = digitalInputs[7].get();
+    inputs.DIO8 = digitalInputs[8].get();
+    inputs.DIO9 = digitalInputs[9].get();
+
     if (rollerMotorsKP.hasChanged()
         || rollerMotorsKI.hasChanged()
         || rollerMotorsKD.hasChanged()
@@ -213,17 +224,6 @@ public class IntakeIOTalonFX implements IntakeIO {
       slot0Configs.kS = rollerMotorsKS.get();
 
       kickerMotor.getConfigurator().apply(slot0Configs);
-
-      inputs.DIO0 = digitalInputs[0].get();
-      inputs.DIO1 = digitalInputs[1].get();
-      inputs.DIO2 = digitalInputs[2].get();
-      inputs.DIO3 = digitalInputs[3].get();
-      inputs.DIO4 = digitalInputs[4].get();
-      inputs.DIO5 = digitalInputs[5].get();
-      inputs.DIO6 = digitalInputs[6].get();
-      inputs.DIO7 = digitalInputs[7].get();
-      inputs.DIO8 = digitalInputs[8].get();
-      inputs.DIO9 = digitalInputs[9].get();
     }
   }
 
