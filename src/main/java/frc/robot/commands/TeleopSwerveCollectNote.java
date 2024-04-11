@@ -8,6 +8,7 @@ import frc.robot.Field2d;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.note_targeting.NoteTargeting;
 import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * This command, when executed, instructs the drivetrain subsystem to drive based on the specified
@@ -87,6 +88,8 @@ public class TeleopSwerveCollectNote extends TeleopSwerve {
   @Override
   public void initialize() {
     super.initialize();
+    Logger.recordOutput("ActiveCommands/TeleopSwerveCollectNote", true);
+
     noteTargeting.setTargetingEnabled(true);
     this.wasFieldRelative = drivetrain.getFieldRelative();
     drivetrain.disableFieldRelative();
@@ -107,6 +110,8 @@ public class TeleopSwerveCollectNote extends TeleopSwerve {
     }
 
     noteTargeting.setTargetingEnabled(false);
+    Logger.recordOutput("ActiveCommands/TeleopSwerveCollectNote", false);
+
     super.end(interrupted);
   }
 

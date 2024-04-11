@@ -116,8 +116,8 @@ public class ShooterConstants {
   public static final double PASS_VELOCITY_TOP = 60.0;
   public static final double PASS_VELOCITY_BOTTOM = 60.0;
   public static final double PASS_ANGLE = 63.0;
-  public static final double SOURCE_SIDE_AUTO_1_VELOCITY = 120.0;
-  public static final double SOURCE_SIDE_AUTO_1_ANGLE = 33; // FIXME: tune
+  public static final double SOURCE_SIDE_AUTO_1_VELOCITY = 100.0;
+  public static final double SOURCE_SIDE_AUTO_1_ANGLE = 40;
   public static final double SOURCE_SIDE_AUTO_2_VELOCITY = 120.0;
   public static final double SOURCE_SIDE_AUTO_2_ANGLE = 28.5; // FIXME: tune
   public static final double SOURCE_SIDE_AUTO_3_4_VELOCITY = 120.0;
