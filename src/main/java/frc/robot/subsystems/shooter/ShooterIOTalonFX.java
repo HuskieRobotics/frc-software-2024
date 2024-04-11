@@ -148,7 +148,7 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     deflectorMotor = new TalonFX(DEFLECTOR_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
 
-    coastModeButton = new DigitalInput(COAST_BUTTON_ID);
+    // coastModeButton = new DigitalInput(COAST_BUTTON_ID);
 
     shootMotorTopVelocityRequest = new VelocityTorqueCurrentFOC(0);
     shootMotorBottomVelocityRequest = new VelocityTorqueCurrentFOC(0);

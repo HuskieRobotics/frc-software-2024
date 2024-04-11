@@ -24,9 +24,10 @@ import frc.lib.team6328.util.TunableNumber;
 public class IntakeIOTalonFX implements IntakeIO {
   private TalonFX rollerMotor;
   private TalonFX kickerMotor;
-  private final DigitalInput rollerIRSensor;
-  private final DigitalInput kickerIRSensor;
-  private final DigitalInput shooterIRSensor;
+  // private final DigitalInput rollerIRSensor;
+  // private final DigitalInput kickerIRSensor;
+  // private final DigitalInput shooterIRSensor;
+  private final DigitalInput[] digitalInputs = new DigitalInput[10];
 
   private Alert configAlert =
       new Alert("Failed to apply configuration for subsystem.", AlertType.ERROR);
@@ -83,9 +84,13 @@ public class IntakeIOTalonFX implements IntakeIO {
       new TunableNumber("Intake/kickerMotorKS", IntakeConstants.INTAKE_KICKER_MOTOR_KS);
 
   public IntakeIOTalonFX() {
-    rollerIRSensor = new DigitalInput(IntakeConstants.INTAKE_ROLLER_IR_SENSOR_ID);
-    kickerIRSensor = new DigitalInput(IntakeConstants.INTAKE_KICKER_IR_SENSOR_ID);
-    shooterIRSensor = new DigitalInput(IntakeConstants.INTAKE_SHOOTER_IR_SENSOR_ID);
+    // rollerIRSensor = new DigitalInput(IntakeConstants.INTAKE_ROLLER_IR_SENSOR_ID);
+    // kickerIRSensor = new DigitalInput(IntakeConstants.INTAKE_KICKER_IR_SENSOR_ID);
+    // shooterIRSensor = new DigitalInput(IntakeConstants.INTAKE_SHOOTER_IR_SENSOR_ID);
+
+    for (int i = 0; i < 10; i++) {
+      digitalInputs[i] = new DigitalInput(i);
+    }
 
     // torque current FOC control mode is not support in simulation yet
 
@@ -156,9 +161,9 @@ public class IntakeIOTalonFX implements IntakeIO {
         rollerVoltageStatusSignal,
         kickerVoltageStatusSignal);
 
-    inputs.isRollerIRBlocked = !rollerIRSensor.get();
-    inputs.isKickerIRBlocked = !kickerIRSensor.get();
-    inputs.isShooterIRBlocked = !shooterIRSensor.get();
+    // inputs.isRollerIRBlocked = !rollerIRSensor.get();
+    // inputs.isKickerIRBlocked = !kickerIRSensor.get();
+    // inputs.isShooterIRBlocked = !shooterIRSensor.get();
 
     inputs.rollerStatorCurrentAmps = rollerStatorCurrentStatusSignal.getValueAsDouble();
     inputs.kickerStatorCurrentAmps = kickerStatorCurrentStatusSignal.getValueAsDouble();
@@ -208,6 +213,17 @@ public class IntakeIOTalonFX implements IntakeIO {
       slot0Configs.kS = rollerMotorsKS.get();
 
       kickerMotor.getConfigurator().apply(slot0Configs);
+
+      inputs.DIO0 = digitalInputs[0].get();
+      inputs.DIO1 = digitalInputs[1].get();
+      inputs.DIO2 = digitalInputs[2].get();
+      inputs.DIO3 = digitalInputs[3].get();
+      inputs.DIO4 = digitalInputs[4].get();
+      inputs.DIO5 = digitalInputs[5].get();
+      inputs.DIO6 = digitalInputs[6].get();
+      inputs.DIO7 = digitalInputs[7].get();
+      inputs.DIO8 = digitalInputs[8].get();
+      inputs.DIO9 = digitalInputs[9].get();
     }
   }
 
