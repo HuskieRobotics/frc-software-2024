@@ -71,7 +71,7 @@ public class ShooterConstants {
   public static final double MID_RANGE_VELOCITY_BOTTOM = 100;
   public static final double FAR_RANGE_VELOCITY_TOP = 120;
   public static final double FAR_RANGE_VELOCITY_BOTTOM = 120;
-  public static final double SUBWOOFER_TO_NEAR_VELOCITY_DISTANCE_METERS = 1.81;
+  public static final double SUBWOOFER_TO_NEAR_VELOCITY_DISTANCE_METERS = 2.0;
   public static final double NEAR_TO_MID_VELOCITY_DISTANCE_METERS = 2.895;
   public static final double MID_TO_FAST_VELOCITY_DISTANCE_METERS = 4.071;
 
