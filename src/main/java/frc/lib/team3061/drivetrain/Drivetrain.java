@@ -72,6 +72,10 @@ public class Drivetrain extends SubsystemBase {
   private final TunableNumber rotationFutureProjectionSeconds =
       new TunableNumber(
           "Drivetrain/rotationFutureProjectionSeconds", ROTATION_FUTURE_PROJECTION_SECONDS);
+  private final TunableNumber rotationInAutoFutureProjectionSeconds =
+      new TunableNumber(
+          "Drivetrain/rotationInAutoFutureProjectionSeconds",
+          ROTATION_IN_AUTO_FUTURE_PROJECTION_SECONDS);
 
   private final PIDController autoXController =
       new PIDController(autoDriveKp.get(), autoDriveKi.get(), autoDriveKd.get());
@@ -1130,16 +1134,30 @@ public class Drivetrain extends SubsystemBase {
   public Optional<Rotation2d> getRotationTargetOverride() {
     // Some condition that should decide if we want to override rotation
     if (this.isRotationOverrideEnabled) {
-      Transform2d translation =
-          new Transform2d(
-              Field2d.getInstance().getAllianceSpeakerCenter().getX() - this.getPose().getX(),
-              Field2d.getInstance().getAllianceSpeakerCenter().getY() - this.getPose().getY(),
-              new Rotation2d());
-      return Optional.of(new Rotation2d(Math.atan2(translation.getY(), translation.getX())));
+      return Optional.of(
+          this.getFutureRotationAimedAtSpeaker(this.rotationInAutoFutureProjectionSeconds.get()));
     } else {
       // return an empty optional when we don't want to override the path's rotation
       return Optional.empty();
     }
+  }
+
+  public Rotation2d getFutureRotationAimedAtSpeaker(double secondsInFuture) {
+    Pose2d futureRobotPose = this.getPose();
+    futureRobotPose =
+        futureRobotPose.exp(
+            new Twist2d(
+                this.getVelocityX() * secondsInFuture,
+                this.getVelocityY() * secondsInFuture,
+                this.getVelocityT() * secondsInFuture));
+
+    Transform2d translation =
+        new Transform2d(
+            Field2d.getInstance().getAllianceSpeakerCenter().getX() - futureRobotPose.getX(),
+            Field2d.getInstance().getAllianceSpeakerCenter().getY() - futureRobotPose.getY(),
+            new Rotation2d());
+
+    return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
   }
 
   private enum DriveMode {

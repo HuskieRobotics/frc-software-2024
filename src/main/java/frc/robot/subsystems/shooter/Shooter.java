@@ -141,6 +141,8 @@ public class Shooter extends SubsystemBase {
             .getTranslation()
             .getNorm();
     Logger.recordOutput("Shooter/distanceToSpeaker", distanceToSpeaker);
+    Logger.recordOutput("Shooter/futureRobotDistanceToSpeaker", this.getFutureDistanceToSpeaker());
+
     if (testingMode.get() == 1) {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
       io.setShooterWheelTopVelocity(topWheelVelocity.get());
@@ -424,7 +426,6 @@ public class Shooter extends SubsystemBase {
   private boolean isAtShootingDistance() {
     if (this.shootingPosition == ShootingPosition.AUTO_SHOT) {
       double distanceToSpeaker = this.getFutureDistanceToSpeaker();
-      Logger.recordOutput("Shooter/futureDistanceToSpeaker", distanceToSpeaker);
 
       return Math.abs(distanceToSpeaker - ShooterConstants.SHOOTER_AUTO_SHOT_DISTANCE_METERS)
           < ShooterConstants.SHOOTER_AUTO_SHOT_TOLERANCE_METERS;
