@@ -455,6 +455,7 @@ public class RobotContainer {
             new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO_3)),
             new PathPlannerAuto("Amp Score 3rd Collect 4th"),
+            Commands.runOnce(intake::enableQuickShoot),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO_4)),
             new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
             new PathPlannerAuto("Amp Score 4th Collect 5th"),
@@ -463,7 +464,8 @@ public class RobotContainer {
             new PathPlannerAuto("Amp Score 5th Collect 6th"),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO_6)),
             new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
-            getAutoStopAndShootCommand());
+            getAutoStopAndShootCommand(),
+            Commands.runOnce(intake::disableQuickShoot));
 
     autoChooser.addOption("6 Note Amp Side", sixNoteAmpSide);
 
