@@ -42,6 +42,8 @@ public class Climber extends SubsystemBase {
     } else {
       io.setClimberVoltage(climberVoltage.get());
     }
+
+    Logger.recordOutput("Climber/State", this.climberState);
   }
 
   public void extendClimber() {

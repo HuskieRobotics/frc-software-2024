@@ -285,7 +285,7 @@ public class RobotContainer {
     // change the following to connect the subsystem being tested to actual hardware
     drivetrain = new Drivetrain(new DrivetrainIO() {});
     intake = new Intake(new IntakeIO() {});
-    climber = new Climber(new ClimberIO() {});
+    climber = new Climber(new ClimberIOTalonFX() {});
     shooter = new Shooter(new ShooterIO() {}, intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
