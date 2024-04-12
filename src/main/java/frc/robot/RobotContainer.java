@@ -648,6 +648,11 @@ public class RobotContainer {
 
     oi.getClimberRetractButton()
         .onTrue(Commands.runOnce(climber::retractClimber).withName("RetractClimber"));
+
+    oi.getClimberResetButton()
+        .onTrue(Commands.runOnce(climber::resetClimber).withName("ResetClimber"));
+    oi.getClimberResetButton()
+        .onFalse(Commands.runOnce(climber::zeroClimber).withName("ZeroClimber"));
   }
 
   private void configureDrivetrainCommands() {

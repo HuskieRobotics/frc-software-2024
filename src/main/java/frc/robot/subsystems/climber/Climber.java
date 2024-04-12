@@ -19,7 +19,8 @@ public class Climber extends SubsystemBase {
   private enum ClimberState {
     IDLE,
     EXTENDING,
-    RETRACTING
+    RETRACTING,
+    RETRACTING_SLOW
   }
 
   public Climber(ClimberIO io) {
@@ -54,6 +55,15 @@ public class Climber extends SubsystemBase {
     climberState = ClimberState.RETRACTING;
   }
 
+  public void resetClimber() {
+    climberState = ClimberState.RETRACTING_SLOW;
+  }
+
+  public void zeroClimber() {
+    this.climberState = ClimberState.IDLE;
+    io.zeroPosition();
+  }
+
   private void runClimberStateMachine() {
     if (climberState == ClimberState.IDLE) {
       io.setClimberVoltage(0.0);
@@ -64,6 +74,8 @@ public class Climber extends SubsystemBase {
         climberState = ClimberState.IDLE;
       }
     } else if (climberState == ClimberState.RETRACTING) {
+      io.setClimberVoltage(ClimberConstants.RETRACTING_VOLTAGE);
+    } else if (climberState == ClimberState.RETRACTING_SLOW) {
       io.setClimberVoltage(ClimberConstants.RETRACTING_VOLTAGE);
     }
   }

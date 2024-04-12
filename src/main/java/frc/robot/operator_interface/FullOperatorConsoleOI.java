@@ -137,6 +137,11 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
+  public Trigger getClimberResetButton() {
+    return new Trigger(operatorController::getBButton);
+  }
+
+  @Override
   public Trigger getInterruptAll() {
     return new Trigger(operatorController::getStartButton);
   }
