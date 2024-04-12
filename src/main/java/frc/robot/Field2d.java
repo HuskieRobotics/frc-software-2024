@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.Drivetrain;
+import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.FieldConstants;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,8 +37,7 @@ public class Field2d {
 
   private Alliance alliance;
 
-  private static final double AMP_SCORING_ALIGNMENT_OFFSET = -0.1
-  ;
+  private static final double AMP_SCORING_ALIGNMENT_OFFSET = -0.1;
 
   /**
    * Get the singleton instance of the Field2d class.
@@ -254,6 +254,18 @@ public class Field2d {
     } else {
       return new Pose2d(FieldConstants.redAmpCenter, new Rotation2d(Units.degreesToRadians(90.0)))
           .plus(new Transform2d(AMP_SCORING_ALIGNMENT_OFFSET, 0.0, new Rotation2d()));
+    }
+  }
+
+  public boolean hasFullyLeftAllianceSideOfField() {
+    if (alliance == Alliance.Blue) {
+      return RobotOdometry.getInstance().getEstimatedPosition().getX()
+          > FieldConstants.StagingLocations.centerlineX
+              + RobotConfig.getInstance().getRobotLengthWithBumpers() / 2;
+    } else {
+      return RobotOdometry.getInstance().getEstimatedPosition().getX()
+          < FieldConstants.StagingLocations.centerlineX
+              - RobotConfig.getInstance().getRobotLengthWithBumpers() / 2;
     }
   }
 }

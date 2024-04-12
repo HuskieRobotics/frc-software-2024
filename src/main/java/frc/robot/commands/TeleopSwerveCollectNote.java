@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.team3061.drivetrain.Drivetrain;
 import frc.robot.Constants;
@@ -117,6 +118,9 @@ public class TeleopSwerveCollectNote extends TeleopSwerve {
 
   @Override
   public boolean isFinished() {
-    return this.intake.hasNoteForAuto() || !this.noteTargeting.hasTarget();
+    return this.intake.hasNoteForAuto()
+        || !this.noteTargeting.hasTarget()
+        || (DriverStation.isAutonomousEnabled()
+            && Field2d.getInstance().hasFullyLeftAllianceSideOfField());
   }
 }
