@@ -11,7 +11,7 @@ public class Climber extends SubsystemBase {
 
   private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
 
-  private final TunableNumber testingMode = new TunableNumber("Shooter/TestingMode", 0);
+  private final TunableNumber testingMode = new TunableNumber("Climber/TestingMode", 0);
   private final TunableNumber climberVoltage = new TunableNumber("Climber/Voltage", 0.0);
 
   private ClimberState climberState;
