@@ -8,8 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.880225620973841,
-        "y": 6.259957882733563
+        "x": 2.076961489095587,
+        "y": 6.288783412314985
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.8949335056281886,
+        "y": 6.333210591576814
+      },
+      "prevControl": {
+        "x": 2.3619170512251606,
+        "y": 6.337379067655702
+      },
+      "nextControl": {
+        "x": 3.464990914457738,
+        "y": 6.328752435261622
       },
       "isLocked": false,
       "linkedName": null
@@ -20,12 +36,12 @@
         "y": 6.6
       },
       "prevControl": {
-        "x": 2.890701831879621,
-        "y": 5.863739500157144
+        "x": 3.6826657877990345,
+        "y": 6.459764062708658
       },
       "nextControl": {
-        "x": 5.5954265463033295,
-        "y": 7.5381572564093
+        "x": 5.760707992176069,
+        "y": 7.193192464576016
       },
       "isLocked": false,
       "linkedName": null
@@ -46,17 +62,17 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.1,
+      "waypointRelativePos": 0.2,
       "rotationDegrees": 180.0,
       "rotateFast": true
     },
     {
-      "waypointRelativePos": 0.6,
+      "waypointRelativePos": 1.2000000000000002,
       "rotationDegrees": 180.0,
       "rotateFast": true
     },
     {
-      "waypointRelativePos": 1.65,
+      "waypointRelativePos": 2.65,
       "rotationDegrees": 180.0,
       "rotateFast": true
     }
@@ -65,7 +81,7 @@
     {
       "name": "New Constraints Zone",
       "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 1.05,
+      "maxWaypointRelativePos": 2.05,
       "constraints": {
         "maxVelocity": 2.5,
         "maxAcceleration": 11.8,
@@ -77,7 +93,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.6,
+      "waypointRelativePos": 0.0,
       "command": {
         "type": "parallel",
         "data": {
@@ -85,7 +101,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Shoot Now"
+                "name": "Shoot At 4 Meters"
               }
             }
           ]
@@ -94,7 +110,7 @@
     },
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.65,
+      "waypointRelativePos": 1.1,
       "command": {
         "type": "parallel",
         "data": {
@@ -111,7 +127,7 @@
     },
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 2.05,
       "command": {
         "type": "parallel",
         "data": {

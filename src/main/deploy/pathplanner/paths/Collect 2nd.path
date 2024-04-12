@@ -49,7 +49,7 @@
   "eventMarkers": [
     {
       "name": "Shoot",
-      "waypointRelativePos": 0.9,
+      "waypointRelativePos": 0.0,
       "command": {
         "type": "parallel",
         "data": {
@@ -57,7 +57,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Shoot Now"
+                "name": "Shoot At 4 Meters"
               }
             }
           ]

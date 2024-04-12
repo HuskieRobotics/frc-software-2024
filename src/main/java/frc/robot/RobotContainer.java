@@ -381,7 +381,7 @@ public class RobotContainer {
         "disableXStance", Commands.runOnce(drivetrain::disableXstance, drivetrain));
     NamedCommands.registerCommand("wait5Seconds", Commands.waitSeconds(5.0));
 
-    NamedCommands.registerCommand("Shoot Now", getAutoShootNowCommand());
+    NamedCommands.registerCommand("Shoot At 4 Meters", getAutoShootAt4MetersCommand());
     NamedCommands.registerCommand("Stop And Shoot", getAutoStopAndShootCommand());
     NamedCommands.registerCommand(
         "EnableRotationOverride", Commands.runOnce(drivetrain::enableRotationOverride));
@@ -851,8 +851,12 @@ public class RobotContainer {
         .onFalse(Commands.runOnce(shooter::disableScaleDownShooterVelocity));
   }
 
-  private Command getAutoShootNowCommand() {
-    return Commands.runOnce(intake::shoot, intake);
+  private Command getAutoShootAt4MetersCommand() {
+    return Commands.waitUntil(
+            () ->
+                Math.abs(shooter.getFutureDistanceToSpeaker() - 4.0)
+                    < ShooterConstants.SHOOTER_AUTO_SHOT_TOLERANCE_METERS)
+        .andThen(Commands.runOnce(intake::shoot, intake));
   }
 
   private Command getAutoStopAndShootCommand() {

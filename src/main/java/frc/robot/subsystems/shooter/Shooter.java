@@ -423,24 +423,7 @@ public class Shooter extends SubsystemBase {
 
   private boolean isAtShootingDistance() {
     if (this.shootingPosition == ShootingPosition.AUTO_SHOT) {
-      // project the robot pose into the future based on the current velocity
-      Pose2d robotPose = RobotOdometry.getInstance().getEstimatedPosition();
-      robotPose =
-          robotPose.exp(
-              new Twist2d(
-                  drivetrain.getVelocityX() * futureProjectionSeconds.get(),
-                  drivetrain.getVelocityY() * futureProjectionSeconds.get(),
-                  drivetrain.getVelocityT() * futureProjectionSeconds.get()));
-
-      Logger.recordOutput("Shooter/futureRobotPose", robotPose);
-
-      double distanceToSpeaker =
-          Field2d.getInstance()
-              .getAllianceSpeakerCenter()
-              .minus(robotPose)
-              .getTranslation()
-              .getNorm();
-
+      double distanceToSpeaker = this.getFutureDistanceToSpeaker();
       Logger.recordOutput("Shooter/futureDistanceToSpeaker", distanceToSpeaker);
 
       return Math.abs(distanceToSpeaker - ShooterConstants.SHOOTER_AUTO_SHOT_DISTANCE_METERS)
@@ -450,6 +433,25 @@ public class Shooter extends SubsystemBase {
       // irrelevant
       return true;
     }
+  }
+
+  public double getFutureDistanceToSpeaker() {
+    // project the robot pose into the future based on the current velocity
+    Pose2d robotPose = RobotOdometry.getInstance().getEstimatedPosition();
+    robotPose =
+        robotPose.exp(
+            new Twist2d(
+                drivetrain.getVelocityX() * futureProjectionSeconds.get(),
+                drivetrain.getVelocityY() * futureProjectionSeconds.get(),
+                drivetrain.getVelocityT() * futureProjectionSeconds.get()));
+
+    Logger.recordOutput("Shooter/futureRobotPose", robotPose);
+
+    return Field2d.getInstance()
+        .getAllianceSpeakerCenter()
+        .minus(robotPose)
+        .getTranslation()
+        .getNorm();
   }
 
   public boolean isTopShootAtSetpoint() {
