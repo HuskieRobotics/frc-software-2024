@@ -1134,6 +1134,9 @@ public class Drivetrain extends SubsystemBase {
   public Optional<Rotation2d> getRotationTargetOverride() {
     // Some condition that should decide if we want to override rotation
     if (this.isRotationOverrideEnabled) {
+      Rotation2d targetRotation =
+          this.getFutureRotationAimedAtSpeaker(this.rotationInAutoFutureProjectionSeconds.get());
+      Logger.recordOutput(SUBSYSTEM_NAME + "/rotationOverride", targetRotation);
       return Optional.of(
           this.getFutureRotationAimedAtSpeaker(this.rotationInAutoFutureProjectionSeconds.get()));
     } else {
