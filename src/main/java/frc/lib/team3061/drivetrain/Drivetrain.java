@@ -1081,10 +1081,17 @@ public class Drivetrain extends SubsystemBase {
                 - Units.inchesToMeters(13.6875)
                 - futureRobotPose.getY(),
             new Rotation2d());
+    Transform2d speakerOpeningCenter =
+        new Transform2d(
+            Field2d.getInstance().getAllianceSpeakerCenter().getX() - futureRobotPose.getX(),
+            Field2d.getInstance().getAllianceSpeakerCenter().getY() - futureRobotPose.getY(),
+            new Rotation2d());
+
     double angleToLeftSide =
         Math.atan2(speakerOpeningLeftSide.getY(), speakerOpeningLeftSide.getX());
     double angleToRightSide =
         Math.atan2(speakerOpeningRightSide.getY(), speakerOpeningRightSide.getX());
+    double angleToCenter = Math.atan2(speakerOpeningCenter.getY(), speakerOpeningCenter.getX());
     double robotAngle = futureRobotPose.getRotation().getRadians();
 
     // The calculated angles will range from –π to π. When we are on the blue alliance one or more
@@ -1107,6 +1114,7 @@ public class Drivetrain extends SubsystemBase {
     Logger.recordOutput(SUBSYSTEM_NAME + "/AimToSpeaker/RobotAngle", robotAngle);
     Logger.recordOutput(SUBSYSTEM_NAME + "/AimToSpeaker/LeftAngle", angleToLeftSide);
     Logger.recordOutput(SUBSYSTEM_NAME + "/AimToSpeaker/RightAngle", angleToRightSide);
+    Logger.recordOutput(SUBSYSTEM_NAME + "/AimToSpeaker/CenterAngle", angleToCenter);
 
     return aimed;
   }
