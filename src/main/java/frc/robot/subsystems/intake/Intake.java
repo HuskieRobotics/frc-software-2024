@@ -138,7 +138,7 @@ public class Intake extends SubsystemBase {
   }
 
   private void runNoteInIntakeState() {
-    if (quickShootingEnabled) {
+    if (quickShootingEnabled && DriverStation.isAutonomousEnabled()) {
       intakeState = IntakeState.SHOOTING;
       this.transitionGamePiece();
     } else if (inputs.isKickerIRBlocked) {
