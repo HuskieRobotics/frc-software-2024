@@ -783,13 +783,13 @@ public class RobotContainer {
         .onTrue(
             Commands.parallel(
                     Commands.sequence(
-                        new DriveToPose(
-                            drivetrain,
-                            () -> Field2d.getInstance().getAllianceAmpScoringPoseInitial()),
+                        // new DriveToPose(
+                        //     drivetrain,
+                        //     () -> Field2d.getInstance().getAllianceAmpScoringPoseInitial()),
                         new DriveToPose(
                                 drivetrain,
                                 () -> Field2d.getInstance().getAllianceAmpScoringPoseFinal())
-                            .withTimeout(2.0)),
+                            .withTimeout(5.0)),
                     Commands.runOnce(
                         () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter))
                 .withName("prepare to score amp"));
