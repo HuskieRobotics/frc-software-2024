@@ -34,7 +34,7 @@ import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.lib.team3061.vision.VisionIOSim;
 import frc.lib.team6328.util.NoteVisualizer;
 import frc.robot.Constants.Mode;
-import frc.robot.commands.DriveToPose;
+import frc.robot.commands.DriveToAmp;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.TeleopSwerveAimAtSpeaker;
 import frc.robot.commands.TeleopSwerveAimToPass;
@@ -783,13 +783,10 @@ public class RobotContainer {
         .onTrue(
             Commands.parallel(
                     Commands.sequence(
-                        // new DriveToPose(
-                        //     drivetrain,
-                        //     () -> Field2d.getInstance().getAllianceAmpScoringPoseInitial()),
-                        new DriveToPose(
-                                drivetrain,
-                                () -> Field2d.getInstance().getAllianceAmpScoringPoseFinal())
-                            .withTimeout(5.0)),
+                        new DriveToAmp(
+                            drivetrain,
+                            () -> Field2d.getInstance().getAllianceAmpScoringPose(),
+                            intake)),
                     Commands.runOnce(
                         () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter))
                 .withName("prepare to score amp"));
