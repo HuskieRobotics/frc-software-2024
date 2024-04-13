@@ -56,6 +56,8 @@ public class ClimberIOTalonFX implements ClimberIO {
     climberTemperatureStatusSignal = climberMotor.getDeviceTemp();
 
     configureClimberMotor(climberMotor);
+
+    climberMotor.setPosition(0.0);
   }
 
   @Override
