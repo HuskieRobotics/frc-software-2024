@@ -76,7 +76,7 @@ public class SingleHandheldOI implements OperatorInterface {
     return new Trigger(controller::getBButton);
   }
 
-  @Override 
+  @Override
   public Trigger getClimberResetButton() {
     return new Trigger(controller::getXButton);
   }

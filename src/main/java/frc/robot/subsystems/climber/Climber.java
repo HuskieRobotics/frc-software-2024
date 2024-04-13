@@ -75,8 +75,8 @@ public class Climber extends SubsystemBase {
       }
     } else if (climberState == ClimberState.RETRACTING) {
       io.setClimberVoltage(ClimberConstants.RETRACTING_VOLTAGE);
-      
-      if(inputs.climberMotorPositionRotations >= ClimberConstants.RETRACTED_POSITION_ROT){
+
+      if (inputs.climberMotorPositionRotations <= ClimberConstants.RETRACTED_POSITION_ROT) {
         climberState = ClimberState.IDLE;
       }
     } else if (climberState == ClimberState.RETRACTING_SLOW) {
