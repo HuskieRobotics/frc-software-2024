@@ -15,5 +15,5 @@ public class DrivetrainConstants {
   public static final double ANGLE_TO_SPEAKER_TOLERANCE = Math.PI / 36.0;
 
   public static final double ROTATION_FUTURE_PROJECTION_SECONDS = 0.4;
-  public static final double ROTATION_IN_AUTO_FUTURE_PROJECTION_SECONDS = 0.1;
+  public static final double ROTATION_IN_AUTO_FUTURE_PROJECTION_SECONDS = 0.05;
 }
