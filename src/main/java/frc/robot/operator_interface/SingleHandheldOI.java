@@ -30,10 +30,10 @@ public class SingleHandheldOI implements OperatorInterface {
     return -controller.getRightX();
   }
 
-  @Override
-  public Trigger getFieldRelativeButton() {
-    return new Trigger(controller::getBButton);
-  }
+  // @Override
+  // public Trigger getFieldRelativeButton() {
+  //   return new Trigger(controller::getBButton);
+  // }
 
   @Override
   public Trigger getResetGyroButton() {
@@ -61,8 +61,23 @@ public class SingleHandheldOI implements OperatorInterface {
     return new Trigger(() -> true);
   }
 
+  // @Override
+  // public Trigger getLock180Button() {
+  //   return new Trigger(controller::getAButton);
+  // }
+
   @Override
-  public Trigger getLock180Button() {
+  public Trigger getClimberRetractButton() {
     return new Trigger(controller::getAButton);
+  }
+
+  @Override
+  public Trigger getClimberExtendButton() {
+    return new Trigger(controller::getBButton);
+  }
+
+  @Override 
+  public Trigger getClimberResetButton() {
+    return new Trigger(controller::getXButton);
   }
 }
