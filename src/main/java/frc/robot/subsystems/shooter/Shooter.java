@@ -28,6 +28,7 @@ public class Shooter extends SubsystemBase {
   private Intake intake;
   private Drivetrain drivetrain;
   private InterpolatingDoubleTreeMap angleTreeMap;
+  private InterpolatingDoubleTreeMap passingTreeMap;
   private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
 
   private final TunableNumber testingMode = new TunableNumber("Shooter/TestingMode", 0);
@@ -56,6 +57,11 @@ public class Shooter extends SubsystemBase {
     5.72, 6.04
   };
 
+  // private final double[] passingPopulationDistances = {9.558, 11.336, 9.73, 7.2};
+  // private final double[] passingPopulationRealVelocities = {52, 57,48, 42};
+  // sorted
+  private final double[] passingPopulationDistances = {7.2, 9.558, 9.73, 11.336};
+  private final double[] passingPopulationRealVelocities = {42, 52, 48, 57};
   private boolean automatedShooter = true;
 
   private boolean intakeEnabled = true;
@@ -104,7 +110,9 @@ public class Shooter extends SubsystemBase {
     this.intake = intake;
     this.drivetrain = drivetrain;
     this.angleTreeMap = new InterpolatingDoubleTreeMap();
+    this.passingTreeMap = new InterpolatingDoubleTreeMap();
     populateAngleMap();
+    populatePassingMap();
 
     this.leds = LEDs.getInstance();
 
@@ -124,6 +132,14 @@ public class Shooter extends SubsystemBase {
     }
   }
 
+  private void populatePassingMap() {
+    for (int i = 0; i < passingPopulationDistances.length; i++) {
+      passingTreeMap.put(
+          passingPopulationDistances[i] + FIELD_MEASUREMENT_OFFSET,
+          passingPopulationRealVelocities[i]);
+    }
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(shooterInputs);
@@ -133,6 +149,10 @@ public class Shooter extends SubsystemBase {
     Logger.recordOutput("Shooter/AngleAutomated", this.automatedShooter);
     Logger.recordOutput("Shooter/IntakeAutomated", this.intakeEnabled);
     Logger.recordOutput("Shooter/ScaleDownVelocity", this.scaleDownShooterVelocity);
+    Logger.recordOutput("Shooter/distanceToPassPoint", this.getPassingDistance());
+    Logger.recordOutput("Shooter/passingtarget", Field2d.getInstance().getAlliancePassPose());
+    Logger.recordOutput("Shooter/SpeakerPose", Field2d.getInstance().getAllianceSpeakerCenter());
+    Logger.recordOutput("Shooter/PassVelo", this.getPassingVelocity());
 
     double distanceToSpeaker =
         Field2d.getInstance()
@@ -286,8 +306,8 @@ public class Shooter extends SubsystemBase {
     double topVelocity;
     double bottomVelocity;
     if (shootingPosition == ShootingPosition.PASS) {
-      topVelocity = ShooterConstants.PASS_VELOCITY_TOP;
-      bottomVelocity = ShooterConstants.PASS_VELOCITY_BOTTOM;
+      topVelocity = getPassingVelocity();
+      bottomVelocity = getPassingVelocity();
     } else if (shootingPosition == ShootingPosition.PODIUM) {
       topVelocity = ShooterConstants.PODIUM_VELOCITY_TOP;
       bottomVelocity = ShooterConstants.PODIUM_VELOCITY_BOTTOM;
@@ -355,6 +375,37 @@ public class Shooter extends SubsystemBase {
 
     io.setShooterWheelTopVelocity(topVelocity);
     io.setShooterWheelBottomVelocity(bottomVelocity);
+  }
+
+  private double getPassingVelocity() {
+    // project the robot pose into the future based on the current velocity
+    Pose2d robotPose = RobotOdometry.getInstance().getEstimatedPosition();
+    robotPose =
+        robotPose.exp(
+            new Twist2d(
+                drivetrain.getVelocityX() * futureProjectionSeconds.get(),
+                drivetrain.getVelocityY() * futureProjectionSeconds.get(),
+                drivetrain.getVelocityT() * futureProjectionSeconds.get()));
+
+    Logger.recordOutput("Shooter/futureRobotPose", robotPose);
+
+    double distanceToPassPoint =
+        Field2d.getInstance().getAlliancePassPose().minus(robotPose).getTranslation().getNorm();
+
+    return passingTreeMap.get(distanceToPassPoint);
+  }
+
+  private double getPassingDistance() {
+    // project the robot pose into the future based on the current velocity
+    Pose2d robotPose = RobotOdometry.getInstance().getEstimatedPosition();
+    robotPose =
+        robotPose.exp(
+            new Twist2d(
+                drivetrain.getVelocityX() * futureProjectionSeconds.get(),
+                drivetrain.getVelocityY() * futureProjectionSeconds.get(),
+                drivetrain.getVelocityT() * futureProjectionSeconds.get()));
+
+    return Field2d.getInstance().getAlliancePassPose().minus(robotPose).getTranslation().getNorm();
   }
 
   public void setShootingPosition(ShootingPosition position) {
