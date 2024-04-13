@@ -28,7 +28,7 @@ public class ClimberConstants {
   public static final double RETRACTED_POSITION_ROT = 1.0; // FIXME: tune
   public static final double EXTENDING_VOLTAGE = 13.0; // FIXME: TUNE
   public static final double RETRACTING_VOLTAGE = -13.0; // FIXME: tune
-  public static final double RETRACTING_SLOW_VOLTAGE = -1.5;
+  public static final double RETRACTING_SLOW_VOLTAGE = -2.0;
 
   public static final double KP = 0.0;
   public static final double KI = 0;
