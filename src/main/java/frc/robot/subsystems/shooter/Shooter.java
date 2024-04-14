@@ -139,9 +139,6 @@ public class Shooter extends SubsystemBase {
             .getTranslation()
             .getNorm();
     Logger.recordOutput("Shooter/distanceToSpeaker", distanceToSpeaker);
-    Logger.recordOutput(
-        "Shooter/SOTMFutureRobotDistanceToSpeaker",
-        drivetrain.getFutureDistanceToSpeaker(futureProjectionSeconds.get()));
 
     if (testingMode.get() == 1) {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());

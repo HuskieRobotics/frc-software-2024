@@ -54,7 +54,7 @@ public class Drivetrain extends SubsystemBase {
       new DrivetrainIO.DrivetrainIOInputsCollection();
 
   public final TunableNumber preloadedAutoShotDelaySeconds =
-      new TunableNumber("RobotContainer/PreloadedAutoShotDelaySeconds", 0.1);
+      new TunableNumber("Drivetrain/PreloadedAutoShotDelaySeconds", 0.1);
 
   private final TunableNumber autoDriveKp =
       new TunableNumber("AutoDrive/DriveKp", RobotConfig.getInstance().getAutoDriveKP());
@@ -72,13 +72,14 @@ public class Drivetrain extends SubsystemBase {
   private final TunableNumber driveCurrent = new TunableNumber("Drivetrain/driveCurrent", 0.0);
   private final TunableNumber steerCurrent = new TunableNumber("Drivetrain/steerCurrent", 0.0);
 
-  private final TunableNumber rotationFutureProjectionSeconds =
+  private final TunableNumber rotationFutureProjectionLeadTimeSeconds =
       new TunableNumber(
-          "Drivetrain/rotationFutureProjectionSeconds", ROTATION_FUTURE_PROJECTION_SECONDS);
-  private final TunableNumber rotationInAutoFutureProjectionSeconds =
+          "Drivetrain/RotationFutureProjectionLeadTimeSeconds",
+          ROTATION_FUTURE_PROJECTION_LEAD_TIME_SECONDS);
+  private final TunableNumber yVelocityThresholdForRotationFutureProjection =
       new TunableNumber(
-          "Drivetrain/rotationInAutoFutureProjectionSeconds",
-          ROTATION_IN_AUTO_FUTURE_PROJECTION_SECONDS);
+          "Drivetrain/YVelocityThresholdForRotationFutureProjection",
+          Y_VELOCITY_THRESHOLD_FOR_ROTATION_FUTURE_PROJECTION);
 
   private final PIDController autoXController =
       new PIDController(autoDriveKp.get(), autoDriveKi.get(), autoDriveKd.get());
@@ -532,10 +533,6 @@ public class Drivetrain extends SubsystemBase {
     }
     Logger.recordOutput(
         SUBSYSTEM_NAME + "/ConstrainPoseToFieldCount", this.constrainPoseToFieldCount);
-
-    Logger.recordOutput(
-        SUBSYSTEM_NAME + "/PreloadedAutoFutureRobotDistanceToSpeaker",
-        this.getFutureDistanceToSpeaker(this.preloadedAutoShotDelaySeconds.get()));
 
     // update the brake mode based on the robot's velocity and state (enabled/disabled)
     updateBrakeMode();
@@ -1063,69 +1060,80 @@ public class Drivetrain extends SubsystemBase {
     return this.isAimToSpeakerEnabled;
   }
 
-  public double getRotationFutureProjectionSeconds() {
-    return rotationFutureProjectionSeconds.get();
+  private double getRotationFutureProjectionSeconds() {
+    // if the robot is moving slowly, or not at all, across the face of the speaker (i.e., in the y
+    // direction), we will project into the future based solely on the time between executing the
+    // shoot command and the note leaving the robot. However, if the robot is moving more quickly
+    // across the face of the speaker, we need to project further into the future since the robot's
+    // rotation needs time to "catch up" to the target rotation.
+    if (Math.abs(this.getVelocityY()) > yVelocityThresholdForRotationFutureProjection.get()) {
+      return SHOT_DELAY_SECONDS + rotationFutureProjectionLeadTimeSeconds.get();
+    } else {
+      return SHOT_DELAY_SECONDS;
+    }
   }
 
   public boolean isAimedAtSpeaker() {
-    Pose2d futureRobotPose = this.getPose();
-    futureRobotPose =
-        futureRobotPose.exp(
-            new Twist2d(
-                this.getVelocityX() * rotationFutureProjectionSeconds.get(),
-                this.getVelocityY() * rotationFutureProjectionSeconds.get(),
-                this.getVelocityT() * rotationFutureProjectionSeconds.get()));
+    Pose2d robotPose = this.getPose();
+    Pose2d futureRobotPose = this.getFutureRobotPose(this.getRotationFutureProjectionSeconds());
 
-    // calculate the transforms 7 inches inside of the left and right side of the speaker opening
-    // and the corresponding angles
-    Transform2d speakerOpeningLeftSide =
-        new Transform2d(
-            Field2d.getInstance().getAllianceSpeakerCenter().getX() - futureRobotPose.getX(),
-            Field2d.getInstance().getAllianceSpeakerCenter().getY()
-                + Units.inchesToMeters(13.6875)
-                - futureRobotPose.getY(),
-            new Rotation2d());
-    Transform2d speakerOpeningRightSide =
-        new Transform2d(
-            Field2d.getInstance().getAllianceSpeakerCenter().getX() - futureRobotPose.getX(),
-            Field2d.getInstance().getAllianceSpeakerCenter().getY()
-                - Units.inchesToMeters(13.6875)
-                - futureRobotPose.getY(),
-            new Rotation2d());
-    Transform2d speakerOpeningCenter =
-        new Transform2d(
-            Field2d.getInstance().getAllianceSpeakerCenter().getX() - futureRobotPose.getX(),
-            Field2d.getInstance().getAllianceSpeakerCenter().getY() - futureRobotPose.getY(),
-            new Rotation2d());
+    boolean aimed = false;
+    Pose2d[] poses = new Pose2d[] {robotPose, futureRobotPose};
+    for (int i = 0; i < poses.length; i++) {
+      // calculate the transforms 7 inches inside of the left and right side of the speaker opening
+      // and the corresponding angles
+      Transform2d speakerOpeningLeftSide =
+          new Transform2d(
+              Field2d.getInstance().getAllianceSpeakerCenter().getX() - poses[i].getX(),
+              Field2d.getInstance().getAllianceSpeakerCenter().getY()
+                  + Units.inchesToMeters(13.6875)
+                  - poses[i].getY(),
+              new Rotation2d());
+      Transform2d speakerOpeningRightSide =
+          new Transform2d(
+              Field2d.getInstance().getAllianceSpeakerCenter().getX() - poses[i].getX(),
+              Field2d.getInstance().getAllianceSpeakerCenter().getY()
+                  - Units.inchesToMeters(13.6875)
+                  - poses[i].getY(),
+              new Rotation2d());
+      Transform2d speakerOpeningCenter =
+          new Transform2d(
+              Field2d.getInstance().getAllianceSpeakerCenter().getX() - poses[i].getX(),
+              Field2d.getInstance().getAllianceSpeakerCenter().getY() - poses[i].getY(),
+              new Rotation2d());
 
-    double angleToLeftSide =
-        Math.atan2(speakerOpeningLeftSide.getY(), speakerOpeningLeftSide.getX());
-    double angleToRightSide =
-        Math.atan2(speakerOpeningRightSide.getY(), speakerOpeningRightSide.getX());
-    double angleToCenter = Math.atan2(speakerOpeningCenter.getY(), speakerOpeningCenter.getX());
-    double robotAngle = futureRobotPose.getRotation().getRadians();
+      double angleToLeftSide =
+          Math.atan2(speakerOpeningLeftSide.getY(), speakerOpeningLeftSide.getX());
+      double angleToRightSide =
+          Math.atan2(speakerOpeningRightSide.getY(), speakerOpeningRightSide.getX());
+      double angleToCenter = Math.atan2(speakerOpeningCenter.getY(), speakerOpeningCenter.getX());
+      double robotAngle = poses[i].getRotation().getRadians();
 
-    // The calculated angles will range from –π to π. When we are on the blue alliance one or more
-    // of the angles may be very close to -π and other may be very close to π. In order for the
-    // algorithm to work, if the angle is close to -π, we add 2π to it.
-    if (angleToLeftSide < -Math.PI / 2.0) {
-      angleToLeftSide += 2 * Math.PI;
+      // The calculated angles will range from –π to π. When we are on the blue alliance one or more
+      // of the angles may be very close to -π and other may be very close to π. In order for the
+      // algorithm to work, if the angle is close to -π, we add 2π to it.
+      if (angleToLeftSide < -Math.PI / 2.0) {
+        angleToLeftSide += 2 * Math.PI;
+      }
+      if (angleToRightSide < -Math.PI / 2.0) {
+        angleToRightSide += 2 * Math.PI;
+      }
+      if (robotAngle < -Math.PI / 2.0) {
+        robotAngle += 2 * Math.PI;
+      }
+
+      String label = "/AimToSpeaker/";
+      if (i == 1) {
+        aimed =
+            (robotAngle < angleToLeftSide && robotAngle > angleToRightSide)
+                || (robotAngle > angleToLeftSide && robotAngle < angleToRightSide);
+        label += "Future";
+      }
+      Logger.recordOutput(SUBSYSTEM_NAME + label + "RobotAngle", robotAngle);
+      Logger.recordOutput(SUBSYSTEM_NAME + label + "LeftAngle", angleToLeftSide);
+      Logger.recordOutput(SUBSYSTEM_NAME + label + "RightAngle", angleToRightSide);
+      Logger.recordOutput(SUBSYSTEM_NAME + label + "CenterAngle", angleToCenter);
     }
-    if (angleToRightSide < -Math.PI / 2.0) {
-      angleToRightSide += 2 * Math.PI;
-    }
-    if (robotAngle < -Math.PI / 2.0) {
-      robotAngle += 2 * Math.PI;
-    }
-
-    boolean aimed =
-        (robotAngle < angleToLeftSide && robotAngle > angleToRightSide)
-            || (robotAngle > angleToLeftSide && robotAngle < angleToRightSide);
-
-    Logger.recordOutput(SUBSYSTEM_NAME + "/AimToSpeaker/RobotAngle", robotAngle);
-    Logger.recordOutput(SUBSYSTEM_NAME + "/AimToSpeaker/LeftAngle", angleToLeftSide);
-    Logger.recordOutput(SUBSYSTEM_NAME + "/AimToSpeaker/RightAngle", angleToRightSide);
-    Logger.recordOutput(SUBSYSTEM_NAME + "/AimToSpeaker/CenterAngle", angleToCenter);
 
     return aimed;
   }
@@ -1141,59 +1149,51 @@ public class Drivetrain extends SubsystemBase {
   public Optional<Rotation2d> getRotationTargetOverride() {
     // Some condition that should decide if we want to override rotation
     if (this.isRotationOverrideEnabled) {
-      Rotation2d targetRotation =
-          this.getFutureRotationAimedAtSpeaker(this.rotationInAutoFutureProjectionSeconds.get());
+      Rotation2d targetRotation = this.getFutureRotationAimedAtSpeaker();
       Logger.recordOutput(SUBSYSTEM_NAME + "/rotationOverride", targetRotation);
-      return Optional.of(
-          this.getFutureRotationAimedAtSpeaker(this.rotationInAutoFutureProjectionSeconds.get()));
+      return Optional.of(targetRotation);
     } else {
       // return an empty optional when we don't want to override the path's rotation
       return Optional.empty();
     }
   }
 
-  public Rotation2d getFutureRotationAimedAtSpeaker(double secondsInFuture) {
-    Pose2d futureRobotPose = this.getPose();
-    futureRobotPose =
-        futureRobotPose.exp(
-            new Twist2d(
-                this.getVelocityX() * secondsInFuture,
-                this.getVelocityY() * secondsInFuture,
-                this.getVelocityT() * secondsInFuture));
-
+  public Rotation2d getFutureRotationAimedAtSpeaker() {
+    Pose2d futureRobotPose = this.getFutureRobotPose(this.getRotationFutureProjectionSeconds());
     Transform2d translation =
         new Transform2d(
             Field2d.getInstance().getAllianceSpeakerCenter().getX() - futureRobotPose.getX(),
             Field2d.getInstance().getAllianceSpeakerCenter().getY() - futureRobotPose.getY(),
             new Rotation2d());
 
-    Logger.recordOutput(
-        SUBSYSTEM_NAME + "/AimToSpeaker/TargetPose",
-        new Pose2d(
-            futureRobotPose.getX() + translation.getX(),
-            futureRobotPose.getY() + translation.getY(),
-            new Rotation2d()));
+    Logger.recordOutput(SUBSYSTEM_NAME + "/futureRotationRobotPose", futureRobotPose);
 
     return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
   }
 
   public double getFutureDistanceToSpeaker(double secondsInFuture) {
     // project the robot pose into the future based on the current velocity
-    Pose2d futureRobotPose = this.getPose();
-    futureRobotPose =
-        futureRobotPose.exp(
+    Pose2d futureRobotPose = this.getFutureRobotPose(secondsInFuture);
+    Logger.recordOutput(SUBSYSTEM_NAME + "/futureDistanceRobotPose", futureRobotPose);
+
+    double distance =
+        Field2d.getInstance()
+            .getAllianceSpeakerCenter()
+            .minus(futureRobotPose)
+            .getTranslation()
+            .getNorm();
+    Logger.recordOutput(SUBSYSTEM_NAME + "/futureRobotDistanceToSpeaker", distance);
+    return distance;
+  }
+
+  private Pose2d getFutureRobotPose(double secondsInFuture) {
+    // project the robot pose into the future based on the current translational velocity; don't
+    // project the current rotational velocity as that will adversely affect the control loop
+    // attempting to reach the rotational setpoint.
+    return this.getPose()
+        .exp(
             new Twist2d(
-                this.getVelocityX() * secondsInFuture,
-                this.getVelocityY() * secondsInFuture,
-                this.getVelocityT() * secondsInFuture));
-
-    Logger.recordOutput(SUBSYSTEM_NAME + "futureDistanceRobotPose", futureRobotPose);
-
-    return Field2d.getInstance()
-        .getAllianceSpeakerCenter()
-        .minus(futureRobotPose)
-        .getTranslation()
-        .getNorm();
+                this.getVelocityX() * secondsInFuture, this.getVelocityY() * secondsInFuture, 0.0));
   }
 
   private enum DriveMode {

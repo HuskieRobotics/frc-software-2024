@@ -56,9 +56,7 @@ public class TeleopSwerveAimAtSpeaker extends TeleopSwerve {
   private static Supplier<Rotation2d> calculateTargetRotation(Drivetrain drivetrain) {
     // project the robot pose into the future based on the current velocity
     return () -> {
-      Rotation2d targetAngle =
-          drivetrain.getFutureRotationAimedAtSpeaker(
-              drivetrain.getRotationFutureProjectionSeconds());
+      Rotation2d targetAngle = drivetrain.getFutureRotationAimedAtSpeaker();
       Logger.recordOutput("TeleopSwerveAimAtSpeaker/targetAngle", targetAngle);
       return targetAngle;
     };
