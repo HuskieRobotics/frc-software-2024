@@ -6,6 +6,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * This command, when executed, instructs the drivetrain subsystem to drive based on the specified
@@ -55,8 +56,11 @@ public class TeleopSwerveAimAtSpeaker extends TeleopSwerve {
   private static Supplier<Rotation2d> calculateTargetRotation(Drivetrain drivetrain) {
     // project the robot pose into the future based on the current velocity
     return () -> {
-      return drivetrain.getFutureRotationAimedAtSpeaker(
-          drivetrain.getRotationFutureProjectionSeconds());
+      Rotation2d targetAngle =
+          drivetrain.getFutureRotationAimedAtSpeaker(
+              drivetrain.getRotationFutureProjectionSeconds());
+      Logger.recordOutput("TeleopSwerveAimAtSpeaker/targetAngle", targetAngle);
+      return targetAngle;
     };
   }
 
