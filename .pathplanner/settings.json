@@ -14,8 +14,8 @@
     "Tuning"
   ],
   "defaultMaxVel": 2.75,
-  "defaultMaxAccel": 11.8,
-  "defaultMaxAngVel": 537.0,
-  "defaultMaxAngAccel": 2303.0,
+  "defaultMaxAccel": 6.948,
+  "defaultMaxAngVel": 530.0,
+  "defaultMaxAngAccel": 2005.0,
   "maxModuleSpeed": 3.88
 }
