@@ -32,16 +32,16 @@
     },
     {
       "anchor": {
-        "x": 6.8793449435240115,
+        "x": 6.5,
         "y": 1.9842375229774147
       },
       "prevControl": {
-        "x": 6.276292363011267,
-        "y": 1.5854446874770514
+        "x": 6.21288476373249,
+        "y": 1.4577677118317205
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Source Collect 3rd Start"
     }
   ],
   "rotationTargets": [],

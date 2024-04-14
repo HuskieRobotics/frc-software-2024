@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 6.967660208468565,
-        "y": 3.6803468282862495
+        "x": 6.5,
+        "y": 4.046288282150024
       },
       "prevControl": {
-        "x": 6.363364777655481,
-        "y": 2.9661309137433096
+        "x": 6.079210528791427,
+        "y": 3.2958329805548505
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Source Collect 4th Start"
     }
   ],
   "rotationTargets": [],
@@ -39,7 +39,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -160.8107950380922,
+    "rotation": -175.4357812703057,
     "rotateFast": false
   },
   "reversed": false,
