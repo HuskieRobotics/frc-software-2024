@@ -2,8 +2,6 @@ package frc.robot.subsystems.shooter;
 
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -141,7 +139,9 @@ public class Shooter extends SubsystemBase {
             .getTranslation()
             .getNorm();
     Logger.recordOutput("Shooter/distanceToSpeaker", distanceToSpeaker);
-    Logger.recordOutput("Shooter/futureRobotDistanceToSpeaker", this.getFutureDistanceToSpeaker());
+    Logger.recordOutput(
+        "Shooter/SOTMFutureRobotDistanceToSpeaker",
+        drivetrain.getFutureDistanceToSpeaker(futureProjectionSeconds.get()));
 
     if (testingMode.get() == 1) {
       io.setShooterWheelBottomVelocity(bottomWheelVelocity.get());
@@ -425,7 +425,8 @@ public class Shooter extends SubsystemBase {
 
   private boolean isAtShootingDistance() {
     if (this.shootingPosition == ShootingPosition.AUTO_SHOT) {
-      double distanceToSpeaker = this.getFutureDistanceToSpeaker();
+      double distanceToSpeaker =
+          drivetrain.getFutureDistanceToSpeaker(futureProjectionSeconds.get());
 
       return Math.abs(distanceToSpeaker - ShooterConstants.SHOOTER_AUTO_SHOT_DISTANCE_METERS)
           < ShooterConstants.SHOOTER_AUTO_SHOT_TOLERANCE_METERS;
@@ -434,25 +435,6 @@ public class Shooter extends SubsystemBase {
       // irrelevant
       return true;
     }
-  }
-
-  public double getFutureDistanceToSpeaker() {
-    // project the robot pose into the future based on the current velocity
-    Pose2d robotPose = RobotOdometry.getInstance().getEstimatedPosition();
-    robotPose =
-        robotPose.exp(
-            new Twist2d(
-                drivetrain.getVelocityX() * futureProjectionSeconds.get(),
-                drivetrain.getVelocityY() * futureProjectionSeconds.get(),
-                drivetrain.getVelocityT() * futureProjectionSeconds.get()));
-
-    Logger.recordOutput("Shooter/futureRobotPose", robotPose);
-
-    return Field2d.getInstance()
-        .getAllianceSpeakerCenter()
-        .minus(robotPose)
-        .getTranslation()
-        .getNorm();
   }
 
   public boolean isTopShootAtSetpoint() {

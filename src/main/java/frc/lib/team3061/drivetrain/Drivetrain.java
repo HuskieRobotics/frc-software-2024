@@ -53,6 +53,9 @@ public class Drivetrain extends SubsystemBase {
   private final DrivetrainIO.DrivetrainIOInputsCollection inputs =
       new DrivetrainIO.DrivetrainIOInputsCollection();
 
+  public final TunableNumber preloadedAutoShotDelaySeconds =
+      new TunableNumber("RobotContainer/PreloadedAutoShotDelaySeconds", 0.1);
+
   private final TunableNumber autoDriveKp =
       new TunableNumber("AutoDrive/DriveKp", RobotConfig.getInstance().getAutoDriveKP());
   private final TunableNumber autoDriveKi =
@@ -529,6 +532,10 @@ public class Drivetrain extends SubsystemBase {
     }
     Logger.recordOutput(
         SUBSYSTEM_NAME + "/ConstrainPoseToFieldCount", this.constrainPoseToFieldCount);
+
+    Logger.recordOutput(
+        SUBSYSTEM_NAME + "/PreloadedAutoFutureRobotDistanceToSpeaker",
+        this.getFutureDistanceToSpeaker(this.preloadedAutoShotDelaySeconds.get()));
 
     // update the brake mode based on the robot's velocity and state (enabled/disabled)
     updateBrakeMode();
@@ -1160,7 +1167,33 @@ public class Drivetrain extends SubsystemBase {
             Field2d.getInstance().getAllianceSpeakerCenter().getY() - futureRobotPose.getY(),
             new Rotation2d());
 
+    Logger.recordOutput(
+        SUBSYSTEM_NAME + "/AimToSpeaker/TargetPose",
+        new Pose2d(
+            futureRobotPose.getX() + translation.getX(),
+            futureRobotPose.getY() + translation.getY(),
+            new Rotation2d()));
+
     return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
+  }
+
+  public double getFutureDistanceToSpeaker(double secondsInFuture) {
+    // project the robot pose into the future based on the current velocity
+    Pose2d futureRobotPose = this.getPose();
+    futureRobotPose =
+        futureRobotPose.exp(
+            new Twist2d(
+                this.getVelocityX() * secondsInFuture,
+                this.getVelocityY() * secondsInFuture,
+                this.getVelocityT() * secondsInFuture));
+
+    Logger.recordOutput(SUBSYSTEM_NAME + "futureDistanceRobotPose", futureRobotPose);
+
+    return Field2d.getInstance()
+        .getAllianceSpeakerCenter()
+        .minus(futureRobotPose)
+        .getTranslation()
+        .getNorm();
   }
 
   private enum DriveMode {
