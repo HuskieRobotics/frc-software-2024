@@ -39,9 +39,11 @@ public class Shooter extends SubsystemBase {
       new TunableNumber("Shooter/Bottom Wheel Velocity", 0);
   private final TunableNumber pivotAngle = new TunableNumber("Shooter/Angle", 10.0);
   private final TunableNumber deflectorVoltage = new TunableNumber("Shooter/Deflector Voltage", 0);
+  private final TunableNumber futureProjectionSeconds =
+      new TunableNumber("Shooter/FutureProjectionSeconds", SHOOTER_AUTO_SHOT_TIME_DELAY_SECS);
 
   private final double[] populationRealAngles = {
-    64, 58.5, 54, 49.5, 46, 43, 39, 36, 33, 32, 30.5, 29, 27.5
+    64, 58.5, 54, 49.5, 46, 43, 39, 36, 33, 32, 30.5, 29, 28.5, 28.5
   };
   private final double[] populationDistances = {
     1.2 + 0.05,
@@ -56,7 +58,8 @@ public class Shooter extends SubsystemBase {
     4.045 + 0.05,
     4.345 + 0.05,
     4.62 + 0.05,
-    4.88 + 0.05
+    4.88 + 0.05,
+    5.04
   };
 
   private boolean automatedShooter = true;
@@ -254,7 +257,8 @@ public class Shooter extends SubsystemBase {
   }
 
   private void moveToIntakePosition() {
-    if (automatedShooter && !DriverStation.isAutonomousEnabled()) {
+    // FIXME: restore this code when the Limelight is mounted on the hard stop
+    if (automatedShooter) { // } && !DriverStation.isAutonomousEnabled()) {
       io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
     }
   }
@@ -384,9 +388,9 @@ public class Shooter extends SubsystemBase {
       robotPose =
           robotPose.exp(
               new Twist2d(
-                  drivetrain.getVelocityX() * SHOOTER_AUTO_SHOT_TIME_DELAY_SECS,
-                  drivetrain.getVelocityY() * SHOOTER_AUTO_SHOT_TIME_DELAY_SECS,
-                  drivetrain.getVelocityT() * SHOOTER_AUTO_SHOT_TIME_DELAY_SECS));
+                  drivetrain.getVelocityX() * futureProjectionSeconds.get(),
+                  drivetrain.getVelocityY() * futureProjectionSeconds.get(),
+                  drivetrain.getVelocityT() * futureProjectionSeconds.get()));
 
       Logger.recordOutput("Shooter/futureRobotPose", robotPose);
 
@@ -592,10 +596,18 @@ public class Shooter extends SubsystemBase {
   }
 
   public void deployDeflector() {
-    io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_DEPLOY_VOLTAGE);
+    if (ShooterConstants.DEFLECTOR_ENABLED) {
+      io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_DEPLOY_VOLTAGE);
+    } else {
+      io.setDeflectorMotorVoltage(0.0);
+    }
   }
 
   public void retractDeflector() {
-    io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_RETRACT_VOLTAGE);
+    if (ShooterConstants.DEFLECTOR_ENABLED) {
+      io.setDeflectorMotorVoltage(ShooterConstants.DEFLECTOR_RETRACT_VOLTAGE);
+    } else {
+      io.setDeflectorMotorVoltage(0.0);
+    }
   }
 }

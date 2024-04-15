@@ -38,6 +38,7 @@ import frc.robot.commands.DriveToPose;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.TeleopSwerveAimAtSpeaker;
 import frc.robot.commands.TeleopSwerveAimToPass;
+import frc.robot.commands.TeleopSwerveCollectNote;
 import frc.robot.configs.ArtemisRobotConfig;
 import frc.robot.configs.GenericDrivetrainRobotConfig;
 import frc.robot.configs.PracticeBoardConfig;
@@ -50,6 +51,9 @@ import frc.robot.subsystems.climber.ClimberIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
+import frc.robot.subsystems.note_targeting.NoteTargeting;
+import frc.robot.subsystems.note_targeting.NoteTargetingIO;
+import frc.robot.subsystems.note_targeting.NoteTargetingIOLimelight;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.Shooter.ShootingPosition;
 import frc.robot.subsystems.shooter.ShooterConstants;
@@ -73,6 +77,7 @@ public class RobotContainer {
   private Drivetrain drivetrain;
   private Alliance lastAlliance = DriverStation.Alliance.Red;
   private Vision vision;
+  private NoteTargeting noteTargeting;
   private Shooter shooter;
   private Intake intake;
   private Climber climber;
@@ -134,7 +139,7 @@ public class RobotContainer {
 
     } else {
       drivetrain = new Drivetrain(new DrivetrainIO() {});
-
+      noteTargeting = new NoteTargeting(new NoteTargetingIO() {});
       intake = new Intake(new IntakeIO() {});
       climber = new Climber(new ClimberIO() {});
       shooter = new Shooter(new ShooterIO() {}, intake, drivetrain);
@@ -187,6 +192,8 @@ public class RobotContainer {
     shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
+    noteTargeting = new NoteTargeting(new NoteTargetingIOLimelight("limelight"));
+
     String[] cameraNames = config.getCameraNames();
     VisionIO[] visionIOs = new VisionIO[cameraNames.length];
     AprilTagFieldLayout layout;
@@ -236,6 +243,8 @@ public class RobotContainer {
     shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
+    noteTargeting = new NoteTargeting(new NoteTargetingIO() {});
+
     if (Constants.getRobot() == Constants.RobotType.ROBOT_SIMBOT) {
       vision = new Vision(new VisionIO[] {new VisionIO() {}});
     } else {
@@ -263,6 +272,8 @@ public class RobotContainer {
     shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
+    noteTargeting = new NoteTargeting(new NoteTargetingIOLimelight("test"));
+
     // vision = new Vision(new VisionIO[] {new VisionIO() {}});
 
     AprilTagFieldLayout layout;
@@ -288,6 +299,8 @@ public class RobotContainer {
     climber = new Climber(new ClimberIOTalonFX() {});
     shooter = new Shooter(new ShooterIO() {}, intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
+    noteTargeting = new NoteTargeting(new NoteTargetingIO() {});
+
     vision = new Vision(new VisionIO[] {new VisionIO() {}});
   }
 
@@ -452,13 +465,20 @@ public class RobotContainer {
         Commands.sequence(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO)),
             new PathPlannerAuto("Amp Collect 2nd"),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
             Commands.either(
                 new PathPlannerAuto("Amp Score 2nd Collect 3rd"),
                 new PathPlannerAuto("Amp Missed 2nd Collect 3rd"),
                 intake::hasNoteForAuto),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
             new PathPlannerAuto("Amp Score 3rd Collect 4th"),
-            new PathPlannerAuto("4 note center"));
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
+            new PathPlannerAuto("Amp Score 4th Collect 5th"),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
+            new PathPlannerAuto("Amp Score 5th Collect 6th"),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
+            getAutoStopAndShootCommand());
 
     autoChooser.addOption("6 Note Amp Side", sixNoteAmpSide);
 
@@ -471,6 +491,7 @@ public class RobotContainer {
         Commands.sequence(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO)),
             new PathPlannerAuto("Amp Collect 2nd"),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
             Commands.either(
                 Commands.sequence(
                     Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
@@ -682,6 +703,12 @@ public class RobotContainer {
                             ? Rotation2d.fromDegrees(0.0)
                             : Rotation2d.fromDegrees(180.0))
                 .withName("lock 180"));
+
+    oi.getTargetNoteButton()
+        .toggleOnTrue(
+            new TeleopSwerveCollectNote(
+                    drivetrain, intake, noteTargeting, oi::getTranslateX, oi::getTranslateY)
+                .withName("target note"));
 
     oi.getAimSpeakerButton()
         .toggleOnTrue(

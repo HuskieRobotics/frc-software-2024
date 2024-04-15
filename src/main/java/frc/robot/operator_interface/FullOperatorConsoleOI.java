@@ -73,7 +73,7 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getAlignAndIntakeNoteFromSourceButton() {
+  public Trigger getTargetNoteButton() {
     return translateJoystickButtons[4];
   }
 
