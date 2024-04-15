@@ -45,6 +45,9 @@ import frc.robot.configs.PracticeBoardConfig;
 import frc.robot.configs.PracticeRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberIO;
+import frc.robot.subsystems.climber.ClimberIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
@@ -77,6 +80,7 @@ public class RobotContainer {
   private NoteTargeting noteTargeting;
   private Shooter shooter;
   private Intake intake;
+  private Climber climber;
 
   // use AdvantageKit's LoggedDashboardChooser instead of SendableChooser to ensure accurate logging
   private final LoggedDashboardChooser<Command> autoChooser =
@@ -137,6 +141,7 @@ public class RobotContainer {
       drivetrain = new Drivetrain(new DrivetrainIO() {});
       noteTargeting = new NoteTargeting(new NoteTargetingIO() {});
       intake = new Intake(new IntakeIO() {});
+      climber = new Climber(new ClimberIO() {});
       shooter = new Shooter(new ShooterIO() {}, intake, drivetrain);
       intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
@@ -183,6 +188,7 @@ public class RobotContainer {
     drivetrain = new Drivetrain(new DrivetrainIOCTRE());
 
     intake = new Intake(new IntakeIOTalonFX());
+    climber = new Climber(new ClimberIOTalonFX());
     shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
@@ -233,6 +239,7 @@ public class RobotContainer {
                 brModule));
 
     intake = new Intake(new IntakeIOTalonFX());
+    climber = new Climber(new ClimberIOTalonFX());
     shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
@@ -261,6 +268,7 @@ public class RobotContainer {
     drivetrain = new Drivetrain(drivetrainIO);
 
     intake = new Intake(new IntakeIOTalonFX());
+    climber = new Climber(new ClimberIOTalonFX());
     shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
@@ -288,6 +296,7 @@ public class RobotContainer {
     // change the following to connect the subsystem being tested to actual hardware
     drivetrain = new Drivetrain(new DrivetrainIO() {});
     intake = new Intake(new IntakeIO() {});
+    climber = new Climber(new ClimberIOTalonFX() {});
     shooter = new Shooter(new ShooterIO() {}, intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
     noteTargeting = new NoteTargeting(new NoteTargetingIO() {});
@@ -332,6 +341,8 @@ public class RobotContainer {
     configureDrivetrainCommands();
 
     configureIntakeCommands();
+
+    configureClimberCommands();
 
     configureVisionCommands();
 
@@ -650,6 +661,19 @@ public class RobotContainer {
                     Commands.runOnce(intake::turnIntakeOff),
                     Commands.runOnce(intake::turnKickerOff))
                 .withName("ManualOuttakeOff"));
+  }
+
+  private void configureClimberCommands() {
+    oi.getClimberExtendButton()
+        .onTrue(Commands.runOnce(climber::extendClimber).withName("ExtendClimber"));
+
+    oi.getClimberRetractButton()
+        .onTrue(Commands.runOnce(climber::retractClimber).withName("RetractClimber"));
+
+    oi.getClimberResetButton()
+        .onTrue(Commands.runOnce(climber::resetClimber).withName("ResetClimber"));
+    oi.getClimberResetButton()
+        .onFalse(Commands.runOnce(climber::zeroClimber).withName("ZeroClimber"));
   }
 
   private void configureDrivetrainCommands() {
