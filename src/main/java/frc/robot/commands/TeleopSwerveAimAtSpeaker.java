@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.lib.team3061.drivetrain.Drivetrain;
+import frc.lib.team6328.util.TunableNumber;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import java.util.function.DoubleSupplier;
@@ -24,7 +25,10 @@ import org.littletonrobotics.junction.Logger;
 public class TeleopSwerveAimAtSpeaker extends TeleopSwerve {
   private final Shooter shooter;
   private final Intake intake;
-  private final Drivetrain drivetrain;
+
+  // FIXME: remove after tuning
+  private static final TunableNumber rotationTargetRadians =
+      new TunableNumber("RobotContainer/rotationTargetRadians", 0.0);
 
   /**
    * Create a new TeleopSwerve command object.
@@ -50,13 +54,14 @@ public class TeleopSwerveAimAtSpeaker extends TeleopSwerve {
         calculateTargetRotation(drivetrain));
     this.shooter = shooter;
     this.intake = intake;
-    this.drivetrain = drivetrain;
   }
 
   private static Supplier<Rotation2d> calculateTargetRotation(Drivetrain drivetrain) {
     // project the robot pose into the future based on the current velocity
     return () -> {
-      Rotation2d targetAngle = drivetrain.getFutureRotationAimedAtSpeaker();
+      // FIXME: restore after tuning
+      // Rotation2d targetAngle = drivetrain.getFutureRotationAimedAtSpeaker();
+      Rotation2d targetAngle = new Rotation2d(rotationTargetRadians.get());
       Logger.recordOutput("TeleopSwerveAimAtSpeaker/targetAngle", targetAngle);
       return targetAngle;
     };
