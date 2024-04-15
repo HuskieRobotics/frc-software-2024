@@ -15,22 +15,22 @@ public class ArtemisRobotConfig extends RobotConfig {
   private static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1;
   private static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2;
   private static final int FRONT_LEFT_MODULE_STEER_ENCODER = 22;
-  private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = 0.363281;
+  private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = 0.354248;
 
   private static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 3;
   private static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 4;
   private static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 23;
-  private static final double FRONT_RIGHT_MODULE_STEER_OFFSET_ROT = 0.025146;
+  private static final double FRONT_RIGHT_MODULE_STEER_OFFSET_ROT = 0.023926;
 
   private static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 7;
   private static final int BACK_LEFT_MODULE_STEER_MOTOR = 8;
   private static final int BACK_LEFT_MODULE_STEER_ENCODER = 24;
-  private static final double BACK_LEFT_MODULE_STEER_OFFSET_ROT = -0.033203;
+  private static final double BACK_LEFT_MODULE_STEER_OFFSET_ROT = -0.027588;
 
   private static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 5;
   private static final int BACK_RIGHT_MODULE_STEER_MOTOR = 6;
   private static final int BACK_RIGHT_MODULE_STEER_ENCODER = 25;
-  private static final double BACK_RIGHT_MODULE_STEER_OFFSET_ROT = -0.335693;
+  private static final double BACK_RIGHT_MODULE_STEER_OFFSET_ROT = -0.344727;
 
   private static final int GYRO_ID = 26;
 
