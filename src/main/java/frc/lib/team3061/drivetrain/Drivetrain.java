@@ -440,6 +440,8 @@ public class Drivetrain extends SubsystemBase {
         yVelocity * allianceMultiplier,
         targetDirection,
         isOpenLoop);
+
+    Logger.recordOutput(SUBSYSTEM_NAME + "/DriveFacingAngle/targetDirection", targetDirection);
   }
 
   /**
