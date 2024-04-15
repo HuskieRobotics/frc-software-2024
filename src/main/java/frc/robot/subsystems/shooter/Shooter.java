@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.drivetrain.Drivetrain;
+import frc.lib.team3061.drivetrain.DrivetrainConstants;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.leds.LEDs.ShooterLEDState;
 import frc.lib.team3061.util.RobotOdometry;
@@ -55,11 +56,9 @@ public class Shooter extends SubsystemBase {
     5.72, 6.04
   };
 
-  // private final double[] passingPopulationDistances = {9.558, 11.336, 9.73, 7.2};
-  // private final double[] passingPopulationRealVelocities = {52, 57,48, 42};
-  // sorted
   private final double[] passingPopulationDistances = {7.329, 9.649, 11.336};
   private final double[] passingPopulationRealVelocities = {42, 50, 57};
+
   private boolean automatedShooter = true;
 
   private boolean intakeEnabled = true;
@@ -147,10 +146,10 @@ public class Shooter extends SubsystemBase {
     Logger.recordOutput("Shooter/AngleAutomated", this.automatedShooter);
     Logger.recordOutput("Shooter/IntakeAutomated", this.intakeEnabled);
     Logger.recordOutput("Shooter/ScaleDownVelocity", this.scaleDownShooterVelocity);
-    Logger.recordOutput("Shooter/distanceToPassPoint", this.getPassingDistance());
-    Logger.recordOutput("Shooter/passingtarget", Field2d.getInstance().getAlliancePassPose());
+    Logger.recordOutput("Shooter/DistanceToPassPoint", this.getPassingDistance());
+    Logger.recordOutput("Shooter/PassingTarget", Field2d.getInstance().getAlliancePassPose());
     Logger.recordOutput("Shooter/SpeakerPose", Field2d.getInstance().getAllianceSpeakerCenter());
-    Logger.recordOutput("Shooter/PassVelo", this.getPassingVelocity());
+    Logger.recordOutput("Shooter/PassVelocity", this.getPassingVelocity());
 
     double distanceToSpeaker =
         Field2d.getInstance()
@@ -375,34 +374,22 @@ public class Shooter extends SubsystemBase {
   }
 
   private double getPassingVelocity() {
-    // project the robot pose into the future based on the current velocity
-    Pose2d robotPose = RobotOdometry.getInstance().getEstimatedPosition();
-    robotPose =
-        robotPose.exp(
-            new Twist2d(
-                drivetrain.getVelocityX() * futureProjectionSeconds.get(),
-                drivetrain.getVelocityY() * futureProjectionSeconds.get(),
-                drivetrain.getVelocityT() * futureProjectionSeconds.get()));
-
-    Logger.recordOutput("Shooter/futureRobotPose", robotPose);
-
     double distanceToPassPoint =
-        Field2d.getInstance().getAlliancePassPose().minus(robotPose).getTranslation().getNorm();
+        Field2d.getInstance()
+            .getAlliancePassPose()
+            .minus(drivetrain.getFutureRobotPose(DrivetrainConstants.SHOT_DELAY_SECONDS))
+            .getTranslation()
+            .getNorm();
 
     return passingTreeMap.get(distanceToPassPoint);
   }
 
   private double getPassingDistance() {
-    // project the robot pose into the future based on the current velocity
-    Pose2d robotPose = RobotOdometry.getInstance().getEstimatedPosition();
-    robotPose =
-        robotPose.exp(
-            new Twist2d(
-                drivetrain.getVelocityX() * futureProjectionSeconds.get(),
-                drivetrain.getVelocityY() * futureProjectionSeconds.get(),
-                drivetrain.getVelocityT() * futureProjectionSeconds.get()));
-
-    return Field2d.getInstance().getAlliancePassPose().minus(robotPose).getTranslation().getNorm();
+    return Field2d.getInstance()
+        .getAlliancePassPose()
+        .minus(drivetrain.getFutureRobotPose(DrivetrainConstants.SHOT_DELAY_SECONDS))
+        .getTranslation()
+        .getNorm();
   }
 
   public void setShootingPosition(ShootingPosition position) {

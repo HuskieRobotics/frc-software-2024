@@ -1186,7 +1186,7 @@ public class Drivetrain extends SubsystemBase {
     return distance;
   }
 
-  private Pose2d getFutureRobotPose(double secondsInFuture) {
+  public Pose2d getFutureRobotPose(double secondsInFuture) {
     // project the robot pose into the future based on the current translational velocity; don't
     // project the current rotational velocity as that will adversely affect the control loop
     // attempting to reach the rotational setpoint.
