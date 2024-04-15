@@ -232,11 +232,11 @@ public class Field2d {
               Math.abs(
                       FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.getX()
                           - FieldConstants.blueAmpCenter.getX())
-                  / 2.0,
+                  / 1.5,
               Math.abs(
                       FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.getY()
                           - FieldConstants.blueAmpCenter.getY())
-                  / 2.0,
+                  / 1.5,
               new Rotation2d());
       return new Pose2d(
           FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.getX() + offset.getX(),
@@ -248,11 +248,11 @@ public class Field2d {
               Math.abs(
                       FieldConstants.RedSpeaker.redCenterSpeakerOpening.getX()
                           - FieldConstants.redAmpCenter.getX())
-                  / 2.0,
+                  / 1.5,
               Math.abs(
                       FieldConstants.RedSpeaker.redCenterSpeakerOpening.getY()
                           - FieldConstants.redAmpCenter.getY())
-                  / 2.0,
+                  / 1.5,
               new Rotation2d());
       return new Pose2d(
           FieldConstants.RedSpeaker.redCenterSpeakerOpening.getX() - offset.getX(),
