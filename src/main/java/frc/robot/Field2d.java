@@ -228,14 +228,36 @@ public class Field2d {
   public Pose2d getAlliancePassPose() {
     if (alliance == Alliance.Blue) {
       Transform2d offset =
-          FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.minus(
-              new Pose2d(FieldConstants.blueAmpCenter, new Rotation2d()).div(2));
-      return FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.plus(offset);
+          new Transform2d(
+              Math.abs(
+                      FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.getX()
+                          - FieldConstants.blueAmpCenter.getX())
+                  / 2.0,
+              Math.abs(
+                      FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.getY()
+                          - FieldConstants.blueAmpCenter.getY())
+                  / 2.0,
+              new Rotation2d());
+      return new Pose2d(
+          FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.getX() + offset.getX(),
+          FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.getY() + offset.getY(),
+          new Rotation2d());
     } else {
       Transform2d offset =
-          FieldConstants.RedSpeaker.redCenterSpeakerOpening.minus(
-              new Pose2d(FieldConstants.redAmpCenter, new Rotation2d()).div(2));
-      return new Pose2d(FieldConstants.redAmpCenter, new Rotation2d()).plus(offset);
+          new Transform2d(
+              Math.abs(
+                      FieldConstants.RedSpeaker.redCenterSpeakerOpening.getX()
+                          - FieldConstants.redAmpCenter.getX())
+                  / 2.0,
+              Math.abs(
+                      FieldConstants.RedSpeaker.redCenterSpeakerOpening.getY()
+                          - FieldConstants.redAmpCenter.getY())
+                  / 2.0,
+              new Rotation2d());
+      return new Pose2d(
+          FieldConstants.RedSpeaker.redCenterSpeakerOpening.getX() - offset.getX(),
+          FieldConstants.RedSpeaker.redCenterSpeakerOpening.getY() + offset.getY(),
+          new Rotation2d());
     }
   }
 
