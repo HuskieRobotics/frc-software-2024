@@ -25,7 +25,7 @@ public class ClimberConstants {
   public static final double CIRCUMFERENCE_OF_SPOOL = Units.inchesToMeters(1.0) * Math.PI;
 
   public static final double EXTENDED_POSITION_ROT = 5.8; // should be 6// FIXME: tune
-  public static final double RETRACTED_POSITION_ROT = 1.0; // FIXME: tune
+  public static final double RETRACTED_POSITION_ROT = 0.2; // FIXME: tune
   public static final double EXTENDING_VOLTAGE = 13.0; // FIXME: TUNE
   public static final double RETRACTING_VOLTAGE = -13.0; // FIXME: tune
   public static final double RETRACTING_SLOW_VOLTAGE = -2.0;
