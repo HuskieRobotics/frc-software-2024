@@ -71,6 +71,8 @@ public class Intake extends SubsystemBase {
 
     intakeAndKickerTimeout = 0;
 
+    quickShootingEnabled = false;
+
     leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
     this.intakeGamePiece();
 
@@ -87,10 +89,15 @@ public class Intake extends SubsystemBase {
     Logger.processInputs("Intake", inputs);
     Logger.recordOutput("Intake/State", intakeState.toString());
     Logger.recordOutput("Intake/AutomationEnabled", automationEnabled);
+    Logger.recordOutput("Intake/QuickShooting", quickShootingEnabled);
 
     if (TESTING) {
       io.setRollerVelocity(rollerVelocity.get());
       io.setKickerVoltage(kickerVelocity.get());
+    } else if (quickShootingEnabled && DriverStation.isAutonomousEnabled()) {
+      leds.setIntakeLEDState(IntakeLEDState.SHOOTING);
+      this.intakeGamePiece();
+      this.io.setKickerVoltage(KICKER_SHOOTING_VELOCITY_VOLTAGE);
     } else {
       if (automationEnabled) {
         this.runIntakeStateMachine();
@@ -138,10 +145,7 @@ public class Intake extends SubsystemBase {
   }
 
   private void runNoteInIntakeState() {
-    if (quickShootingEnabled && DriverStation.isAutonomousEnabled()) {
-      intakeState = IntakeState.SHOOTING;
-      this.transitionGamePiece();
-    } else if (inputs.isKickerIRBlocked) {
+    if (inputs.isKickerIRBlocked) {
       intakeState = IntakeState.NOTE_IN_INTAKE_AND_KICKER;
       this.transitionGamePiece();
     } else if (!inputs.isRollerIRBlocked) {
@@ -199,7 +203,7 @@ public class Intake extends SubsystemBase {
   }
 
   private void runShootingState() {
-    if (!this.hasNote()) { // } && !(quickShootingEnabled && DriverStation.isAutonomousEnabled())) {
+    if (!this.hasNote()) {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
