@@ -199,7 +199,7 @@ public class Intake extends SubsystemBase {
   }
 
   private void runShootingState() {
-    if (!this.hasNote()) {
+    if (!this.hasNote()) { // } && !(quickShootingEnabled && DriverStation.isAutonomousEnabled())) {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
