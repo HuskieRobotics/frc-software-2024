@@ -139,27 +139,15 @@ public interface OperatorInterface {
 
   // climber
 
-  public default Trigger getClimberDeployButton() {
+  public default Trigger getClimberExtendButton() {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getFinishClimbButton() {
+  public default Trigger getClimberRetractButton() {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getEnableManualClimberButton() {
-    return new Trigger(() -> false);
-  }
-
-  public default Trigger getDisableManualClimberButton() {
-    return new Trigger(() -> false);
-  }
-
-  public default Trigger getClimberUpButton() {
-    return new Trigger(() -> false);
-  }
-
-  public default Trigger getClimberDownButton() {
+  public default Trigger getClimberResetButton() {
     return new Trigger(() -> false);
   }
 
