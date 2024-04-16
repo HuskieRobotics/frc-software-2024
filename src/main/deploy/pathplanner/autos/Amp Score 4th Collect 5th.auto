@@ -8,18 +8,6 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Amp Score 4th"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stop And Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
             "pathName": "Amp Collect 5th"
           }
         }

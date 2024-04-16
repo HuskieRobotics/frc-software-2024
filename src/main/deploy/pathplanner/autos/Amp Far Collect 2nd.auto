@@ -1,6 +1,12 @@
 {
   "version": 1.0,
-  "startingPose": null,
+  "startingPose": {
+    "position": {
+      "x": 1.236833034853615,
+      "y": 7.662625158704337
+    },
+    "rotation": 180.0
+  },
   "command": {
     "type": "sequential",
     "data": {
@@ -8,12 +14,12 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Missed 2nd Collect 3rd Red"
+            "pathName": "Amp Far Collect 2nd"
           }
         }
       ]
     }
   },
-  "folder": "Source Side Notes",
+  "folder": "Amp Side Notes",
   "choreoAuto": false
 }

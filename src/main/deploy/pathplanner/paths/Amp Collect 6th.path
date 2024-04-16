@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.4,
-        "y": 5.55
+        "x": 2.614182985157142,
+        "y": 5.564126755022045
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.3763132980811417,
-        "y": 4.076661971505762
+        "x": 2.0841042629952553,
+        "y": 5.446926533663493
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.635693998660724,
-        "y": 4.123305701156857
+        "x": 1.6950380820192918,
+        "y": 4.785514026004355
       },
       "prevControl": {
-        "x": 1.3856420440113608,
-        "y": 4.104648209296419
+        "x": 1.8109875350557194,
+        "y": 5.257721921467119
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,15 +32,15 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.75,
-    "maxAcceleration": 11.8,
-    "maxAngularVelocity": 537.0,
-    "maxAngularAcceleration": 2303.0
+    "maxVelocity": 1.5,
+    "maxAcceleration": 6.948,
+    "maxAngularVelocity": 530.0,
+    "maxAngularAcceleration": 2005.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0,
-    "rotateFast": false
+    "rotation": 144.9417813281904,
+    "rotateFast": true
   },
   "reversed": false,
   "folder": "6 Amp Side",
@@ -48,5 +48,5 @@
     "rotation": 179.92941213635135,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

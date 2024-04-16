@@ -48,8 +48,18 @@ public interface DrivetrainIO {
     double measuredVYMetersPerSec = 0.0;
     double measuredAngularVelocityRadPerSec = 0.0;
 
-    SwerveModuleState[] swerveReferenceStates = new SwerveModuleState[4];
-    SwerveModuleState[] swerveMeasuredStates = new SwerveModuleState[4];
+    SwerveModuleState[] swerveReferenceStates = {
+      new SwerveModuleState(),
+      new SwerveModuleState(),
+      new SwerveModuleState(),
+      new SwerveModuleState()
+    };
+    SwerveModuleState[] swerveMeasuredStates = {
+      new SwerveModuleState(),
+      new SwerveModuleState(),
+      new SwerveModuleState(),
+      new SwerveModuleState()
+    };
 
     Pose2d robotPoseWithoutGyro = new Pose2d();
     Pose2d robotPose = new Pose2d();
