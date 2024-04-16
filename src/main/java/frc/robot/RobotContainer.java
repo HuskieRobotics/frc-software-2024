@@ -36,10 +36,10 @@ import frc.lib.team6328.util.NoteVisualizer;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.DriveToAmp;
 import frc.robot.commands.TeleopSwerve;
-import frc.robot.commands.WheelDiameterCharacterization;
 import frc.robot.commands.TeleopSwerveAimAtSpeaker;
 import frc.robot.commands.TeleopSwerveAimToPass;
 import frc.robot.commands.TeleopSwerveCollectNote;
+import frc.robot.commands.WheelDiameterCharacterization;
 import frc.robot.configs.ArtemisRobotConfig;
 import frc.robot.configs.GenericDrivetrainRobotConfig;
 import frc.robot.configs.PracticeBoardConfig;
@@ -377,6 +377,7 @@ public class RobotContainer {
     oi.getInterruptAll()
         .onTrue(
             Commands.parallel(
+                // FIXME: update to reset the intake and shooter state machines
                 Commands.runOnce(drivetrain::disableXstance),
                 new TeleopSwerve(drivetrain, oi::getTranslateX, oi::getTranslateY, oi::getRotate)));
   }
