@@ -939,6 +939,11 @@ public class RobotContainer {
     }
   }
 
+  public void autonomousInit() {
+    // ensure that quick shoot is always disabled at the start of auto
+    intake.disableQuickShoot();
+  }
+
   private boolean isReadyToShoot() {
     return shooter.isShooterReadyToShoot(!vision.isEnabled() || drivetrain.isAimedAtSpeaker());
   }
