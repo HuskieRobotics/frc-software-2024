@@ -772,6 +772,22 @@ public class Drivetrain extends SubsystemBase {
     return avgAcceleration / LOOP_PERIOD_SECS;
   }
 
+  /** Runs in a circle at omega. */
+  public void runWheelDiameterCharacterization(double omegaSpeed) {
+    this.io.driveRobotRelative(0.0, 0.0, omegaSpeed, true);
+  }
+
+  /** Get the position of all drive wheels in radians. */
+  public double[] getWheelDiameterCharacterizationPosition() {
+    double[] positions = new double[inputs.swerve.length];
+    for (int i = 0; i < inputs.swerve.length; i++) {
+      positions[i] =
+          inputs.swerve[i].driveDistanceMeters
+              / (RobotConfig.getInstance().getWheelDiameterMeters() / 2.0);
+    }
+    return positions;
+  }
+
   /**
    * Enables or disables the move-to-pose feature. Refer to the MoveToPose command class for more
    * information.
