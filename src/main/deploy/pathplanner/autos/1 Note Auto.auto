@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.3022437589635005,
+      "y": 1.7782623629293821
+    },
+    "rotation": -179.13546079596517
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "One Note Source Start"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop And Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "One Note Source End"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

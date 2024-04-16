@@ -65,7 +65,11 @@ public interface OperatorInterface {
 
   // drivetrain, game-specific
 
-  public default Trigger getLockToSpeakerButton() {
+  public default Trigger getAimSpeakerButton() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getAimAndShootSpeakerButton() {
     return new Trigger(() -> false);
   }
 
@@ -73,7 +77,7 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getAimAutomationSwitch() {
+  public default Trigger getTargetNoteButton() {
     return new Trigger(() -> false);
   }
 
@@ -113,11 +117,11 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getShooterAutomationSwitch() {
+  public default Trigger getShooterAngleDownButton() {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getShooterAngleDownButton() {
+  public default Trigger getAimAutomationSwitch() {
     return new Trigger(() -> false);
   }
 
@@ -129,29 +133,21 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
+  public default Trigger getScaleDownShooterVelocityButton() {
+    return new Trigger(() -> false);
+  }
+
   // climber
 
-  public default Trigger getClimberDeployButton() {
+  public default Trigger getClimberExtendButton() {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getFinishClimbButton() {
+  public default Trigger getClimberRetractButton() {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getEnableManualClimberButton() {
-    return new Trigger(() -> false);
-  }
-
-  public default Trigger getDisableManualClimberButton() {
-    return new Trigger(() -> false);
-  }
-
-  public default Trigger getClimberUpButton() {
-    return new Trigger(() -> false);
-  }
-
-  public default Trigger getClimberDownButton() {
+  public default Trigger getClimberResetButton() {
     return new Trigger(() -> false);
   }
 

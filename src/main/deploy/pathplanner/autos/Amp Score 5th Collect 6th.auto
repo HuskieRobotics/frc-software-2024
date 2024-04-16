@@ -1,0 +1,25 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop And Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Collect 6th"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Amp Side Notes",
+  "choreoAuto": false
+}

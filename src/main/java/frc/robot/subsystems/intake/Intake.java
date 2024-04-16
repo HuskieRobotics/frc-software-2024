@@ -1,11 +1,16 @@
 package frc.robot.subsystems.intake;
 
+import static frc.robot.subsystems.intake.IntakeConstants.*;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.leds.LEDs.IntakeLEDState;
+import frc.lib.team6328.util.TunableNumber;
+import frc.robot.Constants;
 import java.util.ArrayList;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -15,7 +20,6 @@ public class Intake extends SubsystemBase {
   private static final String SUBSYSTEM_NAME = "INTAKE";
 
   private final IntakeIO io;
-  private final BooleanSupplier isShooterAngleReady;
 
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
   private final LEDs leds;
@@ -24,13 +28,18 @@ public class Intake extends SubsystemBase {
     IntakeMotor.ROLLER, IntakeMotor.KICKER,
   };
 
+  private BooleanSupplier isShooterAngleReady;
+
   private IntakeState intakeState;
   private boolean automationEnabled;
-  private boolean hasNote;
+  private int intakeAndKickerTimeout;
 
   // system tests
   private IntakeState mostRecentIntakeState;
   private boolean checkComplete;
+
+  private final TunableNumber rollerVelocity = new TunableNumber("Intake/Roller Velocity", 0);
+  private final TunableNumber kickerVelocity = new TunableNumber("Intake/Kicker Velocity", 0);
 
   enum IntakeMotor {
     ROLLER,
@@ -41,21 +50,25 @@ public class Intake extends SubsystemBase {
     EMPTY,
     NOTE_IN_INTAKE,
     NOTE_IN_INTAKE_AND_KICKER,
+    NOTE_IN_BETWEEN_INTAKE_AND_KICKER,
     NOTE_IN_KICKER,
     NOTE_IN_KICKER_AND_SHOOTER,
-    NOTE_IN_SHOOTER
+    NOTE_IN_SHOOTER,
+    SHOOTING
   }
 
-  public Intake(IntakeIO io, BooleanSupplier isShooterAngleReady) {
+  public Intake(IntakeIO io) {
     this.io = io;
-    this.isShooterAngleReady = isShooterAngleReady;
 
     leds = LEDs.getInstance();
     intakeState = IntakeState.EMPTY;
     automationEnabled = true;
 
     mostRecentIntakeState = null;
+
     checkComplete = false;
+
+    intakeAndKickerTimeout = 0;
 
     leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
     this.intakeGamePiece();
@@ -63,14 +76,24 @@ public class Intake extends SubsystemBase {
     FaultReporter.getInstance().registerSystemCheck(SUBSYSTEM_NAME, getSystemCheckCommand());
   }
 
+  public void setShooterAngleReady(BooleanSupplier isShooterAngleReady) {
+    this.isShooterAngleReady = isShooterAngleReady;
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
     Logger.recordOutput("Intake/State", intakeState.toString());
+    Logger.recordOutput("Intake/AutomationEnabled", automationEnabled);
 
-    if (automationEnabled) {
-      this.runIntakeStateMachine();
+    if (TESTING) {
+      io.setRollerVelocity(rollerVelocity.get());
+      io.setKickerVoltage(kickerVelocity.get());
+    } else {
+      if (automationEnabled) {
+        this.runIntakeStateMachine();
+      }
     }
   }
 
@@ -82,17 +105,21 @@ public class Intake extends SubsystemBase {
       runNoteInIntakeState();
     } else if (intakeState == IntakeState.NOTE_IN_INTAKE_AND_KICKER) {
       runNoteInIntakeAndKickerState();
+    } else if (intakeState == IntakeState.NOTE_IN_BETWEEN_INTAKE_AND_KICKER) {
+      runNoteInBetweenIntakeAndKickerState();
     } else if (intakeState == IntakeState.NOTE_IN_KICKER) {
       runNoteInKickerState();
     } else if (intakeState == IntakeState.NOTE_IN_KICKER_AND_SHOOTER) {
       runNoteInKickerAndShooterState();
     } else if (intakeState == IntakeState.NOTE_IN_SHOOTER) {
       runNoteInShooterState();
+    } else if (intakeState == IntakeState.SHOOTING) {
+      runShootingState();
     }
   }
 
   private void runEmptyState() {
-    if (isShooterAngleReady.getAsBoolean()) {
+    if (isShooterAngleReady.getAsBoolean() || DriverStation.isAutonomousEnabled()) {
       this.intakeGamePiece();
     } else {
       this.repelGamePiece();
@@ -102,12 +129,10 @@ public class Intake extends SubsystemBase {
       intakeState = IntakeState.NOTE_IN_INTAKE;
       leds.setIntakeLEDState(IntakeLEDState.HAS_GAME_PIECE);
       this.transitionGamePiece();
-      hasNote = true;
     } else if (inputs.isShooterIRBlocked) {
       intakeState = IntakeState.NOTE_IN_SHOOTER;
       leds.setIntakeLEDState(IntakeLEDState.HAS_GAME_PIECE);
       this.repelGamePiece();
-      hasNote = true;
     }
   }
 
@@ -116,15 +141,29 @@ public class Intake extends SubsystemBase {
       intakeState = IntakeState.NOTE_IN_INTAKE_AND_KICKER;
       this.transitionGamePiece();
     } else if (!inputs.isRollerIRBlocked) {
-      intakeState = IntakeState.EMPTY;
-      leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
-      this.intakeGamePiece();
-      hasNote = false;
+      intakeState = IntakeState.NOTE_IN_BETWEEN_INTAKE_AND_KICKER;
+      this.transitionGamePiece();
+      intakeAndKickerTimeout = 0;
     }
   }
 
   private void runNoteInIntakeAndKickerState() {
     if (!inputs.isRollerIRBlocked) {
+      intakeState = IntakeState.NOTE_IN_KICKER;
+      this.transitionGamePiece();
+      this.repelGamePiece();
+    }
+  }
+
+  private void runNoteInBetweenIntakeAndKickerState() {
+    this.intakeAndKickerTimeout++;
+
+    if (intakeAndKickerTimeout
+        > IntakeConstants.IN_BETWEEN_TIMEOUT_SECONDS / Constants.LOOP_PERIOD_SECS) {
+      intakeState = IntakeState.EMPTY;
+      leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
+      this.intakeGamePiece();
+    } else if (inputs.isKickerIRBlocked) {
       intakeState = IntakeState.NOTE_IN_KICKER;
       this.transitionGamePiece();
       this.repelGamePiece();
@@ -145,17 +184,33 @@ public class Intake extends SubsystemBase {
   }
 
   private void runNoteInShooterState() {
-    // TODO: Set up access of shooter angle
-    if (!inputs.isShooterIRBlocked) {
+    // only transition to the empty state if the note is not in the kicker or the shooter (for amp
+    // shots, the note can move such that it isn't detected by the shooter IR sensor)
+    if (!this.hasNote()) {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
-      hasNote = false;
+    }
+  }
+
+  private void runShootingState() {
+    if (!this.hasNote()) {
+      intakeState = IntakeState.EMPTY;
+      leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
+      this.intakeGamePiece();
+      this.turnKickerOff();
+    } else {
+      leds.setIntakeLEDState(IntakeLEDState.SHOOTING);
+      this.io.setKickerVoltage(KICKER_SHOOTING_VELOCITY_VOLTAGE);
     }
   }
 
   public boolean hasNote() {
-    return hasNote;
+    return inputs.isKickerIRBlocked || inputs.isShooterIRBlocked;
+  }
+
+  public boolean hasNoteForAuto() {
+    return inputs.isKickerIRBlocked || inputs.isShooterIRBlocked || inputs.isRollerIRBlocked;
   }
 
   private void setIntakeState(IntakeState state) {
@@ -279,6 +334,7 @@ public class Intake extends SubsystemBase {
 
   public void enableAutomation() {
     automationEnabled = true;
+    this.intakeState = IntakeState.EMPTY;
   }
 
   public void disableAutomation() {
@@ -319,6 +375,10 @@ public class Intake extends SubsystemBase {
   }
 
   public void shoot() {
-    this.setKickerVelocity(IntakeConstants.KICKER_SHOOTING_VELOCITY_RPS);
+    this.intakeState = IntakeState.SHOOTING;
+  }
+
+  public boolean isShooting() {
+    return this.intakeState == IntakeState.SHOOTING;
   }
 }

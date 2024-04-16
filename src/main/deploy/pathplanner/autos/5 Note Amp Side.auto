@@ -2,25 +2,31 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.4229570277322372,
-      "y": 6.28
+      "x": 1.32,
+      "y": 6.26
     },
-    "rotation": 179.34477450273
+    "rotation": -160.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "5 Note Amp Side 1"
+            "name": "PrepAutoSubwooferShot"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 Note Amp Side 1"
           }
         },
         {
@@ -32,7 +38,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "Stop And Shoot"
           }
         },
         {
@@ -44,7 +50,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "Stop And Shoot"
           }
         },
         {
@@ -56,7 +62,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "Stop And Shoot"
           }
         },
         {
@@ -74,7 +80,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "Stop And Shoot"
           }
         }
       ]

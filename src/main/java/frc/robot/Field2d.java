@@ -5,7 +5,9 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.team3061.RobotConfig;
@@ -33,6 +35,8 @@ public class Field2d {
   private Region2d[] regions;
 
   private Alliance alliance;
+
+  private static final double AMP_SCORING_ALIGNMENT_OFFSET = -0.3;
 
   /**
    * Get the singleton instance of the Field2d class.
@@ -220,11 +224,35 @@ public class Field2d {
     }
   }
 
+  public Pose2d getAlliancePassPose() {
+    if (alliance == Alliance.Blue) {
+      Transform2d offset =
+          FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.minus(
+              new Pose2d(FieldConstants.blueAmpCenter, new Rotation2d()).div(2));
+      return FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.plus(offset);
+    } else {
+      Transform2d offset =
+          FieldConstants.RedSpeaker.redCenterSpeakerOpening.minus(
+              new Pose2d(FieldConstants.redAmpCenter, new Rotation2d()).div(2));
+      return new Pose2d(FieldConstants.redAmpCenter, new Rotation2d()).plus(offset);
+    }
+  }
+
   public Pose2d getOpponentSpeakerCenter() {
     if (alliance == Alliance.Blue) {
       return FieldConstants.RedSpeaker.redCenterSpeakerOpening;
     } else {
       return FieldConstants.BlueSpeaker.blueCenterSpeakerOpening;
+    }
+  }
+
+  public Pose2d getAllianceAmpScoringPose() {
+    if (alliance == Alliance.Blue) {
+      return new Pose2d(FieldConstants.blueAmpCenter, new Rotation2d(Units.degreesToRadians(90.0)))
+          .plus(new Transform2d(AMP_SCORING_ALIGNMENT_OFFSET, 0.0, new Rotation2d()));
+    } else {
+      return new Pose2d(FieldConstants.redAmpCenter, new Rotation2d(Units.degreesToRadians(90.0)))
+          .plus(new Transform2d(AMP_SCORING_ALIGNMENT_OFFSET, 0.0, new Rotation2d()));
     }
   }
 }

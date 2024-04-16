@@ -8,11 +8,13 @@
   },
   "NTProvider": {
     "types": {
+      "/AdvantageKit/RealOutputs/Shooter/ArmSim": "Mechanism2d",
       "/FMSInfo": "FMSInfo",
       "/Shuffleboard/MAIN/SendableChooser[0]": "String Chooser",
       "/SmartDashboard/Auto Routine": "String Chooser",
       "/SmartDashboard/SystemStatus/Drivetrain/SystemCheck": "Command",
       "/SmartDashboard/SystemStatus/INTAKE/SystemCheck": "Command",
+      "/SmartDashboard/SystemStatus/Shooter/SystemCheck": "Command",
       "/SmartDashboard/SystemStatus/Subsystem/SystemCheck": "Command",
       "/SmartDashboard/SystemStatus/SwerveModule0/SystemCheck": "Command",
       "/SmartDashboard/SystemStatus/SwerveModule1/SystemCheck": "Command",
