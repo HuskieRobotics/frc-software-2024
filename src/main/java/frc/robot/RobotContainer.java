@@ -36,6 +36,7 @@ import frc.lib.team6328.util.NoteVisualizer;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.DriveToAmp;
 import frc.robot.commands.TeleopSwerve;
+import frc.robot.commands.WheelDiameterCharacterization;
 import frc.robot.commands.TeleopSwerveAimAtSpeaker;
 import frc.robot.commands.TeleopSwerveAimToPass;
 import frc.robot.commands.TeleopSwerveCollectNote;
@@ -596,6 +597,23 @@ public class RobotContainer {
                     Commands.waitSeconds(0.5),
                     Commands.run(
                         () -> drivetrain.drive(0.1, -0.1, 0.0, true, false), drivetrain)))));
+
+    /************ Drive Wheel Diameter Characterization ************
+     *
+     * useful for characterizing the drive wheel diameter
+     *
+     */
+    autoChooser.addOption( // start by driving slowing in a circle to align wheels
+        "Drive Wheel Diameter Characterization",
+        Commands.sequence(
+                Commands.deadline(
+                    Commands.waitSeconds(0.5),
+                    Commands.run(() -> drivetrain.drive(0.0, 0.0, 0.1, true, false), drivetrain)),
+                Commands.deadline(
+                    Commands.waitSeconds(0.25),
+                    Commands.run(() -> drivetrain.drive(0.0, 0.0, 0.0, true, false), drivetrain)),
+                new WheelDiameterCharacterization(drivetrain))
+            .withName("Drive Wheel Diameter Characterization"));
 
     Shuffleboard.getTab("MAIN").add(autoChooser.getSendableChooser());
   }
