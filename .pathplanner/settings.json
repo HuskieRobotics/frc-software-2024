@@ -13,7 +13,7 @@
     "Source Side Notes",
     "Tuning"
   ],
-  "defaultMaxVel": 2.75,
+  "defaultMaxVel": 3.0,
   "defaultMaxAccel": 6.948,
   "defaultMaxAngVel": 530.0,
   "defaultMaxAngAccel": 2005.0,
