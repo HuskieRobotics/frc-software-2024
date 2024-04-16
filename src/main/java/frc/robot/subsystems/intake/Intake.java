@@ -35,6 +35,7 @@ public class Intake extends SubsystemBase {
   private IntakeState intakeState;
   private boolean automationEnabled;
   private int intakeAndKickerTimeout;
+  private boolean quickShootingEnabled;
 
   // system tests
   private IntakeState mostRecentIntakeState;
@@ -72,6 +73,8 @@ public class Intake extends SubsystemBase {
 
     intakeAndKickerTimeout = 0;
 
+    quickShootingEnabled = false;
+
     leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
     this.intakeGamePiece();
 
@@ -91,10 +94,15 @@ public class Intake extends SubsystemBase {
     Logger.processInputs("Intake", inputs);
     Logger.recordOutput("Intake/State", intakeState.toString());
     Logger.recordOutput("Intake/AutomationEnabled", automationEnabled);
+    Logger.recordOutput("Intake/QuickShooting", quickShootingEnabled);
 
     if (TESTING) {
       io.setRollerVelocity(rollerVelocity.get());
       io.setKickerVoltage(kickerVelocity.get());
+    } else if (quickShootingEnabled && DriverStation.isAutonomousEnabled()) {
+      leds.setIntakeLEDState(IntakeLEDState.SHOOTING);
+      this.intakeGamePiece();
+      this.io.setKickerVoltage(KICKER_SHOOTING_VELOCITY_VOLTAGE);
     } else {
       if (automationEnabled) {
         this.runIntakeStateMachine();
@@ -147,8 +155,8 @@ public class Intake extends SubsystemBase {
       this.transitionGamePiece();
     } else if (!inputs.isRollerIRBlocked) {
       intakeState = IntakeState.NOTE_IN_BETWEEN_INTAKE_AND_KICKER;
-      this.transitionGamePiece();
       intakeAndKickerTimeout = 0;
+      this.transitionGamePiece();
     }
   }
 
@@ -194,6 +202,7 @@ public class Intake extends SubsystemBase {
     if (!this.hasNote()) {
       intakeState = IntakeState.EMPTY;
       leds.setIntakeLEDState(IntakeLEDState.WAITING_FOR_GAME_PIECE);
+      this.turnKickerOff();
       this.intakeGamePiece();
     }
   }
@@ -220,6 +229,14 @@ public class Intake extends SubsystemBase {
 
   private void setIntakeState(IntakeState state) {
     this.intakeState = state;
+  }
+
+  public void enableQuickShoot() {
+    quickShootingEnabled = true;
+  }
+
+  public void disableQuickShoot() {
+    quickShootingEnabled = false;
   }
 
   public void completeCheck() {

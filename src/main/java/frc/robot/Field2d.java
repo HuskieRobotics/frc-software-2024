@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.Drivetrain;
+import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.FieldConstants;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +37,7 @@ public class Field2d {
 
   private Alliance alliance;
 
-  private static final double AMP_SCORING_ALIGNMENT_OFFSET = -0.3;
+  private static final double AMP_SCORING_ALIGNMENT_OFFSET = -0.1;
 
   /**
    * Get the singleton instance of the Field2d class.
@@ -225,16 +226,14 @@ public class Field2d {
   }
 
   public Pose2d getAlliancePassPose() {
+    // When the robot shoots a note at a low velocity, the note curves to the left of where the
+    // robot is aimed. Therefore, when shooting between the blue alliance's speaker and amp, we aim
+    // the robot at the amp such that note will land in the desired location. Similarly, when
+    // shooting between the red alliance's speaker and amp, we aim toward the speaker.
     if (alliance == Alliance.Blue) {
-      Transform2d offset =
-          FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.minus(
-              new Pose2d(FieldConstants.blueAmpCenter, new Rotation2d()).div(2));
-      return FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.plus(offset);
+      return new Pose2d(FieldConstants.blueAmpCenter, new Rotation2d());
     } else {
-      Transform2d offset =
-          FieldConstants.RedSpeaker.redCenterSpeakerOpening.minus(
-              new Pose2d(FieldConstants.redAmpCenter, new Rotation2d()).div(2));
-      return new Pose2d(FieldConstants.redAmpCenter, new Rotation2d()).plus(offset);
+      return FieldConstants.RedSpeaker.redCenterSpeakerOpening;
     }
   }
 
@@ -253,6 +252,18 @@ public class Field2d {
     } else {
       return new Pose2d(FieldConstants.redAmpCenter, new Rotation2d(Units.degreesToRadians(90.0)))
           .plus(new Transform2d(AMP_SCORING_ALIGNMENT_OFFSET, 0.0, new Rotation2d()));
+    }
+  }
+
+  public boolean hasFullyLeftAllianceSideOfField() {
+    if (alliance == Alliance.Blue) {
+      return RobotOdometry.getInstance().getEstimatedPosition().getX()
+          > FieldConstants.StagingLocations.centerlineX
+              + RobotConfig.getInstance().getRobotLengthWithBumpers() / 2;
+    } else {
+      return RobotOdometry.getInstance().getEstimatedPosition().getX()
+          < FieldConstants.StagingLocations.centerlineX
+              - RobotConfig.getInstance().getRobotLengthWithBumpers() / 2;
     }
   }
 }

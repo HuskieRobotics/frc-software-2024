@@ -15,28 +15,28 @@ public class ArtemisRobotConfig extends RobotConfig {
   private static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1;
   private static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2;
   private static final int FRONT_LEFT_MODULE_STEER_ENCODER = 22;
-  private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = 0.363281;
+  private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = 0.354248;
 
   private static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 3;
   private static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 4;
   private static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 23;
-  private static final double FRONT_RIGHT_MODULE_STEER_OFFSET_ROT = 0.025146;
+  private static final double FRONT_RIGHT_MODULE_STEER_OFFSET_ROT = 0.023926;
 
   private static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 7;
   private static final int BACK_LEFT_MODULE_STEER_MOTOR = 8;
   private static final int BACK_LEFT_MODULE_STEER_ENCODER = 24;
-  private static final double BACK_LEFT_MODULE_STEER_OFFSET_ROT = -0.033203;
+  private static final double BACK_LEFT_MODULE_STEER_OFFSET_ROT = -0.027588;
 
   private static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 5;
   private static final int BACK_RIGHT_MODULE_STEER_MOTOR = 6;
   private static final int BACK_RIGHT_MODULE_STEER_ENCODER = 25;
-  private static final double BACK_RIGHT_MODULE_STEER_OFFSET_ROT = -0.335693;
+  private static final double BACK_RIGHT_MODULE_STEER_OFFSET_ROT = -0.344727;
 
   private static final int GYRO_ID = 26;
 
   private static final double TRACKWIDTH_METERS = 0.57785; // 22.75
   private static final double WHEELBASE_METERS = 0.57785; // 22.75
-  private static final double WHEEL_DIAMETER_METERS = 0.09849016753330445;
+  private static final double WHEEL_DIAMETER_METERS = 0.1027125;
   private static final double ROBOT_WIDTH_WITH_BUMPERS =
       0.88265; // meters //34.75 in , measure the actual bumpers
   private static final double ROBOT_LENGTH_WITH_BUMPERS = 0.88265; // meters // 34.75 in same above
@@ -132,7 +132,7 @@ public class ArtemisRobotConfig extends RobotConfig {
   private static final double DRIVE_TO_POSE_THETA_KD = 0.0;
   private static final double DRIVE_TO_POSE_DRIVE_TOLERANCE_METERS = 0.06;
   private static final double DRIVE_TO_POSE_THETA_TOLERANCE_RADIANS = 0.02;
-  private static final double DRIVE_TO_POSE_MAX_VELOCITY = 1.0;
+  private static final double DRIVE_TO_POSE_MAX_VELOCITY = 1.25;
 
   private static final double SQUARING_SPEED_METERS_PER_SECOND = 1.0;
 

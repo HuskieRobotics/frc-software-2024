@@ -1,7 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import edu.wpi.first.math.util.Units;
-
 public class ShooterConstants {
 
   private static final String CONSTRUCTOR_EXCEPTION = "constant class";
@@ -65,15 +63,17 @@ public class ShooterConstants {
   public static final boolean SHOOT_TOP_INVERTED = false;
   public static final boolean SHOOT_BOTTOM_INVERTED = false;
   public static final double VELOCITY_TOLERANCE = 5.0; // FIXME: tune with real robot
-  public static final double CLOSE_RANGE_VELOCITY_TOP = 60;
-  public static final double CLOSE_RANGE_VELOCITY_BOTTOM = 60;
-  public static final double MID_RANGE_VELOCITY_TOP = 80;
-  public static final double MID_RANGE_VELOCITY_BOTTOM = 80;
+  public static final double SUBWOOFER_RANGE_VELOCITY_TOP = 60;
+  public static final double SUBWOOFER_RANGE_VELOCITY_BOTTOM = 60;
+  public static final double NEAR_RANGE_VELOCITY_TOP = 80;
+  public static final double NEAR_RANGE_VELOCITY_BOTTOM = 80;
+  public static final double MID_RANGE_VELOCITY_TOP = 100;
+  public static final double MID_RANGE_VELOCITY_BOTTOM = 100;
   public static final double FAR_RANGE_VELOCITY_TOP = 120;
   public static final double FAR_RANGE_VELOCITY_BOTTOM = 120;
-  public static final double SLOW_TO_MID_VELOCITY_DISTANCE_METERS =
-      Units.inchesToMeters(106.901) / 2.0;
-  public static final double MID_TO_FAST_VELOCITY_DISTANCE_METERS = Units.inchesToMeters(106.901);
+  public static final double SUBWOOFER_TO_NEAR_VELOCITY_DISTANCE_METERS = 2.0;
+  public static final double NEAR_TO_MID_VELOCITY_DISTANCE_METERS = 2.895;
+  public static final double MID_TO_FAST_VELOCITY_DISTANCE_METERS = 4.071;
 
   // Deflector Motor
   public static final double DEFLECTOR_DEPLOY_VOLTAGE = 1;
@@ -82,6 +82,7 @@ public class ShooterConstants {
   public static final double DEFLECTOR_MOTOR_PEAK_CURRENT_LIMIT = 15;
   public static final double DEFLECTOR_MOTOR_PEAK_CURRENT_DURATION = 0.1;
   public static final boolean DEFLECTOR_MOTOR_INVERTED = false;
+  public static final double DEFLECTOR_RETRACTION_DELAY_SECS = 0.2;
 
   // Angle Motor
   public static final double ANGLE_MOTOR_CONTINUOUS_CURRENT_LIMIT = 15;
@@ -91,11 +92,11 @@ public class ShooterConstants {
   public static final double MOTION_MAGIC_CRUISE_VELOCITY = 0;
   public static final double ANGLE_MOTOR_GEAR_RATIO = 45.0;
   public static final boolean ANGLE_MOTOR_INVERTED = true;
-  public static final double MAGNET_OFFSET = -0.805;
+  public static final double MAGNET_OFFSET = -0.70727;
   public static final double SENSOR_TO_MECHANISM_RATIO = 4.0;
   // FIXME: tune on practice field and reduce this value
   public static final double ANGLE_TOLERANCE_DEGREES = 1.5;
-  public static final double SHOOTER_STORAGE_ANGLE = 10.4;
+  public static final double SHOOTER_STORAGE_ANGLE = 14.7;
   public static final double MAX_INTAKE_ANGLE = 60.0;
   public static final double ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE = 1.0;
   public static final double UPPER_ANGLE_LIMIT = 135.0;
@@ -109,18 +110,32 @@ public class ShooterConstants {
   public static final double PODIUM_VELOCITY_TOP = 120;
   public static final double PODIUM_VELOCITY_BOTTOM = 120;
   public static final double PODIUM_ANGLE = 40;
-  public static final double AMP_VELOCITY_TOP = 30;
-  public static final double AMP_VELOCITY_BOTTOM = 17;
-  public static final double AMP_ANGLE = 56;
+  public static final double AMP_VELOCITY_TOP = 35; // 30;
+  public static final double AMP_VELOCITY_BOTTOM = 22; // 17;
+  public static final double AMP_ANGLE = 52; // 56;
   public static final double PASS_VELOCITY_TOP = 60.0;
   public static final double PASS_VELOCITY_BOTTOM = 60.0;
-  public static final double PASS_ANGLE = 63.0;
-  public static final double SOURCE_SIDE_AUTO_VELOCITY = 120.0;
-  public static final double SOURCE_SIDE_AUTO_ANGLE = 33;
-  public static final double SOURCE_SIDE_UNDER_STAGE_AUTO_VELOCITY = 120.0;
-  public static final double SOURCE_SIDE_UNDER_STAGE_AUTO_ANGLE = 30.5;
-  public static final double AMP_SIDE_SIX_NOTE_ANGLE = 33.0;
-  public static final double AMP_SIDE_SIX_NOTE_VELOCITY = 120.0;
+  public static final double PASS_ANGLE = 48.0;
+  public static final double SOURCE_SIDE_AUTO_1_VELOCITY = 100.0;
+  public static final double SOURCE_SIDE_AUTO_1_ANGLE = 30.5;
+  public static final double SOURCE_SIDE_AUTO_2_VELOCITY = 120.0;
+  public static final double SOURCE_SIDE_AUTO_2_ANGLE = 28.6;
+  public static final double SOURCE_SIDE_AUTO_3_4_VELOCITY = 120.0;
+  public static final double SOURCE_SIDE_AUTO_3_4_ANGLE = 31.6;
+  public static final double AMP_SIDE_AUTO_1_VELOCITY = 100.0;
+  public static final double AMP_SIDE_AUTO_1_ANGLE = 30.5;
+  public static final double AMP_SIDE_AUTO_2_VELOCITY = 120.0;
+  public static final double AMP_SIDE_AUTO_2_ANGLE = 28.8;
+  public static final double AMP_SIDE_AUTO_3_VELOCITY = 80.0;
+  public static final double AMP_SIDE_AUTO_3_ANGLE = 37.5;
+  public static final double AMP_SIDE_AUTO_4_VELOCITY = 80.0;
+  public static final double AMP_SIDE_AUTO_4_ANGLE = 47.0;
+  public static final double AMP_SIDE_AUTO_5_VELOCITY = 80.0;
+  public static final double AMP_SIDE_AUTO_5_ANGLE = 39.0;
+  public static final double AMP_SIDE_AUTO_6_VELOCITY = 80.0;
+  public static final double AMP_SIDE_AUTO_6_ANGLE = 47.0;
+  public static final double AMP_FAR_SIDE_AUTO_1_VELOCITY = 120.0;
+  public static final double AMP_FAR_SIDE_AUTO_1_ANGLE = 33.0; // FIXME: tune
 
   // auto shot
   public static final double SHOOTER_AUTO_SHOT_ANGLE_DEG = 28.5;

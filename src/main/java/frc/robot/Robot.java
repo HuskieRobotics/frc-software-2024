@@ -255,6 +255,8 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
     }
+
+    robotContainer.autonomousInit();
   }
 
   /** This method is invoked at the start of the teleop period. */

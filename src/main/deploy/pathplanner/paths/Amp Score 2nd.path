@@ -16,37 +16,49 @@
     },
     {
       "anchor": {
-        "x": 4.08,
-        "y": 6.6047521185951465
+        "x": 4.993182357834665,
+        "y": 6.316687318385498
       },
       "prevControl": {
-        "x": 4.08,
-        "y": 6.600087745630037
+        "x": 4.993182357834665,
+        "y": 6.312022945420389
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Amp Score 2nd End"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.3,
-      "rotationDegrees": -166.09129194412046,
-      "rotateFast": true
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "EnableRotationOverride"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
-    "maxVelocity": 2.75,
-    "maxAcceleration": 11.8,
-    "maxAngularVelocity": 537.0,
-    "maxAngularAcceleration": 2303.0
+    "maxVelocity": 3.0,
+    "maxAcceleration": 6.948,
+    "maxAngularVelocity": 530.0,
+    "maxAngularAcceleration": 2005.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -164.05,
-    "rotateFast": false
+    "rotation": -170.8139752064971,
+    "rotateFast": true
   },
   "reversed": false,
   "folder": "6 Amp Side",

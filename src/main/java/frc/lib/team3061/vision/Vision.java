@@ -196,6 +196,7 @@ public class Vision extends SubsystemBase {
     // such that old data is not seen in AdvantageScope
     if (cyclesWithNoResults[i] == EXPIRATION_COUNT) {
       Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/RobotPose2d", new Pose2d());
+      Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/RobotPose3d", new Pose3d());
     }
   }
 

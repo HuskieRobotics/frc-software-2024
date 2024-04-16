@@ -19,7 +19,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class WheelDiameterCharacterization extends Command {
   private static final TunableNumber characterizationSpeed =
-      new TunableNumber("WheelDiameterCharacterization/SpeedRadsPerSec", 0.1);
+      new TunableNumber("WheelDiameterCharacterization/SpeedRadsPerSec", 0.5);
   private static final double DRIVE_RADIUS =
       Math.hypot(
           RobotConfig.getInstance().getTrackwidth() / 2.0,

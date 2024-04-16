@@ -73,7 +73,7 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getTargetNoteButton() {
+  public Trigger getRunIntakeButton() {
     return translateJoystickButtons[4];
   }
 
@@ -105,7 +105,7 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getOuttakeAllButton() {
+  public Trigger getTargetNoteButton() {
     return rotateJoystickButtons[2];
   }
 
@@ -149,13 +149,28 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   // Operator Panel
 
   @Override
-  public Trigger getPrepareToScoreSubwooferButton() {
-    return operatorPanelButtons[6];
+  public Trigger getOuttakeAllButton() {
+    return operatorPanelButtons[1];
   }
 
   @Override
   public Trigger getPrepareToScorePodiumButton() {
     return operatorPanelButtons[5];
+  }
+
+  @Override
+  public Trigger getPrepareToScoreSubwooferButton() {
+    return operatorPanelButtons[6];
+  }
+
+  @Override
+  public Trigger getStoreShooterButton() {
+    return operatorPanelButtons[7];
+  }
+
+  @Override
+  public Trigger getScaleDownShooterVelocityButton() {
+    return operatorPanelButtons[8];
   }
 
   @Override
@@ -169,17 +184,7 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getStoreShooterButton() {
-    return operatorPanelButtons[2];
-  }
-
-  @Override
   public Trigger getIntakeAutomationSwitch() {
     return operatorPanelButtons[12];
-  }
-
-  @Override
-  public Trigger getScaleDownShooterVelocityButton() {
-    return operatorPanelButtons[8];
   }
 }
