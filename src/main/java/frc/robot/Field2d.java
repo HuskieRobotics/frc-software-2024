@@ -226,39 +226,13 @@ public class Field2d {
   }
 
   public Pose2d getAlliancePassPose() {
+    // When the robot shoots a note at a low velocity, the note curves to the left of where the
+    // robot is aimed. Therefore, when shooting between the blue alliance's speaker and amp, we aim
+    // the robot at the amp such that note will land in the desired location. Similarly, when
+    // shooting between the red alliance's speaker and amp, we aim toward the speaker.
     if (alliance == Alliance.Blue) {
-      // Transform2d offset =
-      //     new Transform2d(
-      //         Math.abs(
-      //                 FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.getX()
-      //                     - FieldConstants.blueAmpCenter.getX())
-      //             / 1.5,
-      //         Math.abs(
-      //                 FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.getY()
-      //                     - FieldConstants.blueAmpCenter.getY())
-      //             / 1.5,
-      //         new Rotation2d());
-      // return new Pose2d(
-      //     FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.getX() + offset.getX(),
-      //     FieldConstants.BlueSpeaker.blueCenterSpeakerOpening.getY() + offset.getY(),
-      //     new Rotation2d());
       return new Pose2d(FieldConstants.blueAmpCenter, new Rotation2d());
     } else {
-      // Transform2d offset =
-      //     new Transform2d(
-      //         Math.abs(
-      //                 FieldConstants.RedSpeaker.redCenterSpeakerOpening.getX()
-      //                     - FieldConstants.redAmpCenter.getX())
-      //             / 1.5,
-      //         Math.abs(
-      //                 FieldConstants.RedSpeaker.redCenterSpeakerOpening.getY()
-      //                     - FieldConstants.redAmpCenter.getY())
-      //             / 1.5,
-      //         new Rotation2d());
-      // return new Pose2d(
-      //     FieldConstants.RedSpeaker.redCenterSpeakerOpening.getX() - offset.getX(),
-      //     FieldConstants.RedSpeaker.redCenterSpeakerOpening.getY() + offset.getY(),
-      //     new Rotation2d());
       return FieldConstants.RedSpeaker.redCenterSpeakerOpening;
     }
   }
