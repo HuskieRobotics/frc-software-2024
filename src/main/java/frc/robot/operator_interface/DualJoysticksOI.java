@@ -30,21 +30,6 @@ public class DualJoysticksOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getIntakeAutomationSwitch() {
-    return translateJoystickButtons[1];
-  }
-
-  @Override
-  public Trigger getRunIntakeButton() {
-    return translateJoystickButtons[2];
-  }
-
-  @Override
-  public Trigger getOuttakeAllButton() {
-    return translateJoystickButtons[3];
-  }
-
-  @Override
   public double getTranslateX() {
     return -translateJoystick.getY();
   }
@@ -55,8 +40,18 @@ public class DualJoysticksOI implements OperatorInterface {
   }
 
   @Override
-  public double getRotate() {
-    return -rotateJoystick.getX();
+  public Trigger getPrepareToScoreAmpButton() {
+    return translateJoystickButtons[1];
+  }
+
+  @Override
+  public Trigger getShootButton() {
+    return translateJoystickButtons[2];
+  }
+
+  @Override
+  public Trigger getOuttakeAllButton() {
+    return translateJoystickButtons[3];
   }
 
   @Override
@@ -65,18 +60,18 @@ public class DualJoysticksOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getResetGyroButton() {
-    return rotateJoystickButtons[3];
-  }
-
-  @Override
-  public Trigger getLock180Button() {
-    return new Trigger(() -> false);
+  public double getRotate() {
+    return -rotateJoystick.getX();
   }
 
   @Override
   public Trigger getAimSpeakerButton() {
     return rotateJoystickButtons[2];
+  }
+
+  @Override
+  public Trigger getResetGyroButton() {
+    return rotateJoystickButtons[3];
   }
 
   @Override
@@ -88,15 +83,5 @@ public class DualJoysticksOI implements OperatorInterface {
   public Trigger getVisionIsEnabledSwitch() {
     // vision is always enabled with dual joysticks as there is no switch to disable
     return new Trigger(() -> true);
-  }
-
-  @Override
-  public Trigger getTurboButton() {
-    return translateJoystickButtons[1];
-  }
-
-  @Override
-  public Trigger getShootButton() {
-    return translateJoystickButtons[2];
   }
 }

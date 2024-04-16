@@ -3,71 +3,77 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.73,
-        "y": 2.73
+        "x": 4.288662112056496,
+        "y": 2.478236732884464
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.37951431792588,
-        "y": 1.141894614616297
+        "x": 4.593581130290223,
+        "y": 1.9842375229774147
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Source Score 2nd End"
     },
     {
       "anchor": {
-        "x": 6.675719015598432,
-        "y": 2.2117778571396745
+        "x": 5.430073419388546,
+        "y": 1.478451487708661
       },
       "prevControl": {
-        "x": 6.161352072077578,
-        "y": 1.903157691027161
+        "x": 4.822581602610772,
+        "y": 1.6708104359202063
       },
       "nextControl": {
-        "x": 7.170971538041804,
-        "y": 2.5089293706056983
+        "x": 5.890087410207938,
+        "y": 1.3327905833264981
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.299436504086279,
-        "y": 2.5
+        "x": 6.5,
+        "y": 1.9842375229774147
       },
       "prevControl": {
-        "x": 7.527886088804998,
-        "y": 2.458850644518332
+        "x": 6.21288476373249,
+        "y": 1.4577677118317205
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Source Collect 3rd Start"
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [
+  "constraintZones": [],
+  "eventMarkers": [
     {
-      "name": "New Constraints Zone",
-      "minWaypointRelativePos": 1.45,
-      "maxWaypointRelativePos": 2.0,
-      "constraints": {
-        "maxVelocity": 1.5,
-        "maxAcceleration": 11.8,
-        "maxAngularVelocity": 537.0,
-        "maxAngularAcceleration": 2303.0
+      "name": "DisableRotationOverride",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "DisableRotationOverride"
+              }
+            }
+          ]
+        }
       }
     }
   ],
-  "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.75,
-    "maxAcceleration": 11.8,
-    "maxAngularVelocity": 537.0,
-    "maxAngularAcceleration": 2303.0
+    "maxVelocity": 3.0,
+    "maxAcceleration": 6.948,
+    "maxAngularVelocity": 530.0,
+    "maxAngularAcceleration": 2005.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0,
+    "rotation": -160.82099197418913,
     "rotateFast": true
   },
   "reversed": false,

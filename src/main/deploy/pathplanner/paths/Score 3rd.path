@@ -8,44 +8,72 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.551341209127023,
-        "y": 4.176324265030862
+        "x": 6.480552108023648,
+        "y": 3.64749544664966
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.13,
-        "y": 4.89
+        "x": 5.81913960036451,
+        "y": 3.9198417733328355
       },
       "prevControl": {
-        "x": 5.685180481472074,
-        "y": 4.100069144582734
+        "x": 6.047697847285506,
+        "y": 3.7783355119494595
+      },
+      "nextControl": {
+        "x": 5.590581353443514,
+        "y": 4.061348034716211
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.369868076229044,
+        "y": 4.960593807443538
+      },
+      "prevControl": {
+        "x": 4.768660911729407,
+        "y": 4.600707590040772
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Source Score 3rd End"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.65,
-      "rotationDegrees": 170.68,
-      "rotateFast": true
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "EnableRotationOverride",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "EnableRotationOverride"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
-    "maxAcceleration": 11.8,
-    "maxAngularVelocity": 537.0,
-    "maxAngularAcceleration": 2303.0
+    "maxAcceleration": 6.948,
+    "maxAngularVelocity": 530.0,
+    "maxAngularAcceleration": 2005.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 170.68,
+    "rotation": 171.81019383329584,
     "rotateFast": false
   },
   "reversed": false,
@@ -54,5 +82,5 @@
     "rotation": -156.82234431846047,
     "velocity": 0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

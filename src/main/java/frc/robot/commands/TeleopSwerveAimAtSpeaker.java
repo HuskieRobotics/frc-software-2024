@@ -1,12 +1,12 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import frc.lib.team3061.drivetrain.Drivetrain;
-import frc.robot.Field2d;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * This command, when executed, instructs the drivetrain subsystem to drive based on the specified
@@ -46,18 +46,18 @@ public class TeleopSwerveAimAtSpeaker extends TeleopSwerve {
         drivetrain,
         translationXSupplier,
         translationYSupplier,
-        () -> {
-          Transform2d translation =
-              new Transform2d(
-                  Field2d.getInstance().getAllianceSpeakerCenter().getX()
-                      - drivetrain.getPose().getX(),
-                  Field2d.getInstance().getAllianceSpeakerCenter().getY()
-                      - drivetrain.getPose().getY(),
-                  new Rotation2d());
-          return new Rotation2d(Math.atan2(translation.getY(), translation.getX()));
-        });
+        calculateTargetRotation(drivetrain));
     this.shooter = shooter;
     this.intake = intake;
+  }
+
+  private static Supplier<Rotation2d> calculateTargetRotation(Drivetrain drivetrain) {
+    // project the robot pose into the future based on the current velocity
+    return () -> {
+      Rotation2d targetAngle = drivetrain.getFutureRotationAimedAtSpeaker();
+      Logger.recordOutput("TeleopSwerveAimAtSpeaker/targetAngle", targetAngle);
+      return targetAngle;
+    };
   }
 
   @Override
@@ -83,6 +83,6 @@ public class TeleopSwerveAimAtSpeaker extends TeleopSwerve {
 
   @Override
   public boolean isFinished() {
-    return !this.intake.hasNote();
+    return this.intake.isShooting();
   }
 }

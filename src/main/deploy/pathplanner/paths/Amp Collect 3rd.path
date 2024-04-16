@@ -3,25 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.08,
-        "y": 6.6
+        "x": 4.993182357834665,
+        "y": 6.316687318385498
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.460927794582862,
-        "y": 6.642067102316023
+        "x": 5.328628789685423,
+        "y": 6.31386739994759
+      },
+      "isLocked": false,
+      "linkedName": "Amp Score 2nd End"
+    },
+    {
+      "anchor": {
+        "x": 5.965039418230496,
+        "y": 6.4779519132497985
+      },
+      "prevControl": {
+        "x": 5.717598053233731,
+        "y": 6.493141841511097
+      },
+      "nextControl": {
+        "x": 6.348532032279589,
+        "y": 6.454410072150515
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.2795852864433,
-        "y": 5.765164984875425
+        "x": 6.733445125658025,
+        "y": 5.80681275106626
       },
       "prevControl": {
-        "x": 5.555591474819313,
-        "y": 5.671877525573234
+        "x": 6.461104216047297,
+        "y": 6.079159077749434
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,12 +46,30 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "DisableRotationOverride"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
-    "maxVelocity": 2.75,
-    "maxAcceleration": 11.8,
-    "maxAngularVelocity": 537.0,
-    "maxAngularAcceleration": 2303.0
+    "maxVelocity": 3.0,
+    "maxAcceleration": 6.948,
+    "maxAngularVelocity": 530.0,
+    "maxAngularAcceleration": 2005.0
   },
   "goalEndState": {
     "velocity": 0,
