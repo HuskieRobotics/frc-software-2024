@@ -955,10 +955,14 @@ public class Drivetrain extends SubsystemBase {
                     .andThen(
                         Commands.runOnce(
                             () -> {
-                              checkSwerveModule(0, 135, 1, -0.38 * Math.PI, .1);
-                              checkSwerveModule(1, 45, 1, -0.38 * Math.PI, .1);
-                              checkSwerveModule(2, 45, 1, 0.38 * Math.PI, .1);
-                              checkSwerveModule(3, 135, 1, 0.38 * Math.PI, .1);
+                              checkSwerveModule(
+                                  0, 135, ANGLE_TOLERANCE, -0.38 * Math.PI, VELOCITY_TOLERANCE);
+                              checkSwerveModule(
+                                  1, 45, ANGLE_TOLERANCE, -0.38 * Math.PI, VELOCITY_TOLERANCE);
+                              checkSwerveModule(
+                                  2, 45, ANGLE_TOLERANCE, 0.38 * Math.PI, VELOCITY_TOLERANCE);
+                              checkSwerveModule(
+                                  3, 135, ANGLE_TOLERANCE, 0.38 * Math.PI, VELOCITY_TOLERANCE);
                             })))
             .withTimeout(1);
       case COUNTERCLOCKWISE:
@@ -968,10 +972,14 @@ public class Drivetrain extends SubsystemBase {
                     .andThen(
                         Commands.runOnce(
                             () -> {
-                              checkSwerveModule(0, 135, 1, .38 * Math.PI, .1);
-                              checkSwerveModule(1, 45, 1, .38 * Math.PI, .1);
-                              checkSwerveModule(2, 45, 1, -.38 * Math.PI, .1);
-                              checkSwerveModule(3, 135, 1, -.38 * Math.PI, .1);
+                              checkSwerveModule(
+                                  0, 135, ANGLE_TOLERANCE, .38 * Math.PI, VELOCITY_TOLERANCE);
+                              checkSwerveModule(
+                                  1, 45, ANGLE_TOLERANCE, .38 * Math.PI, VELOCITY_TOLERANCE);
+                              checkSwerveModule(
+                                  2, 45, ANGLE_TOLERANCE, -.38 * Math.PI, VELOCITY_TOLERANCE);
+                              checkSwerveModule(
+                                  3, 135, ANGLE_TOLERANCE, -.38 * Math.PI, VELOCITY_TOLERANCE);
                             })))
             .withTimeout(1);
       default:
@@ -991,7 +999,8 @@ public class Drivetrain extends SubsystemBase {
                     Commands.runOnce(
                         () -> {
                           for (int i = 0; i < this.inputs.swerve.length; i++) {
-                            checkSwerveModule(i, angleTarget, 1, velocityTarget, 0.1);
+                            checkSwerveModule(
+                                i, angleTarget, 1, velocityTarget, VELOCITY_TOLERANCE);
                           }
                         })))
         .withTimeout(2);
