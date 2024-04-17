@@ -671,6 +671,17 @@ public class RobotContainer {
                     Commands.runOnce(intake::turnIntakeOff),
                     Commands.runOnce(intake::turnKickerOff))
                 .withName("ManualOuttakeOff"));
+
+    oi.getIntakeIRSensorSwitch()
+        .onTrue(
+            Commands.runOnce(() -> intake.setIRSensorsInUse(true))
+                .ignoringDisable(true)
+                .withName("use main IR sensors"));
+    oi.getIntakeIRSensorSwitch()
+        .onFalse(
+            Commands.runOnce(() -> intake.setIRSensorsInUse(false))
+                .ignoringDisable(true)
+                .withName("use backup IR sensors"));
   }
 
   private void configureClimberCommands() {
