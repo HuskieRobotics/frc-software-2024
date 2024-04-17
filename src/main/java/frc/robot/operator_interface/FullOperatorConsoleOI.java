@@ -155,8 +155,7 @@ public class FullOperatorConsoleOI implements OperatorInterface {
 
   @Override
   public Trigger getIntakeIRSensorSwitch() {
-    // temporary, not set in feature sheet yet
-    return operatorPanelButtons[3];
+    return operatorPanelButtons[4];
   }
 
   @Override

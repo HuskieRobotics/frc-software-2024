@@ -30,9 +30,9 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final DigitalInput rollerIRSensor2;
   private final DigitalInput kickerIRSensor2;
   private final DigitalInput shooterIRSensor2;
-  private final DigitalInput rollerIRSensorInUse;
-  private final DigitalInput kickerIRSensorInUse;
-  private final DigitalInput shooterIRSensorInUse;
+  private DigitalInput rollerIRSensorInUse;
+  private DigitalInput kickerIRSensorInUse;
+  private DigitalInput shooterIRSensorInUse;
   private boolean usingMainIRSensors = true;
 
   private Alert configAlert =
@@ -237,8 +237,14 @@ public class IntakeIOTalonFX implements IntakeIO {
     // IR sensor set we are using
     if (isMain) {
       usingMainIRSensors = true;
+      rollerIRSensorInUse = rollerIRSensor1;
+      kickerIRSensorInUse = kickerIRSensor1;
+      shooterIRSensorInUse = shooterIRSensor1;
     } else {
       usingMainIRSensors = false;
+      rollerIRSensorInUse = rollerIRSensor2;
+      kickerIRSensorInUse = kickerIRSensor2;
+      shooterIRSensorInUse = shooterIRSensor2;
     }
   }
 
