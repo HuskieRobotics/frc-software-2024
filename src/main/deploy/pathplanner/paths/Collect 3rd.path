@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.288662112056496,
-        "y": 2.478236732884464
+        "x": 3.5625557507039187,
+        "y": 2.519203521819365
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.593581130290223,
-        "y": 1.9842375229774147
+        "x": 3.867474768937646,
+        "y": 2.025204311912316
       },
       "isLocked": false,
       "linkedName": "Source Score 2nd End"
@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 6.5,
-        "y": 1.9842375229774147
+        "x": 6.976611488768002,
+        "y": 2.03287079559941
       },
       "prevControl": {
-        "x": 6.21288476373249,
-        "y": 1.4577677118317205
+        "x": 6.626451925889635,
+        "y": 1.5562647239038547
       },
       "nextControl": null,
       "isLocked": false,
@@ -66,7 +66,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 3.25,
     "maxAcceleration": 6.948,
     "maxAngularVelocity": 530.0,
     "maxAngularAcceleration": 2005.0

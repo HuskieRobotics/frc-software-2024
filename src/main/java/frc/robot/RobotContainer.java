@@ -428,21 +428,21 @@ public class RobotContainer {
             Commands.runOnce(
                 () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_AUTO_1)),
             new PathPlannerAuto("Collect 2nd"),
-            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6),
             Commands.runOnce(
                 () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_AUTO_2)),
             Commands.either(
                 new PathPlannerAuto("Score 2nd Collect 3rd"),
                 new PathPlannerAuto("Missed 2nd Collect 3rd"),
                 intake::hasNoteForAuto),
-            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6),
             Commands.runOnce(
                 () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_AUTO_3_4)),
             Commands.either(
                 new PathPlannerAuto("Score 3rd Collect 4th"),
                 new PathPlannerAuto("Missed 3rd Collect 4th"),
                 intake::hasNoteForAuto),
-            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6),
             Commands.runOnce(
                 () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_AUTO_3_4)),
             new PathPlannerAuto("Score 4th Center"));
@@ -458,13 +458,13 @@ public class RobotContainer {
         Commands.sequence(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO_1)),
             new PathPlannerAuto("Amp Collect 2nd"),
-            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO_2)),
             Commands.either(
                 new PathPlannerAuto("Amp Score 2nd Collect 3rd"),
                 new PathPlannerAuto("Amp Missed 2nd Collect 3rd"),
                 intake::hasNoteForAuto),
-            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO_3)),
             new PathPlannerAuto("Amp Score 3rd Collect 4th"),
             Commands.runOnce(intake::enableQuickShoot),
@@ -496,13 +496,13 @@ public class RobotContainer {
             Commands.runOnce(
                 () -> shooter.setShootingPosition(ShootingPosition.AMP_FAR_SIDE_AUTO_1)),
             new PathPlannerAuto("Amp Far Collect 2nd"),
-            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO_2)),
             Commands.either(
                 new PathPlannerAuto("Amp Score 2nd Collect 3rd"),
                 new PathPlannerAuto("Amp Missed 2nd Collect 3rd"),
                 intake::hasNoteForAuto),
-            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.75),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.AMP_SIDE_AUTO_3)),
             new PathPlannerAuto("Amp Far Score 3rd"),
             getAutoStopAndShootCommand());
@@ -922,6 +922,9 @@ public class RobotContainer {
   private Command getAutoStopAndShootCommand() {
     return Commands.sequence(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.FIELD)),
+            Commands.runOnce(drivetrain::enableXstance),
+            Commands.waitSeconds(0.1),
+            Commands.runOnce(drivetrain::disableXstance),
             Commands.parallel(
                     new TeleopSwerveAimAtSpeaker(drivetrain, shooter, intake, () -> 0.0, () -> 0.0),
                     getShootCommand())

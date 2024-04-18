@@ -54,7 +54,7 @@ public class Drivetrain extends SubsystemBase {
       new DrivetrainIO.DrivetrainIOInputsCollection();
 
   public final TunableNumber preloadedAutoShotDelaySeconds =
-      new TunableNumber("Drivetrain/PreloadedAutoShotDelaySeconds", 0.1);
+      new TunableNumber("Drivetrain/PreloadedAutoShotDelaySeconds", 0.14);
 
   private final TunableNumber autoDriveKp =
       new TunableNumber("AutoDrive/DriveKp", RobotConfig.getInstance().getAutoDriveKP());
