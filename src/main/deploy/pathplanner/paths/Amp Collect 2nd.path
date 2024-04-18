@@ -63,12 +63,12 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.2,
-      "rotationDegrees": 180.0,
+      "rotationDegrees": -166.0,
       "rotateFast": true
     },
     {
       "waypointRelativePos": 1.2000000000000002,
-      "rotationDegrees": 180.0,
+      "rotationDegrees": -166.0,
       "rotateFast": true
     },
     {
@@ -110,7 +110,7 @@
     },
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 1.1,
+      "waypointRelativePos": 1.0999999999999999,
       "command": {
         "type": "parallel",
         "data": {
