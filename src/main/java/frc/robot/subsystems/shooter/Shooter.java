@@ -57,7 +57,7 @@ public class Shooter extends SubsystemBase {
   };
 
   private final double[] passingPopulationDistances = {7.329, 9.649, 11.336};
-  private final double[] passingPopulationRealVelocities = {42.0 - 4.0, 50.0 - 4.0, 57.0 - 4.0};
+  private final double[] passingPopulationRealVelocities = {42.0 - 2.0, 50.0 - 2.0, 57.0 - 2.0};
 
   private boolean automatedShooter = true;
 
