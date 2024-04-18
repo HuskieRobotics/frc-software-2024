@@ -349,6 +349,8 @@ public class Shooter extends SubsystemBase {
     } else if (shootingPosition == ShootingPosition.AMP_FAR_SIDE_AUTO_1) {
       topVelocity = ShooterConstants.AMP_FAR_SIDE_AUTO_1_VELOCITY;
       bottomVelocity = ShooterConstants.AMP_FAR_SIDE_AUTO_1_VELOCITY;
+    } else if (DriverStation.isAutonomousEnabled()) {
+      return;
     } else if (distanceToSpeaker < ShooterConstants.SUBWOOFER_TO_NEAR_VELOCITY_DISTANCE_METERS) {
       topVelocity = ShooterConstants.SUBWOOFER_RANGE_VELOCITY_TOP;
       bottomVelocity = ShooterConstants.SUBWOOFER_RANGE_VELOCITY_BOTTOM;
