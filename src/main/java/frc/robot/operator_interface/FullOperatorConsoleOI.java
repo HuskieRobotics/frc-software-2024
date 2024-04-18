@@ -154,6 +154,11 @@ public class FullOperatorConsoleOI implements OperatorInterface {
   }
 
   @Override
+  public Trigger getIntakeIRSensorSwitch() {
+    return operatorPanelButtons[4];
+  }
+
+  @Override
   public Trigger getPrepareToScorePodiumButton() {
     return operatorPanelButtons[5];
   }

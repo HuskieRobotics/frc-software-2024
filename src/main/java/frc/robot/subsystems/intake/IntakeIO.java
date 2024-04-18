@@ -10,6 +10,8 @@ public interface IntakeIO {
     boolean isKickerIRBlocked = false;
     boolean isShooterIRBlocked = false;
 
+    boolean usingMainIRSensors = true;
+
     double rollerStatorCurrentAmps = 0;
     double kickerStatorCurrentAmps = 0;
 
@@ -30,6 +32,8 @@ public interface IntakeIO {
   }
 
   public default void updateInputs(IntakeIOInputs inputs) {}
+
+  public default void setIRSensorsInUse(boolean isMain) {}
 
   public default void setRollerVelocity(double velocity) {}
 
