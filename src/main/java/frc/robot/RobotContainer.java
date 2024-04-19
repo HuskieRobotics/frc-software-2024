@@ -910,12 +910,14 @@ public class RobotContainer {
 
   private Command getAutoShootAt4MetersCommand() {
     return Commands.waitUntil(
-            () ->
-                Math.abs(
-                        drivetrain.getFutureDistanceToSpeaker(
-                                drivetrain.preloadedAutoShotDelaySeconds.get())
-                            - 4.0)
-                    < ShooterConstants.SHOOTER_AUTO_SHOT_TOLERANCE_METERS)
+            () -> {
+              double distanceToSpeaker =
+                  drivetrain.getFutureDistanceToSpeaker(
+                      drivetrain.preloadedAutoShotDelaySeconds.get());
+              return Math.abs(distanceToSpeaker - 4.0)
+                      < ShooterConstants.SHOOTER_AUTO_SHOT_TOLERANCE_METERS
+                  || distanceToSpeaker > 4.1;
+            })
         .andThen(Commands.runOnce(intake::shoot, intake));
   }
 
