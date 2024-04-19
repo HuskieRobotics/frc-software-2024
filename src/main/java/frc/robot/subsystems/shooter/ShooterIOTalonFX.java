@@ -8,7 +8,6 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -138,6 +137,8 @@ public class ShooterIOTalonFX implements ShooterIO {
   private double topWheelVelocity;
   private double bottomWheelVelocity;
 
+  private TalonFXConfiguration angleMotorConfig;
+
   public ShooterIOTalonFX() {
 
     shootMotorTop = new TalonFX(TOP_SHOOTER_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
@@ -149,6 +150,8 @@ public class ShooterIOTalonFX implements ShooterIO {
     deflectorMotor = new TalonFX(DEFLECTOR_MOTOR_ID, RobotConfig.getInstance().getCANBusName());
 
     coastModeButton = new DigitalInput(COAST_BUTTON_ID);
+
+    angleMotorConfig = new TalonFXConfiguration();
 
     shootMotorTopVelocityRequest = new VelocityTorqueCurrentFOC(0);
     shootMotorBottomVelocityRequest = new VelocityTorqueCurrentFOC(0);
@@ -473,7 +476,7 @@ public class ShooterIOTalonFX implements ShooterIO {
       configAlert.setText(status.toString());
     }
 
-    TalonFXConfiguration angleMotorConfig = new TalonFXConfiguration();
+    angleMotorConfig = new TalonFXConfiguration();
     CurrentLimitsConfigs angleMotorCurrentLimits = new CurrentLimitsConfigs();
     MotionMagicConfigs rotationMotionMagicConfig = angleMotorConfig.MotionMagic;
 
@@ -567,9 +570,8 @@ public class ShooterIOTalonFX implements ShooterIO {
 
   @Override
   public void setCoastMode(boolean coast) {
-    MotorOutputConfigs angleMotorConfig = new MotorOutputConfigs();
-    angleMotor.getConfigurator().refresh(angleMotorConfig);
-    angleMotorConfig.NeutralMode = coast ? NeutralModeValue.Coast : NeutralModeValue.Brake;
+    angleMotorConfig.MotorOutput.NeutralMode =
+        coast ? NeutralModeValue.Coast : NeutralModeValue.Brake;
 
     StatusCode status = StatusCode.StatusCodeNotInitialized;
     for (int i = 0; i < 5; ++i) {
