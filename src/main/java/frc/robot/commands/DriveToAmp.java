@@ -28,6 +28,9 @@ import java.util.function.Supplier;
  */
 public class DriveToAmp extends DriveToPose {
 
+  private Drivetrain drivetrain;
+  private Supplier<Pose2d> targetPoseSupplier;
+
   /**
    * Constructs a new DriveToPose command that drives the robot in a straight line to the specified
    * pose. A pose supplier is specified instead of a pose since the target pose may not be known
@@ -39,5 +42,13 @@ public class DriveToAmp extends DriveToPose {
   public DriveToAmp(Drivetrain drivetrain, Supplier<Pose2d> poseSupplier, Intake intake) {
     super(drivetrain, poseSupplier);
     addRequirements(intake);
+    this.drivetrain = drivetrain;
+  }
+
+  @Override
+  public boolean isFinished() {
+    Pose2d targetPose = targetPoseSupplier.get();
+    boolean isClose = Math.abs(drivetrain.getPose().getY() - targetPose.getY()) < .25;
+    return super.isFinished() || (isClose && Math.abs(drivetrain.getVelocityY()) < 0.1);
   }
 }
