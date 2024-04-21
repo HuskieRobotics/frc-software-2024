@@ -43,6 +43,7 @@ public class DriveToAmp extends DriveToPose {
     super(drivetrain, poseSupplier);
     addRequirements(intake);
     this.drivetrain = drivetrain;
+    this.targetPoseSupplier = poseSupplier;
   }
 
   @Override
