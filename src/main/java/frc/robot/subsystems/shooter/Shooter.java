@@ -30,6 +30,8 @@ public class Shooter extends SubsystemBase {
   private InterpolatingDoubleTreeMap passingTreeMap;
   private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
 
+  private boolean demoModeEnabled = false;
+
   private final TunableNumber testingMode = new TunableNumber("Shooter/TestingMode", 0);
 
   private final TunableNumber angleManualControlVoltage =
@@ -233,7 +235,7 @@ public class Shooter extends SubsystemBase {
   private void setIdleVelocity() {
     // don't idle the shooter wheels in autonomous
     if (!DriverStation.isAutonomous()) {
-      if (intakeEnabled) {
+      if (intakeEnabled || !demoModeEnabled) {
         io.setShooterWheelBottomVelocity(SHOOTER_IDLE_VELOCITY);
         io.setShooterWheelTopVelocity(SHOOTER_IDLE_VELOCITY);
       } else {
@@ -671,5 +673,13 @@ public class Shooter extends SubsystemBase {
     } else {
       io.setDeflectorMotorVoltage(0.0);
     }
+  }
+
+  public void enableDemoMode() {
+    this.demoModeEnabled = true;
+  }
+
+  public void disableDemoMode() {
+    this.demoModeEnabled = false;
   }
 }

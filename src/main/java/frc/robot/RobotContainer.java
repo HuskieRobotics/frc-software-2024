@@ -623,20 +623,14 @@ public class RobotContainer {
     oi.getIntakeAutomationSwitch()
         .onTrue(
             Commands.parallel(
-                    Commands.runOnce(shooter::intakeEnabled),
-                    Commands.runOnce(intake::enableAutomation, intake))
-                .ignoringDisable(true)
-                .withName("enable intake automation"));
+                Commands.runOnce(drivetrain::enableDemoMode),
+                Commands.runOnce(shooter::enableDemoMode)));
 
     oi.getIntakeAutomationSwitch()
         .onFalse(
             Commands.parallel(
-                    Commands.runOnce(intake::disableAutomation, intake),
-                    Commands.runOnce(intake::turnIntakeOff),
-                    Commands.runOnce(intake::turnKickerOff),
-                    Commands.runOnce(shooter::intakeDisabled))
-                .ignoringDisable(true)
-                .withName("disable intake automation"));
+                Commands.runOnce(drivetrain::disableDemoMode),
+                Commands.runOnce(shooter::disableDemoMode)));
 
     Trigger coastModeButton = new Trigger(shooter::getCoastEnableOverride);
     coastModeButton.onTrue(
