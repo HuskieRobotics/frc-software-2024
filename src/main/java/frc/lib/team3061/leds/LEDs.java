@@ -135,7 +135,7 @@ public abstract class LEDs extends SubsystemBase {
         // Low battery
         solid(Section.FULL, new Color(255, 20, 0));
 
-      } else if (PRIDE_LEDS) {
+      } else if (demoMode) {
         // Pride stripes
         updateToPridePattern();
 
