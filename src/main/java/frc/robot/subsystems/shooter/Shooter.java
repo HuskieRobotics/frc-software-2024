@@ -235,7 +235,7 @@ public class Shooter extends SubsystemBase {
   private void setIdleVelocity() {
     // don't idle the shooter wheels in autonomous
     if (!DriverStation.isAutonomous()) {
-      if (intakeEnabled || !demoModeEnabled) {
+      if (intakeEnabled && !demoModeEnabled) {
         io.setShooterWheelBottomVelocity(SHOOTER_IDLE_VELOCITY);
         io.setShooterWheelTopVelocity(SHOOTER_IDLE_VELOCITY);
       } else {
@@ -371,6 +371,9 @@ public class Shooter extends SubsystemBase {
     if (scaleDownShooterVelocity) {
       topVelocity *= 0.1;
       bottomVelocity *= 0.1;
+    } else if (demoModeEnabled) {
+      topVelocity *= 0.2;
+      bottomVelocity *= 0.2;
     }
 
     io.setShooterWheelTopVelocity(topVelocity);
