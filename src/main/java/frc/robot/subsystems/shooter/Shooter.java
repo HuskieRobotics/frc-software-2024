@@ -371,9 +371,9 @@ public class Shooter extends SubsystemBase {
     if (scaleDownShooterVelocity) {
       topVelocity *= 0.1;
       bottomVelocity *= 0.1;
-    } else if (demoModeEnabled) {
-      topVelocity *= 0.2;
-      bottomVelocity *= 0.2;
+    } else if (demoModeEnabled && shootingPosition != ShootingPosition.AMP) {
+      topVelocity *= 0.6;
+      bottomVelocity *= 0.6;
     }
 
     io.setShooterWheelTopVelocity(topVelocity);
@@ -443,7 +443,8 @@ public class Shooter extends SubsystemBase {
     boolean alignedToShoot =
         isAimedAtSpeaker
             || this.shootingPosition == ShootingPosition.AMP
-            || this.shootingPosition == ShootingPosition.PASS;
+            || this.shootingPosition == ShootingPosition.PASS
+            || this.demoModeEnabled;
 
     boolean topWheelAtSetpoint = isTopShootAtSetpoint();
     boolean bottomWheelAtSetpoint = isBottomShootAtSetpoint();
