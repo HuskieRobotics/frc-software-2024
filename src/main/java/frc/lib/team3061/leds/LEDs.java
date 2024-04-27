@@ -131,13 +131,13 @@ public abstract class LEDs extends SubsystemBase {
         // Auto fade
         solid(1.0 - ((Timer.getFPGATimestamp() - lastEnabledTime) / AUTO_FADE_TIME), Color.kGreen);
 
-      } else if (lowBatteryAlert) {
-        // Low battery
-        solid(Section.FULL, new Color(255, 20, 0));
-
       } else if (demoMode) {
         // Pride stripes
         updateToPridePattern();
+
+      } else if (lowBatteryAlert) {
+        // Low battery
+        solid(Section.FULL, new Color(255, 20, 0));
 
       } else {
         // Default pattern
