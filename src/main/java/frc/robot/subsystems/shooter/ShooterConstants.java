@@ -120,7 +120,7 @@ public class ShooterConstants {
   public static final double SOURCE_SIDE_AUTO_1_ANGLE = 30.5;
   public static final double SOURCE_SIDE_AUTO_2_VELOCITY = 120.0;
   public static final double SOURCE_SIDE_AUTO_2_ANGLE = 28.6;
-  public static final double SOURCE_SIDE_AUTO_3_4_VELOCITY = 120.0;
+  public static final double SOURCE_SIDE_AUTO_3_4_VELOCITY = 100.0;
   public static final double SOURCE_SIDE_AUTO_3_4_ANGLE = 31.6;
   public static final double AMP_SIDE_AUTO_1_VELOCITY = 100.0;
   public static final double AMP_SIDE_AUTO_1_ANGLE = 30.5;
@@ -129,16 +129,16 @@ public class ShooterConstants {
   public static final double AMP_SIDE_AUTO_3_VELOCITY = 80.0;
   public static final double AMP_SIDE_AUTO_3_ANGLE = 37.5;
   public static final double AMP_SIDE_AUTO_4_VELOCITY = 80.0;
-  public static final double AMP_SIDE_AUTO_4_ANGLE = 47.0;
+  public static final double AMP_SIDE_AUTO_4_ANGLE = 39.5;
   public static final double AMP_SIDE_AUTO_5_VELOCITY = 80.0;
-  public static final double AMP_SIDE_AUTO_5_ANGLE = 39.0;
+  public static final double AMP_SIDE_AUTO_5_ANGLE = 41;
   public static final double AMP_SIDE_AUTO_6_VELOCITY = 80.0;
-  public static final double AMP_SIDE_AUTO_6_ANGLE = 47.0;
+  public static final double AMP_SIDE_AUTO_6_ANGLE = 39.5;
   public static final double AMP_FAR_SIDE_AUTO_1_VELOCITY = 120.0;
   public static final double AMP_FAR_SIDE_AUTO_1_ANGLE = 33.0; // FIXME: tune
 
   // auto shot
-  public static final double SHOOTER_AUTO_SHOT_ANGLE_DEG = 28.5;
+  public static final double SHOOTER_AUTO_SHOT_ANGLE_DEG = 29.5;
   public static final double SHOOTER_AUTO_SHOT_VELOCITY_RPS = 120.0;
   public static final double SHOOTER_AUTO_SHOT_DISTANCE_METERS = 5.06;
   public static final double SHOOTER_AUTO_SHOT_TOLERANCE_METERS = 0.1;

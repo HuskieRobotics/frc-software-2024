@@ -49,7 +49,7 @@ public class Shooter extends SubsystemBase {
   // FIXME: tune on the competititon field
   private static final double FIELD_MEASUREMENT_OFFSET = 0.0;
   private final double[] populationRealAngles = {
-    64, 57, 53, 45, 43, 41, 38, 36, 35, 33, 32, 31, 29.5, 29, 28, 27, 26.5
+    64, 57, 53, 45, 43, 41, 38, 36, 35, 33, 32, 31, 29.5, 29.5, 29, 28, 27.5
   };
   private final double[] populationDistances = {
     1.33, 1.63, 1.947, 2.196, 2.47, 2.77, 3.02, 3.32, 3.6, 3.936, 4.206, 4.495, 4.785, 5.083, 5.39,
@@ -57,7 +57,7 @@ public class Shooter extends SubsystemBase {
   };
 
   private final double[] passingPopulationDistances = {7.329, 9.649, 11.336};
-  private final double[] passingPopulationRealVelocities = {42, 50, 57};
+  private final double[] passingPopulationRealVelocities = {42.0 - 2.0, 50.0 - 2.0, 57.0 - 2.0};
 
   private boolean automatedShooter = true;
 
@@ -349,6 +349,8 @@ public class Shooter extends SubsystemBase {
     } else if (shootingPosition == ShootingPosition.AMP_FAR_SIDE_AUTO_1) {
       topVelocity = ShooterConstants.AMP_FAR_SIDE_AUTO_1_VELOCITY;
       bottomVelocity = ShooterConstants.AMP_FAR_SIDE_AUTO_1_VELOCITY;
+    } else if (DriverStation.isAutonomousEnabled()) {
+      return;
     } else if (distanceToSpeaker < ShooterConstants.SUBWOOFER_TO_NEAR_VELOCITY_DISTANCE_METERS) {
       topVelocity = ShooterConstants.SUBWOOFER_RANGE_VELOCITY_TOP;
       bottomVelocity = ShooterConstants.SUBWOOFER_RANGE_VELOCITY_BOTTOM;

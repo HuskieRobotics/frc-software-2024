@@ -95,6 +95,10 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
+  public default Trigger getIntakeIRSensorSwitch() {
+    return new Trigger(() -> false);
+  }
+
   // shooter
 
   public default Trigger getShootButton() {

@@ -48,11 +48,11 @@
     },
     {
       "anchor": {
-        "x": 6.5,
+        "x": 7.0,
         "y": 7.450617365689708
       },
       "prevControl": {
-        "x": 5.48843334653494,
+        "x": 5.98843334653494,
         "y": 7.343624165921318
       },
       "nextControl": null,
@@ -63,12 +63,12 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.2,
-      "rotationDegrees": 180.0,
+      "rotationDegrees": -166.0,
       "rotateFast": true
     },
     {
       "waypointRelativePos": 1.2000000000000002,
-      "rotationDegrees": 180.0,
+      "rotationDegrees": -166.0,
       "rotateFast": true
     },
     {
@@ -110,7 +110,7 @@
     },
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 1.1,
+      "waypointRelativePos": 1.0999999999999999,
       "command": {
         "type": "parallel",
         "data": {
