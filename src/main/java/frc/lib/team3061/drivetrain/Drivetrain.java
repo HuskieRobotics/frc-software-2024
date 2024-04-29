@@ -105,8 +105,6 @@ public class Drivetrain extends SubsystemBase {
 
   private boolean isAimToSpeakerEnabled;
 
-  private boolean demoModeEnabled;
-
   private double maxVelocity;
 
   private Alert noPoseAlert =
@@ -143,8 +141,6 @@ public class Drivetrain extends SubsystemBase {
     this.isMoveToPoseEnabled = true;
 
     this.isAimToSpeakerEnabled = false;
-
-    this.demoModeEnabled = false;
 
     this.maxVelocity = 0.5;
 
@@ -389,7 +385,7 @@ public class Drivetrain extends SubsystemBase {
         yVelocity *= slowModeMultiplier;
       }
 
-      if (demoModeEnabled) {
+      if (Constants.DEMO_MODE) {
         double velocity = Math.sqrt(Math.pow(xVelocity, 2) + Math.pow(yVelocity, 2));
         if (velocity > this.maxVelocity) {
           double scale = this.maxVelocity / velocity;
@@ -452,7 +448,7 @@ public class Drivetrain extends SubsystemBase {
       yVelocity *= slowModeMultiplier;
     }
 
-    if (demoModeEnabled) {
+    if (Constants.DEMO_MODE) {
       double velocity = Math.sqrt(Math.pow(xVelocity, 2) + Math.pow(yVelocity, 2));
       if (velocity > this.maxVelocity) {
         double scale = this.maxVelocity / velocity;
@@ -1239,14 +1235,6 @@ public class Drivetrain extends SubsystemBase {
         .exp(
             new Twist2d(
                 this.getVelocityX() * secondsInFuture, this.getVelocityY() * secondsInFuture, 0.0));
-  }
-
-  public void enableDemoMode() {
-    this.demoModeEnabled = true;
-  }
-
-  public void disableDemoMode() {
-    this.demoModeEnabled = false;
   }
 
   private enum DriveMode {

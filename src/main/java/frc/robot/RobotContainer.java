@@ -621,22 +621,6 @@ public class RobotContainer {
   }
 
   private void configureIntakeCommands() {
-    oi.getIntakeAutomationSwitch()
-        .onTrue(
-            Commands.parallel(
-                    Commands.runOnce(drivetrain::enableDemoMode),
-                    Commands.runOnce(shooter::enableDemoMode),
-                    Commands.runOnce(() -> LEDs.getInstance().setDemoMode(true)))
-                .ignoringDisable(true));
-
-    oi.getIntakeAutomationSwitch()
-        .onFalse(
-            Commands.parallel(
-                    Commands.runOnce(drivetrain::disableDemoMode),
-                    Commands.runOnce(shooter::disableDemoMode),
-                    Commands.runOnce(() -> LEDs.getInstance().setDemoMode(false)))
-                .ignoringDisable(true));
-
     Trigger coastModeButton = new Trigger(shooter::getCoastEnableOverride);
     coastModeButton.onTrue(
         Commands.runOnce(() -> shooter.setCoastModeOverride(true)).ignoringDisable(true));
