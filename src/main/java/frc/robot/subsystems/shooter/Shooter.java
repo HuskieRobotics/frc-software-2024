@@ -16,6 +16,7 @@ import frc.lib.team3061.leds.LEDs;
 import frc.lib.team3061.leds.LEDs.ShooterLEDState;
 import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
+import frc.robot.Constants;
 import frc.robot.Field2d;
 import frc.robot.subsystems.intake.Intake;
 import java.util.function.BooleanSupplier;
@@ -233,7 +234,7 @@ public class Shooter extends SubsystemBase {
   private void setIdleVelocity() {
     // don't idle the shooter wheels in autonomous
     if (!DriverStation.isAutonomous()) {
-      if (intakeEnabled) {
+      if (intakeEnabled && !Constants.DEMO_MODE) {
         io.setShooterWheelBottomVelocity(SHOOTER_IDLE_VELOCITY);
         io.setShooterWheelTopVelocity(SHOOTER_IDLE_VELOCITY);
       } else {
@@ -369,6 +370,9 @@ public class Shooter extends SubsystemBase {
     if (scaleDownShooterVelocity) {
       topVelocity *= 0.1;
       bottomVelocity *= 0.1;
+    } else if (Constants.DEMO_MODE && shootingPosition != ShootingPosition.AMP) {
+      topVelocity *= 0.6;
+      bottomVelocity *= 0.6;
     }
 
     io.setShooterWheelTopVelocity(topVelocity);
@@ -438,7 +442,8 @@ public class Shooter extends SubsystemBase {
     boolean alignedToShoot =
         isAimedAtSpeaker
             || this.shootingPosition == ShootingPosition.AMP
-            || this.shootingPosition == ShootingPosition.PASS;
+            || this.shootingPosition == ShootingPosition.PASS
+            || Constants.DEMO_MODE;
 
     boolean topWheelAtSetpoint = isTopShootAtSetpoint();
     boolean bottomWheelAtSetpoint = isBottomShootAtSetpoint();
