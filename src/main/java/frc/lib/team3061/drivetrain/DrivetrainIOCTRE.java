@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
@@ -134,6 +135,32 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
   private static final SwerveModuleConstantsFactory constantCreator =
       new SwerveModuleConstantsFactory()
+          .withDriveMotorInitialConfigs(
+              new TalonFXConfiguration()
+                  .withTorqueCurrent(
+                      new TorqueCurrentConfigs()
+                          .withPeakForwardTorqueCurrent(SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT)
+                          .withPeakReverseTorqueCurrent(-SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT))
+                  .withCurrentLimits(
+                      new CurrentLimitsConfigs()
+                          .withSupplyCurrentLimit(SwerveConstants.DRIVE_CONTINUOUS_CURRENT_LIMIT)
+                          .withSupplyCurrentThreshold(SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT)
+                          .withSupplyTimeThreshold(SwerveConstants.DRIVE_PEAK_CURRENT_DURATION)
+                          .withSupplyCurrentLimitEnable(SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT)
+                          .withStatorCurrentLimit(SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT)
+                          .withStatorCurrentLimitEnable(
+                              SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT)))
+          .withSteerMotorInitialConfigs(
+              new TalonFXConfiguration()
+                  .withCurrentLimits(
+                      new CurrentLimitsConfigs()
+                          .withSupplyCurrentLimit(SwerveConstants.ANGLE_CONTINUOUS_CURRENT_LIMIT)
+                          .withSupplyCurrentThreshold(SwerveConstants.ANGLE_PEAK_CURRENT_LIMIT)
+                          .withSupplyTimeThreshold(SwerveConstants.ANGLE_PEAK_CURRENT_DURATION)
+                          .withSupplyCurrentLimitEnable(SwerveConstants.ANGLE_ENABLE_CURRENT_LIMIT)
+                          .withStatorCurrentLimit(SwerveConstants.ANGLE_PEAK_CURRENT_LIMIT)
+                          .withStatorCurrentLimitEnable(
+                              SwerveConstants.ANGLE_ENABLE_CURRENT_LIMIT)))
           .withDriveMotorGearRatio(
               RobotConfig.getInstance().getSwerveConstants().getDriveGearRatio())
           .withSteerMotorGearRatio(
@@ -234,34 +261,6 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
         frontRight,
         backLeft,
         backRight);
-
-    // configure current limits
-    for (SwerveModule swerveModule : this.Modules) {
-
-      // set torque current configs for closed loop control with TorqueCurrentFOC
-      // set current limits for everything else
-      TalonFXConfiguration config = new TalonFXConfiguration();
-      swerveModule.getDriveMotor().getConfigurator().refresh(config);
-      config.TorqueCurrent.PeakForwardTorqueCurrent = SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
-      config.TorqueCurrent.PeakReverseTorqueCurrent = -SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
-      config.CurrentLimits.SupplyCurrentLimit = SwerveConstants.DRIVE_CONTINUOUS_CURRENT_LIMIT;
-      config.CurrentLimits.SupplyCurrentThreshold = SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
-      config.CurrentLimits.SupplyTimeThreshold = SwerveConstants.DRIVE_PEAK_CURRENT_DURATION;
-      config.CurrentLimits.SupplyCurrentLimitEnable = SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
-      config.CurrentLimits.StatorCurrentLimit = SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
-      config.CurrentLimits.StatorCurrentLimitEnable = SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
-      swerveModule.getDriveMotor().getConfigurator().apply(config);
-
-      CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
-      swerveModule.getSteerMotor().getConfigurator().refresh(currentLimits);
-      currentLimits.SupplyCurrentLimit = SwerveConstants.ANGLE_CONTINUOUS_CURRENT_LIMIT;
-      currentLimits.SupplyCurrentThreshold = SwerveConstants.ANGLE_PEAK_CURRENT_LIMIT;
-      currentLimits.SupplyTimeThreshold = SwerveConstants.ANGLE_PEAK_CURRENT_DURATION;
-      currentLimits.SupplyCurrentLimitEnable = SwerveConstants.ANGLE_ENABLE_CURRENT_LIMIT;
-      currentLimits.StatorCurrentLimit = SwerveConstants.ANGLE_PEAK_CURRENT_LIMIT;
-      currentLimits.StatorCurrentLimitEnable = SwerveConstants.ANGLE_ENABLE_CURRENT_LIMIT;
-      swerveModule.getSteerMotor().getConfigurator().apply(currentLimits);
-    }
 
     this.pitchStatusSignal = this.m_pigeon2.getPitch().clone();
     this.pitchStatusSignal.setUpdateFrequency(100);
