@@ -248,11 +248,8 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
       config.CurrentLimits.SupplyCurrentThreshold = SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
       config.CurrentLimits.SupplyTimeThreshold = SwerveConstants.DRIVE_PEAK_CURRENT_DURATION;
       config.CurrentLimits.SupplyCurrentLimitEnable = SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
-
-      if (Constants.getMode() != Constants.Mode.SIM) {
-        config.CurrentLimits.StatorCurrentLimit = SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
-        config.CurrentLimits.StatorCurrentLimitEnable = SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
-      }
+      config.CurrentLimits.StatorCurrentLimit = SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
+      config.CurrentLimits.StatorCurrentLimitEnable = SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
       swerveModule.getDriveMotor().getConfigurator().apply(config);
 
       CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
@@ -261,11 +258,8 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
       currentLimits.SupplyCurrentThreshold = SwerveConstants.ANGLE_PEAK_CURRENT_LIMIT;
       currentLimits.SupplyTimeThreshold = SwerveConstants.ANGLE_PEAK_CURRENT_DURATION;
       currentLimits.SupplyCurrentLimitEnable = SwerveConstants.ANGLE_ENABLE_CURRENT_LIMIT;
-
-      if (Constants.getMode() != Constants.Mode.SIM) {
-        currentLimits.StatorCurrentLimit = SwerveConstants.ANGLE_PEAK_CURRENT_LIMIT;
-        currentLimits.StatorCurrentLimitEnable = SwerveConstants.ANGLE_ENABLE_CURRENT_LIMIT;
-      }
+      currentLimits.StatorCurrentLimit = SwerveConstants.ANGLE_PEAK_CURRENT_LIMIT;
+      currentLimits.StatorCurrentLimitEnable = SwerveConstants.ANGLE_ENABLE_CURRENT_LIMIT;
       swerveModule.getSteerMotor().getConfigurator().apply(currentLimits);
     }
 
