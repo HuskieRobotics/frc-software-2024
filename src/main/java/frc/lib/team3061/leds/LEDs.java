@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3061.RobotConfig;
+import frc.robot.Field2d;
 import java.util.List;
 
 @java.lang.SuppressWarnings({"java:S6548"})
@@ -42,7 +43,6 @@ public abstract class LEDs extends SubsystemBase {
   private boolean demoMode = false;
 
   private boolean assignedAlliance = false;
-  private Alliance alliance = Alliance.Blue;
   private boolean lastEnabledAuto = false;
   private double lastEnabledTime = 0.0;
   private boolean estopped = false;
@@ -215,7 +215,7 @@ public abstract class LEDs extends SubsystemBase {
 
   private void updateToDisabledPattern() {
     if (assignedAlliance) {
-      if (alliance == Alliance.Red) {
+      if (Field2d.getInstance().getAlliance() == Alliance.Red) {
         wave(
             Section.FULL,
             Color.kRed,
@@ -259,7 +259,7 @@ public abstract class LEDs extends SubsystemBase {
             new Color(0.15, 0.3, 1.0)),
         3,
         5.0);
-    switch (alliance) {
+    switch (Field2d.getInstance().getAlliance()) {
       case Red:
         solid(Section.STATIC_LOW, Color.kRed);
         break;
@@ -272,9 +272,8 @@ public abstract class LEDs extends SubsystemBase {
   }
 
   private void updateState() {
-    // Update alliance color
+    // check for alliance assignment when connected to FMS
     if (DriverStation.isFMSAttached()) {
-      alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
       assignedAlliance = true;
     } else {
       assignedAlliance = false;

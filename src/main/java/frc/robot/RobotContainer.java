@@ -76,7 +76,7 @@ public class RobotContainer {
   private OperatorInterface oi = new OperatorInterface() {};
   private RobotConfig config;
   private Drivetrain drivetrain;
-  private Alliance lastAlliance = DriverStation.Alliance.Red;
+  private Alliance lastAlliance = Field2d.getInstance().getAlliance();
   private Vision vision;
   private NoteTargeting noteTargeting;
   private Shooter shooter;
