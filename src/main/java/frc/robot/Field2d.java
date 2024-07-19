@@ -35,7 +35,7 @@ public class Field2d {
 
   private Region2d[] regions;
 
-  private Alliance alliance;
+  private Alliance alliance = DriverStation.Alliance.Blue;
 
   private static final double AMP_SCORING_ALIGNMENT_OFFSET = -0.1;
 

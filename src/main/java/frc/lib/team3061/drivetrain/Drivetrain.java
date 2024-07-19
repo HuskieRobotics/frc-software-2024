@@ -115,7 +115,7 @@ public class Drivetrain extends SubsystemBase {
   private ChassisSpeeds prevSpeeds = new ChassisSpeeds();
   private double[] prevSteerVelocitiesRevPerMin = new double[4];
 
-  private DriverStation.Alliance alliance = DriverStation.Alliance.Red;
+  private DriverStation.Alliance alliance = Field2d.getInstance().getAlliance();
 
   private Pose2d prevRobotPose = new Pose2d();
   private int teleportedCount = 0;
