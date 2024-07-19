@@ -105,6 +105,8 @@ public class Drivetrain extends SubsystemBase {
 
   private boolean isAimToSpeakerEnabled;
 
+  private double maxVelocity;
+
   private Alert noPoseAlert =
       new Alert("Attempted to reset pose from vision, but no pose was found.", AlertType.WARNING);
   private static final String SYSTEM_CHECK_PREFIX = "[System Check] Swerve module ";
@@ -139,6 +141,8 @@ public class Drivetrain extends SubsystemBase {
     this.isMoveToPoseEnabled = true;
 
     this.isAimToSpeakerEnabled = false;
+
+    this.maxVelocity = 0.5;
 
     ShuffleboardTab tabMain = Shuffleboard.getTab("MAIN");
     tabMain
@@ -381,6 +385,15 @@ public class Drivetrain extends SubsystemBase {
         yVelocity *= slowModeMultiplier;
       }
 
+      if (Constants.DEMO_MODE) {
+        double velocity = Math.sqrt(Math.pow(xVelocity, 2) + Math.pow(yVelocity, 2));
+        if (velocity > this.maxVelocity) {
+          double scale = this.maxVelocity / velocity;
+          xVelocity *= scale;
+          yVelocity *= scale;
+        }
+      }
+
       // if rotation is in slow mode, multiply the rotational velocity by the slow-mode multiplier
       if (isRotationSlowMode) {
         rotationalVelocity *= slowModeMultiplier;
@@ -434,6 +447,16 @@ public class Drivetrain extends SubsystemBase {
       xVelocity *= slowModeMultiplier;
       yVelocity *= slowModeMultiplier;
     }
+
+    if (Constants.DEMO_MODE) {
+      double velocity = Math.sqrt(Math.pow(xVelocity, 2) + Math.pow(yVelocity, 2));
+      if (velocity > this.maxVelocity) {
+        double scale = this.maxVelocity / velocity;
+        xVelocity *= scale;
+        yVelocity *= scale;
+      }
+    }
+
     int allianceMultiplier = this.alliance == Alliance.Blue ? 1 : -1;
     this.io.driveFieldRelativeFacingAngle(
         xVelocity * allianceMultiplier,

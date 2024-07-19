@@ -8,6 +8,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -842,7 +843,19 @@ public class RobotContainer {
                     Commands.sequence(
                         new DriveToAmp(
                             drivetrain,
-                            () -> Field2d.getInstance().getAllianceAmpScoringPose(),
+                            () -> {
+                              if (Constants.DEMO_MODE) {
+                                Pose2d pose = drivetrain.getPose();
+                                return new Pose2d(
+                                    pose.getX() - 1.0,
+                                    pose.getY() - 1.0,
+                                    Rotation2d.fromDegrees(
+                                        pose.getRotation().getDegrees() + 180.0));
+
+                              } else {
+                                return Field2d.getInstance().getAllianceAmpScoringPose();
+                              }
+                            },
                             intake)),
                     Commands.runOnce(
                         () -> shooter.setShootingPosition(ShootingPosition.AMP), shooter))
