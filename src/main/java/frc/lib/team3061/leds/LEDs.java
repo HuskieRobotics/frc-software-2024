@@ -19,7 +19,7 @@ import frc.robot.Constants;
 import frc.robot.Field2d;
 import java.util.List;
 import java.util.TreeSet;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 @java.lang.SuppressWarnings({"java:S6548"})
 public abstract class LEDs extends SubsystemBase {
@@ -40,6 +40,7 @@ public abstract class LEDs extends SubsystemBase {
   /* based on FRC 6995's use of TreeSet to prioritize LED states as shared on CD:
    * https://www.chiefdelphi.com/t/enums-and-subsytem-states/463974/31?u=gcschmit
    */
+
   private TreeSet<States> fullStates = new TreeSet<>();
   private TreeSet<States> shoulderStates = new TreeSet<>();
   private TreeSet<States> staticStates = new TreeSet<>();
@@ -47,58 +48,63 @@ public abstract class LEDs extends SubsystemBase {
   private TreeSet<States> staticMidStates = new TreeSet<>();
   private TreeSet<States> staticHighStates = new TreeSet<>();
 
+  /**
+   * Enum for LED states. Each state has a lambda function that accepts an LED subsystem and section
+   * of the LED strip on which to display the specified pattern corresponding to the state.
+   *
+   * <p>The order of the states in the enum is the priority order for the states. The first state in
+   * the enum is the highest priority state.
+   */
   public enum States {
-    ESTOPPED(leds -> leds.solid(Section.FULL, Color.kRed)),
+    ESTOPPED((leds, section) -> leds.solid(section, Color.kRed)),
     AUTO_FADE(
-        leds ->
+        (leds, section) ->
             leds.solid(
                 1.0 - ((Timer.getFPGATimestamp() - leds.lastEnabledTime) / AUTO_FADE_TIME),
                 Color.kGreen)),
-    DISABLED_DEMO_MODE(LEDs::updateToPridePattern),
-    LOW_BATTERY(leds -> leds.solid(Section.FULL, new Color(255, 20, 0))),
-    DISABLED(LEDs::updateToDisabledPattern),
-    AUTO(leds -> leds.orangePulse(Section.FULL, PULSE_DURATION)),
+    DISABLED_DEMO_MODE((leds, section) -> leds.updateToPridePattern()),
+    LOW_BATTERY((leds, section) -> leds.solid(section, new Color(255, 20, 0))),
+    DISABLED((leds, section) -> leds.updateToDisabledPattern(section)),
+    AUTO((leds, section) -> leds.orangePulse(section, PULSE_DURATION)),
     TELEOP_DEMO_MODE(
-        leds ->
+        (leds, section) ->
             leds.wave(
-                Section.FULL,
+                section,
                 new Color(255, 30, 0),
                 Color.kDarkBlue,
                 WAVE_SLOW_CYCLE_LENGTH,
                 WAVE_MEDIUM_DURATION)),
-    ENDGAME_ALERT(leds -> leds.strobe(Section.FULL, Color.kYellow, STROBE_SLOW_DURATION)),
-    SHOOTING(leds -> leds.strobe(Section.FULL, Color.kGreen, STROBE_SLOW_DURATION)),
-    AIMING_AT_SPEAKER(leds -> leds.solid(Section.FULL, Color.kGreen)),
-    READY_TO_SHOOT(leds -> leds.solid(Section.FULL, Color.kBlue)),
-    HAS_GAME_PIECE(leds -> leds.strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION)),
-    PURSUING_NOTE(leds -> leds.orangePulse(Section.FULL, PULSE_DURATION)),
+    ENDGAME_ALERT((leds, section) -> leds.strobe(section, Color.kYellow, STROBE_SLOW_DURATION)),
+    SHOOTING((leds, section) -> leds.strobe(section, Color.kGreen, STROBE_SLOW_DURATION)),
+    AIMING_AT_SPEAKER((leds, section) -> leds.solid(section, Color.kGreen)),
+    READY_TO_SHOOT((leds, section) -> leds.solid(section, Color.kBlue)),
+    HAS_GAME_PIECE((leds, section) -> leds.strobe(section, Color.kBlue, STROBE_SLOW_DURATION)),
+    PURSUING_NOTE((leds, section) -> leds.orangePulse(section, PULSE_DURATION)),
     WAITING_FOR_GAME_PIECE(
-        leds ->
+        (leds, section) ->
             leds.wave(
-                Section.FULL,
+                section,
                 Color.kBlue,
                 new Color(255, 20, 0),
                 WAVE_FAST_CYCLE_LENGTH,
                 WAVE_SLOW_DURATION)),
-    MANUAL_REPEL(leds -> leds.strobe(Section.FULL, Color.kDeepPink, STROBE_SLOW_DURATION)),
-    INTAKE_MANUALLY_TURNED_OFF(leds -> leds.solid(Section.FULL, Color.kYellow)),
-    DEFAULT(leds -> leds.solid(Section.FULL, Color.kBlack));
+    MANUAL_REPEL((leds, section) -> leds.strobe(section, Color.kDeepPink, STROBE_SLOW_DURATION)),
+    INTAKE_MANUALLY_TURNED_OFF((leds, section) -> leds.solid(section, Color.kYellow)),
+    DEFAULT((leds, section) -> leds.solid(section, Color.kBlack));
 
-    public final Consumer<LEDs> ledSubsystem;
+    public final BiConsumer<LEDs, Section> setter;
 
-    private States(Consumer<LEDs> leds) {
-      this.ledSubsystem = leds;
+    private States(BiConsumer<LEDs, Section> setter) {
+      this.setter = setter;
     }
   }
 
-  // Robot state tracking
+  // robot state tracking
   private int loopCycleCount = 0;
-
   private boolean assignedAlliance = false;
   private boolean lastEnabledAuto = false;
   private double lastEnabledTime = 0.0;
 
-  // LED IO
   private final Notifier loadingNotifier;
 
   // Constants
@@ -115,7 +121,6 @@ public abstract class LEDs extends SubsystemBase {
   protected static final int LENGTH = MIRROR_LEDS ? ACTUAL_LENGTH / 2 : ACTUAL_LENGTH;
   private static final int STATIC_LENGTH = LENGTH / 2;
   private static final int STATIC_SECTION_LENGTH = STATIC_LENGTH / 3;
-  private static final boolean PRIDE_LEDS = false;
   private static final int MIN_LOOP_CYCLE_COUNT = 10;
   private static final double STROBE_FAST_DURATION = 0.1;
   private static final double STROBE_SLOW_DURATION = 0.2;
@@ -134,6 +139,7 @@ public abstract class LEDs extends SubsystemBase {
   private static final double AUTO_FADE_TIME = 2.5; // 3s nominal
   private static final double AUTO_FADE_MAX_TIME = 5.0; // Return to normal
 
+  // display a pattern while the code is loading
   protected LEDs() {
     loadingNotifier =
         new Notifier(
@@ -147,10 +153,23 @@ public abstract class LEDs extends SubsystemBase {
     loadingNotifier.startPeriodic(0.02);
   }
 
+  /**
+   * Request a state to be displayed on the LEDs. This method will display the state on the entire
+   * (full) LED strip if it is the highest priority state.
+   *
+   * @param state the state to display
+   */
   public void requestState(States state) {
     fullStates.add(state);
   }
 
+  /**
+   * Request a state to be displayed on the LEDs. This method will display the state on the
+   * specified section of the LED strip if it is the highest priority state for that section.
+   *
+   * @param section the section of the LED strip on which to display the state
+   * @param state the state to display
+   */
   public void requestState(Section section, States state) {
     switch (section) {
       case FULL:
@@ -184,7 +203,11 @@ public abstract class LEDs extends SubsystemBase {
     // stop loading notifier if running
     loadingNotifier.stop();
 
-    this.requestState(States.DEFAULT);
+    /* currently, we always use the entire (full) LED strip for all states
+     * if in the future we use smaller sections for some states, we will need
+     * to update this to add the default state to the appropriate sections.
+     */
+    this.requestState(Section.FULL, States.DEFAULT);
 
     // update internal state
     updateInternalState();
@@ -198,24 +221,24 @@ public abstract class LEDs extends SubsystemBase {
      */
     if (!fullStates.isEmpty()) {
       States fullState = fullStates.first();
-      fullState.ledSubsystem.accept(this);
+      fullState.setter.accept(this, Section.FULL);
     } else {
       States shoulderState = shoulderStates.first();
-      shoulderState.ledSubsystem.accept(this);
+      shoulderState.setter.accept(this, Section.SHOULDER);
       if (!staticStates.isEmpty()) {
         States staticState = staticStates.first();
-        staticState.ledSubsystem.accept(this);
+        staticState.setter.accept(this, Section.STATIC);
       } else {
         States staticLowState = staticLowStates.first();
-        staticLowState.ledSubsystem.accept(this);
+        staticLowState.setter.accept(this, Section.STATIC_LOW);
         States staticMidState = staticMidStates.first();
-        staticMidState.ledSubsystem.accept(this);
+        staticMidState.setter.accept(this, Section.STATIC_MID);
         States staticHighState = staticHighStates.first();
-        staticHighState.ledSubsystem.accept(this);
+        staticHighState.setter.accept(this, Section.STATIC_HIGH);
       }
     }
 
-    // Update LEDs
+    // update LEDs
     this.updateLEDs();
 
     fullStates.clear();
@@ -226,26 +249,17 @@ public abstract class LEDs extends SubsystemBase {
     staticHighStates.clear();
   }
 
-  private void updateToDisabledPattern() {
+  private void updateToDisabledPattern(Section section) {
     if (assignedAlliance) {
       if (Field2d.getInstance().getAlliance() == Alliance.Red) {
-        wave(
-            Section.FULL,
-            Color.kRed,
-            Color.kBlack,
-            WAVE_ALLIANCE_CYCLE_LENGTH,
-            WAVE_ALLIANCE_DURATION);
+        wave(section, Color.kRed, Color.kBlack, WAVE_ALLIANCE_CYCLE_LENGTH, WAVE_ALLIANCE_DURATION);
       } else {
         wave(
-            Section.FULL,
-            Color.kBlue,
-            Color.kBlack,
-            WAVE_ALLIANCE_CYCLE_LENGTH,
-            WAVE_ALLIANCE_DURATION);
+            section, Color.kBlue, Color.kBlack, WAVE_ALLIANCE_CYCLE_LENGTH, WAVE_ALLIANCE_DURATION);
       }
     } else {
       wave(
-          Section.FULL,
+          section,
           new Color(255, 30, 0),
           Color.kDarkBlue,
           WAVE_SLOW_CYCLE_LENGTH,
