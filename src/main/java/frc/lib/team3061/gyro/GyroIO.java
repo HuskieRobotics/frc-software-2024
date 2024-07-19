@@ -4,7 +4,7 @@
 
 package frc.lib.team3061.gyro;
 
-import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.BaseStatusSignal;
 import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.AutoLog;
@@ -67,7 +67,7 @@ public interface GyroIO {
    *
    * @return the status signals for the gyro
    */
-  public default List<StatusSignal<Double>> getOdometryStatusSignals() {
+  public default List<BaseStatusSignal> getOdometryStatusSignals() {
     return new ArrayList<>();
   }
 }

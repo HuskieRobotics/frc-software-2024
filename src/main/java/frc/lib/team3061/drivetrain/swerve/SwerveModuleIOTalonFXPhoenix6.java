@@ -403,8 +403,8 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
   }
 
   @Override
-  public List<StatusSignal<Double>> getOdometryStatusSignals() {
-    ArrayList<StatusSignal<Double>> signals = new ArrayList<>();
+  public List<BaseStatusSignal> getOdometryStatusSignals() {
+    ArrayList<BaseStatusSignal> signals = new ArrayList<>();
     signals.add(drivePositionStatusSignal);
     signals.add(driveVelocityStatusSignal);
     signals.add(anglePositionStatusSignal);
