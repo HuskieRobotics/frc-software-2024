@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3061.RobotConfig;
+import frc.robot.Constants;
 import java.util.List;
 
 @java.lang.SuppressWarnings({"java:S6548"})
@@ -39,7 +40,6 @@ public abstract class LEDs extends SubsystemBase {
   private boolean autoFinished = false;
   private double autoFinishedTime = 0.0;
   private boolean lowBatteryAlert = false;
-  private boolean demoMode = false;
 
   private boolean assignedAlliance = false;
   private Alliance alliance = Alliance.Blue;
@@ -131,13 +131,13 @@ public abstract class LEDs extends SubsystemBase {
         // Auto fade
         solid(1.0 - ((Timer.getFPGATimestamp() - lastEnabledTime) / AUTO_FADE_TIME), Color.kGreen);
 
+      } else if (Constants.DEMO_MODE) {
+        // Pride stripes
+        updateToPridePattern();
+
       } else if (lowBatteryAlert) {
         // Low battery
         solid(Section.FULL, new Color(255, 20, 0));
-
-      } else if (PRIDE_LEDS) {
-        // Pride stripes
-        updateToPridePattern();
 
       } else {
         // Default pattern
@@ -157,7 +157,7 @@ public abstract class LEDs extends SubsystemBase {
     // Set special modes
 
     // Demo mode background
-    if (demoMode) {
+    if (Constants.DEMO_MODE) {
       wave(
           Section.FULL,
           new Color(255, 30, 0),
@@ -307,10 +307,6 @@ public abstract class LEDs extends SubsystemBase {
 
   public void setLowBatteryAlert(boolean lowBatteryAlert) {
     this.lowBatteryAlert = lowBatteryAlert;
-  }
-
-  public void setDemoMode(boolean demoMode) {
-    this.demoMode = demoMode;
   }
 
   public enum ShooterLEDState {
