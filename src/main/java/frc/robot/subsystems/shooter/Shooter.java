@@ -1,6 +1,7 @@
 package frc.robot.subsystems.shooter;
 
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
+import static java.util.Map.entry;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -19,6 +20,7 @@ import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
 import frc.robot.Field2d;
 import frc.robot.subsystems.intake.Intake;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -47,7 +49,7 @@ public class Shooter extends SubsystemBase {
           "Shooter/DeflectorRetractionDelaySeconds",
           ShooterConstants.DEFLECTOR_RETRACTION_DELAY_SECS);
 
-  // FIXME: tune on the competititon field
+  // FIXME: tune on the competition field
   private static final double FIELD_MEASUREMENT_OFFSET = 0.0;
   private final double[] populationRealAngles = {
     64, 57, 53, 45, 43, 41, 38, 36, 35, 33, 32, 31, 29.5, 29.5, 29, 28, 27.5
@@ -60,6 +62,111 @@ public class Shooter extends SubsystemBase {
   private final double[] passingPopulationDistances = {7.329, 9.649, 11.336};
   private final double[] passingPopulationRealVelocities = {42.0 - 2.0, 50.0 - 2.0, 57.0 - 2.0};
 
+  private final Map<ShootingPosition, Double> positionToAngleMap =
+      Map.ofEntries(
+          entry(ShootingPosition.PASS, ShooterConstants.PASS_ANGLE),
+          entry(ShootingPosition.PODIUM, ShooterConstants.PODIUM_ANGLE),
+          entry(ShootingPosition.SUBWOOFER, ShooterConstants.SUBWOOFER_ANGLE),
+          entry(ShootingPosition.AMP, ShooterConstants.AMP_ANGLE),
+          entry(ShootingPosition.AUTO_SHOT, ShooterConstants.SHOOTER_AUTO_SHOT_ANGLE_DEG),
+          entry(ShootingPosition.SOURCE_SIDE_AUTO_1, ShooterConstants.SOURCE_SIDE_AUTO_1_ANGLE),
+          entry(ShootingPosition.SOURCE_SIDE_AUTO_2, ShooterConstants.SOURCE_SIDE_AUTO_2_ANGLE),
+          entry(ShootingPosition.SOURCE_SIDE_AUTO_3_4, ShooterConstants.SOURCE_SIDE_AUTO_3_4_ANGLE),
+          entry(ShootingPosition.STORAGE, ShooterConstants.SHOOTER_STORAGE_ANGLE),
+          entry(ShootingPosition.AMP_SIDE_AUTO_1, ShooterConstants.AMP_SIDE_AUTO_1_ANGLE),
+          entry(ShootingPosition.AMP_SIDE_AUTO_2, ShooterConstants.AMP_SIDE_AUTO_2_ANGLE),
+          entry(ShootingPosition.AMP_SIDE_AUTO_3, ShooterConstants.AMP_SIDE_AUTO_3_ANGLE),
+          entry(ShootingPosition.AMP_SIDE_AUTO_4, ShooterConstants.AMP_SIDE_AUTO_4_ANGLE),
+          entry(ShootingPosition.AMP_SIDE_AUTO_5, ShooterConstants.AMP_SIDE_AUTO_5_ANGLE),
+          entry(ShootingPosition.AMP_SIDE_AUTO_6, ShooterConstants.AMP_SIDE_AUTO_6_ANGLE),
+          entry(ShootingPosition.AMP_FAR_SIDE_AUTO_1, ShooterConstants.AMP_FAR_SIDE_AUTO_1_ANGLE));
+
+  @java.lang.SuppressWarnings({"java:S1104"})
+  private class Velocity {
+    public double top;
+    public double bottom;
+
+    public Velocity(double top, double bottom) {
+      this.top = top;
+      this.bottom = bottom;
+    }
+  }
+
+  private final Map<ShootingPosition, Velocity> positionToVelocityMap =
+      Map.ofEntries(
+          entry(
+              ShootingPosition.PODIUM,
+              new Velocity(
+                  ShooterConstants.PODIUM_VELOCITY_TOP, ShooterConstants.PODIUM_VELOCITY_BOTTOM)),
+          entry(
+              ShootingPosition.SUBWOOFER,
+              new Velocity(
+                  ShooterConstants.SUBWOOFER_VELOCITY_TOP,
+                  ShooterConstants.SUBWOOFER_VELOCITY_BOTTOM)),
+          entry(
+              ShootingPosition.AMP,
+              new Velocity(
+                  ShooterConstants.AMP_VELOCITY_TOP, ShooterConstants.AMP_VELOCITY_BOTTOM)),
+          entry(
+              ShootingPosition.AUTO_SHOT,
+              new Velocity(
+                  ShooterConstants.SHOOTER_AUTO_SHOT_VELOCITY_RPS,
+                  ShooterConstants.SHOOTER_AUTO_SHOT_VELOCITY_RPS)),
+          entry(
+              ShootingPosition.SOURCE_SIDE_AUTO_1,
+              new Velocity(
+                  ShooterConstants.SOURCE_SIDE_AUTO_1_VELOCITY,
+                  ShooterConstants.SOURCE_SIDE_AUTO_1_VELOCITY)),
+          entry(
+              ShootingPosition.SOURCE_SIDE_AUTO_2,
+              new Velocity(
+                  ShooterConstants.SOURCE_SIDE_AUTO_2_VELOCITY,
+                  ShooterConstants.SOURCE_SIDE_AUTO_2_VELOCITY)),
+          entry(
+              ShootingPosition.SOURCE_SIDE_AUTO_3_4,
+              new Velocity(
+                  ShooterConstants.SOURCE_SIDE_AUTO_3_4_VELOCITY,
+                  ShooterConstants.SOURCE_SIDE_AUTO_3_4_VELOCITY)),
+          entry(
+              ShootingPosition.STORAGE,
+              new Velocity(
+                  ShooterConstants.SHOOTER_IDLE_VELOCITY, ShooterConstants.SHOOTER_IDLE_VELOCITY)),
+          entry(
+              ShootingPosition.AMP_SIDE_AUTO_1,
+              new Velocity(
+                  ShooterConstants.AMP_SIDE_AUTO_1_VELOCITY,
+                  ShooterConstants.AMP_SIDE_AUTO_1_VELOCITY)),
+          entry(
+              ShootingPosition.AMP_SIDE_AUTO_2,
+              new Velocity(
+                  ShooterConstants.AMP_SIDE_AUTO_2_VELOCITY,
+                  ShooterConstants.AMP_SIDE_AUTO_2_VELOCITY)),
+          entry(
+              ShootingPosition.AMP_SIDE_AUTO_3,
+              new Velocity(
+                  ShooterConstants.AMP_SIDE_AUTO_3_VELOCITY,
+                  ShooterConstants.AMP_SIDE_AUTO_3_VELOCITY)),
+          entry(
+              ShootingPosition.AMP_SIDE_AUTO_4,
+              new Velocity(
+                  ShooterConstants.AMP_SIDE_AUTO_4_VELOCITY,
+                  ShooterConstants.AMP_SIDE_AUTO_4_VELOCITY)),
+          entry(
+              ShootingPosition.AMP_SIDE_AUTO_5,
+              new Velocity(
+                  ShooterConstants.AMP_SIDE_AUTO_5_VELOCITY,
+                  ShooterConstants.AMP_SIDE_AUTO_5_VELOCITY)),
+          entry(
+              ShootingPosition.AMP_SIDE_AUTO_6,
+              new Velocity(
+                  ShooterConstants.AMP_SIDE_AUTO_6_VELOCITY,
+                  ShooterConstants.AMP_SIDE_AUTO_6_VELOCITY)),
+          entry(
+              ShootingPosition.AMP_FAR_SIDE_AUTO_1,
+              new Velocity(
+                  ShooterConstants.AMP_FAR_SIDE_AUTO_1_VELOCITY,
+                  ShooterConstants.AMP_FAR_SIDE_AUTO_1_VELOCITY)));
+
   private boolean automatedShooter = true;
 
   private boolean intakeEnabled = true;
@@ -70,6 +177,7 @@ public class Shooter extends SubsystemBase {
   private int angleAtSetpointIterationCount = 0;
 
   private State state = State.WAITING_FOR_NOTE;
+  private State lastState = State.UNINITIALIZED;
   private ShootingPosition shootingPosition = ShootingPosition.FIELD;
   private boolean overrideSetpointsForNextShot = false;
 
@@ -98,9 +206,129 @@ public class Shooter extends SubsystemBase {
   }
 
   private enum State {
-    WAITING_FOR_NOTE,
-    AIMING_AT_SPEAKER,
-    PREPARING_TO_SHOOT
+    UNINITIALIZED {
+      @Override
+      void execute(Shooter shooter) {
+        /* no-op */
+      }
+
+      @Override
+      void onEnter(Shooter shooter) {
+        /* no-op */
+      }
+
+      @Override
+      void onExit(Shooter shooter) {
+        /* no-op */
+      }
+    },
+    WAITING_FOR_NOTE {
+      @Override
+      void onEnter(Shooter shooter) {
+        if (DriverStation.isAutonomousEnabled()) {
+          // don't reset the shooting position if we are in autonomous as it has been set at the
+          // start of the auto
+          shooter.overrideSetpointsForNextShot = true;
+        } else {
+          shooter.overrideSetpointsForNextShot = false;
+          shooter.shootingPosition = ShootingPosition.FIELD;
+
+          // delay retraction of the deflector so it has time to help the note score in the amp
+          Commands.sequence(
+                  Commands.waitSeconds(shooter.deflectorRetractionDelaySeconds.get()),
+                  Commands.runOnce(shooter::retractDeflector))
+              .schedule();
+        }
+
+        shooter.moveToIntakePosition();
+        shooter.setIdleVelocity();
+      }
+
+      @Override
+      void execute(Shooter shooter) {
+        shooter.leds.setShooterLEDState(ShooterLEDState.WAITING_FOR_GAME_PIECE);
+
+        if (shooter.intake.hasNote()) {
+          shooter.setState(State.AIMING_AT_SPEAKER);
+        }
+      }
+
+      @Override
+      void onExit(Shooter shooter) {
+        /* no-op */
+      }
+    },
+    AIMING_AT_SPEAKER {
+      @Override
+      void execute(Shooter shooter) {
+        shooter.leds.setShooterLEDState(ShooterLEDState.AIMING_AT_SPEAKER);
+
+        if (!shooter.intake.hasNote()) {
+          shooter.setState(State.WAITING_FOR_NOTE);
+        } else if (shooter.overrideSetpointsForNextShot) {
+          shooter.setState(State.PREPARING_TO_SHOOT);
+        } else {
+          double distanceToSpeaker =
+              Field2d.getInstance()
+                  .getAllianceSpeakerCenter()
+                  .minus(RobotOdometry.getInstance().getEstimatedPosition())
+                  .getTranslation()
+                  .getNorm();
+          shooter.adjustAngle(distanceToSpeaker);
+          shooter.setIdleVelocity();
+        }
+      }
+
+      @Override
+      void onEnter(Shooter shooter) {
+        /* no-op */
+      }
+
+      @Override
+      void onExit(Shooter shooter) {
+        /* no-op */
+      }
+    },
+    PREPARING_TO_SHOOT {
+      @Override
+      void execute(Shooter shooter) {
+        shooter.leds.setShooterLEDState(ShooterLEDState.AIMING_AT_SPEAKER);
+
+        if (!shooter.intake.hasNote()) {
+          shooter.setState(State.WAITING_FOR_NOTE);
+        } else {
+          double distanceToSpeaker =
+              Field2d.getInstance()
+                  .getAllianceSpeakerCenter()
+                  .minus(RobotOdometry.getInstance().getEstimatedPosition())
+                  .getTranslation()
+                  .getNorm();
+          shooter.adjustAngle(distanceToSpeaker);
+          shooter.setRangeVelocity(distanceToSpeaker);
+          if (shooter.shootingPosition == ShootingPosition.AMP) {
+            shooter.deployDeflector();
+          } else {
+            shooter.retractDeflector();
+          }
+        }
+      }
+
+      @Override
+      void onEnter(Shooter shooter) {
+        /* no-op */
+      }
+
+      @Override
+      void onExit(Shooter shooter) {
+        /* no-op */
+      }
+    };
+
+    abstract void execute(Shooter shooter);
+
+    abstract void onEnter(Shooter shooter);
+
+    abstract void onExit(Shooter shooter);
   }
 
   public Shooter(ShooterIO io, Intake intake, Drivetrain drivetrain) {
@@ -113,8 +341,6 @@ public class Shooter extends SubsystemBase {
     populatePassingMap();
 
     this.leds = LEDs.getInstance();
-
-    this.resetToInitialState();
 
     if (testingMode.get() == 1) {
       ShuffleboardTab tab = Shuffleboard.getTab(SUBSYSTEM_NAME);
@@ -170,65 +396,18 @@ public class Shooter extends SubsystemBase {
     }
   }
 
-  private void runAngleStateMachine() {
-    if (state == State.WAITING_FOR_NOTE) {
-      if (intake.hasNote()) {
-        state = State.AIMING_AT_SPEAKER;
-        leds.setShooterLEDState(ShooterLEDState.AIMING_AT_SPEAKER);
-      }
-      this.moveToIntakePosition();
-      this.setIdleVelocity();
-      leds.setShooterLEDState(ShooterLEDState.WAITING_FOR_GAME_PIECE);
-    } else if (state == State.AIMING_AT_SPEAKER) {
-      if (!intake.hasNote()) {
-        this.resetToInitialState();
-      } else if (overrideSetpointsForNextShot) {
-        state = State.PREPARING_TO_SHOOT;
-      } else {
-        double distanceToSpeaker =
-            Field2d.getInstance()
-                .getAllianceSpeakerCenter()
-                .minus(RobotOdometry.getInstance().getEstimatedPosition())
-                .getTranslation()
-                .getNorm();
-        this.adjustAngle(distanceToSpeaker);
-        this.setIdleVelocity();
-      }
-    } else if (state == State.PREPARING_TO_SHOOT) {
-      if (!intake.hasNote()) {
-        this.resetToInitialState();
-      } else {
-        double distanceToSpeaker =
-            Field2d.getInstance()
-                .getAllianceSpeakerCenter()
-                .minus(RobotOdometry.getInstance().getEstimatedPosition())
-                .getTranslation()
-                .getNorm();
-        this.adjustAngle(distanceToSpeaker);
-        this.setRangeVelocity(distanceToSpeaker);
-        if (shootingPosition == ShootingPosition.AMP) {
-          deployDeflector();
-        } else {
-          retractDeflector();
-        }
-      }
-    }
+  private void setState(State state) {
+    this.state = state;
   }
 
-  private void resetToInitialState() {
-    this.state = State.WAITING_FOR_NOTE;
-    if (DriverStation.isAutonomousEnabled()) {
-      // don't reset the shooting position if we are in autonomous as it has been set at the start
-      // of the auto
-      this.overrideSetpointsForNextShot = true;
-    } else {
-      this.overrideSetpointsForNextShot = false;
-      this.shootingPosition = ShootingPosition.FIELD;
-      Commands.sequence(
-              Commands.waitSeconds(deflectorRetractionDelaySeconds.get()),
-              Commands.runOnce(this::retractDeflector))
-          .schedule();
+  private void runAngleStateMachine() {
+    if (state != lastState) {
+      lastState.onExit(this);
+      lastState = state;
+      state.onEnter(this);
     }
+
+    state.execute(this);
   }
 
   private void setIdleVelocity() {
@@ -254,41 +433,9 @@ public class Shooter extends SubsystemBase {
 
   private void adjustAngle(double distanceToSpeaker) {
     if (automatedShooter) {
-      if (shootingPosition == ShootingPosition.PASS) {
-        io.setAngle(ShooterConstants.PASS_ANGLE);
-      } else if (shootingPosition == ShootingPosition.PODIUM) {
-        io.setAngle(ShooterConstants.PODIUM_ANGLE);
-      } else if (shootingPosition == ShootingPosition.SUBWOOFER) {
-        io.setAngle(ShooterConstants.SUBWOOFER_ANGLE);
-      } else if (shootingPosition == ShootingPosition.AMP) {
-        io.setAngle(ShooterConstants.AMP_ANGLE);
-      } else if (shootingPosition == ShootingPosition.AUTO_SHOT) {
-        io.setAngle(ShooterConstants.SHOOTER_AUTO_SHOT_ANGLE_DEG);
-      } else if (shootingPosition == ShootingPosition.SOURCE_SIDE_AUTO_1) {
-        io.setAngle(ShooterConstants.SOURCE_SIDE_AUTO_1_ANGLE);
-      } else if (shootingPosition == ShootingPosition.SOURCE_SIDE_AUTO_2) {
-        io.setAngle(ShooterConstants.SOURCE_SIDE_AUTO_2_ANGLE);
-      } else if (shootingPosition == ShootingPosition.SOURCE_SIDE_AUTO_3_4) {
-        io.setAngle(ShooterConstants.SOURCE_SIDE_AUTO_3_4_ANGLE);
-      } else if (shootingPosition == ShootingPosition.STORAGE) {
-        io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
-      } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO_1) {
-        io.setAngle(ShooterConstants.AMP_SIDE_AUTO_1_ANGLE);
-      } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO_2) {
-        io.setAngle(ShooterConstants.AMP_SIDE_AUTO_2_ANGLE);
-      } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO_3) {
-        io.setAngle(ShooterConstants.AMP_SIDE_AUTO_3_ANGLE);
-      } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO_4) {
-        io.setAngle(ShooterConstants.AMP_SIDE_AUTO_4_ANGLE);
-      } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO_5) {
-        io.setAngle(ShooterConstants.AMP_SIDE_AUTO_5_ANGLE);
-      } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO_6) {
-        io.setAngle(ShooterConstants.AMP_SIDE_AUTO_6_ANGLE);
-      } else if (shootingPosition == ShootingPosition.AMP_FAR_SIDE_AUTO_1) {
-        io.setAngle(ShooterConstants.AMP_FAR_SIDE_AUTO_1_ANGLE);
-      } else {
-        io.setAngle(getAngleForDistance(distanceToSpeaker));
-      }
+      if (positionToAngleMap.containsKey(shootingPosition)) {
+        io.setAngle(positionToAngleMap.get(shootingPosition));
+      } else io.setAngle(getAngleForDistance(distanceToSpeaker));
     }
   }
 
@@ -302,54 +449,13 @@ public class Shooter extends SubsystemBase {
     Logger.recordOutput("Shooter/distanceToSpeaker", distanceToSpeaker);
     double topVelocity;
     double bottomVelocity;
-    if (shootingPosition == ShootingPosition.PASS) {
+
+    if (positionToVelocityMap.containsKey(shootingPosition)) {
+      topVelocity = positionToVelocityMap.get(shootingPosition).top;
+      bottomVelocity = positionToVelocityMap.get(shootingPosition).bottom;
+    } else if (shootingPosition == ShootingPosition.PASS) {
       topVelocity = getPassingVelocity();
       bottomVelocity = getPassingVelocity();
-    } else if (shootingPosition == ShootingPosition.PODIUM) {
-      topVelocity = ShooterConstants.PODIUM_VELOCITY_TOP;
-      bottomVelocity = ShooterConstants.PODIUM_VELOCITY_BOTTOM;
-    } else if (shootingPosition == ShootingPosition.SUBWOOFER) {
-      topVelocity = ShooterConstants.SUBWOOFER_VELOCITY_TOP;
-      bottomVelocity = ShooterConstants.SUBWOOFER_VELOCITY_BOTTOM;
-    } else if (shootingPosition == ShootingPosition.AMP) {
-      topVelocity = ShooterConstants.AMP_VELOCITY_TOP;
-      bottomVelocity = ShooterConstants.AMP_VELOCITY_BOTTOM;
-    } else if (shootingPosition == ShootingPosition.AUTO_SHOT) {
-      topVelocity = ShooterConstants.SHOOTER_AUTO_SHOT_VELOCITY_RPS;
-      bottomVelocity = ShooterConstants.SHOOTER_AUTO_SHOT_VELOCITY_RPS;
-    } else if (shootingPosition == ShootingPosition.SOURCE_SIDE_AUTO_1) {
-      topVelocity = ShooterConstants.SOURCE_SIDE_AUTO_1_VELOCITY;
-      bottomVelocity = ShooterConstants.SOURCE_SIDE_AUTO_1_VELOCITY;
-    } else if (shootingPosition == ShootingPosition.SOURCE_SIDE_AUTO_2) {
-      topVelocity = ShooterConstants.SOURCE_SIDE_AUTO_2_VELOCITY;
-      bottomVelocity = ShooterConstants.SOURCE_SIDE_AUTO_2_VELOCITY;
-    } else if (shootingPosition == ShootingPosition.SOURCE_SIDE_AUTO_3_4) {
-      topVelocity = ShooterConstants.SOURCE_SIDE_AUTO_3_4_VELOCITY;
-      bottomVelocity = ShooterConstants.SOURCE_SIDE_AUTO_3_4_VELOCITY;
-    } else if (shootingPosition == ShootingPosition.STORAGE) {
-      topVelocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
-      bottomVelocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
-    } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO_1) {
-      topVelocity = ShooterConstants.AMP_SIDE_AUTO_1_VELOCITY;
-      bottomVelocity = ShooterConstants.AMP_SIDE_AUTO_1_VELOCITY;
-    } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO_2) {
-      topVelocity = ShooterConstants.AMP_SIDE_AUTO_2_VELOCITY;
-      bottomVelocity = ShooterConstants.AMP_SIDE_AUTO_2_VELOCITY;
-    } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO_3) {
-      topVelocity = ShooterConstants.AMP_SIDE_AUTO_3_VELOCITY;
-      bottomVelocity = ShooterConstants.AMP_SIDE_AUTO_3_VELOCITY;
-    } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO_4) {
-      topVelocity = ShooterConstants.AMP_SIDE_AUTO_4_VELOCITY;
-      bottomVelocity = ShooterConstants.AMP_SIDE_AUTO_4_VELOCITY;
-    } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO_5) {
-      topVelocity = ShooterConstants.AMP_SIDE_AUTO_5_VELOCITY;
-      bottomVelocity = ShooterConstants.AMP_SIDE_AUTO_5_VELOCITY;
-    } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO_6) {
-      topVelocity = ShooterConstants.AMP_SIDE_AUTO_6_VELOCITY;
-      bottomVelocity = ShooterConstants.AMP_SIDE_AUTO_6_VELOCITY;
-    } else if (shootingPosition == ShootingPosition.AMP_FAR_SIDE_AUTO_1) {
-      topVelocity = ShooterConstants.AMP_FAR_SIDE_AUTO_1_VELOCITY;
-      bottomVelocity = ShooterConstants.AMP_FAR_SIDE_AUTO_1_VELOCITY;
     } else if (DriverStation.isAutonomousEnabled()) {
       return;
     } else if (distanceToSpeaker < ShooterConstants.SUBWOOFER_TO_NEAR_VELOCITY_DISTANCE_METERS) {
