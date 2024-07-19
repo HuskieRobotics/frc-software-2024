@@ -15,9 +15,11 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3061.RobotConfig;
-import frc.robot.Field2d;
 import frc.robot.Constants;
+import frc.robot.Field2d;
 import java.util.List;
+import java.util.TreeSet;
+import java.util.function.Consumer;
 
 @java.lang.SuppressWarnings({"java:S6548"})
 public abstract class LEDs extends SubsystemBase {
@@ -35,21 +37,61 @@ public abstract class LEDs extends SubsystemBase {
     return instance;
   }
 
+  /* based on FRC 6995's use of TreeSet to prioritize LED states as shared on CD:
+   * https://www.chiefdelphi.com/t/enums-and-subsytem-states/463974/31?u=gcschmit
+   */
+  private TreeSet<States> states = new TreeSet<>();
+
+  public enum States {
+    ESTOPPED(leds -> leds.solid(Section.FULL, Color.kRed)),
+    AUTO_FADE(
+        leds ->
+            leds.solid(
+                1.0 - ((Timer.getFPGATimestamp() - leds.lastEnabledTime) / AUTO_FADE_TIME),
+                Color.kGreen)),
+    DISABLED_DEMO_MODE(LEDs::updateToPridePattern),
+    LOW_BATTERY(leds -> leds.solid(Section.FULL, new Color(255, 20, 0))),
+    DISABLED(LEDs::updateToDisabledPattern),
+    AUTO(leds -> leds.orangePulse(Section.FULL, PULSE_DURATION)),
+    TELEOP_DEMO_MODE(
+        leds ->
+            leds.wave(
+                Section.FULL,
+                new Color(255, 30, 0),
+                Color.kDarkBlue,
+                WAVE_SLOW_CYCLE_LENGTH,
+                WAVE_MEDIUM_DURATION)),
+    ENDGAME_ALERT(leds -> leds.strobe(Section.FULL, Color.kYellow, STROBE_SLOW_DURATION)),
+    SHOOTING(leds -> leds.strobe(Section.FULL, Color.kGreen, STROBE_SLOW_DURATION)),
+    AIMING_AT_SPEAKER(leds -> leds.solid(Section.FULL, Color.kGreen)),
+    READY_TO_SHOOT(leds -> leds.solid(Section.FULL, Color.kBlue)),
+    HAS_GAME_PIECE(leds -> leds.strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION)),
+    PURSUING_NOTE(leds -> leds.orangePulse(Section.FULL, PULSE_DURATION)),
+    WAITING_FOR_GAME_PIECE(
+        leds ->
+            leds.wave(
+                Section.FULL,
+                Color.kBlue,
+                new Color(255, 20, 0),
+                WAVE_FAST_CYCLE_LENGTH,
+                WAVE_SLOW_DURATION)),
+    MANUAL_REPEL(leds -> leds.strobe(Section.FULL, Color.kDeepPink, STROBE_SLOW_DURATION)),
+    INTAKE_MANUALLY_TURNED_OFF(leds -> leds.solid(Section.FULL, Color.kYellow)),
+    DEFAULT(leds -> leds.solid(Section.FULL, Color.kBlack));
+
+    public final Consumer<LEDs> ledSubsystem;
+
+    private States(Consumer<LEDs> leds) {
+      this.ledSubsystem = leds;
+    }
+  }
+
   // Robot state tracking
   private int loopCycleCount = 0;
-  private boolean endgameAlert = false;
-  private boolean autoFinished = false;
-  private double autoFinishedTime = 0.0;
-  private boolean lowBatteryAlert = false;
 
   private boolean assignedAlliance = false;
   private boolean lastEnabledAuto = false;
   private double lastEnabledTime = 0.0;
-  private boolean estopped = false;
-
-  private IntakeLEDState intakeLEDState;
-  private ShooterLEDState shooterLEDState;
-  private NoteTargetingLEDState noteTargetingLEDState;
 
   // LED IO
   private final Notifier loadingNotifier;
@@ -100,11 +142,12 @@ public abstract class LEDs extends SubsystemBase {
     loadingNotifier.startPeriodic(0.02);
   }
 
+  public void requestState(States state) {
+    states.add(state);
+  }
+
   @Override
   public synchronized void periodic() {
-    // update all state variables
-    updateState();
-
     // exit during initial cycles
     if (++loopCycleCount < MIN_LOOP_CYCLE_COUNT) {
       return;
@@ -113,104 +156,19 @@ public abstract class LEDs extends SubsystemBase {
     // stop loading notifier if running
     loadingNotifier.stop();
 
+    this.requestState(States.DEFAULT);
+
+    // update internal state
+    updateInternalState();
+
     // select LED mode
-    updateLEDPattern();
+    States state = states.first();
+    state.ledSubsystem.accept(this);
 
     // Update LEDs
     this.updateLEDs();
-  }
 
-  private void updateLEDPattern() {
-    // default to off
-    solid(Section.FULL, Color.kBlack);
-
-    if (estopped) {
-      solid(Section.FULL, Color.kRed);
-    } else if (DriverStation.isDisabled()) {
-      if (lastEnabledAuto && Timer.getFPGATimestamp() - lastEnabledTime < AUTO_FADE_MAX_TIME) {
-        // Auto fade
-        solid(1.0 - ((Timer.getFPGATimestamp() - lastEnabledTime) / AUTO_FADE_TIME), Color.kGreen);
-
-      } else if (Constants.DEMO_MODE) {
-        // Pride stripes
-        updateToPridePattern();
-
-      } else if (lowBatteryAlert) {
-        // Low battery
-        solid(Section.FULL, new Color(255, 20, 0));
-
-      } else {
-        // Default pattern
-        updateToDisabledPattern();
-      }
-    } else if (DriverStation.isAutonomous()) {
-      updateToAutoPattern();
-    } else { // teleop
-
-      updateToTeleopPattern();
-    }
-  }
-
-  private void updateToTeleopPattern() {
-    // FIXME: add other patterns here based specific to the game
-
-    // Set special modes
-
-    // Demo mode background
-    if (Constants.DEMO_MODE) {
-      wave(
-          Section.FULL,
-          new Color(255, 30, 0),
-          Color.kDarkBlue,
-          WAVE_SLOW_CYCLE_LENGTH,
-          WAVE_MEDIUM_DURATION);
-    }
-
-    if (endgameAlert) {
-      // Endgame alert
-      strobe(Section.FULL, Color.kYellow, STROBE_SLOW_DURATION);
-    } else if (intakeLEDState == IntakeLEDState.SHOOTING) {
-      // Actively shooting
-      strobe(Section.FULL, Color.kGreen, STROBE_SLOW_DURATION);
-    } else if (shooterLEDState == ShooterLEDState.AIMING_AT_SPEAKER) {
-      // Aiming at speaker
-      solid(Section.FULL, Color.kGreen);
-    } else if (shooterLEDState == ShooterLEDState.IS_READY_TO_SHOOT) {
-      // Ready to shoot
-      solid(Section.FULL, Color.kBlue);
-    } else if (intakeLEDState == IntakeLEDState.HAS_GAME_PIECE) {
-      // Has game piece
-      strobe(Section.FULL, Color.kBlue, STROBE_SLOW_DURATION);
-    } else if (noteTargetingLEDState == NoteTargetingLEDState.PURSUING_NOTE) {
-      // Going after note
-      orangePulse(Section.FULL, PULSE_DURATION);
-      // FIXME: re-enable if we tune note detection such that one isn't always seen
-      // } else if (noteTargetingLEDState == NoteTargetingLEDState.NOTE_TARGETED) {
-      //   // Note seen
-      //   solid(Section.FULL, Color.kBlue);
-    } else if (intakeLEDState == IntakeLEDState.WAITING_FOR_GAME_PIECE) {
-      wave(
-          Section.FULL,
-          Color.kBlue,
-          new Color(255, 20, 0),
-          WAVE_FAST_CYCLE_LENGTH,
-          WAVE_SLOW_DURATION);
-    } else if (intakeLEDState == IntakeLEDState.MANUAL_REPEL) {
-      // Manual repel
-      strobe(Section.FULL, Color.kDeepPink, STROBE_SLOW_DURATION);
-    } else if (intakeLEDState == IntakeLEDState.INTAKE_MANUALLY_TURNED_OFF) {
-      // Intake manually turned off
-      solid(Section.FULL, Color.kYellow);
-    }
-  }
-
-  private void updateToAutoPattern() {
-    orangePulse(Section.FULL, PULSE_DURATION);
-
-    // if (autoFinished) {
-    //   double fullTime = LENGTH / WAVE_FAST_CYCLE_LENGTH * WAVE_FAST_DURATION;
-    //   solid((Timer.getFPGATimestamp() - autoFinishedTime) / fullTime, Color.kGreen);
-    // }
+    states.clear();
   }
 
   private void updateToDisabledPattern() {
@@ -271,7 +229,7 @@ public abstract class LEDs extends SubsystemBase {
     }
   }
 
-  private void updateState() {
+  private void updateInternalState() {
     // check for alliance assignment when connected to FMS
     if (DriverStation.isFMSAttached()) {
       assignedAlliance = true;
@@ -279,66 +237,34 @@ public abstract class LEDs extends SubsystemBase {
       assignedAlliance = false;
     }
 
-    // Update auto state
+    // Update based on robot state
     if (DriverStation.isDisabled()) {
-      autoFinished = false;
+      this.requestState(States.DISABLED);
+      if (lastEnabledAuto && Timer.getFPGATimestamp() - lastEnabledTime < AUTO_FADE_MAX_TIME) {
+        this.requestState(States.AUTO_FADE);
+      }
     } else {
       lastEnabledAuto = DriverStation.isAutonomous();
       lastEnabledTime = Timer.getFPGATimestamp();
+
+      if (DriverStation.isAutonomous()) {
+        this.requestState(States.AUTO);
+      }
     }
 
     // Update estop state
     if (DriverStation.isEStopped()) {
-      estopped = true;
+      this.requestState(States.ESTOPPED);
     }
-  }
 
-  public void setEndgameAlert(boolean endgameAlert) {
-    this.endgameAlert = endgameAlert;
-  }
-
-  public void setAutoFinished(boolean autoFinished) {
-    this.autoFinished = autoFinished;
-    if (autoFinished) {
-      this.autoFinishedTime = Timer.getFPGATimestamp();
+    // update for demo mode
+    if (Constants.DEMO_MODE) {
+      if (DriverStation.isDisabled()) {
+        this.requestState(States.DISABLED_DEMO_MODE);
+      } else {
+        this.requestState(States.TELEOP_DEMO_MODE);
+      }
     }
-  }
-
-  public void setLowBatteryAlert(boolean lowBatteryAlert) {
-    this.lowBatteryAlert = lowBatteryAlert;
-  }
-
-  public enum ShooterLEDState {
-    IS_READY_TO_SHOOT,
-    AIMING_AT_SPEAKER,
-    WAITING_FOR_GAME_PIECE
-  }
-
-  public enum IntakeLEDState {
-    WAITING_FOR_GAME_PIECE,
-    HAS_GAME_PIECE,
-    SHOOTING,
-    MANUAL_REPEL,
-    INTAKE_MANUALLY_TURNED_OFF,
-    // TODO: add implementation for ready to shoot after talking with Jake and Mr. Schmit
-  }
-
-  public enum NoteTargetingLEDState {
-    NOTE_TARGETED,
-    NO_NOTE_TARGETED,
-    PURSUING_NOTE
-  }
-
-  public void setShooterLEDState(ShooterLEDState state) {
-    this.shooterLEDState = state;
-  }
-
-  public void setIntakeLEDState(IntakeLEDState state) {
-    this.intakeLEDState = state;
-  }
-
-  public void setNoteTargetingLEDState(NoteTargetingLEDState state) {
-    this.noteTargetingLEDState = state;
   }
 
   protected abstract void updateLEDs();

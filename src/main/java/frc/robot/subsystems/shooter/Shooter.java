@@ -13,7 +13,6 @@ import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.drivetrain.Drivetrain;
 import frc.lib.team3061.drivetrain.DrivetrainConstants;
 import frc.lib.team3061.leds.LEDs;
-import frc.lib.team3061.leds.LEDs.ShooterLEDState;
 import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
@@ -47,7 +46,7 @@ public class Shooter extends SubsystemBase {
           "Shooter/DeflectorRetractionDelaySeconds",
           ShooterConstants.DEFLECTOR_RETRACTION_DELAY_SECS);
 
-  // FIXME: tune on the competititon field
+  // FIXME: tune on the competition field
   private static final double FIELD_MEASUREMENT_OFFSET = 0.0;
   private final double[] populationRealAngles = {
     64, 57, 53, 45, 43, 41, 38, 36, 35, 33, 32, 31, 29.5, 29.5, 29, 28, 27.5
@@ -174,11 +173,11 @@ public class Shooter extends SubsystemBase {
     if (state == State.WAITING_FOR_NOTE) {
       if (intake.hasNote()) {
         state = State.AIMING_AT_SPEAKER;
-        leds.setShooterLEDState(ShooterLEDState.AIMING_AT_SPEAKER);
+        leds.requestState(LEDs.States.AIMING_AT_SPEAKER);
       }
       this.moveToIntakePosition();
       this.setIdleVelocity();
-      leds.setShooterLEDState(ShooterLEDState.WAITING_FOR_GAME_PIECE);
+      leds.requestState(LEDs.States.WAITING_FOR_GAME_PIECE);
     } else if (state == State.AIMING_AT_SPEAKER) {
       if (!intake.hasNote()) {
         this.resetToInitialState();
