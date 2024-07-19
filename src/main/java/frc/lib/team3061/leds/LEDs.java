@@ -40,7 +40,12 @@ public abstract class LEDs extends SubsystemBase {
   /* based on FRC 6995's use of TreeSet to prioritize LED states as shared on CD:
    * https://www.chiefdelphi.com/t/enums-and-subsytem-states/463974/31?u=gcschmit
    */
-  private TreeSet<States> states = new TreeSet<>();
+  private TreeSet<States> fullStates = new TreeSet<>();
+  private TreeSet<States> shoulderStates = new TreeSet<>();
+  private TreeSet<States> staticStates = new TreeSet<>();
+  private TreeSet<States> staticLowStates = new TreeSet<>();
+  private TreeSet<States> staticMidStates = new TreeSet<>();
+  private TreeSet<States> staticHighStates = new TreeSet<>();
 
   public enum States {
     ESTOPPED(leds -> leds.solid(Section.FULL, Color.kRed)),
@@ -143,7 +148,30 @@ public abstract class LEDs extends SubsystemBase {
   }
 
   public void requestState(States state) {
-    states.add(state);
+    fullStates.add(state);
+  }
+
+  public void requestState(Section section, States state) {
+    switch (section) {
+      case FULL:
+        fullStates.add(state);
+        break;
+      case SHOULDER:
+        shoulderStates.add(state);
+        break;
+      case STATIC:
+        staticStates.add(state);
+        break;
+      case STATIC_LOW:
+        staticLowStates.add(state);
+        break;
+      case STATIC_MID:
+        staticMidStates.add(state);
+        break;
+      case STATIC_HIGH:
+        staticHighStates.add(state);
+        break;
+    }
   }
 
   @Override
@@ -161,14 +189,41 @@ public abstract class LEDs extends SubsystemBase {
     // update internal state
     updateInternalState();
 
-    // select LED mode
-    States state = states.first();
-    state.ledSubsystem.accept(this);
+    /*
+     * select LED mode
+     *   if there is a state requested that use the full (entire) LED strip, display it
+     *   otherwise, display the shoulder state and then,
+     *      if there is a state requested that uses the static section, display it
+     *      otherwise, display the static low, mid, and high requested states
+     */
+    if (!fullStates.isEmpty()) {
+      States fullState = fullStates.first();
+      fullState.ledSubsystem.accept(this);
+    } else {
+      States shoulderState = shoulderStates.first();
+      shoulderState.ledSubsystem.accept(this);
+      if (!staticStates.isEmpty()) {
+        States staticState = staticStates.first();
+        staticState.ledSubsystem.accept(this);
+      } else {
+        States staticLowState = staticLowStates.first();
+        staticLowState.ledSubsystem.accept(this);
+        States staticMidState = staticMidStates.first();
+        staticMidState.ledSubsystem.accept(this);
+        States staticHighState = staticHighStates.first();
+        staticHighState.ledSubsystem.accept(this);
+      }
+    }
 
     // Update LEDs
     this.updateLEDs();
 
-    states.clear();
+    fullStates.clear();
+    shoulderStates.clear();
+    staticStates.clear();
+    staticLowStates.clear();
+    staticMidStates.clear();
+    staticHighStates.clear();
   }
 
   private void updateToDisabledPattern() {
@@ -407,10 +462,10 @@ public abstract class LEDs extends SubsystemBase {
     }
   }
 
-  private enum Section {
-    STATIC,
-    SHOULDER,
+  public enum Section {
     FULL,
+    SHOULDER,
+    STATIC,
     STATIC_LOW,
     STATIC_MID,
     STATIC_HIGH;
