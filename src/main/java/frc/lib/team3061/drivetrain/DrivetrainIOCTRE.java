@@ -28,7 +28,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
@@ -135,7 +134,7 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   // TorqueCurrentFOC is not currently supported in simulation.
   private static final ClosedLoopOutputType driveClosedLoopOutput = getDriveClosedLoopOutputType();
 
-  private static final double COUPLE_RATIO = 0.0;
+  private static final double COUPLE_RATIO = 3.125;
   private static final double STEER_INERTIA = 0.00001;
   private static final double DRIVE_INERTIA = 0.001;
 
@@ -179,14 +178,13 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
               RobotConfig.getInstance().getSwerveConstants().getDriveGearRatio())
           .withSteerMotorGearRatio(
               RobotConfig.getInstance().getSwerveConstants().getAngleGearRatio())
-          .withWheelRadius(
-              Units.metersToInches(RobotConfig.getInstance().getWheelDiameterMeters() / 2.0))
-          .withSlipCurrent(800)
+          .withWheelRadius(Meters.of(RobotConfig.getInstance().getWheelDiameterMeters() / 2.0))
+          .withSlipCurrent(Amps.of(120.0))
           .withSteerMotorGains(steerGains)
           .withDriveMotorGains(driveGains)
           .withSteerMotorClosedLoopOutput(steerClosedLoopOutput)
           .withDriveMotorClosedLoopOutput(driveClosedLoopOutput)
-          .withSpeedAt12Volts(RobotConfig.getInstance().getRobotMaxVelocity())
+          .withSpeedAt12Volts(MetersPerSecond.of(RobotConfig.getInstance().getRobotMaxVelocity()))
           .withSteerInertia(STEER_INERTIA)
           .withDriveInertia(DRIVE_INERTIA)
           .withFeedbackSource(SteerFeedbackType.FusedCANcoder)
@@ -198,9 +196,9 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
           RobotConfig.getInstance().getSwerveSteerMotorCANIDs()[0],
           RobotConfig.getInstance().getSwerveDriveMotorCANIDs()[0],
           RobotConfig.getInstance().getSwerveSteerEncoderCANIDs()[0],
-          RobotConfig.getInstance().getSwerveSteerOffsets()[0],
-          RobotConfig.getInstance().getWheelbase() / 2.0,
-          RobotConfig.getInstance().getTrackwidth() / 2.0,
+          Rotations.of(RobotConfig.getInstance().getSwerveSteerOffsets()[0]),
+          Meters.of(RobotConfig.getInstance().getWheelbase() / 2.0),
+          Meters.of(RobotConfig.getInstance().getTrackwidth() / 2.0),
           !RobotConfig.getInstance().getSwerveConstants().isDriveMotorInverted(),
           RobotConfig.getInstance().getSwerveConstants().isAngleMotorInverted());
   private static final SwerveModuleConstants frontRight =
@@ -208,9 +206,9 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
           RobotConfig.getInstance().getSwerveSteerMotorCANIDs()[1],
           RobotConfig.getInstance().getSwerveDriveMotorCANIDs()[1],
           RobotConfig.getInstance().getSwerveSteerEncoderCANIDs()[1],
-          RobotConfig.getInstance().getSwerveSteerOffsets()[1],
-          RobotConfig.getInstance().getWheelbase() / 2.0,
-          -RobotConfig.getInstance().getTrackwidth() / 2.0,
+          Rotations.of(RobotConfig.getInstance().getSwerveSteerOffsets()[1]),
+          Meters.of(RobotConfig.getInstance().getWheelbase() / 2.0),
+          Meters.of(-RobotConfig.getInstance().getTrackwidth() / 2.0),
           RobotConfig.getInstance().getSwerveConstants().isDriveMotorInverted(),
           RobotConfig.getInstance().getSwerveConstants().isAngleMotorInverted());
   private static final SwerveModuleConstants backLeft =
@@ -218,9 +216,9 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
           RobotConfig.getInstance().getSwerveSteerMotorCANIDs()[2],
           RobotConfig.getInstance().getSwerveDriveMotorCANIDs()[2],
           RobotConfig.getInstance().getSwerveSteerEncoderCANIDs()[2],
-          RobotConfig.getInstance().getSwerveSteerOffsets()[2],
-          -RobotConfig.getInstance().getWheelbase() / 2.0,
-          RobotConfig.getInstance().getTrackwidth() / 2.0,
+          Rotations.of(RobotConfig.getInstance().getSwerveSteerOffsets()[2]),
+          Meters.of(-RobotConfig.getInstance().getWheelbase() / 2.0),
+          Meters.of(RobotConfig.getInstance().getTrackwidth() / 2.0),
           !RobotConfig.getInstance().getSwerveConstants().isDriveMotorInverted(),
           RobotConfig.getInstance().getSwerveConstants().isAngleMotorInverted());
   private static final SwerveModuleConstants backRight =
@@ -228,9 +226,9 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
           RobotConfig.getInstance().getSwerveSteerMotorCANIDs()[3],
           RobotConfig.getInstance().getSwerveDriveMotorCANIDs()[3],
           RobotConfig.getInstance().getSwerveSteerEncoderCANIDs()[3],
-          RobotConfig.getInstance().getSwerveSteerOffsets()[3],
-          -RobotConfig.getInstance().getWheelbase() / 2.0,
-          -RobotConfig.getInstance().getTrackwidth() / 2.0,
+          Rotations.of(RobotConfig.getInstance().getSwerveSteerOffsets()[3]),
+          Meters.of(-RobotConfig.getInstance().getWheelbase() / 2.0),
+          Meters.of(-RobotConfig.getInstance().getTrackwidth() / 2.0),
           RobotConfig.getInstance().getSwerveConstants().isDriveMotorInverted(),
           RobotConfig.getInstance().getSwerveConstants().isAngleMotorInverted());
 
