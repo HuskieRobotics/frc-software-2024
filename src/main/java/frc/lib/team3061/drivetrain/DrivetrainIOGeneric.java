@@ -363,9 +363,6 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
   @Override
   public void resetPose(Pose2d pose) {
     setGyroOffset(pose.getRotation().getDegrees());
-    this.estimatedPoseWithoutGyro = new Pose2d(pose.getTranslation(), pose.getRotation());
-    this.odometry.resetPosition(
-        Rotation2d.fromDegrees(this.robotRotationDeg), swerveModulePositions, pose);
   }
 
   @Override

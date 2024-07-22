@@ -20,6 +20,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -32,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.DrivetrainIO.SwerveIOInputs;
+import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.Alert;
 import frc.lib.team6328.util.Alert.AlertType;
 import frc.lib.team6328.util.FieldConstants;
@@ -117,6 +119,7 @@ public class Drivetrain extends SubsystemBase {
 
   private DriverStation.Alliance alliance = Field2d.getInstance().getAlliance();
 
+  private final RobotOdometry odometry;
   private Pose2d prevRobotPose = new Pose2d();
   private int teleportedCount = 0;
   private int constrainPoseToFieldCount = 0;
@@ -189,6 +192,8 @@ public class Drivetrain extends SubsystemBase {
         );
 
     PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
+
+    this.odometry = RobotOdometry.getInstance();
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
@@ -300,15 +305,26 @@ public class Drivetrain extends SubsystemBase {
   }
 
   /**
-   * Sets the odometry of the robot to the specified PathPlanner state. This method should only be
-   * invoked when the rotation of the robot is known (e.g., at the start of an autonomous path). The
-   * origin of the field to the lower left corner (i.e., the corner of the field to the driver's
-   * right). Zero degrees is away from the driver and increases in the CCW direction.
+   * Sets the odometry of the robot to the specified pose. This method should only be invoked when
+   * the rotation of the robot is known (e.g., at the start of an autonomous path). The origin of
+   * the field to the lower left corner (i.e., the corner of the field to the driver's right). Zero
+   * degrees is away from the driver and increases in the CCW direction.
    *
-   * @param state the specified PathPlanner state to which is set the odometry
+   * @param pose the specified pose to which is set the odometry
    */
   public void resetPose(Pose2d pose) {
+
+    SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
+    for (int i = 0; i < modulePositions.length; i++) {
+      modulePositions[i] =
+          new SwerveModulePosition(
+              inputs.swerve[i].driveDistanceMeters,
+              Rotation2d.fromDegrees(inputs.swerve[i].steerPositionDeg));
+    }
+
     this.io.resetPose(pose);
+    this.odometry.resetPosition(Rotation2d.fromDegrees(inputs.gyro.yawDeg), modulePositions, pose);
+
     this.prevRobotPose = pose;
   }
 

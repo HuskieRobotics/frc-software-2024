@@ -37,7 +37,6 @@ import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.swerve.Conversions;
 import frc.lib.team3061.drivetrain.swerve.SwerveConstants;
 import frc.lib.team3061.gyro.GyroIO.GyroIOInputs;
-import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
 
@@ -296,9 +295,6 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     this.centerOfRotation = new Translation2d(); // default to (0,0)
 
     this.targetChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
-
-    // specify that we will be using CTRE's custom odometry instead of 3061 lib's default
-    RobotOdometry.getInstance().setCustomOdometry(this);
 
     for (int i = 0; i < driveCurrentRequests.length; i++) {
       this.driveCurrentRequests[i] = new TorqueCurrentFOC(0.0);
@@ -676,20 +672,6 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
       totalCurrent += swerveInputs.driveStatorCurrentAmps;
     }
     return totalCurrent / inputs.swerve.length;
-  }
-
-  public Pose2d getEstimatedPosition() {
-    return this.m_odometry.getEstimatedPosition();
-  }
-
-  public void resetPosition(
-      Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d poseMeters) {
-    this.m_odometry.resetPosition(gyroAngle, modulePositions, poseMeters);
-  }
-
-  public Pose2d updateWithTime(
-      double currentTimeSeconds, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-    return this.m_odometry.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
   }
 
   private static ClosedLoopOutputType getSteerClosedLoopOutputType() {
