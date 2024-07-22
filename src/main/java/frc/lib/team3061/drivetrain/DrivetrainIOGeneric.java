@@ -3,7 +3,6 @@ package frc.lib.team3061.drivetrain;
 import static frc.robot.Constants.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusSignal;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -84,7 +83,7 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
   private final RobotOdometry odometry;
   private Pose2d estimatedPoseWithoutGyro = new Pose2d();
 
-  private final List<StatusSignal<Double>> odometrySignals = new ArrayList<>();
+  private final List<BaseStatusSignal> odometrySignals = new ArrayList<>();
 
   protected static final TunableNumber thetaKp =
       new TunableNumber(
