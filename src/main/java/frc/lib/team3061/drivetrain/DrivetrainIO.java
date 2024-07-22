@@ -34,6 +34,9 @@ public interface DrivetrainIO {
     public double steerStatorCurrentAmps = 0.0;
     public double steerSupplyCurrentAmps = 0.0;
     public double steerTempCelsius = 0.0;
+
+    public double[] odometryDrivePositionsMeters = new double[] {};
+    public Rotation2d[] odometryTurnPositions = new Rotation2d[] {};
   }
 
   /** Contains all of the input data received from hardware. */
@@ -61,6 +64,8 @@ public interface DrivetrainIO {
     };
 
     double averageDriveCurrent = 0.0;
+
+    double[] odometryTimestamps = new double[] {};
   }
 
   public static class DrivetrainIOInputsCollection {

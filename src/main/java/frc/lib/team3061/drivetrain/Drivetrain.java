@@ -530,6 +530,22 @@ public class Drivetrain extends SubsystemBase {
     Logger.processInputs(SUBSYSTEM_NAME + "/BL", this.inputs.swerve[2]);
     Logger.processInputs(SUBSYSTEM_NAME + "/BR", this.inputs.swerve[3]);
 
+    // update odometry
+    for (int i = 0; i < inputs.drivetrain.odometryTimestamps.length; i++) {
+      SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
+      for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
+        modulePositions[moduleIndex] =
+            new SwerveModulePosition(
+                inputs.swerve[moduleIndex].odometryDrivePositionsMeters[i],
+                inputs.swerve[moduleIndex].odometryTurnPositions[i]);
+      }
+
+      this.odometry.updateWithTime(
+          inputs.drivetrain.odometryTimestamps[i],
+          inputs.gyro.odometryYawPositions[i],
+          modulePositions);
+    }
+
     Pose2d robotPose = this.odometry.getEstimatedPose();
     Logger.recordOutput(SUBSYSTEM_NAME + "/Pose2d", robotPose);
     Logger.recordOutput(SUBSYSTEM_NAME + "/Pose3d", new Pose3d(robotPose));

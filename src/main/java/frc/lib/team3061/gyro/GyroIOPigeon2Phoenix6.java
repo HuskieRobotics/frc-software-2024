@@ -11,6 +11,7 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.sim.Pigeon2SimState;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
@@ -87,6 +88,9 @@ public class GyroIOPigeon2Phoenix6 implements GyroIO {
     inputs.rollDegPerSec = this.angularVelocityXStatusSignal.getValue().in(DegreesPerSecond);
     inputs.pitchDegPerSec = this.angularVelocityYStatusSignal.getValue().in(DegreesPerSecond);
     inputs.yawDegPerSec = this.angularVelocityZStatusSignal.getValue().in(DegreesPerSecond);
+
+    inputs.odometryYawPositions = new Rotation2d[] {Rotation2d.fromDegrees(inputs.yawDeg)};
+
     if (Constants.getMode() == Constants.Mode.SIM) {
       this.gyroSim.setSupplyVoltage(RobotController.getBatteryVoltage());
     }

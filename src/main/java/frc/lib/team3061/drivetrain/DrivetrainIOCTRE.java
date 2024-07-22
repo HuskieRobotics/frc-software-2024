@@ -36,10 +36,16 @@ import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.swerve.Conversions;
 import frc.lib.team3061.drivetrain.swerve.SwerveConstants;
 import frc.lib.team3061.gyro.GyroIO.GyroIOInputs;
+import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
-
-// FIXME: invoke registerTelemetry to queue telemetry updates and use our own pose estimator
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import org.littletonrobotics.junction.Logger;
 
 public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
@@ -256,6 +262,13 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   private TorqueCurrentFOC[] driveCurrentRequests = new TorqueCurrentFOC[4];
   private TorqueCurrentFOC[] steerCurrentRequests = new TorqueCurrentFOC[4];
 
+  // queues for odometry updates from CTRE's thread
+  private final Lock odometryLock = new ReentrantLock();
+  List<Queue<Double>> drivePositionQueues = new ArrayList<>();
+  List<Queue<Double>> steerPositionQueues = new ArrayList<>();
+  Queue<Double> gyroYawQueue;
+  Queue<Double> timestampQueue;
+
   /**
    * Creates a new Drivetrain subsystem.
    *
@@ -313,18 +326,54 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     this.driveFieldCentricRequest.ForwardReference =
         SwerveRequest.ForwardReferenceValue.RedAlliance;
 
-    // FIXME: consider if we need to invoke setOperatorPerspectiveForward
+    // create queues for updates from CTRE's odometry thread
+    for (int i = 0; i < 4; i++) {
+      this.drivePositionQueues.add(new ArrayBlockingQueue<>(20));
+      this.steerPositionQueues.add(new ArrayBlockingQueue<>(20));
+    }
+    this.gyroYawQueue = new ArrayBlockingQueue<>(20);
+    this.timestampQueue = new ArrayBlockingQueue<>(20);
+
+    this.registerTelemetry(this::updateTelemetry);
+  }
+
+  private void updateTelemetry(SwerveDriveState state) {
+
+    this.odometryLock.lock();
+
+    double fpgaTimestamp = Logger.getRealTimestamp() / 1.0e6;
+
+    // update and log the swerve modules telemetry
+    for (int i = 0; i < 4; i++) {
+      // FIXME: uncomment when CTRE adds drive position to SwerveModuleState
+      // this.drivePositionQueues[i].offer(state.ModuleStates[i].position);
+      this.steerPositionQueues.get(i).offer(state.ModuleStates[i].angle.getDegrees());
+    }
+
+    // FIXME: uncomment when CTRE adds gyro yaw to SwerveDriveState
+    // this.gyroYawQueue.offer(state.GyroYaw);
+
+    this.timestampQueue.offer(fpgaTimestamp);
+
+    this.odometryLock.unlock();
   }
 
   @Override
   public void updateInputs(DrivetrainIOInputsCollection inputs) {
+
+    this.odometryLock.lock();
 
     // update and log gyro inputs
     this.updateGyroInputs(inputs.gyro);
 
     // update and log the swerve modules inputs
     for (int i = 0; i < swerveModulesSignals.length; i++) {
-      this.updateSwerveModuleInputs(inputs.swerve[i], this.getModule(i), swerveModulesSignals[i]);
+      this.updateSwerveModuleInputs(
+          inputs.swerve[i],
+          this.getModule(i),
+          swerveModulesSignals[i],
+          this.drivePositionQueues.get(i),
+          this.steerPositionQueues.get(i));
     }
 
     inputs.drivetrain.swerveMeasuredStates = this.getState().ModuleStates;
@@ -343,6 +392,11 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
         measuredChassisSpeeds.omegaRadiansPerSecond;
 
     inputs.drivetrain.averageDriveCurrent = this.getAverageDriveCurrent(inputs);
+
+    inputs.drivetrain.odometryTimestamps =
+        this.timestampQueue.stream().mapToDouble(Double::valueOf).toArray();
+
+    this.odometryLock.unlock();
 
     if (Constants.getMode() == Constants.Mode.SIM) {
       updateSimState(Constants.LOOP_PERIOD_SECS, 12.0);
@@ -407,10 +461,19 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     inputs.rollDegPerSec = this.angularVelocityXStatusSignal.getValue().in(DegreesPerSecond);
     inputs.pitchDegPerSec = this.angularVelocityYStatusSignal.getValue().in(DegreesPerSecond);
     inputs.yawDegPerSec = this.angularVelocityZStatusSignal.getValue().in(DegreesPerSecond);
+
+    // FIXME: uncomment when CTRE adds gyro yaw to SwerveModuleState
+    // inputs.gyro.odometryYawPositions =
+    //     this.gyroYawQueue.stream().map(Rotation2d::fromDegrees).toArray(Rotation2d[]::new);
+    inputs.odometryYawPositions = new Rotation2d[] {Rotation2d.fromDegrees(inputs.yawDeg)};
   }
 
   private void updateSwerveModuleInputs(
-      SwerveIOInputs inputs, SwerveModule module, SwerveModuleSignals signals) {
+      SwerveIOInputs inputs,
+      SwerveModule module,
+      SwerveModuleSignals signals,
+      Queue<Double> drivePositionQueue,
+      Queue<Double> steerPositionQueue) {
 
     BaseStatusSignal.refreshAll(
         signals.steerVelocityStatusSignal,
@@ -484,6 +547,11 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     inputs.steerStatorCurrentAmps = module.getSteerMotor().getStatorCurrent().getValue().in(Amps);
     inputs.steerSupplyCurrentAmps = module.getSteerMotor().getSupplyCurrent().getValue().in(Amps);
     inputs.steerTempCelsius = module.getSteerMotor().getDeviceTemp().getValue().in(Celsius);
+
+    inputs.odometryDrivePositionsMeters =
+        drivePositionQueue.stream().mapToDouble(Double::valueOf).toArray();
+    inputs.odometryTurnPositions =
+        steerPositionQueue.stream().map(Rotation2d::fromDegrees).toArray(Rotation2d[]::new);
   }
 
   @Override
@@ -499,8 +567,10 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     this.targetChassisSpeeds =
         ChassisSpeeds.discretize(
             ChassisSpeeds.fromFieldRelativeSpeeds(
-                // FIXME: cannot use the Pose from CTRE
-                xVelocity, yVelocity, rotationalVelocity, this.getState().Pose.getRotation()),
+                xVelocity,
+                yVelocity,
+                rotationalVelocity,
+                RobotOdometry.getInstance().getEstimatedPose().getRotation()),
             Constants.LOOP_PERIOD_SECS);
 
     if (isOpenLoop) {
@@ -528,8 +598,10 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     this.targetChassisSpeeds =
         ChassisSpeeds.discretize(
             ChassisSpeeds.fromFieldRelativeSpeeds(
-                // FIXME: cannot use the Pose from CTRE
-                xVelocity, yVelocity, 0.0, getState().Pose.getRotation()),
+                xVelocity,
+                yVelocity,
+                0.0,
+                RobotOdometry.getInstance().getEstimatedPose().getRotation()),
             Constants.LOOP_PERIOD_SECS);
 
     if (isOpenLoop) {
@@ -611,8 +683,9 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   @Override
   public void setGyroOffset(double expectedYaw) {
     this.seedFieldRelative(
-        // FIXME: cannot use the Pose from CTRE
-        new Pose2d(getState().Pose.getTranslation(), Rotation2d.fromDegrees(expectedYaw)));
+        new Pose2d(
+            RobotOdometry.getInstance().getEstimatedPose().getTranslation(),
+            Rotation2d.fromDegrees(expectedYaw)));
   }
 
   @Override
