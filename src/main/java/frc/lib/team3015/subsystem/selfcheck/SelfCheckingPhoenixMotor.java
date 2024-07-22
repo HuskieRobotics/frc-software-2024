@@ -3,7 +3,6 @@ package frc.lib.team3015.subsystem.selfcheck;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
 import frc.lib.team3015.subsystem.SubsystemFault;

@@ -23,7 +23,6 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerFeedbackType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -331,11 +330,6 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     inputs.drivetrain.swerveMeasuredStates = this.getState().ModuleStates;
     inputs.drivetrain.swerveReferenceStates = this.getState().ModuleTargets;
 
-    // log poses, 3D geometry, and swerve module states, gyro offset
-    inputs.drivetrain.robotPose =
-        new Pose2d(this.getState().Pose.getTranslation(), this.getState().Pose.getRotation());
-    inputs.drivetrain.robotPose3D = new Pose3d(inputs.drivetrain.robotPose);
-
     inputs.drivetrain.targetVXMetersPerSec = this.targetChassisSpeeds.vxMetersPerSecond;
     inputs.drivetrain.targetVYMetersPerSec = this.targetChassisSpeeds.vyMetersPerSecond;
     inputs.drivetrain.targetAngularVelocityRadPerSec =
@@ -349,8 +343,6 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
         measuredChassisSpeeds.omegaRadiansPerSecond;
 
     inputs.drivetrain.averageDriveCurrent = this.getAverageDriveCurrent(inputs);
-
-    inputs.drivetrain.rotation = this.getState().Pose.getRotation();
 
     if (Constants.getMode() == Constants.Mode.SIM) {
       updateSimState(Constants.LOOP_PERIOD_SECS, 12.0);
@@ -507,6 +499,7 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     this.targetChassisSpeeds =
         ChassisSpeeds.discretize(
             ChassisSpeeds.fromFieldRelativeSpeeds(
+                // FIXME: cannot use the Pose from CTRE
                 xVelocity, yVelocity, rotationalVelocity, this.getState().Pose.getRotation()),
             Constants.LOOP_PERIOD_SECS);
 
@@ -535,6 +528,7 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     this.targetChassisSpeeds =
         ChassisSpeeds.discretize(
             ChassisSpeeds.fromFieldRelativeSpeeds(
+                // FIXME: cannot use the Pose from CTRE
                 xVelocity, yVelocity, 0.0, getState().Pose.getRotation()),
             Constants.LOOP_PERIOD_SECS);
 
@@ -617,6 +611,7 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   @Override
   public void setGyroOffset(double expectedYaw) {
     this.seedFieldRelative(
+        // FIXME: cannot use the Pose from CTRE
         new Pose2d(getState().Pose.getTranslation(), Rotation2d.fromDegrees(expectedYaw)));
   }
 

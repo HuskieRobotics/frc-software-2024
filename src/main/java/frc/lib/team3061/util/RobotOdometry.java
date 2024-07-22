@@ -35,7 +35,15 @@ public class RobotOdometry {
             new Pose2d());
   }
 
-  public Pose2d getEstimatedPosition() {
+  /**
+   * Returns the estimated pose of the robot (e.g., x and y position of the robot on the field and
+   * the robot's rotation). The origin of the field to the lower left corner (i.e., the corner of
+   * the field to the driver's right). Zero degrees is away from the driver and increases in the CCW
+   * direction.
+   *
+   * @return the pose of the robot
+   */
+  public Pose2d getEstimatedPose() {
     return this.estimator.getEstimatedPosition();
   }
 

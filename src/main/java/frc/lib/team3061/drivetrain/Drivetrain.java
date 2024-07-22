@@ -251,7 +251,7 @@ public class Drivetrain extends SubsystemBase {
    * @return the rotation of the robot
    */
   public Rotation2d getRotation() {
-    return this.inputs.drivetrain.rotation;
+    return this.odometry.getEstimatedPose().getRotation();
   }
 
   /**
@@ -301,7 +301,7 @@ public class Drivetrain extends SubsystemBase {
    * @return the pose of the robot
    */
   public Pose2d getPose() {
-    return this.inputs.drivetrain.robotPose;
+    return this.odometry.getEstimatedPose();
   }
 
   /**
@@ -530,46 +530,36 @@ public class Drivetrain extends SubsystemBase {
     Logger.processInputs(SUBSYSTEM_NAME + "/BL", this.inputs.swerve[2]);
     Logger.processInputs(SUBSYSTEM_NAME + "/BR", this.inputs.swerve[3]);
 
+    Pose2d robotPose = this.odometry.getEstimatedPose();
+    Logger.recordOutput(SUBSYSTEM_NAME + "/Pose2d", robotPose);
+    Logger.recordOutput(SUBSYSTEM_NAME + "/Pose3d", new Pose3d(robotPose));
+
     // check for teleportation
-    if (this.inputs.drivetrain.robotPose.minus(prevRobotPose).getTranslation().getNorm() > 0.4) {
+    if (robotPose.minus(prevRobotPose).getTranslation().getNorm() > 0.4) {
       this.resetPose(prevRobotPose);
       this.teleportedCount++;
-      Logger.recordOutput(SUBSYSTEM_NAME + "/TeleportedPose", this.inputs.drivetrain.robotPose);
+      Logger.recordOutput(SUBSYSTEM_NAME + "/TeleportedPose", robotPose);
       Logger.recordOutput(SUBSYSTEM_NAME + "/TeleportCount", this.teleportedCount);
     } else {
-      this.prevRobotPose = this.inputs.drivetrain.robotPose;
+      this.prevRobotPose = robotPose;
     }
 
     // check for position outside the field due to slipping
-    if (this.inputs.drivetrain.robotPose.getX() < 0) {
-      this.resetPose(
-          new Pose2d(
-              0,
-              this.inputs.drivetrain.robotPose.getY(),
-              this.inputs.drivetrain.robotPose.getRotation()));
+    if (robotPose.getX() < 0) {
+      this.resetPose(new Pose2d(0, robotPose.getY(), robotPose.getRotation()));
       this.constrainPoseToFieldCount++;
-    } else if (this.inputs.drivetrain.robotPose.getX() > FieldConstants.fieldLength) {
+    } else if (robotPose.getX() > FieldConstants.fieldLength) {
       this.resetPose(
-          new Pose2d(
-              FieldConstants.fieldLength,
-              this.inputs.drivetrain.robotPose.getY(),
-              this.inputs.drivetrain.robotPose.getRotation()));
+          new Pose2d(FieldConstants.fieldLength, robotPose.getY(), robotPose.getRotation()));
       this.constrainPoseToFieldCount++;
     }
 
-    if (this.inputs.drivetrain.robotPose.getY() < 0) {
-      this.resetPose(
-          new Pose2d(
-              this.inputs.drivetrain.robotPose.getX(),
-              0,
-              this.inputs.drivetrain.robotPose.getRotation()));
+    if (robotPose.getY() < 0) {
+      this.resetPose(new Pose2d(robotPose.getX(), 0, robotPose.getRotation()));
       this.constrainPoseToFieldCount++;
-    } else if (this.inputs.drivetrain.robotPose.getY() > FieldConstants.fieldWidth) {
+    } else if (robotPose.getY() > FieldConstants.fieldWidth) {
       this.resetPose(
-          new Pose2d(
-              this.inputs.drivetrain.robotPose.getX(),
-              FieldConstants.fieldWidth,
-              this.inputs.drivetrain.robotPose.getRotation()));
+          new Pose2d(robotPose.getX(), FieldConstants.fieldWidth, robotPose.getRotation()));
       this.constrainPoseToFieldCount++;
     }
     Logger.recordOutput(

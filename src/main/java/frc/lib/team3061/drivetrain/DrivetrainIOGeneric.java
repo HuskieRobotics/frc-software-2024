@@ -5,7 +5,6 @@ import static frc.robot.Constants.*;
 import com.ctre.phoenix6.BaseStatusSignal;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -208,11 +207,6 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
         Rotation2d.fromDegrees(this.robotRotationDeg),
         swerveModulePositions);
 
-    // log poses, 3D geometry, and swerve module states, gyro offset
-    inputs.drivetrain.robotPoseWithoutGyro = estimatedPoseWithoutGyro;
-    inputs.drivetrain.robotPose = odometry.getEstimatedPosition();
-    inputs.drivetrain.robotPose3D = new Pose3d(inputs.drivetrain.robotPose);
-
     inputs.drivetrain.targetVXMetersPerSec = this.targetChassisSpeeds.vxMetersPerSecond;
     inputs.drivetrain.targetVYMetersPerSec = this.targetChassisSpeeds.vyMetersPerSecond;
     inputs.drivetrain.targetAngularVelocityRadPerSec =
@@ -225,8 +219,6 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
         measuredChassisSpeeds.omegaRadiansPerSecond;
 
     inputs.drivetrain.averageDriveCurrent = this.getAverageDriveCurrent(inputs);
-
-    inputs.drivetrain.rotation = Rotation2d.fromDegrees(this.robotRotationDeg);
 
     if (thetaKp.hasChanged()
         || thetaKd.hasChanged()
