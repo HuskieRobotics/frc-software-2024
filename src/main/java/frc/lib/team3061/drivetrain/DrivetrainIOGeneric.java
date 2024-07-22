@@ -201,12 +201,6 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
     inputs.drivetrain.swerveMeasuredStates = this.swerveModuleStates;
     inputs.drivetrain.swerveReferenceStates = this.swerveReferenceStates;
 
-    // update the pose estimator based on the gyro and swerve module positions
-    this.odometry.updateWithTime(
-        Logger.getRealTimestamp() / 1e6,
-        Rotation2d.fromDegrees(this.robotRotationDeg),
-        swerveModulePositions);
-
     inputs.drivetrain.targetVXMetersPerSec = this.targetChassisSpeeds.vxMetersPerSecond;
     inputs.drivetrain.targetVYMetersPerSec = this.targetChassisSpeeds.vyMetersPerSecond;
     inputs.drivetrain.targetAngularVelocityRadPerSec =
@@ -219,6 +213,8 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
         measuredChassisSpeeds.omegaRadiansPerSecond;
 
     inputs.drivetrain.averageDriveCurrent = this.getAverageDriveCurrent(inputs);
+
+    inputs.drivetrain.odometryTimestamps = new double[] {Logger.getRealTimestamp() / 1e6};
 
     if (thetaKp.hasChanged()
         || thetaKd.hasChanged()

@@ -531,7 +531,9 @@ public class Drivetrain extends SubsystemBase {
     Logger.processInputs(SUBSYSTEM_NAME + "/BR", this.inputs.swerve[3]);
 
     // update odometry
-    for (int i = 0; i < inputs.drivetrain.odometryTimestamps.length; i++) {
+    // FIXME: uncomment after CTRE adds additional fields
+    // for (int i = 0; i < inputs.drivetrain.odometryTimestamps.length; i++) {
+    for (int i = 0; i < Math.min(1, inputs.drivetrain.odometryTimestamps.length); i++) {
       SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
       for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
         modulePositions[moduleIndex] =

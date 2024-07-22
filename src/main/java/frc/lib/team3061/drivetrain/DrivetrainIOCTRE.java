@@ -287,15 +287,15 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
         backLeft,
         backRight);
 
-    this.yawStatusSignal = this.m_pigeon2.getYaw().clone();
-    this.pitchStatusSignal = this.m_pigeon2.getPitch().clone();
+    this.yawStatusSignal = this.getPigeon2().getYaw().clone();
+    this.pitchStatusSignal = this.getPigeon2().getPitch().clone();
     this.pitchStatusSignal.setUpdateFrequency(100);
-    this.rollStatusSignal = this.m_pigeon2.getRoll().clone();
+    this.rollStatusSignal = this.getPigeon2().getRoll().clone();
     this.rollStatusSignal.setUpdateFrequency(100);
-    this.angularVelocityZStatusSignal = this.m_pigeon2.getAngularVelocityZWorld().clone();
-    this.angularVelocityXStatusSignal = this.m_pigeon2.getAngularVelocityXWorld().clone();
+    this.angularVelocityZStatusSignal = this.getPigeon2().getAngularVelocityZWorld().clone();
+    this.angularVelocityXStatusSignal = this.getPigeon2().getAngularVelocityXWorld().clone();
     this.angularVelocityXStatusSignal.setUpdateFrequency(100);
-    this.angularVelocityYStatusSignal = this.m_pigeon2.getAngularVelocityYWorld().clone();
+    this.angularVelocityYStatusSignal = this.getPigeon2().getAngularVelocityYWorld().clone();
     this.angularVelocityYStatusSignal.setUpdateFrequency(100);
 
     for (int i = 0; i < swerveModulesSignals.length; i++) {
@@ -361,19 +361,12 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   @Override
   public void updateInputs(DrivetrainIOInputsCollection inputs) {
 
-    this.odometryLock.lock();
-
     // update and log gyro inputs
     this.updateGyroInputs(inputs.gyro);
 
     // update and log the swerve modules inputs
     for (int i = 0; i < swerveModulesSignals.length; i++) {
-      this.updateSwerveModuleInputs(
-          inputs.swerve[i],
-          this.getModule(i),
-          swerveModulesSignals[i],
-          this.drivePositionQueues.get(i),
-          this.steerPositionQueues.get(i));
+      this.updateSwerveModuleInputs(inputs.swerve[i], this.getModule(i), swerveModulesSignals[i]);
     }
 
     inputs.drivetrain.swerveMeasuredStates = this.getState().ModuleStates;
@@ -393,8 +386,27 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
     inputs.drivetrain.averageDriveCurrent = this.getAverageDriveCurrent(inputs);
 
+    this.odometryLock.lock();
+
     inputs.drivetrain.odometryTimestamps =
         this.timestampQueue.stream().mapToDouble(Double::valueOf).toArray();
+
+    // FIXME: uncomment when CTRE adds gyro yaw to SwerveModuleState
+    // inputs.gyro.odometryYawPositions =
+    //     this.gyroYawQueue.stream().map(Rotation2d::fromDegrees).toArray(Rotation2d[]::new);
+    inputs.gyro.odometryYawPositions =
+        new Rotation2d[] {Rotation2d.fromDegrees(inputs.gyro.yawDeg)};
+
+    for (int i = 0; i < swerveModulesSignals.length; i++) {
+      // inputs.odometryDrivePositionsMeters =
+      //     drivePositionQueue.stream().mapToDouble(Double::valueOf).toArray();
+      // inputs.odometryTurnPositions =
+      //     steerPositionQueue.stream().map(Rotation2d::fromDegrees).toArray(Rotation2d[]::new);
+      inputs.swerve[i].odometryDrivePositionsMeters =
+          new double[] {inputs.swerve[i].driveDistanceMeters};
+      inputs.swerve[i].odometryTurnPositions =
+          new Rotation2d[] {Rotation2d.fromDegrees(inputs.swerve[i].steerPositionDeg)};
+    }
 
     this.odometryLock.unlock();
 
@@ -461,19 +473,10 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     inputs.rollDegPerSec = this.angularVelocityXStatusSignal.getValue().in(DegreesPerSecond);
     inputs.pitchDegPerSec = this.angularVelocityYStatusSignal.getValue().in(DegreesPerSecond);
     inputs.yawDegPerSec = this.angularVelocityZStatusSignal.getValue().in(DegreesPerSecond);
-
-    // FIXME: uncomment when CTRE adds gyro yaw to SwerveModuleState
-    // inputs.gyro.odometryYawPositions =
-    //     this.gyroYawQueue.stream().map(Rotation2d::fromDegrees).toArray(Rotation2d[]::new);
-    inputs.odometryYawPositions = new Rotation2d[] {Rotation2d.fromDegrees(inputs.yawDeg)};
   }
 
   private void updateSwerveModuleInputs(
-      SwerveIOInputs inputs,
-      SwerveModule module,
-      SwerveModuleSignals signals,
-      Queue<Double> drivePositionQueue,
-      Queue<Double> steerPositionQueue) {
+      SwerveIOInputs inputs, SwerveModule module, SwerveModuleSignals signals) {
 
     BaseStatusSignal.refreshAll(
         signals.steerVelocityStatusSignal,
@@ -547,11 +550,6 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     inputs.steerStatorCurrentAmps = module.getSteerMotor().getStatorCurrent().getValue().in(Amps);
     inputs.steerSupplyCurrentAmps = module.getSteerMotor().getSupplyCurrent().getValue().in(Amps);
     inputs.steerTempCelsius = module.getSteerMotor().getDeviceTemp().getValue().in(Celsius);
-
-    inputs.odometryDrivePositionsMeters =
-        drivePositionQueue.stream().mapToDouble(Double::valueOf).toArray();
-    inputs.odometryTurnPositions =
-        steerPositionQueue.stream().map(Rotation2d::fromDegrees).toArray(Rotation2d[]::new);
   }
 
   @Override
