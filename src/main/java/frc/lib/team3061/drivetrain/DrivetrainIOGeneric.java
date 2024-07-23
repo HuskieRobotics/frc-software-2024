@@ -18,7 +18,6 @@ import edu.wpi.first.math.util.Units;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.swerve.SwerveModuleIO;
 import frc.lib.team3061.gyro.GyroIO;
-import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
 import java.util.ArrayList;
@@ -80,7 +79,6 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
 
   private double[] steerMotorsLastAngle = new double[4];
 
-  private final RobotOdometry odometry;
   private Pose2d estimatedPoseWithoutGyro = new Pose2d();
 
   private final List<StatusSignal<Double>> odometrySignals = new ArrayList<>();
@@ -137,8 +135,6 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
     this.setGyroOffset(0.0);
 
     this.targetChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
-
-    this.odometry = RobotOdometry.getInstance();
 
     this.odometrySignals.addAll(this.gyroIO.getOdometryStatusSignals());
     for (SwerveModuleIO swerveModule : swerveModules) {
