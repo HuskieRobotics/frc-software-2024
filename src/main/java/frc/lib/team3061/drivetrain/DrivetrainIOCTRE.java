@@ -478,55 +478,59 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   public void driveFieldRelative(
       double xVelocity, double yVelocity, double rotationalVelocity, boolean isOpenLoop) {
 
-    this.targetChassisSpeeds =
+    ChassisSpeeds discreteFieldCentricSpeeds =
         ChassisSpeeds.discretize(
-            ChassisSpeeds.fromFieldRelativeSpeeds(
-                xVelocity, yVelocity, rotationalVelocity, this.getState().Pose.getRotation()),
+            new ChassisSpeeds(xVelocity, yVelocity, rotationalVelocity),
             Constants.LOOP_PERIOD_SECS);
+    this.targetChassisSpeeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            discreteFieldCentricSpeeds, this.getState().Pose.getRotation());
 
     if (isOpenLoop) {
       this.setControl(
           this.driveFieldCentricRequest
               .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage)
               .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo)
-              .withVelocityX(xVelocity)
-              .withVelocityY(yVelocity)
-              .withRotationalRate(rotationalVelocity));
+              .withVelocityX(discreteFieldCentricSpeeds.vxMetersPerSecond)
+              .withVelocityY(discreteFieldCentricSpeeds.vyMetersPerSecond)
+              .withRotationalRate(discreteFieldCentricSpeeds.omegaRadiansPerSecond));
     } else {
       this.setControl(
           this.driveFieldCentricRequest
               .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
               .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo)
-              .withVelocityX(xVelocity)
-              .withVelocityY(yVelocity)
-              .withRotationalRate(rotationalVelocity));
+              .withVelocityX(discreteFieldCentricSpeeds.vxMetersPerSecond)
+              .withVelocityY(discreteFieldCentricSpeeds.vyMetersPerSecond)
+              .withRotationalRate(discreteFieldCentricSpeeds.omegaRadiansPerSecond));
     }
   }
 
   @Override
   public void driveFieldRelativeFacingAngle(
       double xVelocity, double yVelocity, Rotation2d targetDirection, boolean isOpenLoop) {
-    this.targetChassisSpeeds =
+
+    ChassisSpeeds discreteFieldCentricSpeeds =
         ChassisSpeeds.discretize(
-            ChassisSpeeds.fromFieldRelativeSpeeds(
-                xVelocity, yVelocity, 0.0, getState().Pose.getRotation()),
-            Constants.LOOP_PERIOD_SECS);
+            new ChassisSpeeds(xVelocity, yVelocity, 0.0), Constants.LOOP_PERIOD_SECS);
+    this.targetChassisSpeeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            discreteFieldCentricSpeeds, this.getState().Pose.getRotation());
 
     if (isOpenLoop) {
       this.setControl(
           this.driveFacingAngleRequest
               .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage)
               .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo)
-              .withVelocityX(xVelocity)
-              .withVelocityY(yVelocity)
+              .withVelocityX(discreteFieldCentricSpeeds.vxMetersPerSecond)
+              .withVelocityY(discreteFieldCentricSpeeds.vyMetersPerSecond)
               .withTargetDirection(targetDirection));
     } else {
       this.setControl(
           this.driveFacingAngleRequest
               .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
               .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo)
-              .withVelocityX(xVelocity)
-              .withVelocityY(yVelocity)
+              .withVelocityX(discreteFieldCentricSpeeds.vxMetersPerSecond)
+              .withVelocityY(discreteFieldCentricSpeeds.vyMetersPerSecond)
               .withTargetDirection(targetDirection));
     }
   }
@@ -551,17 +555,17 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
           this.driveRobotCentricRequest
               .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage)
               .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo)
-              .withVelocityX(xVelocity)
-              .withVelocityY(yVelocity)
-              .withRotationalRate(rotationalVelocity));
+              .withVelocityX(this.targetChassisSpeeds.vxMetersPerSecond)
+              .withVelocityY(this.targetChassisSpeeds.vyMetersPerSecond)
+              .withRotationalRate(this.targetChassisSpeeds.omegaRadiansPerSecond));
     } else {
       this.setControl(
           this.driveRobotCentricRequest
               .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
               .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo)
-              .withVelocityX(xVelocity)
-              .withVelocityY(yVelocity)
-              .withRotationalRate(rotationalVelocity));
+              .withVelocityX(this.targetChassisSpeeds.vxMetersPerSecond)
+              .withVelocityY(this.targetChassisSpeeds.vyMetersPerSecond)
+              .withRotationalRate(this.targetChassisSpeeds.omegaRadiansPerSecond));
     }
   }
 
