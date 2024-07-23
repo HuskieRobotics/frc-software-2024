@@ -32,7 +32,6 @@ import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.swerve.Conversions;
 import frc.lib.team3061.drivetrain.swerve.SwerveConstants;
 import frc.lib.team3061.gyro.GyroIO.GyroIOInputs;
-import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
 
@@ -279,9 +278,6 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     this.centerOfRotation = new Translation2d(); // default to (0,0)
 
     this.targetChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
-
-    // specify that we will be using CTRE's custom odometry instead of 3061 lib's default
-    RobotOdometry.getInstance().setCustomOdometry(this);
 
     for (int i = 0; i < driveCurrentRequests.length; i++) {
       this.driveCurrentRequests[i] = new TorqueCurrentFOC(0.0);
