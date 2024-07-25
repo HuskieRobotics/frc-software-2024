@@ -4,6 +4,7 @@
         "sonarsource.sonarlint-vscode",
         "streetsidesoftware.code-spell-checker",
         "onlyutkarsh.git-config-user-profiles",
-        "mechanical-advantage.event-deploy-wpilib"
+        "mechanical-advantage.event-deploy-wpilib",
+        "eamodio.gitlens"
     ]
 }
