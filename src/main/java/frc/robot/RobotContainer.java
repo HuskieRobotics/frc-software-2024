@@ -944,7 +944,8 @@ public class RobotContainer {
                     new TeleopSwerveAimAtSpeaker(drivetrain, shooter, intake, () -> 0.0, () -> 0.0),
                     getShootCommand())
                 .withTimeout(1.0))
-        .andThen(Commands.runOnce(intake::shoot, intake));
+        .andThen(Commands.runOnce(intake::shoot, intake))
+        .finallyDo(drivetrain::disableXstance);
   }
 
   private Command getShootCommand() {
