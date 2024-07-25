@@ -992,6 +992,17 @@ public class RobotContainer {
     intake.disableQuickShoot();
   }
 
+  public void teleopInit() {
+    // check if the alliance color has changed based on the FMS data; if the robot power cycled
+    // during a match, this would be the first opportunity to check the alliance color based on FMS
+    // data.
+    this.checkAllianceColor();
+
+    // ensure that x-stance is disabled at the start of teleop as there is a possibility if the
+    //  auto command is interrupted, we could still be in x-stance
+    drivetrain.disableXstance();
+  }
+
   private boolean isReadyToShoot() {
     return shooter.isShooterReadyToShoot(!vision.isEnabled() || drivetrain.isAimedAtSpeaker());
   }
