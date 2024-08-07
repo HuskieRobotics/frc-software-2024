@@ -271,10 +271,7 @@ public class Robot extends LoggedRobot {
       autonomousCommand.cancel();
     }
 
-    // check if the alliance color has changed based on the FMS data; if the robot power cycled
-    // during a match, this would be the first opportunity to check the alliance color based on FMS
-    // data.
-    robotContainer.checkAllianceColor();
+    robotContainer.teleopInit();
   }
 
   /** This method is invoked at the start of the test period. */
