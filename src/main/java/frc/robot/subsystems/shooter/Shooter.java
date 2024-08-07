@@ -64,6 +64,7 @@ public class Shooter extends SubsystemBase {
   private boolean intakeEnabled = true;
   private final LEDs leds;
 
+
   private int topAtSetpointIterationCount = 0;
   private int bottomAtSetpointIterationCount = 0;
   private int angleAtSetpointIterationCount = 0;
