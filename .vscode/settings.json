@@ -38,6 +38,7 @@
     "brushless",
     "canbus",
     "Cancoder",
+    "CANFD",
     "CANID",
     "CANIDs",
     "chargedup",

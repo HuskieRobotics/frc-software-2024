@@ -23,6 +23,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -333,6 +334,10 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
     inputs.steerStatorCurrentAmps = this.angleMotor.getStatorCurrent().getValue();
     inputs.steerSupplyCurrentAmps = this.angleMotor.getSupplyCurrent().getValue();
     inputs.steerTempCelsius = this.angleMotor.getDeviceTemp().getValue();
+
+    inputs.odometryDrivePositionsMeters = new double[] {inputs.driveDistanceMeters};
+    inputs.odometryTurnPositions =
+        new Rotation2d[] {Rotation2d.fromDegrees(inputs.steerPositionDeg)};
 
     // update tunables
     if (driveKp.hasChanged()

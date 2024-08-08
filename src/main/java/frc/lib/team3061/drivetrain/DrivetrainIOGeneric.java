@@ -6,7 +6,6 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -19,7 +18,6 @@ import edu.wpi.first.math.util.Units;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.swerve.SwerveModuleIO;
 import frc.lib.team3061.gyro.GyroIO;
-import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
 import java.util.ArrayList;
@@ -81,7 +79,6 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
 
   private double[] steerMotorsLastAngle = new double[4];
 
-  private final RobotOdometry odometry;
   private Pose2d estimatedPoseWithoutGyro = new Pose2d();
 
   private final List<StatusSignal<Double>> odometrySignals = new ArrayList<>();
@@ -138,8 +135,6 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
     this.setGyroOffset(0.0);
 
     this.targetChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
-
-    this.odometry = RobotOdometry.getInstance();
 
     this.odometrySignals.addAll(this.gyroIO.getOdometryStatusSignals());
     for (SwerveModuleIO swerveModule : swerveModules) {
@@ -203,17 +198,6 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
     inputs.drivetrain.swerveMeasuredStates = this.swerveModuleStates;
     inputs.drivetrain.swerveReferenceStates = this.swerveReferenceStates;
 
-    // update the pose estimator based on the gyro and swerve module positions
-    this.odometry.updateWithTime(
-        Logger.getRealTimestamp() / 1e6,
-        Rotation2d.fromDegrees(this.robotRotationDeg),
-        swerveModulePositions);
-
-    // log poses, 3D geometry, and swerve module states, gyro offset
-    inputs.drivetrain.robotPoseWithoutGyro = estimatedPoseWithoutGyro;
-    inputs.drivetrain.robotPose = odometry.getEstimatedPosition();
-    inputs.drivetrain.robotPose3D = new Pose3d(inputs.drivetrain.robotPose);
-
     inputs.drivetrain.targetVXMetersPerSec = this.targetChassisSpeeds.vxMetersPerSecond;
     inputs.drivetrain.targetVYMetersPerSec = this.targetChassisSpeeds.vyMetersPerSecond;
     inputs.drivetrain.targetAngularVelocityRadPerSec =
@@ -227,7 +211,7 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
 
     inputs.drivetrain.averageDriveCurrent = this.getAverageDriveCurrent(inputs);
 
-    inputs.drivetrain.rotation = Rotation2d.fromDegrees(this.robotRotationDeg);
+    inputs.drivetrain.odometryTimestamps = new double[] {Logger.getRealTimestamp() / 1e6};
 
     if (thetaKp.hasChanged()
         || thetaKd.hasChanged()
@@ -364,9 +348,6 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
   @Override
   public void resetPose(Pose2d pose) {
     setGyroOffset(pose.getRotation().getDegrees());
-    this.estimatedPoseWithoutGyro = new Pose2d(pose.getTranslation(), pose.getRotation());
-    this.odometry.resetPosition(
-        Rotation2d.fromDegrees(this.robotRotationDeg), swerveModulePositions, pose);
   }
 
   @Override

@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3061.RobotConfig;
-import frc.robot.Field2d;
 import frc.robot.Constants;
+import frc.robot.Field2d;
 import java.util.List;
 
 @java.lang.SuppressWarnings({"java:S6548"})
