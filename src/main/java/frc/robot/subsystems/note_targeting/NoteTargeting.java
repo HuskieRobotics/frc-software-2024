@@ -3,7 +3,6 @@ package frc.robot.subsystems.note_targeting;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3061.leds.LEDs;
-import frc.lib.team3061.leds.LEDs.NoteTargetingLEDState;
 import frc.lib.team6328.util.TunableNumber;
 import org.littletonrobotics.junction.Logger;
 
@@ -27,14 +26,10 @@ public class NoteTargeting extends SubsystemBase {
   }
 
   private void handleLEDs() {
-    // we see nothing,  we see it but arent going after it, we are now going after it
+    // we see nothing,  we see it but aren't going after it, we are now going after it
 
     if (targeting) {
-      LEDs.getInstance().setNoteTargetingLEDState(NoteTargetingLEDState.PURSUING_NOTE);
-    } else if (inputs.hasTarget) {
-      LEDs.getInstance().setNoteTargetingLEDState(NoteTargetingLEDState.NOTE_TARGETED);
-    } else {
-      LEDs.getInstance().setNoteTargetingLEDState(NoteTargetingLEDState.NO_NOTE_TARGETED);
+      LEDs.getInstance().requestState(LEDs.States.PURSUING_NOTE);
     }
   }
 
