@@ -257,11 +257,11 @@ public class Field2d {
 
   public boolean hasFullyLeftAllianceSideOfField() {
     if (alliance == Alliance.Blue) {
-      return RobotOdometry.getInstance().getEstimatedPosition().getX()
+      return RobotOdometry.getInstance().getEstimatedPose().getX()
           > FieldConstants.StagingLocations.centerlineX
               + RobotConfig.getInstance().getRobotLengthWithBumpers() / 2;
     } else {
-      return RobotOdometry.getInstance().getEstimatedPosition().getX()
+      return RobotOdometry.getInstance().getEstimatedPose().getX()
           < FieldConstants.StagingLocations.centerlineX
               - RobotConfig.getInstance().getRobotLengthWithBumpers() / 2;
     }
