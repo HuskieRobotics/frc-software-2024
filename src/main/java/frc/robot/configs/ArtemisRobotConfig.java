@@ -449,7 +449,7 @@ public class ArtemisRobotConfig extends RobotConfig {
 
   @Override
   public double getOdometryUpdateFrequency() {
-    return 175.0;
+    return 250.0;
   }
 
   @Override
