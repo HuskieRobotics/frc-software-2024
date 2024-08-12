@@ -63,6 +63,7 @@ public abstract class LEDs extends SubsystemBase {
                 1.0 - ((Timer.getFPGATimestamp() - leds.lastEnabledTime) / AUTO_FADE_TIME),
                 Color.kGreen)),
     LOW_BATTERY((leds, section) -> leds.solid(section, new Color(255, 20, 0))),
+    DISABLED_DEMO_MODE((leds, section) -> leds.updateToPridePattern()),
     DISABLED((leds, section) -> leds.updateToDisabledPattern(section)),
     AUTO((leds, section) -> leds.orangePulse(section, PULSE_DURATION)),
     ENDGAME_ALERT((leds, section) -> leds.strobe(section, Color.kYellow, STROBE_SLOW_DURATION)),
@@ -81,16 +82,6 @@ public abstract class LEDs extends SubsystemBase {
                 WAVE_SLOW_DURATION)),
     MANUAL_REPEL((leds, section) -> leds.strobe(section, Color.kDeepPink, STROBE_SLOW_DURATION)),
     INTAKE_MANUALLY_TURNED_OFF((leds, section) -> leds.solid(section, Color.kYellow)),
-    TELEOP_DEMO_MODE(
-        (leds, section) ->
-            leds.wave(
-                section,
-                new Color(255, 30, 0),
-                Color.kDarkBlue,
-                WAVE_SLOW_CYCLE_LENGTH,
-                WAVE_MEDIUM_DURATION)),
-    
-                DISABLED_DEMO_MODE((leds, section) -> leds.updateToPridePattern()),
     DEFAULT((leds, section) -> leds.solid(section, Color.kBlack));
 
     public final BiConsumer<LEDs, Section> setter;
@@ -328,12 +319,8 @@ public abstract class LEDs extends SubsystemBase {
     }
 
     // update for demo mode
-    if (Constants.DEMO_MODE) {
-      if (DriverStation.isDisabled()) {
-        this.requestState(States.DISABLED_DEMO_MODE);
-      } else {
-        this.requestState(States.TELEOP_DEMO_MODE);
-      }
+    if (Constants.DEMO_MODE && DriverStation.isDisabled()) {
+      this.requestState(States.DISABLED_DEMO_MODE);
     }
   }
 
