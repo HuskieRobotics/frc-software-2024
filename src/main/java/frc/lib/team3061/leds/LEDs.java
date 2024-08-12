@@ -62,18 +62,9 @@ public abstract class LEDs extends SubsystemBase {
             leds.solid(
                 1.0 - ((Timer.getFPGATimestamp() - leds.lastEnabledTime) / AUTO_FADE_TIME),
                 Color.kGreen)),
-    DISABLED_DEMO_MODE((leds, section) -> leds.updateToPridePattern()),
     LOW_BATTERY((leds, section) -> leds.solid(section, new Color(255, 20, 0))),
     DISABLED((leds, section) -> leds.updateToDisabledPattern(section)),
     AUTO((leds, section) -> leds.orangePulse(section, PULSE_DURATION)),
-    TELEOP_DEMO_MODE(
-        (leds, section) ->
-            leds.wave(
-                section,
-                new Color(255, 30, 0),
-                Color.kDarkBlue,
-                WAVE_SLOW_CYCLE_LENGTH,
-                WAVE_MEDIUM_DURATION)),
     ENDGAME_ALERT((leds, section) -> leds.strobe(section, Color.kYellow, STROBE_SLOW_DURATION)),
     SHOOTING((leds, section) -> leds.strobe(section, Color.kGreen, STROBE_SLOW_DURATION)),
     AIMING_AT_SPEAKER((leds, section) -> leds.solid(section, Color.kGreen)),
@@ -90,6 +81,16 @@ public abstract class LEDs extends SubsystemBase {
                 WAVE_SLOW_DURATION)),
     MANUAL_REPEL((leds, section) -> leds.strobe(section, Color.kDeepPink, STROBE_SLOW_DURATION)),
     INTAKE_MANUALLY_TURNED_OFF((leds, section) -> leds.solid(section, Color.kYellow)),
+    TELEOP_DEMO_MODE(
+        (leds, section) ->
+            leds.wave(
+                section,
+                new Color(255, 30, 0),
+                Color.kDarkBlue,
+                WAVE_SLOW_CYCLE_LENGTH,
+                WAVE_MEDIUM_DURATION)),
+    
+                DISABLED_DEMO_MODE((leds, section) -> leds.updateToPridePattern()),
     DEFAULT((leds, section) -> leds.solid(section, Color.kBlack));
 
     public final BiConsumer<LEDs, Section> setter;
