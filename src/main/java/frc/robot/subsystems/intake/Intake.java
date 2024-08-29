@@ -12,6 +12,8 @@ import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.leds.LEDs;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
+import frc.robot.subsystems.shooter.Shooter;
+
 import java.util.ArrayList;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -56,7 +58,9 @@ public class Intake extends SubsystemBase {
     NOTE_IN_KICKER,
     NOTE_IN_KICKER_AND_SHOOTER,
     NOTE_IN_SHOOTER,
-    SHOOTING
+    SHOOTING,
+    NOTE_IN_INTAKE_KICKER_SHOOTER,
+    EJECTING
   }
 
   public Intake(IntakeIO io) {
@@ -132,6 +136,8 @@ public class Intake extends SubsystemBase {
       runNoteInShooterState();
     } else if (intakeState == IntakeState.SHOOTING) {
       runShootingState();
+    } else if (intakeState == IntakeState.EJECTING) {
+      runEjectingState();
     }
   }
 
@@ -169,6 +175,7 @@ public class Intake extends SubsystemBase {
       intakeState = IntakeState.NOTE_IN_KICKER;
       this.transitionGamePiece();
       this.repelGamePiece();
+
     }
   }
 
@@ -223,12 +230,29 @@ public class Intake extends SubsystemBase {
     }
   }
 
+  private void runEjectingState() {
+    if (!this.hasNote()) {
+      intakeState = IntakeState.EMPTY;
+      leds.requestState(LEDs.States.WAITING_FOR_GAME_PIECE);
+      this.intakeGamePiece();
+      this.turnKickerOff();
+    } else {
+      this.ejectAll();
+    }
+  }
+
+  
+
   public boolean hasNote() {
     return inputs.isKickerIRBlocked || inputs.isShooterIRBlocked;
   }
 
   public boolean hasNoteForAuto() {
     return inputs.isKickerIRBlocked || inputs.isShooterIRBlocked || inputs.isRollerIRBlocked;
+  }
+
+  public boolean allIRsBlocked() {
+    return inputs.isKickerIRBlocked && inputs.isShooterIRBlocked && inputs.isRollerIRBlocked;
   }
 
   private void setIntakeState(IntakeState state) {
@@ -313,7 +337,8 @@ public class Intake extends SubsystemBase {
       IntakeState.NOTE_IN_INTAKE_AND_KICKER,
       IntakeState.NOTE_IN_KICKER,
       IntakeState.NOTE_IN_KICKER_AND_SHOOTER,
-      IntakeState.NOTE_IN_SHOOTER
+      IntakeState.NOTE_IN_SHOOTER,
+      IntakeState.NOTE_IN_INTAKE_KICKER_SHOOTER
     };
 
     ArrayList<IntakeState> actualStateSequence = new ArrayList<>();
@@ -392,6 +417,11 @@ public class Intake extends SubsystemBase {
     this.outtakeKicker();
   }
 
+  public void ejectAll() {
+    this.intakeGamePiece();
+    this.transitionGamePiece();
+  }
+
   public void outtakeKicker() {
     this.setKickerVelocity(-IntakeConstants.KICKER_INTAKING_VELOCITY_RPS);
   }
@@ -406,5 +436,9 @@ public class Intake extends SubsystemBase {
 
   public boolean isShooting() {
     return this.intakeState == IntakeState.SHOOTING;
+  }
+
+  public void eject() {
+    this.intakeState = IntakeState.EJECTING;
   }
 }

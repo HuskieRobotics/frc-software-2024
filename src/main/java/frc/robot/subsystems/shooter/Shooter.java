@@ -99,7 +99,8 @@ public class Shooter extends SubsystemBase {
   private enum State {
     WAITING_FOR_NOTE,
     AIMING_AT_SPEAKER,
-    PREPARING_TO_SHOOT
+    PREPARING_TO_SHOOT,
+    EJECTING_ALL
   }
 
   public Shooter(ShooterIO io, Intake intake, Drivetrain drivetrain) {
@@ -170,6 +171,11 @@ public class Shooter extends SubsystemBase {
   }
 
   private void runAngleStateMachine() {
+    // We don't know what state it will be in when the ejection gets triggered, so put it at the top
+    if (intake.allIRsBlocked()) {
+      state = State.EJECTING_ALL;
+      intake.eject();
+    }
     if (state == State.WAITING_FOR_NOTE) {
       if (intake.hasNote()) {
         state = State.AIMING_AT_SPEAKER;
@@ -211,6 +217,10 @@ public class Shooter extends SubsystemBase {
           retractDeflector();
         }
       }
+    } else if (state == State.EJECTING_ALL) {
+      
+      
+      this.eject();
     }
   }
 
@@ -675,5 +685,13 @@ public class Shooter extends SubsystemBase {
     } else {
       io.setDeflectorMotorVoltage(0.0);
     }
+  }
+
+ 
+
+  public void eject() {
+    io.setShooterWheelTopVelocity(EJECT_VELOCITY);
+    io.setShooterWheelBottomVelocity(EJECT_VELOCITY);
+    
   }
 }

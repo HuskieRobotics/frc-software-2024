@@ -63,6 +63,7 @@ public class ShooterConstants {
   public static final boolean SHOOT_TOP_INVERTED = false;
   public static final boolean SHOOT_BOTTOM_INVERTED = false;
   public static final double VELOCITY_TOLERANCE = 5.0; // FIXME: tune with real robot
+  public static final double EJECT_VELOCITY = 20.0;
   public static final double SUBWOOFER_RANGE_VELOCITY_TOP = 60;
   public static final double SUBWOOFER_RANGE_VELOCITY_BOTTOM = 60;
   public static final double NEAR_RANGE_VELOCITY_TOP = 80;
