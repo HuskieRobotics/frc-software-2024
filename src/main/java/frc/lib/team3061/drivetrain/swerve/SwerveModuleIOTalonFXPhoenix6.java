@@ -33,13 +33,12 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
+import frc.lib.team3061.drivetrain.DrivetrainIO.SignalPair;
 import frc.lib.team3061.drivetrain.DrivetrainIO.SwerveIOInputs;
 import frc.lib.team6328.util.Alert;
 import frc.lib.team6328.util.Alert.AlertType;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Implementation of the SwerveModuleIO interface for MK4 Swerve Modules with two Falcon 500 motors
@@ -410,13 +409,13 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
   }
 
   @Override
-  public List<StatusSignal<Double>> getOdometryStatusSignals() {
-    ArrayList<StatusSignal<Double>> signals = new ArrayList<>();
-    signals.add(drivePositionStatusSignal);
-    signals.add(driveVelocityStatusSignal);
-    signals.add(anglePositionStatusSignal);
-    signals.add(angleVelocityStatusSignal);
-    return signals;
+  public SignalPair getOdometryDriveSignalPair() {
+    return new SignalPair(drivePositionStatusSignal, driveVelocityStatusSignal);
+  }
+
+  @Override
+  public SignalPair getOdometryAngleSignalPair() {
+    return new SignalPair(anglePositionStatusSignal, angleVelocityStatusSignal);
   }
 
   private void configSim() {
@@ -439,7 +438,7 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
             ? ChassisReference.Clockwise_Positive
             : ChassisReference.CounterClockwise_Positive;
 
-    this.turnSim = new LinearSystemSim<>(LinearSystemId.identifyPositionSystem(2.5845, 0.030892));
+    this.turnSim = new LinearSystemSim<>(LinearSystemId.identifyPositionSystem(0.5, 0.030892));
 
     this.driveSim =
         new LinearSystemSim<>(LinearSystemId.identifyVelocitySystem(2.7637325, 0.0139575));

@@ -13,9 +13,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
+import frc.lib.team3061.drivetrain.DrivetrainIO.SignalPair;
 import frc.robot.Constants;
-import java.util.ArrayList;
-import java.util.List;
 
 public class GyroIOPigeon2Phoenix6 implements GyroIO {
   private final Pigeon2 gyro;
@@ -96,10 +95,7 @@ public class GyroIOPigeon2Phoenix6 implements GyroIO {
   }
 
   @Override
-  public List<StatusSignal<Double>> getOdometryStatusSignals() {
-    ArrayList<StatusSignal<Double>> signals = new ArrayList<>();
-    signals.add(this.yawStatusSignal);
-    signals.add(this.angularVelocityZStatusSignal);
-    return signals;
+  public SignalPair getOdometrySignalPair() {
+    return new SignalPair(this.yawStatusSignal, this.angularVelocityZStatusSignal);
   }
 }
