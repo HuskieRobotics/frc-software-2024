@@ -542,7 +542,7 @@ public class Drivetrain extends SubsystemBase {
     }
     minOdometryUpdates = Math.min(inputs.gyro.odometryYawPositions.length, minOdometryUpdates);
 
-    for (int i = 0; i < minOdometryUpdates && i < 1; i++) {
+    for (int i = 0; i < minOdometryUpdates; i++) {
       SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
       for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
         modulePositions[moduleIndex] =
