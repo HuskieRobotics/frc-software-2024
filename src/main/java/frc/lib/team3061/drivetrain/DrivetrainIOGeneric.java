@@ -149,6 +149,8 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
       // this is a licensed method
       BaseStatusSignal.waitForAll(
           Constants.LOOP_PERIOD_SECS, this.odometrySignals.toArray(new BaseStatusSignal[0]));
+    } else {
+      BaseStatusSignal.refreshAll(this.odometrySignals.toArray(new BaseStatusSignal[0]));
     }
 
     // update and log gyro inputs
@@ -382,7 +384,7 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
   private double getAverageDriveCurrent(DrivetrainIOInputsCollection inputs) {
     double totalCurrent = 0.0;
     for (SwerveIOInputs swerveInputs : inputs.swerve) {
-      totalCurrent += swerveInputs.driveStatorCurrentAmps;
+      totalCurrent += Math.abs(swerveInputs.driveStatorCurrentAmps);
     }
     return totalCurrent / inputs.swerve.length;
   }
