@@ -10,7 +10,9 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -73,18 +75,15 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
   private double angleOffsetRot;
 
   private VoltageOut driveVoltageRequest;
-  private VelocityVoltage driveVelocityRequest;
+  private VelocityVoltage driveVelocityVoltageRequest;
+  private VelocityTorqueCurrentFOC driveVelocityTorqueCurrentFOCRequest;
   private VoltageOut angleVoltageRequest;
-  private PositionVoltage anglePositionRequest;
+  private MotionMagicExpoVoltage anglePositionRequest;
 
   private StatusSignal<Double> anglePositionStatusSignal;
   private StatusSignal<Double> angleVelocityStatusSignal;
-  private StatusSignal<Double> anglePositionErrorStatusSignal;
-  private StatusSignal<Double> anglePositionReferenceStatusSignal;
   private StatusSignal<Double> drivePositionStatusSignal;
   private StatusSignal<Double> driveVelocityStatusSignal;
-  private StatusSignal<Double> driveVelocityErrorStatusSignal;
-  private StatusSignal<Double> driveVelocityReferenceStatusSignal;
 
   private Alert angleEncoderConfigAlert =
       new Alert("Failed to apply configuration for angle encoder.", AlertType.ERROR);
@@ -179,15 +178,23 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
     config.Slot0.kI = turnKi.get();
     config.Slot0.kD = turnKd.get();
     config.Slot0.kS = RobotConfig.getInstance().getSwerveAngleKS();
-    config.Slot0.kV =
-        RobotConfig.getInstance().getSwerveAngleKV()
-            * 2
-            * Math.PI; // convert from V/(radians/s) to V/(rotations/s)
+    config.Slot0.kV = RobotConfig.getInstance().getSwerveAngleKV();
+    config.Slot0.kA = RobotConfig.getInstance().getSwerveAngleKA();
+
+    config.MotionMagic.MotionMagicCruiseVelocity = 100.0 / angleGearRatio;
+    config.MotionMagic.MotionMagicAcceleration =
+        config.MotionMagic.MotionMagicCruiseVelocity / 0.100;
+    config.MotionMagic.MotionMagicExpo_kV = 0.12 * angleGearRatio;
+    config.MotionMagic.MotionMagicExpo_kA = 0.1;
 
     config.ClosedLoopGeneral.ContinuousWrap = true;
 
     config.Feedback.FeedbackRemoteSensorID = canCoderID;
-    config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+    if (RobotConfig.getInstance().getPhoenix6Licensed()) {
+      config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+    } else {
+      config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    }
     config.Feedback.RotorToSensorRatio = angleGearRatio;
 
     StatusCode status = StatusCode.StatusCodeNotInitialized;
@@ -205,13 +212,10 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
 
     this.anglePositionStatusSignal = this.angleMotor.getPosition().clone();
     this.angleVelocityStatusSignal = this.angleMotor.getVelocity().clone();
-    this.anglePositionErrorStatusSignal = this.angleMotor.getClosedLoopError().clone();
-    this.anglePositionReferenceStatusSignal = this.angleMotor.getClosedLoopReference().clone();
 
-    this.angleVoltageRequest = new VoltageOut(0.0);
+    this.angleVoltageRequest = new VoltageOut(0.0).withUpdateFreqHz(0.0);
     this.angleVoltageRequest.EnableFOC = RobotConfig.getInstance().getPhoenix6Licensed();
-    this.anglePositionRequest = new PositionVoltage(0.0).withSlot(0);
-    this.anglePositionRequest.EnableFOC = RobotConfig.getInstance().getPhoenix6Licensed();
+    this.anglePositionRequest = new MotionMagicExpoVoltage(0.0).withSlot(0).withUpdateFreqHz(0.0);
   }
 
   private void configDriveMotor(int driveMotorID) {
@@ -226,6 +230,11 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
     currentLimits.SupplyCurrentLimitEnable = DRIVE_ENABLE_CURRENT_LIMIT;
     config.CurrentLimits = currentLimits;
 
+    TorqueCurrentConfigs torqueCurrentConfigs = new TorqueCurrentConfigs();
+    torqueCurrentConfigs.PeakForwardTorqueCurrent = DRIVE_PEAK_CURRENT_LIMIT;
+    torqueCurrentConfigs.PeakReverseTorqueCurrent = -DRIVE_PEAK_CURRENT_LIMIT;
+    config.TorqueCurrent = torqueCurrentConfigs;
+
     config.MotorOutput.Inverted =
         driveMotorInverted
             ? InvertedValue.Clockwise_Positive
@@ -235,9 +244,8 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
     config.Slot0.kI = driveKi.get();
     config.Slot0.kD = driveKd.get();
     config.Slot0.kS = RobotConfig.getInstance().getDriveKS();
-    config.Slot0.kV =
-        RobotConfig.getInstance().getDriveKV()
-            / Conversions.mpsToFalconRPS(1.0, wheelCircumference, driveGearRatio);
+    config.Slot0.kV = RobotConfig.getInstance().getDriveKV();
+    config.Slot0.kA = RobotConfig.getInstance().getDriveKA();
 
     config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = CLOSED_LOOP_RAMP;
     config.OpenLoopRamps.VoltageOpenLoopRampPeriod = OPEN_LOOP_RAMP;
@@ -259,39 +267,18 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
 
     this.drivePositionStatusSignal = this.driveMotor.getPosition().clone();
     this.driveVelocityStatusSignal = this.driveMotor.getVelocity().clone();
-    this.driveVelocityErrorStatusSignal = this.driveMotor.getClosedLoopError().clone();
-    this.driveVelocityReferenceStatusSignal = this.driveMotor.getClosedLoopReference().clone();
 
     this.driveVoltageRequest = new VoltageOut(0.0);
     this.driveVoltageRequest.EnableFOC = RobotConfig.getInstance().getPhoenix6Licensed();
-    this.driveVelocityRequest = new VelocityVoltage(0).withSlot(0);
-    this.driveVelocityRequest.EnableFOC = RobotConfig.getInstance().getPhoenix6Licensed();
+    this.driveVelocityTorqueCurrentFOCRequest =
+        new VelocityTorqueCurrentFOC(0).withSlot(0).withUpdateFreqHz(0.0);
+    this.driveVelocityVoltageRequest = new VelocityVoltage(0).withSlot(0).withUpdateFreqHz(0.0);
   }
 
   /** Updates the set of loggable inputs. */
   @Override
   public void updateInputs(SwerveIOInputs inputs) {
     updateSim();
-
-    // only invoke refresh if Phoenix is not licensed (if licensed, these signals have already been
-    // refreshed)
-    if (!RobotConfig.getInstance().getPhoenix6Licensed()) {
-      BaseStatusSignal.refreshAll(
-          anglePositionStatusSignal,
-          angleVelocityStatusSignal,
-          drivePositionStatusSignal,
-          driveVelocityStatusSignal);
-    } else {
-      BaseStatusSignal.refreshAll(
-          anglePositionStatusSignal,
-          angleVelocityStatusSignal,
-          drivePositionStatusSignal,
-          driveVelocityStatusSignal,
-          anglePositionErrorStatusSignal,
-          anglePositionReferenceStatusSignal,
-          driveVelocityErrorStatusSignal,
-          driveVelocityReferenceStatusSignal);
-    }
 
     inputs.driveDistanceMeters =
         Conversions.falconRotationsToMechanismMeters(
@@ -304,10 +291,12 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
             driveVelocityStatusSignal.getValue(), wheelCircumference, driveGearRatio);
     inputs.driveVelocityReferenceMetersPerSec =
         Conversions.falconRPSToMechanismMPS(
-            driveVelocityReferenceStatusSignal.getValue(), wheelCircumference, driveGearRatio);
+            this.driveMotor.getClosedLoopReference().getValue(),
+            wheelCircumference,
+            driveGearRatio);
     inputs.driveVelocityErrorMetersPerSec =
         Conversions.falconRPSToMechanismMPS(
-            driveVelocityErrorStatusSignal.getValue(), wheelCircumference, driveGearRatio);
+            this.driveMotor.getClosedLoopError().getValue(), wheelCircumference, driveGearRatio);
     inputs.driveAppliedVolts = this.driveMotor.getMotorVoltage().getValue();
     inputs.driveStatorCurrentAmps = this.driveMotor.getStatorCurrent().getValue();
     inputs.driveSupplyCurrentAmps = this.driveMotor.getSupplyCurrent().getValue();
@@ -324,9 +313,10 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
             1);
     inputs.steerPositionReferenceDeg =
         Conversions.falconRotationsToMechanismDegrees(
-            anglePositionReferenceStatusSignal.getValue(), 1);
+            this.angleMotor.getClosedLoopReference().getValue(), 1);
     inputs.steerPositionErrorDeg =
-        Conversions.falconRotationsToMechanismDegrees(anglePositionErrorStatusSignal.getValue(), 1);
+        Conversions.falconRotationsToMechanismDegrees(
+            this.angleMotor.getClosedLoopError().getValue(), 1);
     inputs.steerVelocityRevPerMin =
         Conversions.falconRPSToMechanismRPM(angleVelocityStatusSignal.getValue(), 1);
 
@@ -378,7 +368,11 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
   @Override
   public void setDriveVelocity(double velocity) {
     double rps = Conversions.mpsToFalconRPS(velocity, wheelCircumference, driveGearRatio);
-    this.driveMotor.setControl(driveVelocityRequest.withVelocity(rps));
+    if (RobotConfig.getInstance().getPhoenix6Licensed()) {
+      this.driveMotor.setControl(driveVelocityTorqueCurrentFOCRequest.withVelocity(rps));
+    } else {
+      this.driveMotor.setControl(driveVelocityVoltageRequest.withVelocity(rps));
+    }
   }
 
   /** Run the turn motor to the specified angle. */
@@ -437,16 +431,10 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
             ? ChassisReference.Clockwise_Positive
             : ChassisReference.CounterClockwise_Positive;
 
-    this.turnSim =
-        new LinearSystemSim<>(
-            LinearSystemId.identifyPositionSystem(
-                RobotConfig.getInstance().getSwerveAngleKV(),
-                RobotConfig.getInstance().getSwerveAngleKA()));
+    this.turnSim = new LinearSystemSim<>(LinearSystemId.identifyPositionSystem(2.5845, 0.030892));
 
     this.driveSim =
-        new LinearSystemSim<>(
-            LinearSystemId.identifyVelocitySystem(
-                RobotConfig.getInstance().getDriveKV(), RobotConfig.getInstance().getDriveKA()));
+        new LinearSystemSim<>(LinearSystemId.identifyVelocitySystem(2.7637325, 0.0139575));
   }
 
   private void updateSim() {
