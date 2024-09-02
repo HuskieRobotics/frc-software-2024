@@ -19,6 +19,7 @@ import java.util.List;
 
 public class GyroIOPigeon2Phoenix6 implements GyroIO {
   private final Pigeon2 gyro;
+  private double yawOffset = 0;
   private final StatusSignal<Double> yawStatusSignal;
   private final StatusSignal<Double> pitchStatusSignal;
   private final StatusSignal<Double> rollStatusSignal;
@@ -30,7 +31,6 @@ public class GyroIOPigeon2Phoenix6 implements GyroIO {
   public GyroIOPigeon2Phoenix6(int id) {
     gyro = new Pigeon2(id, RobotConfig.getInstance().getCANBusName());
     this.yawStatusSignal = this.gyro.getYaw().clone();
-    this.yawStatusSignal.setUpdateFrequency(100);
     this.pitchStatusSignal = this.gyro.getPitch().clone();
     this.pitchStatusSignal.setUpdateFrequency(100);
     this.rollStatusSignal = this.gyro.getRoll().clone();
@@ -40,7 +40,6 @@ public class GyroIOPigeon2Phoenix6 implements GyroIO {
     this.angularVelocityYStatusSignal = this.gyro.getAngularVelocityYWorld().clone();
     this.angularVelocityYStatusSignal.setUpdateFrequency(100);
     this.angularVelocityZStatusSignal = this.gyro.getAngularVelocityZWorld().clone();
-    this.angularVelocityZStatusSignal.setUpdateFrequency(100);
 
     FaultReporter.getInstance().registerHardware("Drivetrain", "gyro", gyro);
 
@@ -53,24 +52,17 @@ public class GyroIOPigeon2Phoenix6 implements GyroIO {
 
   @Override
   public void updateInputs(GyroIOInputs inputs) {
-    // only invoke refresh if Phoenix is not licensed (if licensed, these signals have already been
-    // refreshed)
-    if (!RobotConfig.getInstance().getPhoenix6Licensed()) {
-      BaseStatusSignal.refreshAll(this.yawStatusSignal, this.angularVelocityZStatusSignal);
-    } else {
-      BaseStatusSignal.refreshAll(
-          this.yawStatusSignal,
-          this.angularVelocityZStatusSignal,
-          this.pitchStatusSignal,
-          this.rollStatusSignal,
-          this.angularVelocityXStatusSignal,
-          this.angularVelocityYStatusSignal);
-    }
+    BaseStatusSignal.refreshAll(
+        this.pitchStatusSignal,
+        this.rollStatusSignal,
+        this.angularVelocityXStatusSignal,
+        this.angularVelocityYStatusSignal);
 
     inputs.connected = (this.yawStatusSignal.getStatus() == StatusCode.OK);
     inputs.yawDeg =
         BaseStatusSignal.getLatencyCompensatedValue(
-            this.yawStatusSignal, this.angularVelocityZStatusSignal);
+                this.yawStatusSignal, this.angularVelocityZStatusSignal)
+            + this.yawOffset;
     inputs.pitchDeg =
         BaseStatusSignal.getLatencyCompensatedValue(
             this.pitchStatusSignal, this.angularVelocityYStatusSignal);
@@ -90,7 +82,10 @@ public class GyroIOPigeon2Phoenix6 implements GyroIO {
 
   @Override
   public void setYaw(double yaw) {
-    this.gyro.setYaw(yaw, 0.1);
+    this.yawOffset =
+        yaw
+            - BaseStatusSignal.getLatencyCompensatedValue(
+                this.yawStatusSignal, this.angularVelocityZStatusSignal);
   }
 
   @Override
