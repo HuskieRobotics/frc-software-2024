@@ -60,6 +60,9 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
   private final TunableNumber turnKd =
       new TunableNumber("Drivetrain/TurnKd", RobotConfig.getInstance().getSwerveAngleKD());
 
+  private static final double COUPLE_RATIO =
+      RobotConfig.getInstance().getAzimuthSteerCouplingRatio();
+
   private final double wheelCircumference;
   private final double driveGearRatio;
   private final boolean driveMotorInverted;
@@ -280,12 +283,21 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
   public void updateInputs(SwerveIOInputs inputs) {
     updateSim();
 
+    double driveRotations =
+        BaseStatusSignal.getLatencyCompensatedValue(
+            drivePositionStatusSignal, driveVelocityStatusSignal);
+    double angleRotations =
+        BaseStatusSignal.getLatencyCompensatedValue(
+            anglePositionStatusSignal, angleVelocityStatusSignal);
+    /*
+     * From CTRE: back out the drive rotations based on angle rotations due to coupling between
+     * azimuth and steer
+     */
+    driveRotations -= angleRotations * COUPLE_RATIO;
+
     inputs.driveDistanceMeters =
         Conversions.falconRotationsToMechanismMeters(
-            BaseStatusSignal.getLatencyCompensatedValue(
-                drivePositionStatusSignal, driveVelocityStatusSignal),
-            wheelCircumference,
-            driveGearRatio);
+            driveRotations, wheelCircumference, driveGearRatio);
     inputs.driveVelocityMetersPerSec =
         Conversions.falconRPSToMechanismMPS(
             driveVelocityStatusSignal.getValue(), wheelCircumference, driveGearRatio);
@@ -306,11 +318,7 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
     // since we are using the FusedCANcoder feature, the position and velocity signal for the angle
     // motor accounts for the gear ratio; so, pass a gear ratio of 1 to just convert from rotations
     // to degrees.
-    inputs.steerPositionDeg =
-        Conversions.falconRotationsToMechanismDegrees(
-            BaseStatusSignal.getLatencyCompensatedValue(
-                anglePositionStatusSignal, angleVelocityStatusSignal),
-            1);
+    inputs.steerPositionDeg = Conversions.falconRotationsToMechanismDegrees(angleRotations, 1);
     inputs.steerPositionReferenceDeg =
         Conversions.falconRotationsToMechanismDegrees(
             this.angleMotor.getClosedLoopReference().getValue(), 1);

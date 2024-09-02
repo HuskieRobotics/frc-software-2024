@@ -16,6 +16,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.lib.team3061.RobotConfig;
+import frc.lib.team3061.drivetrain.swerve.Conversions;
 import frc.lib.team3061.drivetrain.swerve.SwerveModuleIO;
 import frc.lib.team3061.gyro.GyroIO;
 import frc.lib.team6328.util.TunableNumber;
@@ -32,6 +33,9 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
   private final double wheelbaseMeters = RobotConfig.getInstance().getWheelbase();
   private final SwerveDriveKinematics kinematics =
       RobotConfig.getInstance().getSwerveDriveKinematics();
+
+  private static final double COUPLE_RATIO =
+      RobotConfig.getInstance().getAzimuthSteerCouplingRatio();
 
   private final SwerveModuleIO[] swerveModules = new SwerveModuleIO[4]; // FL, FR, BL, BR
 
@@ -78,6 +82,7 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
   private ChassisSpeeds targetChassisSpeeds;
 
   private double[] steerMotorsLastAngle = new double[4];
+  private double[] steerMotorsLastVelocityRPM = new double[4];
 
   private Pose2d estimatedPoseWithoutGyro = new Pose2d();
 
@@ -173,6 +178,7 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
           new SwerveModulePosition(
               inputs.swerve[i].driveDistanceMeters,
               Rotation2d.fromDegrees(inputs.swerve[i].steerPositionDeg));
+      steerMotorsLastVelocityRPM[i] = inputs.swerve[i].steerVelocityRevPerMin;
     }
 
     // if the gyro is not connected, use the swerve module positions to estimate the robot's
@@ -398,11 +404,37 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
     for (int i = 0; i < this.swerveModules.length; i++) {
       states[i] = SwerveModuleState.optimize(states[i], swerveModuleStates[i].angle);
 
+      double velocityToSet = states[i].speedMetersPerSecond;
+
+      // the following is from CTRE
+
+      /* From FRC 900's whitepaper, we add a cosine compensator to the applied drive velocity */
+      /* To reduce the "skew" that occurs when changing direction */
+      double steerMotorError =
+          states[i].angle.getRotations() - swerveModulePositions[i].angle.getRotations();
+      /* If error is close to 0 rotations, we're already there, so apply full power */
+      /* If the error is close to 0.25 rotations, then we're 90 degrees, so movement doesn't help us at all */
+      double cosineScalar = Math.cos(Units.rotationsToRadians(steerMotorError));
+      /* Make sure we don't invert our drive, even though we shouldn't ever target over 90 degrees anyway */
+      if (cosineScalar < 0.0) {
+        cosineScalar = 0.0;
+      }
+      velocityToSet *= cosineScalar;
+
+      /* Back out the expected shimmy the drive motor will see */
+      /* Find the angular rate to determine what to back out */
+      double azimuthTurnRps = steerMotorsLastVelocityRPM[i] / 60.0;
+      /* Azimuth turn rate multiplied by coupling ratio provides back-out rps */
+      double driveRateBackOut = azimuthTurnRps * COUPLE_RATIO;
+      double wheelCircumference = RobotConfig.getInstance().getWheelDiameterMeters() * Math.PI;
+      double driveGearRatio = RobotConfig.getInstance().getSwerveConstants().getDriveGearRatio();
+      velocityToSet +=
+          Conversions.falconRPSToMechanismMPS(driveRateBackOut, wheelCircumference, driveGearRatio);
+
       if (isOpenLoop) {
-        this.swerveModules[i].setDriveMotorVoltage(
-            states[i].speedMetersPerSecond / maxVelocity * 12.0);
+        this.swerveModules[i].setDriveMotorVoltage(velocityToSet / maxVelocity * 12.0);
       } else {
-        this.swerveModules[i].setDriveVelocity(states[i].speedMetersPerSecond);
+        this.swerveModules[i].setDriveVelocity(velocityToSet);
       }
 
       // Unless the angle is forced (e.g., X-stance), don't rotate the module if speed is less then
