@@ -27,7 +27,6 @@ import frc.lib.team3061.drivetrain.swerve.SwerveModuleIO;
 import frc.lib.team3061.drivetrain.swerve.SwerveModuleIOTalonFXPhoenix6;
 import frc.lib.team3061.gyro.GyroIOPigeon2Phoenix6;
 import frc.lib.team3061.leds.LEDs;
-import frc.lib.team3061.leds.LEDs.ShooterLEDState;
 import frc.lib.team3061.vision.Vision;
 import frc.lib.team3061.vision.VisionConstants;
 import frc.lib.team3061.vision.VisionIO;
@@ -356,11 +355,8 @@ public class RobotContainer {
                     && DriverStation.getMatchTime() > 0.0
                     && DriverStation.getMatchTime() <= Math.round(endgameAlert1.get()))
         .onTrue(
-            Commands.run(() -> LEDs.getInstance().setEndgameAlert(true))
-                .withTimeout(1)
-                .andThen(
-                    Commands.run(() -> LEDs.getInstance().setEndgameAlert(false))
-                        .withTimeout(1.0)));
+            Commands.run(() -> LEDs.getInstance().requestState(LEDs.States.ENDGAME_ALERT))
+                .withTimeout(1));
     new Trigger(
             () ->
                 DriverStation.isTeleopEnabled()
@@ -368,10 +364,11 @@ public class RobotContainer {
                     && DriverStation.getMatchTime() <= Math.round(endgameAlert2.get()))
         .onTrue(
             Commands.sequence(
-                Commands.run(() -> LEDs.getInstance().setEndgameAlert(true)).withTimeout(0.5),
-                Commands.run(() -> LEDs.getInstance().setEndgameAlert(false)).withTimeout(0.25),
-                Commands.run(() -> LEDs.getInstance().setEndgameAlert(true)).withTimeout(0.5),
-                Commands.run(() -> LEDs.getInstance().setEndgameAlert(false)).withTimeout(0.25)));
+                Commands.run(() -> LEDs.getInstance().requestState(LEDs.States.ENDGAME_ALERT))
+                    .withTimeout(0.5),
+                Commands.waitSeconds(0.25),
+                Commands.run(() -> LEDs.getInstance().requestState(LEDs.States.ENDGAME_ALERT))
+                    .withTimeout(0.5)));
 
     // interrupt all commands by running a command that requires every subsystem. This is used to
     // recover to a known state if the robot becomes "stuck" in a command.
@@ -944,7 +941,8 @@ public class RobotContainer {
                     new TeleopSwerveAimAtSpeaker(drivetrain, shooter, intake, () -> 0.0, () -> 0.0),
                     getShootCommand())
                 .withTimeout(1.0))
-        .andThen(Commands.runOnce(intake::shoot, intake));
+        .andThen(Commands.runOnce(intake::shoot, intake))
+        .finallyDo(drivetrain::disableXstance);
   }
 
   private Command getShootCommand() {
@@ -981,15 +979,26 @@ public class RobotContainer {
 
   public void periodic() {
     if (this.isReadyToShoot()) {
-      LEDs.getInstance().setShooterLEDState(ShooterLEDState.IS_READY_TO_SHOOT);
+      LEDs.getInstance().requestState(LEDs.States.READY_TO_SHOOT);
     } else if (this.intake.hasNote()) {
-      LEDs.getInstance().setShooterLEDState(ShooterLEDState.AIMING_AT_SPEAKER);
+      LEDs.getInstance().requestState(LEDs.States.AIMING_AT_SPEAKER);
     }
   }
 
   public void autonomousInit() {
     // ensure that quick shoot is always disabled at the start of auto
     intake.disableQuickShoot();
+  }
+
+  public void teleopInit() {
+    // check if the alliance color has changed based on the FMS data; if the robot power cycled
+    // during a match, this would be the first opportunity to check the alliance color based on FMS
+    // data.
+    this.checkAllianceColor();
+
+    // ensure that x-stance is disabled at the start of teleop as there is a possibility if the
+    //  auto command is interrupted, we could still be in x-stance
+    drivetrain.disableXstance();
   }
 
   private boolean isReadyToShoot() {

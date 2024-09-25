@@ -595,6 +595,8 @@ public class Drivetrain extends SubsystemBase {
     // update the brake mode based on the robot's velocity and state (enabled/disabled)
     updateBrakeMode();
 
+    Logger.recordOutput(SUBSYSTEM_NAME + "/DriveMode", this.driveMode);
+
     // update tunables
     if (autoDriveKp.hasChanged() || autoDriveKi.hasChanged() || autoDriveKd.hasChanged()) {
       autoXController.setPID(autoDriveKp.get(), autoDriveKi.get(), autoDriveKd.get());
