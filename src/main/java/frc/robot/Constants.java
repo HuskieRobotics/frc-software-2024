@@ -29,7 +29,7 @@ public final class Constants {
   public static final boolean TUNING_MODE = false;
   public static final boolean DEMO_MODE = false;
 
-  private static final RobotType ROBOT = RobotType.ROBOT_COMPETITION;
+  private static final RobotType ROBOT = RobotType.ROBOT_COMPETITION_GENERIC;
 
   private static final Alert invalidRobotAlert =
       new Alert("Invalid robot selected, using competition robot as default.", AlertType.ERROR);
@@ -38,7 +38,8 @@ public final class Constants {
     ROBOT_SIMBOT,
     ROBOT_SIMBOT_CTRE,
     ROBOT_PRACTICE,
-    ROBOT_COMPETITION,
+    ROBOT_COMPETITION_CTRE,
+    ROBOT_COMPETITION_GENERIC,
     ROBOT_PRACTICE_BOARD
   }
 
@@ -47,7 +48,7 @@ public final class Constants {
       if (ROBOT == RobotType.ROBOT_SIMBOT
           || ROBOT == RobotType.ROBOT_SIMBOT_CTRE) { // Invalid robot selected
         invalidRobotAlert.set(true);
-        return RobotType.ROBOT_COMPETITION;
+        return RobotType.ROBOT_COMPETITION_GENERIC;
       } else {
         return ROBOT;
       }
@@ -60,7 +61,8 @@ public final class Constants {
     switch (getRobot()) {
       case ROBOT_PRACTICE:
       case ROBOT_PRACTICE_BOARD:
-      case ROBOT_COMPETITION:
+      case ROBOT_COMPETITION_CTRE:
+      case ROBOT_COMPETITION_GENERIC:
         return RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
 
       case ROBOT_SIMBOT:
