@@ -240,9 +240,15 @@ public class RobotContainer {
                 blModule,
                 brModule));
 
-    intake = new Intake(new IntakeIOTalonFX());
-    climber = new Climber(new ClimberIOTalonFX());
-    shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
+    // FIXME: disable other subsystems for testing
+    // intake = new Intake(new IntakeIOTalonFX());
+    // climber = new Climber(new ClimberIOTalonFX());
+    // shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
+    // intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
+
+    intake = new Intake(new IntakeIO() {});
+    climber = new Climber(new ClimberIOTalonFX() {});
+    shooter = new Shooter(new ShooterIO() {}, intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
     noteTargeting = new NoteTargeting(new NoteTargetingIO() {});
