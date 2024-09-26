@@ -219,12 +219,23 @@ public class Vision extends SubsystemBase {
     Pose3d robotPoseFromMostRecentData = null;
     double mostRecentTimestamp = 0.0;
     for (int i = 0; i < visionIOs.length; i++) {
-      if (ios[i].estimatedCameraPoseTimestamp > mostRecentTimestamp
-          && ios[i].ambiguity < AMBIGUITY_THRESHOLD) {
-        robotPoseFromMostRecentData =
-            ios[i].estimatedCameraPose.plus(
-                RobotConfig.getInstance().getRobotToCameraTransforms()[i].inverse());
-        mostRecentTimestamp = ios[i].estimatedCameraPoseTimestamp;
+      // if multi pose then do the reprojection error, if not then do the ambiguity here
+      if (ios[i].poseFromMultiTag) {
+        if (ios[i].estimatedCameraPoseTimestamp > mostRecentTimestamp
+            && ios[i].reprojectionError < REPROJECTION_ERROR_THRESHOLD) {
+          robotPoseFromMostRecentData =
+              ios[i].estimatedCameraPose.plus(
+                  RobotConfig.getInstance().getRobotToCameraTransforms()[i].inverse());
+          mostRecentTimestamp = ios[i].estimatedCameraPoseTimestamp;
+        }
+      } else {
+        if (ios[i].estimatedCameraPoseTimestamp > mostRecentTimestamp
+            && ios[i].ambiguity < AMBIGUITY_THRESHOLD) {
+          robotPoseFromMostRecentData =
+              ios[i].estimatedCameraPose.plus(
+                  RobotConfig.getInstance().getRobotToCameraTransforms()[i].inverse());
+          mostRecentTimestamp = ios[i].estimatedCameraPoseTimestamp;
+        }
       }
     }
 

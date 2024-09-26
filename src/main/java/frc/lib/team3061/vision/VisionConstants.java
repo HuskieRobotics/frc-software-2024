@@ -19,6 +19,9 @@ public final class VisionConstants {
   // the pose ambiguity must be less than this value for the target to be considered valid
   public static final double AMBIGUITY_THRESHOLD = 0.5;
 
+  // arbitrary for now, wait until testing on robot
+  public static final double REPROJECTION_ERROR_THRESHOLD = 100.0;
+
   // this factor is applied to the pose ambiguity when calculating the standard deviation to pass to
   // the pose estimator
   public static final double AMBIGUITY_SCALE_FACTOR = 0.2;
