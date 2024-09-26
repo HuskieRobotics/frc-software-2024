@@ -1,0 +1,55 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.3288209438323977,
+      "y": 5.542205810546875
+    },
+    "rotation": 180.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Grab_First_Note"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Back-To_Speaker"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Grab_Second_Note"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Grab_Third_Note"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Grab_Fourth_Note"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Shoot_Final"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": true
+}
