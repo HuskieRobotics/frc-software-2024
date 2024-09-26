@@ -20,7 +20,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Back-To_Speaker"
+            "pathName": "Back-To_Speaker1"
           }
         },
         {
@@ -32,7 +32,25 @@
         {
           "type": "path",
           "data": {
+            "pathName": "Back-To-Speaker2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop And Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
             "pathName": "Grab_Third_Note"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop And Shoot"
           }
         },
         {
@@ -42,14 +60,14 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Shoot_Final"
+            "name": "Stop And Shoot"
           }
         }
       ]
     }
   },
-  "folder": null,
+  "folder": "Choreo Autos",
   "choreoAuto": true
 }
