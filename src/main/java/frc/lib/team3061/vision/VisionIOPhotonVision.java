@@ -74,6 +74,10 @@ public class VisionIOPhotonVision implements VisionIO {
 
           if (inputs.poseFromMultiTag) {
             inputs.ambiguity = 0.2;
+
+            // unit of reprojection error is pixels
+            inputs.reprojectionError =
+                camera.getLatestResult().getMultiTagResult().estimatedPose.bestReprojErr;
           }
 
           this.cyclesWithNoResults = 0;
