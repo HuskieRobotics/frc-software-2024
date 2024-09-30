@@ -561,6 +561,10 @@ public class Drivetrain extends SubsystemBase {
     Logger.recordOutput(SUBSYSTEM_NAME + "/Pose2d", robotPose);
     Logger.recordOutput(SUBSYSTEM_NAME + "/Pose3d", new Pose3d(robotPose));
 
+    Pose2d robotPoseWithoutVision = this.odometry.getEstimatedPositionWithoutVision();
+    Logger.recordOutput(SUBSYSTEM_NAME + "/Pose2dNoVision", robotPoseWithoutVision);
+    Logger.recordOutput(SUBSYSTEM_NAME + "/Pose3dNoVision", new Pose3d(robotPoseWithoutVision));
+
     // check for teleportation
     if (robotPose.minus(prevRobotPose).getTranslation().getNorm() > 0.4) {
       this.resetPose(prevRobotPose);

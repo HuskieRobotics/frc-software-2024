@@ -18,6 +18,7 @@ import frc.lib.team3061.RobotConfig;
 public class RobotOdometry {
   private static final RobotOdometry robotOdometry = new RobotOdometry();
   private SwerveDrivePoseEstimator estimator = null;
+  private SwerveDrivePoseEstimator estimatorWithoutVision = null;
   private SwerveModulePosition[] defaultPositions =
       new SwerveModulePosition[] {
         new SwerveModulePosition(),
@@ -33,19 +34,31 @@ public class RobotOdometry {
             new Rotation2d(),
             defaultPositions,
             new Pose2d());
+    estimatorWithoutVision =
+        new SwerveDrivePoseEstimator(
+            RobotConfig.getInstance().getSwerveDriveKinematics(),
+            new Rotation2d(),
+            defaultPositions,
+            new Pose2d());
   }
 
   public Pose2d getEstimatedPosition() {
     return this.estimator.getEstimatedPosition();
   }
 
+  public Pose2d getEstimatedPositionWithoutVision() {
+    return this.estimatorWithoutVision.getEstimatedPosition();
+  }
+
   public void resetPosition(
       Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d poseMeters) {
     this.estimator.resetPosition(gyroAngle, modulePositions, poseMeters);
+    this.estimatorWithoutVision.resetPosition(gyroAngle, modulePositions, poseMeters);
   }
 
   public Pose2d updateWithTime(
       double currentTimeSeconds, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
+    this.estimatorWithoutVision.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
     return this.estimator.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
   }
 
@@ -53,6 +66,7 @@ public class RobotOdometry {
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
+    // don't update the estimator without vision
     this.estimator.addVisionMeasurement(
         visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
   }
