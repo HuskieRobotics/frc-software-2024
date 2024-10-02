@@ -946,12 +946,10 @@ public class RobotContainer {
   }
 
   private Command getShootCommand() {
-    return Commands.waitUntil(this::isReadyToShoot)
-        .andThen(
-            Commands.sequence(
-                Commands.runOnce(intake::shoot, intake),
-                NoteVisualizer.shoot(),
-                Commands.runOnce(drivetrain::disableAimToSpeaker)))
+    return Commands.sequence(
+            Commands.runOnce(intake::shoot, intake),
+            NoteVisualizer.shoot(),
+            Commands.runOnce(drivetrain::disableAimToSpeaker))
         .withName("shoot");
   }
 

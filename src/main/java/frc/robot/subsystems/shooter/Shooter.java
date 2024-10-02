@@ -30,7 +30,7 @@ public class Shooter extends SubsystemBase {
   private InterpolatingDoubleTreeMap passingTreeMap;
   private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
 
-  private final TunableNumber testingMode = new TunableNumber("Shooter/TestingMode", 0);
+  private final TunableNumber testingMode = new TunableNumber("Shooter/TestingMode", 1);
 
   private final TunableNumber angleManualControlVoltage =
       new TunableNumber("Shooter/ManualControlVoltage", ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE);
