@@ -400,6 +400,9 @@ public class RobotContainer {
 
     // build auto path commands
 
+    Command choreo4NoteAuto = new PathPlannerAuto("4 Note Choreo Auto");
+    autoChooser.addOption("4 Note Choreo Auto", choreo4NoteAuto);
+
     // add commands to the auto chooser
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
 
