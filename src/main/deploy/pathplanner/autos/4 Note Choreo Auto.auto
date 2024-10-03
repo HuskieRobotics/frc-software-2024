@@ -24,6 +24,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Stop And Shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Grab_Second_Note"

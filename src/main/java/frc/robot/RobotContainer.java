@@ -400,7 +400,11 @@ public class RobotContainer {
 
     // build auto path commands
 
-    Command choreo4NoteAuto = new PathPlannerAuto("4 Note Choreo Auto");
+    Command choreo4NoteAuto =
+        Commands.sequence(
+            Commands.runOnce(
+                () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_AUTO_1)),
+            new PathPlannerAuto("4 Note Choreo Auto"));
     autoChooser.addOption("4 Note Choreo Auto", choreo4NoteAuto);
 
     // add commands to the auto chooser
@@ -938,7 +942,7 @@ public class RobotContainer {
     return Commands.sequence(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.FIELD)),
             Commands.runOnce(drivetrain::enableXstance),
-            Commands.waitSeconds(0.1),
+            Commands.waitSeconds(2.0),
             Commands.runOnce(drivetrain::disableXstance),
             Commands.parallel(
                     new TeleopSwerveAimAtSpeaker(drivetrain, shooter, intake, () -> 0.0, () -> 0.0),
