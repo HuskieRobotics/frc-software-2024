@@ -1,9 +1,7 @@
 package frc.lib.team3061.drivetrain.swerve;
 
-import com.ctre.phoenix6.StatusSignal;
+import frc.lib.team3061.drivetrain.DrivetrainIO.SignalPair;
 import frc.lib.team3061.drivetrain.DrivetrainIO.SwerveIOInputs;
-import java.util.ArrayList;
-import java.util.List;
 
 /** Swerve module hardware abstraction interface. */
 public interface SwerveModuleIO {
@@ -30,12 +28,26 @@ public interface SwerveModuleIO {
   public default void setAngleBrakeMode(boolean enable) {}
 
   /**
-   * Returns a list of status signals for the swerve module related to odometry. This can be used to
-   * synchronize the gyro and swerve modules to improve the accuracy of pose estimation.
+   * Returns a pair of status signals related to odometry for the drive motor of the swerve module.
+   * This can be used to synchronize the gyro and swerve modules to improve the accuracy of pose
+   * estimation. The pair must be constructed such that one signal is the rate of change of the
+   * other and latency-compensation can be performed.
    *
-   * @return the status signals for the swerve module
+   * @return the pair of status signals for the drive motor of the swerve module
    */
-  public default List<StatusSignal<Double>> getOdometryStatusSignals() {
-    return new ArrayList<>();
+  public default SignalPair getOdometryDriveSignalPair() {
+    return null;
+  }
+
+  /**
+   * Returns a pair of status signals related to odometry for the steer motor of the swerve module.
+   * This can be used to synchronize the gyro and swerve modules to improve the accuracy of pose
+   * estimation. The pair must be constructed such that one signal is the rate of change of the
+   * other and latency-compensation can be performed.
+   *
+   * @return the pair of status signals for the steer motor of the swerve module
+   */
+  public default SignalPair getOdometryAngleSignalPair() {
+    return null;
   }
 }
