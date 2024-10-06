@@ -5,19 +5,20 @@
   "pathFolders": [
     "1 Note Source Side",
     "6 Amp Side",
-    "New Folder",
+    "5 Note Center",
     "Source Side",
     "Tuning"
   ],
   "autoFolders": [
     "Amp Side Notes",
     "Choreo Autos",
+    "Speaker Notes",
     "Source Side Notes",
     "Tuning"
   ],
   "defaultMaxVel": 3.25,
-  "defaultMaxAccel": 6.948,
+  "defaultMaxAccel": 6.95,
   "defaultMaxAngVel": 530.0,
-  "defaultMaxAngAccel": 2005.0,
+  "defaultMaxAngAccel": 1500.0,
   "maxModuleSpeed": 3.88
 }

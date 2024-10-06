@@ -1,0 +1,19 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Go To Second Note"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Speaker Notes",
+  "choreoAuto": false
+}

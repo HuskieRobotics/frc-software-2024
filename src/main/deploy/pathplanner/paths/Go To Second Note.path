@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.383817858544808,
-        "y": 7.313736809291801
+        "x": 1.33,
+        "y": 5.53
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.062992125984252,
-        "y": 6.57676588080449
+        "x": 1.8400540828406289,
+        "y": 5.121882174841022
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Speaker"
     },
     {
       "anchor": {
-        "x": 4.08,
-        "y": 6.6
+        "x": 2.0278276098966552,
+        "y": 4.10391039583058
       },
       "prevControl": {
-        "x": 4.072320871914471,
-        "y": 6.632738356385804
+        "x": 1.631410974893728,
+        "y": 4.502698574116561
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,21 +32,21 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.25,
+    "maxVelocity": 2.0,
     "maxAcceleration": 6.95,
     "maxAngularVelocity": 530.0,
     "maxAngularAcceleration": 1500.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -163.24958789933322,
+    "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Tuning",
+  "folder": "5 Note Center",
   "previewStartingState": {
     "rotation": 180.0,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }
