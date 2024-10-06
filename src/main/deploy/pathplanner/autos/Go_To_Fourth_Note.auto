@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 2.3661772442028295,
-      "y": 7.31444420234812
+      "x": 1.3343039751052856,
+      "y": 5.594158172607422
     },
-    "rotation": 0
+    "rotation": -179.9999742540606
   },
   "command": {
     "type": "sequential",
@@ -14,12 +14,12 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Start Point"
+            "pathName": "Go_To_Fourth_Note"
           }
         }
       ]
     }
   },
-  "folder": null,
-  "choreoAuto": false
+  "folder": "Choreo Autos",
+  "choreoAuto": true
 }

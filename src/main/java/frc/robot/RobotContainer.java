@@ -400,12 +400,12 @@ public class RobotContainer {
 
     // build auto path commands
 
-    Command choreo4NoteAuto =
-        Commands.sequence(
-            Commands.runOnce(
-                () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_AUTO_1)),
-            new PathPlannerAuto("4 Note Choreo Auto"));
-    autoChooser.addOption("4 Note Choreo Auto", choreo4NoteAuto);
+    // Command choreo4NoteAuto =
+    //     Commands.sequence(
+    //         Commands.runOnce(
+    //             () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_AUTO_1)),
+    //         new PathPlannerAuto("4 Note Choreo Auto"));
+    // autoChooser.addOption("4 Note Choreo Auto", choreo4NoteAuto);
 
     // add commands to the auto chooser
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
@@ -421,6 +421,42 @@ public class RobotContainer {
                 () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_AUTO_1)),
             new PathPlannerAuto("1 Note Auto"));
     autoChooser.addOption("1 Note Source Side", oneNoteSourceSide);
+
+    /************ 4 Note Choreo Auto ************
+     *
+     */
+    Command choreo4NoteAuto =
+        Commands.sequence(
+            Commands.runOnce(
+                () -> shooter.setShootingPosition(ShootingPosition.FIELD)),
+            new PathPlannerAuto("Collect First Note"),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6),
+
+            new PathPlannerAuto("Back-To_Speaker1"),
+            Commands.runOnce(
+                () -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
+            getAutoStopAndShootCommand(),
+
+            new PathPlannerAuto("Go_To_Second_Note"),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6),
+
+            new PathPlannerAuto("Second_Note_Center"),
+            getAutoStopAndShootCommand(),
+
+            new PathPlannerAuto("Go_To_Third_Note"),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6),
+
+            new PathPlannerAuto("Third_Note_Center"),
+            getAutoStopAndShootCommand(),
+
+            new PathPlannerAuto("Go_To_Fourth_Note"),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6),
+
+            new PathPlannerAuto("Fourth_Note_Center"),
+            getAutoStopAndShootCommand()
+        );
+
+        autoChooser.addOption("4 Note Choreo Auto", choreo4NoteAuto);
 
     /************ 4 Note Source Side ************
      *
