@@ -1072,15 +1072,5 @@
       "timestamp": 4.085020125928388
     }
   ],
-  "eventMarkers": [
-    {
-      "timestamp": 4.085020125928388,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Shoot At 4 Meters"
-        }
-      }
-    }
-  ]
+  "eventMarkers": []
 }

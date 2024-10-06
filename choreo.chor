@@ -4870,21 +4870,7 @@
             "defaultControlIntervalCount": 40,
             "usesDefaultFieldObstacles": true,
             "circleObstacles": [],
-            "eventMarkers": [
-                {
-                    "name": "Shoot",
-                    "target": 4,
-                    "trajTargetIndex": 4,
-                    "targetTimestamp": 4.085020125928388,
-                    "offset": 0,
-                    "command": {
-                        "type": "named",
-                        "data": {
-                            "name": "Shoot At 4 Meters"
-                        }
-                    }
-                }
-            ],
+            "eventMarkers": [],
             "isTrajectoryStale": false
         },
         "Go_To_Second_Note": {
