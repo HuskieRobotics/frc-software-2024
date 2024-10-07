@@ -11,7 +11,7 @@ public class ShooterConstants {
   public static final boolean DEBUGGING = false;
   public static final boolean TESTING = false;
   public static final String SUBSYSTEM_NAME = "Shooter";
-  public static final boolean DEFLECTOR_ENABLED = true;
+  public static final boolean DEFLECTOR_ENABLED = false;
 
   public static final boolean USE_MATHEMATICAL_MODEL = false;
 
