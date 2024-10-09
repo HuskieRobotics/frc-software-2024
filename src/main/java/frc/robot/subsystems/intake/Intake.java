@@ -191,6 +191,13 @@ public class Intake extends SubsystemBase {
     if (inputs.isShooterIRBlocked) {
       intakeState = IntakeState.NOTE_IN_KICKER_AND_SHOOTER;
       this.turnKickerOff();
+    } else if (!inputs.isKickerIRBlocked) {
+      intakeState = IntakeState.EMPTY;
+      leds.requestState(LEDs.States.WAITING_FOR_GAME_PIECE);
+      this.intakeGamePiece();
+    } else if (inputs.isRollerIRBlocked) {
+      intakeState = IntakeState.NOTE_IN_INTAKE_AND_KICKER;
+      this.intakeGamePiece();
     }
   }
 
