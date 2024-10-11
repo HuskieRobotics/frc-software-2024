@@ -20,6 +20,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -32,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.DrivetrainIO.SwerveIOInputs;
+import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.Alert;
 import frc.lib.team6328.util.Alert.AlertType;
 import frc.lib.team6328.util.FieldConstants;
@@ -117,6 +119,7 @@ public class Drivetrain extends SubsystemBase {
 
   private DriverStation.Alliance alliance = Field2d.getInstance().getAlliance();
 
+  private final RobotOdometry odometry;
   private Pose2d prevRobotPose = new Pose2d();
   private int teleportedCount = 0;
   private int constrainPoseToFieldCount = 0;
@@ -189,6 +192,8 @@ public class Drivetrain extends SubsystemBase {
         );
 
     PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
+
+    this.odometry = RobotOdometry.getInstance();
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
@@ -246,7 +251,7 @@ public class Drivetrain extends SubsystemBase {
    * @return the rotation of the robot
    */
   public Rotation2d getRotation() {
-    return this.inputs.drivetrain.rotation;
+    return this.odometry.getEstimatedPosition().getRotation();
   }
 
   /**
@@ -296,19 +301,29 @@ public class Drivetrain extends SubsystemBase {
    * @return the pose of the robot
    */
   public Pose2d getPose() {
-    return this.inputs.drivetrain.robotPose;
+    return this.odometry.getEstimatedPosition();
   }
 
   /**
-   * Sets the odometry of the robot to the specified PathPlanner state. This method should only be
-   * invoked when the rotation of the robot is known (e.g., at the start of an autonomous path). The
-   * origin of the field to the lower left corner (i.e., the corner of the field to the driver's
-   * right). Zero degrees is away from the driver and increases in the CCW direction.
+   * Sets the odometry of the robot to the specified pose. This method should only be invoked when
+   * the rotation of the robot is known (e.g., at the start of an autonomous path). The origin of
+   * the field to the lower left corner (i.e., the corner of the field to the driver's right). Zero
+   * degrees is away from the driver and increases in the CCW direction.
    *
-   * @param state the specified PathPlanner state to which is set the odometry
+   * @param pose the specified pose to which is set the odometry
    */
   public void resetPose(Pose2d pose) {
+    SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
+    for (int i = 0; i < modulePositions.length; i++) {
+      modulePositions[i] =
+          new SwerveModulePosition(
+              inputs.swerve[i].driveDistanceMeters,
+              Rotation2d.fromDegrees(inputs.swerve[i].steerPositionDeg));
+    }
+
     this.io.resetPose(pose);
+    this.odometry.resetPosition(Rotation2d.fromDegrees(inputs.gyro.yawDeg), modulePositions, pose);
+
     this.prevRobotPose = pose;
   }
 
@@ -514,46 +529,68 @@ public class Drivetrain extends SubsystemBase {
     Logger.processInputs(SUBSYSTEM_NAME + "/BL", this.inputs.swerve[2]);
     Logger.processInputs(SUBSYSTEM_NAME + "/BR", this.inputs.swerve[3]);
 
+    // update odometry
+
+    // Calculate the min odometry position updates across all modules
+    int minOdometryUpdates = inputs.drivetrain.odometryTimestamps.length;
+    for (int moduleIndex = 0; moduleIndex < inputs.swerve.length; moduleIndex++) {
+      minOdometryUpdates =
+          Math.min(
+              minOdometryUpdates, inputs.swerve[moduleIndex].odometryDrivePositionsMeters.length);
+      minOdometryUpdates =
+          Math.min(minOdometryUpdates, inputs.swerve[moduleIndex].odometryTurnPositions.length);
+    }
+    minOdometryUpdates = Math.min(inputs.gyro.odometryYawPositions.length, minOdometryUpdates);
+
+    for (int i = 0; i < minOdometryUpdates; i++) {
+      SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
+      for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
+        modulePositions[moduleIndex] =
+            new SwerveModulePosition(
+                inputs.swerve[moduleIndex].odometryDrivePositionsMeters[i],
+                inputs.swerve[moduleIndex].odometryTurnPositions[i]);
+      }
+
+      this.odometry.updateWithTime(
+          inputs.drivetrain.odometryTimestamps[i],
+          inputs.gyro.odometryYawPositions[i],
+          modulePositions);
+    }
+
+    Pose2d robotPose = this.odometry.getEstimatedPosition();
+    Logger.recordOutput(SUBSYSTEM_NAME + "/Pose2d", robotPose);
+    Logger.recordOutput(SUBSYSTEM_NAME + "/Pose3d", new Pose3d(robotPose));
+
+    Pose2d robotPoseWithoutVision = this.odometry.getEstimatedPositionWithoutVision();
+    Logger.recordOutput(SUBSYSTEM_NAME + "/Pose2dNoVision", robotPoseWithoutVision);
+    Logger.recordOutput(SUBSYSTEM_NAME + "/Pose3dNoVision", new Pose3d(robotPoseWithoutVision));
+
     // check for teleportation
-    if (this.inputs.drivetrain.robotPose.minus(prevRobotPose).getTranslation().getNorm() > 0.4) {
+    if (robotPose.minus(prevRobotPose).getTranslation().getNorm() > 0.4) {
       this.resetPose(prevRobotPose);
       this.teleportedCount++;
-      Logger.recordOutput(SUBSYSTEM_NAME + "/TeleportedPose", this.inputs.drivetrain.robotPose);
+      Logger.recordOutput(SUBSYSTEM_NAME + "/TeleportedPose", robotPose);
       Logger.recordOutput(SUBSYSTEM_NAME + "/TeleportCount", this.teleportedCount);
     } else {
-      this.prevRobotPose = this.inputs.drivetrain.robotPose;
+      this.prevRobotPose = robotPose;
     }
 
     // check for position outside the field due to slipping
-    if (this.inputs.drivetrain.robotPose.getX() < 0) {
-      this.resetPose(
-          new Pose2d(
-              0,
-              this.inputs.drivetrain.robotPose.getY(),
-              this.inputs.drivetrain.robotPose.getRotation()));
+    if (robotPose.getX() < 0) {
+      this.resetPose(new Pose2d(0, robotPose.getY(), robotPose.getRotation()));
       this.constrainPoseToFieldCount++;
-    } else if (this.inputs.drivetrain.robotPose.getX() > FieldConstants.fieldLength) {
+    } else if (robotPose.getX() > FieldConstants.fieldLength) {
       this.resetPose(
-          new Pose2d(
-              FieldConstants.fieldLength,
-              this.inputs.drivetrain.robotPose.getY(),
-              this.inputs.drivetrain.robotPose.getRotation()));
+          new Pose2d(FieldConstants.fieldLength, robotPose.getY(), robotPose.getRotation()));
       this.constrainPoseToFieldCount++;
     }
 
-    if (this.inputs.drivetrain.robotPose.getY() < 0) {
-      this.resetPose(
-          new Pose2d(
-              this.inputs.drivetrain.robotPose.getX(),
-              0,
-              this.inputs.drivetrain.robotPose.getRotation()));
+    if (robotPose.getY() < 0) {
+      this.resetPose(new Pose2d(robotPose.getX(), 0, robotPose.getRotation()));
       this.constrainPoseToFieldCount++;
-    } else if (this.inputs.drivetrain.robotPose.getY() > FieldConstants.fieldWidth) {
+    } else if (robotPose.getY() > FieldConstants.fieldWidth) {
       this.resetPose(
-          new Pose2d(
-              this.inputs.drivetrain.robotPose.getX(),
-              FieldConstants.fieldWidth,
-              this.inputs.drivetrain.robotPose.getRotation()));
+          new Pose2d(robotPose.getX(), FieldConstants.fieldWidth, robotPose.getRotation()));
       this.constrainPoseToFieldCount++;
     }
     Logger.recordOutput(
