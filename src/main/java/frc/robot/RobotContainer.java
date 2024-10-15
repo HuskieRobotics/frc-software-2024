@@ -392,6 +392,10 @@ public class RobotContainer {
     NamedCommands.registerCommand("wait5Seconds", Commands.waitSeconds(5.0));
 
     NamedCommands.registerCommand("Shoot At 4 Meters", getAutoShootAt4MetersCommand());
+    NamedCommands.registerCommand(
+        "Shoot Outbound at 3.5 Meters", getAutoShootOutboundAt35MetersCommand());
+    NamedCommands.registerCommand(
+        "Shoot Inbound at 3.5 Meters", getAutoShootInboundAt35MetersCommand());
     NamedCommands.registerCommand("Stop And Shoot", getAutoStopAndShootCommand());
     NamedCommands.registerCommand(
         "EnableRotationOverride", Commands.runOnce(drivetrain::enableRotationOverride));
@@ -445,6 +449,40 @@ public class RobotContainer {
                 () -> shooter.setShootingPosition(ShootingPosition.SOURCE_SIDE_AUTO_3_4)),
             new PathPlannerAuto("Score 4th Center"));
     autoChooser.addOption("4 Note Source Side", fourNoteSourceSide);
+
+    /************ 5 Note Speaker ************
+     *
+     * 5 notes (initial, center speaker, center center, and other two speaker notes)
+     *
+     */
+
+    Command fiveNoteSpeaker =
+        Commands.sequence(
+            Commands.runOnce(
+                () ->
+                    drivetrain.resetPose(
+                        PathPlannerPath.fromPathFile("1 - rush").getPreviewStartingHolonomicPose()),
+                drivetrain),
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
+            this.getShootCommand()
+                .withTimeout(1.0)
+                .andThen(Commands.runOnce(intake::shoot, intake)),
+            Commands.runOnce(
+                () -> shooter.setShootingPosition(ShootingPosition.SPEAKER_AUTO_OUTBOUND)),
+            new PathPlannerAuto("1 - rush"),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6),
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SPEAKER_AUTO_3)),
+            new PathPlannerAuto("2 - stage note"),
+            this.getAutoStopAndShootCommand(),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6),
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SPEAKER_AUTO_4)),
+            new PathPlannerAuto("3 - amp note"),
+            this.getAutoStopAndShootCommand(),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6),
+            this.getAutoStopAndShootCommand(),
+            new PathPlannerAuto("4 - center"),
+            new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6));
+    autoChooser.addOption("5 Note Speaker", fiveNoteSpeaker);
 
     /************ 6 Note Amp Side ************
      *
@@ -927,6 +965,32 @@ public class RobotContainer {
               return Math.abs(distanceToSpeaker - 4.0)
                       < ShooterConstants.SHOOTER_AUTO_SHOT_TOLERANCE_METERS
                   || distanceToSpeaker > 4.1;
+            })
+        .andThen(Commands.runOnce(intake::shoot, intake));
+  }
+
+  private Command getAutoShootOutboundAt35MetersCommand() {
+    return Commands.waitUntil(
+            () -> {
+              double distanceToSpeaker =
+                  drivetrain.getFutureDistanceToSpeaker(
+                      drivetrain.preloadedAutoShotDelaySeconds.get());
+              return Math.abs(distanceToSpeaker - 3.5)
+                      < ShooterConstants.SHOOTER_AUTO_SHOT_TOLERANCE_METERS
+                  || distanceToSpeaker > 3.6;
+            })
+        .andThen(Commands.runOnce(intake::shoot, intake));
+  }
+
+  private Command getAutoShootInboundAt35MetersCommand() {
+    return Commands.waitUntil(
+            () -> {
+              double distanceToSpeaker =
+                  drivetrain.getFutureDistanceToSpeaker(
+                      drivetrain.preloadedAutoShotDelaySeconds.get());
+              return Math.abs(distanceToSpeaker - 3.5)
+                      < ShooterConstants.SHOOTER_AUTO_SHOT_TOLERANCE_METERS
+                  || distanceToSpeaker < 3.4;
             })
         .andThen(Commands.runOnce(intake::shoot, intake));
   }

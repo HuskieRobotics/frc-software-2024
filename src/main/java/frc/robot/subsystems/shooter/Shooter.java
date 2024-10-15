@@ -82,6 +82,10 @@ public class Shooter extends SubsystemBase {
     SOURCE_SIDE_AUTO_1,
     SOURCE_SIDE_AUTO_2,
     SOURCE_SIDE_AUTO_3_4,
+    SPEAKER_AUTO_OUTBOUND,
+    SPEAKER_AUTO_INBOUND,
+    SPEAKER_AUTO_3,
+    SPEAKER_AUTO_4,
     AMP_SIDE_AUTO_1,
     AMP_SIDE_AUTO_2,
     AMP_SIDE_AUTO_3,
@@ -269,6 +273,14 @@ public class Shooter extends SubsystemBase {
         io.setAngle(ShooterConstants.SOURCE_SIDE_AUTO_2_ANGLE);
       } else if (shootingPosition == ShootingPosition.SOURCE_SIDE_AUTO_3_4) {
         io.setAngle(ShooterConstants.SOURCE_SIDE_AUTO_3_4_ANGLE);
+      } else if (shootingPosition == ShootingPosition.SPEAKER_AUTO_OUTBOUND) {
+        io.setAngle(ShooterConstants.SPEAKER_AUTO_OUTBOUND_ANGLE);
+      } else if (shootingPosition == ShootingPosition.SPEAKER_AUTO_INBOUND) {
+        io.setAngle(ShooterConstants.SPEAKER_AUTO_INBOUND_ANGLE);
+      } else if (shootingPosition == ShootingPosition.SPEAKER_AUTO_3) {
+        io.setAngle(ShooterConstants.SPEAKER_AUTO_3_ANGLE);
+      } else if (shootingPosition == ShootingPosition.SPEAKER_AUTO_4) {
+        io.setAngle(ShooterConstants.SPEAKER_AUTO_4_ANGLE);
       } else if (shootingPosition == ShootingPosition.STORAGE) {
         io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
       } else if (shootingPosition == ShootingPosition.AMP_SIDE_AUTO_1) {
@@ -325,6 +337,18 @@ public class Shooter extends SubsystemBase {
     } else if (shootingPosition == ShootingPosition.SOURCE_SIDE_AUTO_3_4) {
       topVelocity = ShooterConstants.SOURCE_SIDE_AUTO_3_4_VELOCITY;
       bottomVelocity = ShooterConstants.SOURCE_SIDE_AUTO_3_4_VELOCITY;
+    } else if (shootingPosition == ShootingPosition.SPEAKER_AUTO_OUTBOUND) {
+      topVelocity = ShooterConstants.SPEAKER_AUTO_OUTBOUND_VELOCITY;
+      bottomVelocity = ShooterConstants.SPEAKER_AUTO_OUTBOUND_VELOCITY;
+    } else if (shootingPosition == ShootingPosition.SPEAKER_AUTO_INBOUND) {
+      topVelocity = ShooterConstants.SPEAKER_AUTO_INBOUND_VELOCITY;
+      bottomVelocity = ShooterConstants.SPEAKER_AUTO_INBOUND_VELOCITY;
+    } else if (shootingPosition == ShootingPosition.SPEAKER_AUTO_3) {
+      topVelocity = ShooterConstants.SPEAKER_AUTO_3_VELOCITY;
+      bottomVelocity = ShooterConstants.SPEAKER_AUTO_3_VELOCITY;
+    } else if (shootingPosition == ShootingPosition.SPEAKER_AUTO_4) {
+      topVelocity = ShooterConstants.SPEAKER_AUTO_4_VELOCITY;
+      bottomVelocity = ShooterConstants.SPEAKER_AUTO_4_VELOCITY;
     } else if (shootingPosition == ShootingPosition.STORAGE) {
       topVelocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
       bottomVelocity = ShooterConstants.SHOOTER_IDLE_VELOCITY;
