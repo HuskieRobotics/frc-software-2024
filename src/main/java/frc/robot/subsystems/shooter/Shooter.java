@@ -304,8 +304,14 @@ public class Shooter extends SubsystemBase {
   }
 
   private void moveToIntakePosition() {
-    if (automatedShooter && !DriverStation.isAutonomousEnabled()) {
-      io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
+    if (automatedShooter) {
+      if (DriverStation.isAutonomousEnabled()) {
+        if (shooterInputs.angleEncoderAngleDegrees > ShooterConstants.MAX_INTAKE_ANGLE) {
+          io.setAngle(ShooterConstants.MAX_INTAKE_ANGLE);
+        }
+      } else {
+        io.setAngle(ShooterConstants.SHOOTER_STORAGE_ANGLE);
+      }
     }
   }
 

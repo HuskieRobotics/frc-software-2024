@@ -97,7 +97,7 @@ public class ShooterConstants {
   // FIXME: tune on practice field and reduce this value
   public static final double ANGLE_TOLERANCE_DEGREES = 1.5;
   public static final double SHOOTER_STORAGE_ANGLE = 14.7;
-  public static final double MAX_INTAKE_ANGLE = 60.0;
+  public static final double MAX_INTAKE_ANGLE = 45.0; // FIXME: tune
   public static final double ANGLE_MOTOR_MANUAL_CONTROL_VOLTAGE = 1.0;
   public static final double UPPER_ANGLE_LIMIT = 135.0;
 
