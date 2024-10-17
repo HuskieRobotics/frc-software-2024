@@ -48,12 +48,12 @@
     },
     {
       "anchor": {
-        "x": 6.95,
-        "y": 4.1
+        "x": 7.43376425141476,
+        "y": 4.046288282150024
       },
       "prevControl": {
-        "x": 6.236835932078893,
-        "y": 4.1
+        "x": 6.720600183493653,
+        "y": 4.046288282150024
       },
       "nextControl": null,
       "isLocked": false,
@@ -65,9 +65,9 @@
     {
       "name": "Slow",
       "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 1.35,
+      "maxWaypointRelativePos": 1.5500000000000003,
       "constraints": {
-        "maxVelocity": 2.0,
+        "maxVelocity": 1.0,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 530.0,
         "maxAngularAcceleration": 2005.0
@@ -110,7 +110,7 @@
       }
     },
     {
-      "name": "Shoot Outbound at 3.5",
+      "name": "Shoot Outbound",
       "waypointRelativePos": 0,
       "command": {
         "type": "parallel",

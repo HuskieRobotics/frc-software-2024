@@ -474,12 +474,15 @@ public class RobotContainer {
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SPEAKER_AUTO_3)),
             new PathPlannerAuto("2 - stage note"),
             this.getAutoStopAndShootCommand(),
+            Commands.waitSeconds(0.4),
             new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6),
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SPEAKER_AUTO_4)),
             new PathPlannerAuto("3 - amp note"),
             this.getAutoStopAndShootCommand(),
+            Commands.waitSeconds(0.4),
             new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6),
             this.getAutoStopAndShootCommand(),
+            Commands.waitSeconds(0.4),
             new PathPlannerAuto("4 - center"),
             new TeleopSwerveCollectNote(drivetrain, intake, noteTargeting, () -> -0.6));
     autoChooser.addOption("5 Note Speaker", fiveNoteSpeaker);
