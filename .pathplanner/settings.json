@@ -5,11 +5,13 @@
   "pathFolders": [
     "1 Note Source Side",
     "6 Amp Side",
+    "5 Note Speaker",
     "Source Side",
     "Tuning"
   ],
   "autoFolders": [
     "Amp Side Notes",
+    "5 Note Speaker",
     "Source Side Notes",
     "Tuning"
   ],
