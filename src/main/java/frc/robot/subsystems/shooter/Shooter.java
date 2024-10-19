@@ -186,6 +186,14 @@ public class Shooter extends SubsystemBase {
       if (!intake.hasNote()) {
         this.resetToInitialState();
       } else if (overrideSetpointsForNextShot) {
+        double distanceToSpeaker =
+            Field2d.getInstance()
+                .getAllianceSpeakerCenter()
+                .minus(RobotOdometry.getInstance().getEstimatedPosition())
+                .getTranslation()
+                .getNorm();
+        this.adjustAngle(distanceToSpeaker);
+        this.setIdleVelocity();
         state = State.PREPARING_TO_SHOOT;
       } else {
         double distanceToSpeaker =
