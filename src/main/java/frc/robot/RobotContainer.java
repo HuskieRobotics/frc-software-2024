@@ -458,12 +458,12 @@ public class RobotContainer {
 
     Command fiveNoteSpeaker =
         Commands.sequence(
+            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
             Commands.runOnce(
                 () ->
                     drivetrain.resetPose(
                         PathPlannerPath.fromPathFile("1 - rush").getPreviewStartingHolonomicPose()),
                 drivetrain),
-            Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
             this.getShootCommand()
                 .withTimeout(1.0)
                 .andThen(Commands.runOnce(intake::shoot, intake)),
