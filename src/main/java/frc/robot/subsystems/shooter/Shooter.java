@@ -49,7 +49,7 @@ public class Shooter extends SubsystemBase {
   // FIXME: tune on the competition field
   private static final double FIELD_MEASUREMENT_OFFSET = 0.0;
   private final double[] populationRealAngles = {
-    64, 57, 53, 45, 43, 41, 38, 36, 35, 33, 32, 31, 29.5, 29.5, 29, 28, 27.5
+    66, 59, 54.5, 46.5, 43.5, 42, 38, 36, 35, 33, 32, 31, 29.5, 29.5, 29, 28, 27.5
   };
   private final double[] populationDistances = {
     1.33, 1.63, 1.947, 2.196, 2.47, 2.77, 3.02, 3.32, 3.6, 3.936, 4.206, 4.495, 4.785, 5.083, 5.39,
