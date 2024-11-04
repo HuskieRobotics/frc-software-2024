@@ -42,7 +42,7 @@ public class NoteTargetingIOLimelight implements NoteTargetingIO {
         this.noTargetCount = 0;
       } else {
         this.noTargetCount++;
-        if (this.noTargetCount > 10) {
+        if (this.noTargetCount > 20) {
           inputs.hasTarget = false;
         }
       }

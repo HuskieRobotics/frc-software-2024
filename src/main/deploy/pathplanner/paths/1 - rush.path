@@ -1,0 +1,159 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.3,
+        "y": 5.55
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.3000000000000007,
+        "y": 5.55
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.5,
+        "y": 5.55
+      },
+      "prevControl": {
+        "x": 2.4976544123270017,
+        "y": 5.55
+      },
+      "nextControl": {
+        "x": 4.25,
+        "y": 5.55
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.0,
+        "y": 4.5
+      },
+      "prevControl": {
+        "x": 4.4696699141100895,
+        "y": 5.0303300858899105
+      },
+      "nextControl": {
+        "x": 5.883883476483185,
+        "y": 3.616116523516816
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.95,
+        "y": 4.046288282150024
+      },
+      "prevControl": {
+        "x": 6.236835932078893,
+        "y": 4.046288282150024
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [
+    {
+      "name": "Slow for Shooter Angle",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.6000000000000001,
+      "constraints": {
+        "maxVelocity": 1.75,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 530.0,
+        "maxAngularAcceleration": 2005.0
+      }
+    },
+    {
+      "name": "Slow for Intake",
+      "minWaypointRelativePos": 0.6000000000000001,
+      "maxWaypointRelativePos": 1.3,
+      "constraints": {
+        "maxVelocity": 0.75,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 530.0,
+        "maxAngularAcceleration": 2005.0
+      }
+    }
+  ],
+  "eventMarkers": [
+    {
+      "name": "Enable Rotation Override",
+      "waypointRelativePos": 0.85,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "EnableRotationOverride"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Disable Rotation Override",
+      "waypointRelativePos": 2.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "DisableRotationOverride"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot Outbound",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Shoot Outbound at 3.5 Meters"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.25,
+    "maxAcceleration": 6.948,
+    "maxAngularVelocity": 530.0,
+    "maxAngularAcceleration": 2005.0
+  },
+  "goalEndState": {
+    "velocity": 0.7,
+    "rotation": 180.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "5 Note Speaker",
+  "previewStartingState": {
+    "rotation": 180.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import static frc.robot.subsystems.intake.IntakeConstants.*;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -35,6 +36,7 @@ public class Intake extends SubsystemBase {
   private boolean automationEnabled;
   private int intakeAndKickerTimeout;
   private boolean quickShootingEnabled;
+  private double shootingTimestamp;
 
   // system tests
   private IntakeState mostRecentIntakeState;
@@ -224,6 +226,8 @@ public class Intake extends SubsystemBase {
       leds.requestState(LEDs.States.WAITING_FOR_GAME_PIECE);
       this.intakeGamePiece();
       this.turnKickerOff();
+      Logger.recordOutput(
+          "Intake/ShootingDuration", Timer.getFPGATimestamp() - this.shootingTimestamp);
     } else {
       leds.requestState(LEDs.States.SHOOTING);
       this.io.setKickerVoltage(KICKER_SHOOTING_VELOCITY_VOLTAGE);
@@ -409,6 +413,7 @@ public class Intake extends SubsystemBase {
 
   public void shoot() {
     this.intakeState = IntakeState.SHOOTING;
+    this.shootingTimestamp = Timer.getFPGATimestamp();
   }
 
   public boolean isShooting() {
