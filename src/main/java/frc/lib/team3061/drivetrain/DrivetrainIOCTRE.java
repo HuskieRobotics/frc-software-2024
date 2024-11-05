@@ -29,9 +29,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.swerve.Conversions;
 import frc.lib.team3061.drivetrain.swerve.SwerveConstants;
@@ -72,14 +72,14 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
       this.driveAccelerationStatusSignal = driveMotor.getAcceleration().clone();
     }
 
-    StatusSignal<Measure<Velocity<Angle>>> steerVelocityStatusSignal;
-    StatusSignal<Measure<Velocity<Velocity<Angle>>>> steerAccelerationStatusSignal;
+    StatusSignal<AngularVelocity> steerVelocityStatusSignal;
+    StatusSignal<AngularAcceleration> steerAccelerationStatusSignal;
     StatusSignal<Double> steerPositionErrorStatusSignal;
     StatusSignal<Double> steerPositionReferenceStatusSignal;
-    StatusSignal<Measure<Angle>> drivePositionStatusSignal;
+    StatusSignal<Angle> drivePositionStatusSignal;
     StatusSignal<Double> driveVelocityErrorStatusSignal;
     StatusSignal<Double> driveVelocityReferenceStatusSignal;
-    StatusSignal<Measure<Velocity<Velocity<Angle>>>> driveAccelerationStatusSignal;
+    StatusSignal<AngularAcceleration> driveAccelerationStatusSignal;
   }
 
   private final TunableNumber driveKp =
@@ -143,7 +143,7 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   private static final SwerveDrivetrainConstants drivetrainConstants =
       new SwerveDrivetrainConstants()
           .withPigeon2Id(RobotConfig.getInstance().getGyroCANID())
-          .withCANbusName(RobotConfig.getInstance().getCANBusName())
+          .withCANBusName(RobotConfig.getInstance().getCANBusName())
           .withPigeon2Configs(
               new Pigeon2Configuration()
                   .withMountPose(new MountPoseConfigs().withMountPoseRoll(-180.0)));
@@ -233,12 +233,12 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
           RobotConfig.getInstance().getSwerveConstants().isAngleMotorInverted());
 
   // gyro signals
-  private final StatusSignal<Measure<Angle>> yawStatusSignal;
-  private final StatusSignal<Measure<Angle>> pitchStatusSignal;
-  private final StatusSignal<Measure<Angle>> rollStatusSignal;
-  private final StatusSignal<Measure<Velocity<Angle>>> angularVelocityZStatusSignal;
-  private final StatusSignal<Measure<Velocity<Angle>>> angularVelocityXStatusSignal;
-  private final StatusSignal<Measure<Velocity<Angle>>> angularVelocityYStatusSignal;
+  private final StatusSignal<Angle> yawStatusSignal;
+  private final StatusSignal<Angle> pitchStatusSignal;
+  private final StatusSignal<Angle> rollStatusSignal;
+  private final StatusSignal<AngularVelocity> angularVelocityZStatusSignal;
+  private final StatusSignal<AngularVelocity> angularVelocityXStatusSignal;
+  private final StatusSignal<AngularVelocity> angularVelocityYStatusSignal;
 
   // swerve module signals
   SwerveModuleSignals[] swerveModulesSignals = new SwerveModuleSignals[4];
@@ -320,9 +320,9 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
     // always define 0° (towards the red alliance) as "forward"; the Drivetrain subsystem handles
     //  the definition of forward based on the current alliance
-    this.driveFacingAngleRequest.ForwardReference = SwerveRequest.ForwardReferenceValue.RedAlliance;
-    this.driveFieldCentricRequest.ForwardReference =
-        SwerveRequest.ForwardReferenceValue.RedAlliance;
+    this.driveFacingAngleRequest.ForwardPerspective = SwerveRequest.ForwardPerspectiveValue.BlueAlliance;
+    this.driveFieldCentricRequest.ForwardPerspective =
+        SwerveRequest.ForwardPerspectiveValue.BlueAlliance;
 
     // create queues for updates from CTRE's odometry thread
     for (int i = 0; i < 4; i++) {
@@ -376,7 +376,7 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
         this.targetChassisSpeeds.omegaRadiansPerSecond;
 
     ChassisSpeeds measuredChassisSpeeds =
-        m_kinematics.toChassisSpeeds(this.getState().ModuleStates);
+      getKinematics().toChassisSpeeds(this.getState().ModuleStates);
     inputs.drivetrain.measuredVXMetersPerSec = measuredChassisSpeeds.vxMetersPerSecond;
     inputs.drivetrain.measuredVYMetersPerSec = measuredChassisSpeeds.vyMetersPerSecond;
     inputs.drivetrain.measuredAngularVelocityRadPerSec =
@@ -678,7 +678,7 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
   @Override
   public void setGyroOffset(double expectedYaw) {
-    this.seedFieldRelative(
+    this.resetPose(
         new Pose2d(
             RobotOdometry.getInstance().getEstimatedPose().getTranslation(),
             Rotation2d.fromDegrees(expectedYaw)));
@@ -691,7 +691,7 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
   @Override
   public void resetPose(Pose2d pose) {
-    this.seedFieldRelative(pose);
+    this.resetPose(pose);
   }
 
   @Override

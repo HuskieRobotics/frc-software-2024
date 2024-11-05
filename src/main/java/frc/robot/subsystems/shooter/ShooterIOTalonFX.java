@@ -25,12 +25,11 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Current;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Temperature;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
@@ -50,36 +49,36 @@ public class ShooterIOTalonFX implements ShooterIO {
   private VoltageOut deflectorMotorVoltageRequest;
 
   // Using StatusSignal to get the stator current of the motors
-  private StatusSignal<Measure<Current>> shootMotorTopStatorCurrentStatusSignal;
-  private StatusSignal<Measure<Current>> shootMotorBottomStatorCurrentStatusSignal;
-  private StatusSignal<Measure<Current>> angleMotorStatorCurrentStatusSignal;
+  private StatusSignal<Current> shootMotorTopStatorCurrentStatusSignal;
+  private StatusSignal<Current> shootMotorBottomStatorCurrentStatusSignal;
+  private StatusSignal<Current> angleMotorStatorCurrentStatusSignal;
 
   // Using StatusSignal to get the supply current of the motors
-  private StatusSignal<Measure<Current>> shootMotorTopSupplyCurrentStatusSignal;
-  private StatusSignal<Measure<Current>> shootMotorBottomSupplyCurrentStatusSignal;
-  private StatusSignal<Measure<Current>> angleMotorSupplyCurrentStatusSignal;
+  private StatusSignal<Current> shootMotorTopSupplyCurrentStatusSignal;
+  private StatusSignal<Current> shootMotorBottomSupplyCurrentStatusSignal;
+  private StatusSignal<Current> angleMotorSupplyCurrentStatusSignal;
 
   // Using StatusSignal to get the velocity of the motors
-  private StatusSignal<Measure<Velocity<Angle>>> shootMotorTopVelocityStatusSignal;
-  private StatusSignal<Measure<Velocity<Angle>>> shootMotorBottomVelocityStatusSignal;
-  private StatusSignal<Measure<Angle>> angleMotorPositionStatusSignal;
+  private StatusSignal<AngularVelocity> shootMotorTopVelocityStatusSignal;
+  private StatusSignal<AngularVelocity> shootMotorBottomVelocityStatusSignal;
+  private StatusSignal<Angle> angleMotorPositionStatusSignal;
 
   private StatusSignal<Double> shootMotorTopReferenceVelocityStatusSignal;
   private StatusSignal<Double> shootMotorBottomReferenceVelocityStatusSignal;
   private StatusSignal<Double> angleMotorReferencePositionStatusSignal;
 
-  private StatusSignal<Measure<Temperature>> shootMotorTopTemperatureStatusSignal;
-  private StatusSignal<Measure<Temperature>> shootMotorBottomTemperatureStatusSignal;
-  private StatusSignal<Measure<Temperature>> angleMotorTemperatureStatusSignal;
+  private StatusSignal<Temperature> shootMotorTopTemperatureStatusSignal;
+  private StatusSignal<Temperature> shootMotorBottomTemperatureStatusSignal;
+  private StatusSignal<Temperature> angleMotorTemperatureStatusSignal;
 
-  private StatusSignal<Measure<Voltage>> shootMotorTopVoltageStatusSignal;
-  private StatusSignal<Measure<Voltage>> shootMotorBottomVoltageStatusSignal;
-  private StatusSignal<Measure<Voltage>> angleMotorVoltageStatusSignal;
+  private StatusSignal<Voltage> shootMotorTopVoltageStatusSignal;
+  private StatusSignal<Voltage> shootMotorBottomVoltageStatusSignal;
+  private StatusSignal<Voltage> angleMotorVoltageStatusSignal;
 
-  private StatusSignal<Measure<Voltage>> deflectorMotorVoltageStatusSignal;
-  private StatusSignal<Measure<Current>> deflectorMotorStatorCurrentStatusSignal;
-  private StatusSignal<Measure<Current>> deflectorMotorSupplyCurrentStatusSignal;
-  private StatusSignal<Measure<Temperature>> deflectorMotorTemperatureStatusSignal;
+  private StatusSignal<Voltage> deflectorMotorVoltageStatusSignal;
+  private StatusSignal<Current> deflectorMotorStatorCurrentStatusSignal;
+  private StatusSignal<Current> deflectorMotorSupplyCurrentStatusSignal;
+  private StatusSignal<Temperature> deflectorMotorTemperatureStatusSignal;
 
   private StatusSignal<Double> angleMotorClosedLoopReferenceSlopeStatusSignal;
 

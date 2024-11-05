@@ -28,9 +28,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import frc.lib.team3015.subsystem.FaultReporter;
@@ -81,12 +80,12 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
   private VoltageOut angleVoltageRequest;
   private PositionVoltage anglePositionRequest;
 
-  private StatusSignal<Measure<Angle>> anglePositionStatusSignal;
-  private StatusSignal<Measure<Velocity<Angle>>> angleVelocityStatusSignal;
+  private StatusSignal<Angle> anglePositionStatusSignal;
+  private StatusSignal<AngularVelocity> angleVelocityStatusSignal;
   private StatusSignal<Double> anglePositionErrorStatusSignal;
   private StatusSignal<Double> anglePositionReferenceStatusSignal;
-  private StatusSignal<Measure<Angle>> drivePositionStatusSignal;
-  private StatusSignal<Measure<Velocity<Angle>>> driveVelocityStatusSignal;
+  private StatusSignal<Angle> drivePositionStatusSignal;
+  private StatusSignal<AngularVelocity> driveVelocityStatusSignal;
   private StatusSignal<Double> driveVelocityErrorStatusSignal;
   private StatusSignal<Double> driveVelocityReferenceStatusSignal;
 

@@ -14,12 +14,10 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Current;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Temperature;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
@@ -49,23 +47,23 @@ public class IntakeIOTalonFX implements IntakeIO {
   private VelocityTorqueCurrentFOC kickerVelocityRequest;
   private VoltageOut kickerVoltageRequest;
 
-  private StatusSignal<Measure<Velocity<Angle>>> rollerVelocityStatusSignal;
-  private StatusSignal<Measure<Velocity<Angle>>> kickerVelocityStatusSignal;
+  private StatusSignal<AngularVelocity> rollerVelocityStatusSignal;
+  private StatusSignal<AngularVelocity> kickerVelocityStatusSignal;
 
-  private StatusSignal<Measure<Current>> rollerStatorCurrentStatusSignal;
-  private StatusSignal<Measure<Current>> kickerStatorCurrentStatusSignal;
+  private StatusSignal<Current> rollerStatorCurrentStatusSignal;
+  private StatusSignal<Current> kickerStatorCurrentStatusSignal;
 
-  private StatusSignal<Measure<Current>> rollerSupplyCurrentStatusSignal;
-  private StatusSignal<Measure<Current>> kickerSupplyCurrentStatusSignal;
+  private StatusSignal<Current> rollerSupplyCurrentStatusSignal;
+  private StatusSignal<Current> kickerSupplyCurrentStatusSignal;
 
   private StatusSignal<Double> rollerReferenceVelocityStatusSignal;
   private StatusSignal<Double> kickerReferenceVelocityStatusSignal;
 
-  private StatusSignal<Measure<Temperature>> rollerTemperatureStatusSignal;
-  private StatusSignal<Measure<Temperature>> kickerTemperatureStatusSignal;
+  private StatusSignal<Temperature> rollerTemperatureStatusSignal;
+  private StatusSignal<Temperature> kickerTemperatureStatusSignal;
 
-  private StatusSignal<Measure<Voltage>> rollerVoltageStatusSignal;
-  private StatusSignal<Measure<Voltage>> kickerVoltageStatusSignal;
+  private StatusSignal<Voltage> rollerVoltageStatusSignal;
+  private StatusSignal<Voltage> kickerVoltageStatusSignal;
 
   // simulation related
   private VelocitySystemSim rollerMotorSim;

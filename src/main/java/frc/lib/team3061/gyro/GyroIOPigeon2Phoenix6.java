@@ -12,9 +12,8 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.sim.Pigeon2SimState;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
@@ -24,12 +23,12 @@ import java.util.List;
 
 public class GyroIOPigeon2Phoenix6 implements GyroIO {
   private final Pigeon2 gyro;
-  private final StatusSignal<Measure<Angle>> yawStatusSignal;
-  private final StatusSignal<Measure<Angle>> pitchStatusSignal;
-  private final StatusSignal<Measure<Angle>> rollStatusSignal;
-  private final StatusSignal<Measure<Velocity<Angle>>> angularVelocityXStatusSignal;
-  private final StatusSignal<Measure<Velocity<Angle>>> angularVelocityYStatusSignal;
-  private final StatusSignal<Measure<Velocity<Angle>>> angularVelocityZStatusSignal;
+  private final StatusSignal<Angle> yawStatusSignal;
+  private final StatusSignal<Angle> pitchStatusSignal;
+  private final StatusSignal<Angle> rollStatusSignal;
+  private final StatusSignal<AngularVelocity> angularVelocityXStatusSignal;
+  private final StatusSignal<AngularVelocity> angularVelocityYStatusSignal;
+  private final StatusSignal<AngularVelocity> angularVelocityZStatusSignal;
   private final Pigeon2SimState gyroSim;
 
   public GyroIOPigeon2Phoenix6(int id) {

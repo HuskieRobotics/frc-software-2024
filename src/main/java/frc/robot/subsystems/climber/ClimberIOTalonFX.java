@@ -12,11 +12,11 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Current;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Temperature;
-import edu.wpi.first.units.Voltage;
+
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team6328.util.Alert;
@@ -44,11 +44,11 @@ public class ClimberIOTalonFX implements ClimberIO {
   private Alert configAlert =
       new Alert("Failed to apply configuration for subsystem.", AlertType.ERROR);
 
-  private StatusSignal<Measure<Current>> climberStatorCurrentStatusSignal;
-  private StatusSignal<Measure<Current>> climberSupplyCurrentStatusSignal;
-  private StatusSignal<Measure<Voltage>> climberVoltageStatusSignal;
-  private StatusSignal<Measure<Angle>> climberPositionStatusSignal;
-  private StatusSignal<Measure<Temperature>> climberTemperatureStatusSignal;
+  private StatusSignal<Current> climberStatorCurrentStatusSignal;
+  private StatusSignal<Current> climberSupplyCurrentStatusSignal;
+  private StatusSignal<Voltage> climberVoltageStatusSignal;
+  private StatusSignal<Angle> climberPositionStatusSignal;
+  private StatusSignal<Temperature> climberTemperatureStatusSignal;
 
   public ClimberIOTalonFX() {
     climberMotor =
