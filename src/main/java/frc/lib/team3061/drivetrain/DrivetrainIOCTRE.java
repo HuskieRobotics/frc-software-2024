@@ -691,11 +691,6 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   }
 
   @Override
-  public void resetPose(Pose2d pose) {
-    this.resetPose(pose);
-  }
-
-  @Override
   public void setDriveMotorCurrent(double amps) {
     // ensure that the SwerveDrivetrain class doesn't control either motor
     this.setControl(idleRequest);
