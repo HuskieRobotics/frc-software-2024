@@ -8,10 +8,8 @@ import static frc.lib.team3061.drivetrain.DrivetrainConstants.*;
 import static frc.robot.Constants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -161,37 +159,33 @@ public class Drivetrain extends SubsystemBase {
     FaultReporter faultReporter = FaultReporter.getInstance();
     faultReporter.registerSystemCheck(SUBSYSTEM_NAME, getSystemCheckCommand());
 
-    AutoBuilder.configureHolonomic(
+    AutoBuilder.configure(
         this::getPose, // Robot pose supplier
         this::resetPose, // Method to reset odometry (will be called if your auto has a starting
         // pose)
         this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE
+        (speeds, feedforwards) ->
+            driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE
         // ChassisSpeeds
-        new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in
+        new PPHolonomicDriveController( // HolonomicPathFollowerConfig, this should likely live in
             // your Constants class
-            new PIDConstants(
+            new com.pathplanner.lib.config.PIDConstants(
                 RobotConfig.getInstance().getAutoDriveKP(),
                 RobotConfig.getInstance().getAutoDriveKI(),
                 RobotConfig.getInstance().getAutoDriveKD()), // Translation PID constants
             new PIDConstants(
                 RobotConfig.getInstance().getAutoTurnKP(),
                 RobotConfig.getInstance().getAutoTurnKI(),
-                RobotConfig.getInstance().getAutoTurnKD()), // Rotation PID constants
-            RobotConfig.getInstance().getAutoMaxSpeed(), // Max module speed, in m/s
-            new Translation2d(
-                    RobotConfig.getInstance().getWheelbase(),
-                    RobotConfig.getInstance().getTrackwidth())
-                .getNorm(), // Drive base radius in meters. Distance from robot center to furthest
-            // module.
-            new ReplanningConfig() // Default path replanning config. See the API for the options
-            // here
-            ),
+                RobotConfig.getInstance().getAutoTurnKD())), // Rotation PID constants
+        RobotConfig.getInstance().getPathPlannerRobotConfig(),
         this::shouldFlipAutoPath,
         this // Reference to this subsystem to set requirements
         );
 
-    PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
+    // FIXME: the new overrideRotationFeedback method is a bit different. It needs to be enabled and
+    // disabled (via clearRotationFeedbackOverride). It also requires that we use a custom PID
+    // controller instead of just specifying an angle
+    // PPHolonomicDriveController.overrideRotationFeedback(this::getRotationTargetOverride);
 
     this.odometry = RobotOdometry.getInstance();
   }
