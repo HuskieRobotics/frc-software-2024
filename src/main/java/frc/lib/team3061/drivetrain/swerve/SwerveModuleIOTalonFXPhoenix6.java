@@ -100,7 +100,7 @@ public class SwerveModuleIOTalonFXPhoenix6 implements SwerveModuleIO {
   private TalonFXSimState driveMotorSimState;
   private CANcoderSimState angleEncoderSimState;
   private LinearSystemSim<N1, N1, N1> driveSim;
-  private LinearSystemSim<N2, N1, N1> turnSim;
+  private LinearSystemSim<N2, N1, N2> turnSim;
   private double lastSimAnglePositionRot = 0.0;
 
   /**

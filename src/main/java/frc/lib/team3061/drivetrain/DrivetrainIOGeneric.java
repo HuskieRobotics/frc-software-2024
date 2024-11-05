@@ -397,7 +397,7 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
     SwerveDriveKinematics.desaturateWheelSpeeds(states, maxVelocity);
 
     for (int i = 0; i < this.swerveModules.length; i++) {
-      states[i] = SwerveModuleState.optimize(states[i], swerveModuleStates[i].angle);
+      states[i].optimize(swerveModuleStates[i].angle);
 
       if (isOpenLoop) {
         this.swerveModules[i].setDriveMotorVoltage(

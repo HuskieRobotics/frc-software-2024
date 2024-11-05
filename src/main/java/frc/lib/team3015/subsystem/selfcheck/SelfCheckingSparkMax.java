@@ -1,7 +1,7 @@
 package frc.lib.team3015.subsystem.selfcheck;
 
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.REVLibError;
+import com.revrobotics.spark.SparkMax;
 import frc.lib.team3015.subsystem.SubsystemFault;
 import java.util.ArrayList;
 import java.util.List;

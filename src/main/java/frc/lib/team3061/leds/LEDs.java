@@ -29,7 +29,8 @@ public abstract class LEDs extends SubsystemBase {
   public static LEDs getInstance() {
     if (instance == null) {
       if (RobotConfig.getInstance().getLEDHardware() == RobotConfig.LED_HARDWARE.CANDLE) {
-        instance = new LEDsCANdle();
+        // FIXME: Phoenix 5 is not yet supported in 2025 beta
+        // instance = new LEDsCANdle();
       } else {
         instance = new LEDsRIO();
       }

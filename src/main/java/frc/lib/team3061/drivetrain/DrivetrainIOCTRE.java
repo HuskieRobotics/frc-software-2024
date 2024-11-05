@@ -253,8 +253,8 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
       new SwerveRequest.FieldCentricFacingAngle();
   private SwerveRequest.SwerveDriveBrake brakeRequest = new SwerveRequest.SwerveDriveBrake();
   private SwerveRequest.PointWheelsAt pointRequest = new SwerveRequest.PointWheelsAt();
-  private SwerveRequest.ApplyChassisSpeeds applyChassisSpeedsRequest =
-      new SwerveRequest.ApplyChassisSpeeds();
+  private SwerveRequest.ApplyRobotSpeeds applyRobotSpeedsRequest =
+      new SwerveRequest.ApplyRobotSpeeds();
 
   // only used for TorqueCurrentFOC characterization
   private TorqueCurrentFOC[] driveCurrentRequests = new TorqueCurrentFOC[4];
@@ -320,7 +320,8 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
     // always define 0° (towards the red alliance) as "forward"; the Drivetrain subsystem handles
     //  the definition of forward based on the current alliance
-    this.driveFacingAngleRequest.ForwardPerspective = SwerveRequest.ForwardPerspectiveValue.BlueAlliance;
+    this.driveFacingAngleRequest.ForwardPerspective =
+        SwerveRequest.ForwardPerspectiveValue.BlueAlliance;
     this.driveFieldCentricRequest.ForwardPerspective =
         SwerveRequest.ForwardPerspectiveValue.BlueAlliance;
 
@@ -376,7 +377,7 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
         this.targetChassisSpeeds.omegaRadiansPerSecond;
 
     ChassisSpeeds measuredChassisSpeeds =
-      getKinematics().toChassisSpeeds(this.getState().ModuleStates);
+        getKinematics().toChassisSpeeds(this.getState().ModuleStates);
     inputs.drivetrain.measuredVXMetersPerSec = measuredChassisSpeeds.vxMetersPerSecond;
     inputs.drivetrain.measuredVYMetersPerSec = measuredChassisSpeeds.vyMetersPerSecond;
     inputs.drivetrain.measuredAngularVelocityRadPerSec =
@@ -661,14 +662,14 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
     if (isOpenLoop) {
       this.setControl(
-          this.applyChassisSpeedsRequest
+          this.applyRobotSpeedsRequest
               .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage)
               .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo)
               .withSpeeds(speeds)
               .withCenterOfRotation(this.centerOfRotation));
     } else {
       this.setControl(
-          this.applyChassisSpeedsRequest
+          this.applyRobotSpeedsRequest
               .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
               .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo)
               .withSpeeds(speeds)
