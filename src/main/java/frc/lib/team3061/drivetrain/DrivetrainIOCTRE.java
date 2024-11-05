@@ -139,7 +139,6 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   private static final double STEER_INERTIA = 0.00001;
   private static final double DRIVE_INERTIA = 0.001;
 
-  // FIXME: add withPigeon2Configs to specify the proper orientation of the Pigeon
   private static final SwerveDrivetrainConstants drivetrainConstants =
       new SwerveDrivetrainConstants()
           .withPigeon2Id(RobotConfig.getInstance().getGyroCANID())
@@ -344,13 +343,12 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
     // update and log the swerve modules telemetry
     for (int i = 0; i < 4; i++) {
-      // FIXME: uncomment when CTRE adds drive position to SwerveModuleState
-      // this.drivePositionQueues[i].offer(state.ModuleStates[i].position);
+      this.drivePositionQueues.get(i).offer(state.ModulePositions[i].distanceMeters);
       this.steerPositionQueues.get(i).offer(state.ModuleStates[i].angle.getDegrees());
     }
 
-    // FIXME: uncomment when CTRE adds gyro yaw to SwerveDriveState
-    // this.gyroYawQueue.offer(state.GyroYaw);
+    // FIXME: update when CTRE adds gyro yaw to SwerveDriveState; for now, use the pose
+    this.gyroYawQueue.offer(state.Pose.getRotation().getDegrees());
 
     this.timestampQueue.offer(fpgaTimestamp);
 
@@ -389,22 +387,21 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
     inputs.drivetrain.odometryTimestamps =
         this.timestampQueue.stream().mapToDouble(Double::valueOf).toArray();
+    this.timestampQueue.clear();
 
-    // FIXME: uncomment when CTRE adds gyro yaw to SwerveModuleState
-    // inputs.gyro.odometryYawPositions =
-    //     this.gyroYawQueue.stream().map(Rotation2d::fromDegrees).toArray(Rotation2d[]::new);
     inputs.gyro.odometryYawPositions =
-        new Rotation2d[] {Rotation2d.fromDegrees(inputs.gyro.yawDeg)};
+        this.gyroYawQueue.stream().map(Rotation2d::fromDegrees).toArray(Rotation2d[]::new);
+    this.gyroYawQueue.clear();
 
     for (int i = 0; i < swerveModulesSignals.length; i++) {
-      // inputs.odometryDrivePositionsMeters =
-      //     drivePositionQueue.stream().mapToDouble(Double::valueOf).toArray();
-      // inputs.odometryTurnPositions =
-      //     steerPositionQueue.stream().map(Rotation2d::fromDegrees).toArray(Rotation2d[]::new);
       inputs.swerve[i].odometryDrivePositionsMeters =
-          new double[] {inputs.swerve[i].driveDistanceMeters};
+          this.drivePositionQueues.get(i).stream().mapToDouble(Double::valueOf).toArray();
       inputs.swerve[i].odometryTurnPositions =
-          new Rotation2d[] {Rotation2d.fromDegrees(inputs.swerve[i].steerPositionDeg)};
+          this.steerPositionQueues.get(i).stream()
+              .map(Rotation2d::fromDegrees)
+              .toArray(Rotation2d[]::new);
+      this.drivePositionQueues.get(i).clear();
+      this.steerPositionQueues.get(i).clear();
     }
 
     this.odometryLock.unlock();
@@ -712,7 +709,8 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
   @Override
   public void setBrakeMode(boolean enable) {
-    // FIXME: replace with configNeutralMode method
+    // FIXME: replace with configNeutralMode method; however, ensure that this doesn't introduce a
+    // long loop time at the start of auto like it did in 2024
     for (SwerveModule swerveModule : this.getModules()) {
       MotorOutputConfigs config = new MotorOutputConfigs();
       swerveModule.getDriveMotor().getConfigurator().refresh(config);
