@@ -233,7 +233,15 @@ public class Field2d {
     if (alliance == Alliance.Blue) {
       return new Pose2d(FieldConstants.blueAmpCenter, new Rotation2d());
     } else {
-      return FieldConstants.RedSpeaker.redCenterSpeakerOpening;
+      // return FieldConstants.RedSpeaker.redCenterSpeakerOpening;
+      return new Pose2d(
+          (FieldConstants.RedSpeaker.redCenterSpeakerOpening.getX()
+                  + FieldConstants.redAmpCenter.getX())
+              / 2.0,
+          (FieldConstants.RedSpeaker.redCenterSpeakerOpening.getY()
+                  + FieldConstants.redAmpCenter.getY())
+              / 2.0,
+          new Rotation2d());
     }
   }
 

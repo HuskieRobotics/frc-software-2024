@@ -7,9 +7,10 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.MountPoseConfigs;
+import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.DeviceEnableValue;
@@ -142,16 +143,15 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   private static final SwerveDrivetrainConstants drivetrainConstants =
       new SwerveDrivetrainConstants()
           .withPigeon2Id(RobotConfig.getInstance().getGyroCANID())
-          .withCANBusName(RobotConfig.getInstance().getCANBusName());
+          .withCANbusName(RobotConfig.getInstance().getCANBusName())
+          .withPigeon2Configs(
+              new Pigeon2Configuration()
+                  .withMountPose(new MountPoseConfigs().withMountPoseRoll(-180.0)));
 
   private static final SwerveModuleConstantsFactory constantCreator =
       new SwerveModuleConstantsFactory()
           .withDriveMotorInitialConfigs(
               new TalonFXConfiguration()
-                  .withTorqueCurrent(
-                      new TorqueCurrentConfigs()
-                          .withPeakForwardTorqueCurrent(SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT)
-                          .withPeakReverseTorqueCurrent(-SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT))
                   .withCurrentLimits(
                       new CurrentLimitsConfigs()
                           .withSupplyCurrentLimit(SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT)
@@ -179,7 +179,7 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
           .withSteerMotorGearRatio(
               RobotConfig.getInstance().getSwerveConstants().getAngleGearRatio())
           .withWheelRadius(Meters.of(RobotConfig.getInstance().getWheelDiameterMeters() / 2.0))
-          .withSlipCurrent(Amps.of(120.0))
+          .withSlipCurrent(SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT)
           .withSteerMotorGains(steerGains)
           .withDriveMotorGains(driveGains)
           .withSteerMotorClosedLoopOutput(steerClosedLoopOutput)
