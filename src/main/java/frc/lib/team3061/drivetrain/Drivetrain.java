@@ -560,7 +560,7 @@ public class Drivetrain extends SubsystemBase {
         SUBSYSTEM_NAME + "/ConstrainPoseToFieldCount", this.constrainPoseToFieldCount);
 
     // update the brake mode based on the robot's velocity and state (enabled/disabled)
-    updateBrakeMode();
+    // updateBrakeMode();
 
     Logger.recordOutput(SUBSYSTEM_NAME + "/DriveMode", this.driveMode);
 
