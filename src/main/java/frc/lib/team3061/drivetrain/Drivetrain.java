@@ -20,6 +20,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -32,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.DrivetrainIO.SwerveIOInputs;
+import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.Alert;
 import frc.lib.team6328.util.Alert.AlertType;
 import frc.lib.team6328.util.FieldConstants;
@@ -120,6 +122,9 @@ public class Drivetrain extends SubsystemBase {
   private Pose2d prevRobotPose = new Pose2d();
   private int teleportedCount = 0;
   private int constrainPoseToFieldCount = 0;
+
+  private Pose2d defaultPose = new Pose2d();
+  private Pose2d customPose = new Pose2d();
 
   private boolean isRotationOverrideEnabled = false;
 
@@ -514,6 +519,30 @@ public class Drivetrain extends SubsystemBase {
     Logger.processInputs(SUBSYSTEM_NAME + "/BL", this.inputs.swerve[2]);
     Logger.processInputs(SUBSYSTEM_NAME + "/BR", this.inputs.swerve[3]);
 
+    // custom pose vs default pose
+    this.defaultPose = RobotOdometry.getInstance().getEstimatedPosition();
+    this.customPose = RobotOdometry.getInstance().getCustomEstimatedPosition();
+    Logger.recordOutput(SUBSYSTEM_NAME + "/DefaultPose", this.defaultPose);
+    Logger.recordOutput(SUBSYSTEM_NAME + "/CustomPose", this.customPose);
+    
+    // SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
+    // for (int i = 0; i < 4; i++) {
+    //   modulePositions[i] = new SwerveModulePosition(this.inputs.swerve[i].steerPositionDeg, this.inputs.swerve[i].);
+    // }
+
+    // what to put as the SwerveModulePosition[] (3rd parameter of updateWithTime)
+    // RobotOdometry.getInstance().updateWithTime(
+    //   System.currentTimeMillis(),
+    //   this.inputs.drivetrain.robotPose.getRotation(),
+    //   this.inputs.swerve./*what here? */);
+
+    // RobotOdometry.getInstance().updateCustomWithTime(
+    //   System.currentTimeMillis(),
+    //   this.inputs.drivetrain.robotPose.getRotation(),
+    //   this.inputs.swerve./*what here? */);
+
+      
+
     // check for teleportation
     if (this.inputs.drivetrain.robotPose.minus(prevRobotPose).getTranslation().getNorm() > 0.4) {
       this.resetPose(prevRobotPose);
@@ -563,6 +592,8 @@ public class Drivetrain extends SubsystemBase {
     // updateBrakeMode();
 
     Logger.recordOutput(SUBSYSTEM_NAME + "/DriveMode", this.driveMode);
+
+    
 
     // update tunables
     if (autoDriveKp.hasChanged() || autoDriveKi.hasChanged() || autoDriveKd.hasChanged()) {

@@ -57,12 +57,15 @@ public class RobotOdometry {
 
   public Pose2d updateWithTime(
       double currentTimeSeconds, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-    if (this.customOdometry == null) {
-      return this.estimator.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
+        return this.estimator.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
+  }
 
-    } else {
+  public Pose2d updateCustomWithTime(
+      double currentTimeSeconds, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
+    if (this.customOdometry != null) {
       return this.customOdometry.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
     }
+    return null;
   }
 
   public void addVisionMeasurement(
