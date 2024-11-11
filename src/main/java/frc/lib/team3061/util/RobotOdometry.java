@@ -60,14 +60,6 @@ public class RobotOdometry {
         return this.estimator.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
   }
 
-  public Pose2d updateCustomWithTime(
-      double currentTimeSeconds, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-    if (this.customOdometry != null) {
-      return this.customOdometry.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
-    }
-    return null;
-  }
-
   public void addVisionMeasurement(
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
