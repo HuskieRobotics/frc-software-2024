@@ -38,45 +38,43 @@ public class RobotOdometry {
   }
 
   public Pose2d getEstimatedPosition() {
-    if (this.customOdometry == null) {
-      return this.estimator.getEstimatedPosition();
-    } else {
-      return this.customOdometry.getEstimatedPosition();
-    }
+    // changed to not consider custom odometry at all
+    return this.estimator.getEstimatedPosition();
+  }
+
+  // new method to get estimated position of the custom odometry (in order to compare with the
+  // default estimator)
+  public Pose2d getCustomEstimatedPosition() {
+    return this.customOdometry != null ? this.customOdometry.getEstimatedPosition() : null;
   }
 
   public void resetPosition(
       Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d poseMeters) {
-    if (this.customOdometry == null) {
-      this.estimator.resetPosition(gyroAngle, modulePositions, poseMeters);
 
-    } else {
-      this.customOdometry.resetPosition(gyroAngle, modulePositions, poseMeters);
-    }
+    // resetting position on both estimators at the same time since we are considering both in
+    // parallel now
+    this.estimator.resetPosition(gyroAngle, modulePositions, poseMeters);
+    this.customOdometry.resetPosition(gyroAngle, modulePositions, poseMeters);
   }
 
   public Pose2d updateWithTime(
       double currentTimeSeconds, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-    if (this.customOdometry == null) {
-      return this.estimator.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
-
-    } else {
-      return this.customOdometry.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
-    }
+    return this.estimator.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
   }
 
   public void addVisionMeasurement(
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
-    if (this.customOdometry == null) {
-      this.estimator.addVisionMeasurement(
-          visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
-
-    } else {
-      this.customOdometry.addVisionMeasurement(
-          visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
-    }
+    // ignore all vision updates in the first stage of tuning
+    // if (this.customOdometry == null) {
+    //   this.estimator.addVisionMeasurement(
+    //   visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+    // } else {
+    // if (this.customOdometry != null) {
+    //   this.customOdometry.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds,
+    // visionMeasurementStdDevs);
+    // }
   }
 
   public void setCustomOdometry(DrivetrainIOCTRE customOdometry) {

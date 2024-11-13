@@ -20,6 +20,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -32,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.DrivetrainIO.SwerveIOInputs;
+import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.Alert;
 import frc.lib.team6328.util.Alert.AlertType;
 import frc.lib.team6328.util.FieldConstants;
@@ -121,7 +123,18 @@ public class Drivetrain extends SubsystemBase {
   private int teleportedCount = 0;
   private int constrainPoseToFieldCount = 0;
 
+  private Pose2d defaultPose = new Pose2d();
+  private Pose2d customPose = new Pose2d();
+
   private boolean isRotationOverrideEnabled = false;
+
+  private SwerveModulePosition[] modulePositions =
+      new SwerveModulePosition[] {
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition()
+      };
 
   /**
    * Creates a new Drivetrain subsystem.
@@ -513,6 +526,25 @@ public class Drivetrain extends SubsystemBase {
     Logger.processInputs(SUBSYSTEM_NAME + "/FR", this.inputs.swerve[1]);
     Logger.processInputs(SUBSYSTEM_NAME + "/BL", this.inputs.swerve[2]);
     Logger.processInputs(SUBSYSTEM_NAME + "/BR", this.inputs.swerve[3]);
+
+    for (int i = 0; i < 4; i++) {
+      this.modulePositions[i].distanceMeters = this.inputs.swerve[i].driveDistanceMeters;
+      this.modulePositions[i].angle =
+          Rotation2d.fromDegrees(this.inputs.swerve[i].steerPositionDeg);
+    }
+
+    // what to put as the SwerveModulePosition[] (3rd parameter of updateWithTime)
+    RobotOdometry.getInstance()
+        .updateWithTime(
+            System.currentTimeMillis(),
+            Rotation2d.fromDegrees(this.inputs.gyro.yawDeg),
+            this.modulePositions);
+
+    // custom pose vs default pose
+    this.defaultPose = RobotOdometry.getInstance().getEstimatedPosition();
+    this.customPose = RobotOdometry.getInstance().getCustomEstimatedPosition();
+    Logger.recordOutput(SUBSYSTEM_NAME + "/DefaultPose", this.defaultPose);
+    Logger.recordOutput(SUBSYSTEM_NAME + "/CustomPose", this.customPose);
 
     // check for teleportation
     if (this.inputs.drivetrain.robotPose.minus(prevRobotPose).getTranslation().getNorm() > 0.4) {
