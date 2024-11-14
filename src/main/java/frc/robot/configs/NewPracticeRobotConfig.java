@@ -12,22 +12,22 @@ public class NewPracticeRobotConfig extends RobotConfig {
 
   private static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 43;
   private static final int FRONT_LEFT_MODULE_STEER_MOTOR = 44;
-  private static final int FRONT_LEFT_MODULE_STEER_ENCODER = 0;
+  private static final int FRONT_LEFT_MODULE_STEER_ENCODER = 0; // wait to get robot wired up
   private static final double FRONT_LEFT_MODULE_STEER_OFFSET_ROT = 0.474121; // tune
 
   private static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 41;
   private static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 42;
-  private static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 0;
+  private static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 0; // wait to get robot wired up
   private static final double FRONT_RIGHT_MODULE_STEER_OFFSET_ROT = -0.358398; // tune
 
   private static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 38;
   private static final int BACK_LEFT_MODULE_STEER_MOTOR = 37;
-  private static final int BACK_LEFT_MODULE_STEER_ENCODER = 0;
+  private static final int BACK_LEFT_MODULE_STEER_ENCODER = 0; // wait to get robot wired up
   private static final double BACK_LEFT_MODULE_STEER_OFFSET_ROT = -0.234863; // tune
 
   private static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 39;
   private static final int BACK_RIGHT_MODULE_STEER_MOTOR = 40;
-  private static final int BACK_RIGHT_MODULE_STEER_ENCODER = 0;
+  private static final int BACK_RIGHT_MODULE_STEER_ENCODER = 0; // wait to get robot wired up
   private static final double BACK_RIGHT_MODULE_STEER_OFFSET_ROT = 0.161133; // tune
 
   private static final int GYRO_ID = 3; // ?
