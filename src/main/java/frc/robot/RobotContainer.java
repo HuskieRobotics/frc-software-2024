@@ -567,8 +567,15 @@ public class RobotContainer {
      * used for empirically determining the wheel diameter
      *
      */
-    Command distanceTestPathCommand = new PathPlannerAuto("DistanceTest");
-    autoChooser.addOption("Distance Path", distanceTestPathCommand);
+    autoChooser.addOption("Distance Test Slow", new PathPlannerAuto("DistanceTestSlow"));
+    autoChooser.addOption("Distance Test Med", new PathPlannerAuto("DistanceTestMed"));
+    autoChooser.addOption("Distance Test Fast", new PathPlannerAuto("DistanceTestFast"));
+
+    autoChooser.addOption("Rotation Test Slow", new PathPlannerAuto("RotationTestSlow"));
+    autoChooser.addOption("Rotation Test Fast", new PathPlannerAuto("RotationTestFast"));
+
+    autoChooser.addOption("Oval Test Slow", new PathPlannerAuto("OvalTestSlow"));
+    autoChooser.addOption("Oval Test Fast", new PathPlannerAuto("OvalTestFast"));
 
     /************ Auto Tuning ************
      *
