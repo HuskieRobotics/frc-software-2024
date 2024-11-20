@@ -6,7 +6,6 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -16,14 +15,19 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Threads;
 import frc.lib.team3061.RobotConfig;
+import frc.lib.team3061.drivetrain.swerve.Conversions;
 import frc.lib.team3061.drivetrain.swerve.SwerveModuleIO;
 import frc.lib.team3061.gyro.GyroIO;
-import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.Logger;
 
 public class DrivetrainIOGeneric implements DrivetrainIO {
@@ -34,6 +38,9 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
   private final double wheelbaseMeters = RobotConfig.getInstance().getWheelbase();
   private final SwerveDriveKinematics kinematics =
       RobotConfig.getInstance().getSwerveDriveKinematics();
+
+  private static final double COUPLE_RATIO =
+      RobotConfig.getInstance().getAzimuthSteerCouplingRatio();
 
   private final SwerveModuleIO[] swerveModules = new SwerveModuleIO[4]; // FL, FR, BL, BR
 
@@ -80,8 +87,8 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
   private ChassisSpeeds targetChassisSpeeds;
 
   private double[] steerMotorsLastAngle = new double[4];
+  private double[] steerMotorsLastVelocityRPM = new double[4];
 
-  private final RobotOdometry odometry;
   private Pose2d estimatedPoseWithoutGyro = new Pose2d();
 
   private final List<StatusSignal<Double>> odometrySignals = new ArrayList<>();
@@ -112,6 +119,15 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
           LOOP_PERIOD_SECS);
   protected boolean lastRequestWasDriveFacingAngle = false;
 
+  // queues for odometry updates from CTRE's thread
+
+  private final Lock odometryLock = new ReentrantLock();
+  private final List<Queue<Double>> drivePositionQueues = new ArrayList<>();
+  private final List<Queue<Double>> steerPositionQueues = new ArrayList<>();
+  private final Queue<Double> gyroYawQueue;
+  private final Queue<Double> timestampQueue = new ArrayBlockingQueue<>(20);
+  private final PhoenixOdometryThread odometryThread = new PhoenixOdometryThread();
+
   /**
    * Creates a new Drivetrain subsystem.
    *
@@ -139,11 +155,25 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
 
     this.targetChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
-    this.odometry = RobotOdometry.getInstance();
-
-    this.odometrySignals.addAll(this.gyroIO.getOdometryStatusSignals());
+    SignalPair signalPair = this.gyroIO.getOdometrySignalPair();
+    this.odometrySignals.add(signalPair.signal);
+    this.odometrySignals.add(signalPair.signalRate);
     for (SwerveModuleIO swerveModule : swerveModules) {
-      this.odometrySignals.addAll(swerveModule.getOdometryStatusSignals());
+      signalPair = swerveModule.getOdometryDriveSignalPair();
+      this.odometrySignals.add(signalPair.signal);
+      this.odometrySignals.add(signalPair.signalRate);
+      signalPair = swerveModule.getOdometryAngleSignalPair();
+      this.odometrySignals.add(signalPair.signal);
+      this.odometrySignals.add(signalPair.signalRate);
+    }
+
+    // create queues for updates from our odometry thread
+    this.gyroYawQueue = this.odometryThread.registerSignalPair(this.gyroIO.getOdometrySignalPair());
+    for (SwerveModuleIO swerveModule : swerveModules) {
+      this.drivePositionQueues.add(
+          this.odometryThread.registerSignalPair(swerveModule.getOdometryDriveSignalPair()));
+      this.steerPositionQueues.add(
+          this.odometryThread.registerSignalPair(swerveModule.getOdometryAngleSignalPair()));
     }
   }
 
@@ -152,8 +182,9 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
     // synchronize all of the signals related to pose estimation
     if (RobotConfig.getInstance().getPhoenix6Licensed()) {
       // this is a licensed method
-      BaseStatusSignal.waitForAll(
-          Constants.LOOP_PERIOD_SECS, this.odometrySignals.toArray(new BaseStatusSignal[0]));
+      BaseStatusSignal.waitForAll(0.0, this.odometrySignals.toArray(new BaseStatusSignal[0]));
+    } else {
+      BaseStatusSignal.refreshAll(this.odometrySignals.toArray(new BaseStatusSignal[0]));
     }
 
     // update and log gyro inputs
@@ -176,6 +207,7 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
           new SwerveModulePosition(
               inputs.swerve[i].driveDistanceMeters,
               Rotation2d.fromDegrees(inputs.swerve[i].steerPositionDeg));
+      steerMotorsLastVelocityRPM[i] = inputs.swerve[i].steerVelocityRevPerMin;
     }
 
     // if the gyro is not connected, use the swerve module positions to estimate the robot's
@@ -203,17 +235,6 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
     inputs.drivetrain.swerveMeasuredStates = this.swerveModuleStates;
     inputs.drivetrain.swerveReferenceStates = this.swerveReferenceStates;
 
-    // update the pose estimator based on the gyro and swerve module positions
-    this.odometry.updateWithTime(
-        Logger.getRealTimestamp() / 1e6,
-        Rotation2d.fromDegrees(this.robotRotationDeg),
-        swerveModulePositions);
-
-    // log poses, 3D geometry, and swerve module states, gyro offset
-    inputs.drivetrain.robotPoseWithoutGyro = estimatedPoseWithoutGyro;
-    inputs.drivetrain.robotPose = odometry.getEstimatedPosition();
-    inputs.drivetrain.robotPose3D = new Pose3d(inputs.drivetrain.robotPose);
-
     inputs.drivetrain.targetVXMetersPerSec = this.targetChassisSpeeds.vxMetersPerSecond;
     inputs.drivetrain.targetVYMetersPerSec = this.targetChassisSpeeds.vyMetersPerSecond;
     inputs.drivetrain.targetAngularVelocityRadPerSec =
@@ -227,7 +248,35 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
 
     inputs.drivetrain.averageDriveCurrent = this.getAverageDriveCurrent(inputs);
 
-    inputs.drivetrain.rotation = Rotation2d.fromDegrees(this.robotRotationDeg);
+    this.odometryLock.lock();
+
+    inputs.drivetrain.odometryTimestamps =
+        this.timestampQueue.stream().mapToDouble(Double::valueOf).toArray();
+    this.timestampQueue.clear();
+
+    inputs.gyro.odometryYawPositions =
+        this.gyroYawQueue.stream().map(Rotation2d::fromDegrees).toArray(Rotation2d[]::new);
+    this.gyroYawQueue.clear();
+
+    for (int i = 0; i < inputs.swerve.length; i++) {
+      inputs.swerve[i].odometryDrivePositionsMeters =
+          drivePositionQueues.get(i).stream()
+              .mapToDouble(
+                  signalValue ->
+                      Conversions.falconRotationsToMechanismMeters(
+                          signalValue,
+                          RobotConfig.getInstance().getWheelDiameterMeters() * Math.PI,
+                          RobotConfig.getInstance().getSwerveConstants().getDriveGearRatio()))
+              .toArray();
+      inputs.swerve[i].odometryTurnPositions =
+          steerPositionQueues.get(i).stream()
+              .map(Rotation2d::fromRotations)
+              .toArray(Rotation2d[]::new);
+      drivePositionQueues.get(i).clear();
+      steerPositionQueues.get(i).clear();
+    }
+
+    this.odometryLock.unlock();
 
     if (thetaKp.hasChanged()
         || thetaKd.hasChanged()
@@ -364,9 +413,6 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
   @Override
   public void resetPose(Pose2d pose) {
     setGyroOffset(pose.getRotation().getDegrees());
-    this.estimatedPoseWithoutGyro = new Pose2d(pose.getTranslation(), pose.getRotation());
-    this.odometry.resetPosition(
-        Rotation2d.fromDegrees(this.robotRotationDeg), swerveModulePositions, pose);
   }
 
   @Override
@@ -401,7 +447,7 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
   private double getAverageDriveCurrent(DrivetrainIOInputsCollection inputs) {
     double totalCurrent = 0.0;
     for (SwerveIOInputs swerveInputs : inputs.swerve) {
-      totalCurrent += swerveInputs.driveStatorCurrentAmps;
+      totalCurrent += Math.abs(swerveInputs.driveStatorCurrentAmps);
     }
     return totalCurrent / inputs.swerve.length;
   }
@@ -415,11 +461,37 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
     for (int i = 0; i < this.swerveModules.length; i++) {
       states[i] = SwerveModuleState.optimize(states[i], swerveModuleStates[i].angle);
 
+      double velocityToSet = states[i].speedMetersPerSecond;
+
+      // the following is from CTRE
+
+      /* From FRC 900's whitepaper, we add a cosine compensator to the applied drive velocity */
+      /* To reduce the "skew" that occurs when changing direction */
+      double steerMotorError =
+          states[i].angle.getRotations() - swerveModulePositions[i].angle.getRotations();
+      /* If error is close to 0 rotations, we're already there, so apply full power */
+      /* If the error is close to 0.25 rotations, then we're 90 degrees, so movement doesn't help us at all */
+      double cosineScalar = Math.cos(Units.rotationsToRadians(steerMotorError));
+      /* Make sure we don't invert our drive, even though we shouldn't ever target over 90 degrees anyway */
+      if (cosineScalar < 0.0) {
+        cosineScalar = 0.0;
+      }
+      velocityToSet *= cosineScalar;
+
+      /* Back out the expected shimmy the drive motor will see */
+      /* Find the angular rate to determine what to back out */
+      double azimuthTurnRps = steerMotorsLastVelocityRPM[i] / 60.0;
+      /* Azimuth turn rate multiplied by coupling ratio provides back-out rps */
+      double driveRateBackOut = azimuthTurnRps * COUPLE_RATIO;
+      double wheelCircumference = RobotConfig.getInstance().getWheelDiameterMeters() * Math.PI;
+      double driveGearRatio = RobotConfig.getInstance().getSwerveConstants().getDriveGearRatio();
+      velocityToSet +=
+          Conversions.falconRPSToMechanismMPS(driveRateBackOut, wheelCircumference, driveGearRatio);
+
       if (isOpenLoop) {
-        this.swerveModules[i].setDriveMotorVoltage(
-            states[i].speedMetersPerSecond / maxVelocity * 12.0);
+        this.swerveModules[i].setDriveMotorVoltage(velocityToSet / maxVelocity * 12.0);
       } else {
-        this.swerveModules[i].setDriveVelocity(states[i].speedMetersPerSecond);
+        this.swerveModules[i].setDriveVelocity(velocityToSet);
       }
 
       // Unless the angle is forced (e.g., X-stance), don't rotate the module if speed is less then
@@ -435,6 +507,102 @@ public class DrivetrainIOGeneric implements DrivetrainIO {
 
       this.swerveModules[i].setAnglePosition(angle);
       steerMotorsLastAngle[i] = angle;
+    }
+  }
+
+  // Heavily based on 6328's PhoenixOdometryThread class from 2024.
+
+  /**
+   * Provides an interface for asynchronously reading high-frequency measurements to a set of
+   * queues.
+   *
+   * <p>This version is intended for Phoenix 6 devices on both the RIO and CANivore buses. When
+   * using a CANivore, the thread uses the "waitForAll" blocking method to enable more consistent
+   * sampling. This also allows Phoenix Pro users to benefit from lower latency between devices
+   * using CANivore time synchronization.
+   */
+  private class PhoenixOdometryThread extends Thread {
+    private final Lock signalsLock =
+        new ReentrantLock(); // Prevents conflicts when registering signals
+    private BaseStatusSignal[] signals = new BaseStatusSignal[0];
+    private final List<SignalPair> signalPairs = new ArrayList<>();
+    private final List<Queue<Double>> queues = new ArrayList<>();
+    private boolean isCANFD = false;
+    private double updateFrequency = RobotConfig.getInstance().getOdometryUpdateFrequency();
+
+    private PhoenixOdometryThread() {
+      setName("PhoenixOdometryThread");
+      setDaemon(true);
+      start();
+    }
+
+    public Queue<Double> registerSignalPair(SignalPair signalPair) {
+      Queue<Double> queue = new ArrayBlockingQueue<>(20);
+      signalsLock.lock();
+      odometryLock.lock();
+      try {
+        isCANFD = !RobotConfig.getInstance().getCANBusName().equals("");
+
+        SignalPair newSignalPair =
+            new SignalPair(signalPair.signal.clone(), signalPair.signalRate.clone());
+        BaseStatusSignal.setUpdateFrequencyForAll(
+            RobotConfig.getInstance().getOdometryUpdateFrequency(),
+            newSignalPair.signal,
+            newSignalPair.signalRate);
+
+        signalPairs.add(newSignalPair);
+
+        BaseStatusSignal[] newSignals = new BaseStatusSignal[signals.length + 2];
+        System.arraycopy(signals, 0, newSignals, 0, signals.length);
+        newSignals[signals.length] = newSignalPair.signal;
+        newSignals[signals.length + 1] = newSignalPair.signalRate;
+        signals = newSignals;
+        queues.add(queue);
+      } finally {
+        signalsLock.unlock();
+        odometryLock.unlock();
+      }
+      return queue;
+    }
+
+    @Override
+    public void run() {
+      // From CTRE: testing shows 1 (minimum realtime) is sufficient for tighter odometry loops.
+      Threads.setCurrentThreadPriority(true, 1);
+
+      while (true) {
+        // Wait for updates from all signals
+        signalsLock.lock();
+        try {
+          if (isCANFD) {
+            BaseStatusSignal.waitForAll(2.0 / updateFrequency, signals);
+          } else {
+            Thread.sleep((long) (1000.0 / updateFrequency));
+            if (signals.length > 0) BaseStatusSignal.refreshAll(signals);
+          }
+
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        } finally {
+          signalsLock.unlock();
+        }
+        double fpgaTimestamp = Logger.getRealTimestamp() / 1.0e6;
+
+        // Save new data to queues
+        odometryLock.lock();
+        try {
+          for (int i = 0; i < queues.size(); i++) {
+            queues
+                .get(i)
+                .offer(
+                    BaseStatusSignal.getLatencyCompensatedValue(
+                        signalPairs.get(i).signal, signalPairs.get(i).signalRate));
+          }
+          timestampQueue.offer(fpgaTimestamp);
+        } finally {
+          odometryLock.unlock();
+        }
+      }
     }
   }
 }

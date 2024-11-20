@@ -1,7 +1,7 @@
 package frc.lib.team3061.drivetrain;
 
+import com.ctre.phoenix6.StatusSignal;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -35,6 +35,9 @@ public interface DrivetrainIO {
     public double steerStatorCurrentAmps = 0.0;
     public double steerSupplyCurrentAmps = 0.0;
     public double steerTempCelsius = 0.0;
+
+    public double[] odometryDrivePositionsMeters = new double[] {};
+    public Rotation2d[] odometryTurnPositions = new Rotation2d[] {};
   }
 
   /** Contains all of the input data received from hardware. */
@@ -61,12 +64,9 @@ public interface DrivetrainIO {
       new SwerveModuleState()
     };
 
-    Pose2d robotPoseWithoutGyro = new Pose2d();
-    Pose2d robotPose = new Pose2d();
-    Pose3d robotPose3D = new Pose3d();
-
     double averageDriveCurrent = 0.0;
-    Rotation2d rotation = new Rotation2d();
+
+    double[] odometryTimestamps = new double[] {};
   }
 
   public static class DrivetrainIOInputsCollection {
@@ -80,6 +80,20 @@ public interface DrivetrainIO {
     GyroIOInputsAutoLogged gyro = new GyroIOInputsAutoLogged();
 
     DrivetrainIOInputsAutoLogged drivetrain = new DrivetrainIOInputsAutoLogged();
+  }
+
+  /**
+   * Encapsulates a pair of signals for use in odometry. The first signal is the signal to be
+   * latency-compensated using the second signal.
+   */
+  public static class SignalPair {
+    public StatusSignal<Double> signal;
+    public StatusSignal<Double> signalRate;
+
+    public SignalPair(StatusSignal<Double> signal, StatusSignal<Double> signalRate) {
+      this.signal = signal;
+      this.signalRate = signalRate;
+    }
   }
 
   /** Updates the set of loggable inputs. */

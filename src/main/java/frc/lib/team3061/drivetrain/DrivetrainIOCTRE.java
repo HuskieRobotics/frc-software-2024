@@ -1,6 +1,7 @@
 package frc.lib.team3061.drivetrain;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -10,6 +11,7 @@ import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
@@ -22,7 +24,6 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.signals.DeviceEnableValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -36,6 +37,13 @@ import frc.lib.team3061.gyro.GyroIO.GyroIOInputs;
 import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import org.littletonrobotics.junction.Logger;
 
 public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
@@ -125,7 +133,8 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   // TorqueCurrentFOC is not currently supported in simulation.
   private static final ClosedLoopOutputType driveClosedLoopOutput = getDriveClosedLoopOutputType();
 
-  private static final double COUPLE_RATIO = 0.0;
+  private static final double COUPLE_RATIO =
+      RobotConfig.getInstance().getAzimuthSteerCouplingRatio();
   private static final double STEER_INERTIA = 0.00001;
   private static final double DRIVE_INERTIA = 0.001;
 
@@ -242,6 +251,15 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
   private TorqueCurrentFOC[] driveCurrentRequests = new TorqueCurrentFOC[4];
   private TorqueCurrentFOC[] steerCurrentRequests = new TorqueCurrentFOC[4];
 
+  // queues for odometry updates from CTRE's thread
+
+  private final Lock odometryLock = new ReentrantLock();
+  private final List<Queue<Double>> drivePositionQueues = new ArrayList<>();
+  private final List<Queue<Double>> steerPositionQueues = new ArrayList<>();
+  private final Queue<Double> gyroYawQueue;
+  private final Queue<Double> timestampQueue = new ArrayBlockingQueue<>(20);
+  private final PhoenixOdometryThread odometryThread = new PhoenixOdometryThread();
+
   /**
    * Creates a new Drivetrain subsystem.
    *
@@ -252,13 +270,7 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
    * @param brModule the back right swerve module
    */
   public DrivetrainIOCTRE() {
-    super(
-        drivetrainConstants,
-        RobotConfig.getInstance().getOdometryUpdateFrequency(),
-        frontLeft,
-        frontRight,
-        backLeft,
-        backRight);
+    super(drivetrainConstants, 250.0, frontLeft, frontRight, backLeft, backRight);
 
     this.pitchStatusSignal = this.m_pigeon2.getPitch().clone();
     this.pitchStatusSignal.setUpdateFrequency(100);
@@ -278,9 +290,6 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
     this.targetChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
-    // specify that we will be using CTRE's custom odometry instead of 3061 lib's default
-    RobotOdometry.getInstance().setCustomOdometry(this);
-
     for (int i = 0; i < driveCurrentRequests.length; i++) {
       this.driveCurrentRequests[i] = new TorqueCurrentFOC(0.0);
       this.steerCurrentRequests[i] = new TorqueCurrentFOC(0.0);
@@ -297,6 +306,17 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     //  the definition of forward based on the current alliance
     this.driveFacingAngleRequest.ForwardReference = SwerveRequest.ForwardReference.RedAlliance;
     this.driveFieldCentricRequest.ForwardReference = SwerveRequest.ForwardReference.RedAlliance;
+
+    // create queues for updates from our odometry thread
+    for (int i = 0; i < this.Modules.length; i++) {
+      this.drivePositionQueues.add(
+          this.odometryThread.registerSignal(
+              this.Modules[i].getDriveMotor(), this.Modules[i].getDriveMotor().getPosition()));
+      this.steerPositionQueues.add(
+          this.odometryThread.registerSignal(
+              this.Modules[i].getSteerMotor(), this.Modules[i].getSteerMotor().getPosition()));
+    }
+    this.gyroYawQueue = this.odometryThread.registerSignal(this.m_pigeon2, this.m_pigeon2.getYaw());
   }
 
   @Override
@@ -313,11 +333,6 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     inputs.drivetrain.swerveMeasuredStates = this.getState().ModuleStates;
     inputs.drivetrain.swerveReferenceStates = this.getState().ModuleTargets;
 
-    // log poses, 3D geometry, and swerve module states, gyro offset
-    inputs.drivetrain.robotPose =
-        new Pose2d(this.getState().Pose.getTranslation(), this.getState().Pose.getRotation());
-    inputs.drivetrain.robotPose3D = new Pose3d(inputs.drivetrain.robotPose);
-
     inputs.drivetrain.targetVXMetersPerSec = this.targetChassisSpeeds.vxMetersPerSecond;
     inputs.drivetrain.targetVYMetersPerSec = this.targetChassisSpeeds.vyMetersPerSecond;
     inputs.drivetrain.targetAngularVelocityRadPerSec =
@@ -332,7 +347,35 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
     inputs.drivetrain.averageDriveCurrent = this.getAverageDriveCurrent(inputs);
 
-    inputs.drivetrain.rotation = this.getState().Pose.getRotation();
+    this.odometryLock.lock();
+
+    inputs.drivetrain.odometryTimestamps =
+        this.timestampQueue.stream().mapToDouble(Double::valueOf).toArray();
+    this.timestampQueue.clear();
+
+    inputs.gyro.odometryYawPositions =
+        this.gyroYawQueue.stream().map(Rotation2d::fromDegrees).toArray(Rotation2d[]::new);
+    this.gyroYawQueue.clear();
+
+    for (int i = 0; i < swerveModulesSignals.length; i++) {
+      inputs.swerve[i].odometryDrivePositionsMeters =
+          drivePositionQueues.get(i).stream()
+              .mapToDouble(
+                  signalValue ->
+                      Conversions.falconRotationsToMechanismMeters(
+                          signalValue,
+                          RobotConfig.getInstance().getWheelDiameterMeters() * Math.PI,
+                          RobotConfig.getInstance().getSwerveConstants().getDriveGearRatio()))
+              .toArray();
+      inputs.swerve[i].odometryTurnPositions =
+          steerPositionQueues.get(i).stream()
+              .map(Rotation2d::fromRotations)
+              .toArray(Rotation2d[]::new);
+      drivePositionQueues.get(i).clear();
+      steerPositionQueues.get(i).clear();
+    }
+
+    this.odometryLock.unlock();
 
     if (Constants.getMode() == Constants.Mode.SIM) {
       updateSimState(Constants.LOOP_PERIOD_SECS, 12.0);
@@ -588,14 +631,10 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
 
   @Override
   public void setGyroOffset(double expectedYaw) {
-    try {
-      m_stateLock.writeLock().lock();
-
-      m_fieldRelativeOffset =
-          getState().Pose.getRotation().plus(Rotation2d.fromDegrees(expectedYaw));
-    } finally {
-      m_stateLock.writeLock().unlock();
-    }
+    this.seedFieldRelative(
+        new Pose2d(
+            RobotOdometry.getInstance().getEstimatedPosition().getTranslation(),
+            Rotation2d.fromDegrees(expectedYaw)));
   }
 
   @Override
@@ -651,20 +690,6 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
     return totalCurrent / inputs.swerve.length;
   }
 
-  public Pose2d getEstimatedPosition() {
-    return this.m_odometry.getEstimatedPosition();
-  }
-
-  public void resetPosition(
-      Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d poseMeters) {
-    this.m_odometry.resetPosition(gyroAngle, modulePositions, poseMeters);
-  }
-
-  public Pose2d updateWithTime(
-      double currentTimeSeconds, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-    return this.m_odometry.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
-  }
-
   private static ClosedLoopOutputType getSteerClosedLoopOutputType() {
     if (RobotConfig.getInstance().getSwerveSteerControlMode()
         == RobotConfig.SWERVE_CONTROL_MODE.TORQUE_CURRENT_FOC) {
@@ -680,6 +705,83 @@ public class DrivetrainIOCTRE extends SwerveDrivetrain implements DrivetrainIO {
       return ClosedLoopOutputType.TorqueCurrentFOC;
     } else {
       return ClosedLoopOutputType.Voltage;
+    }
+  }
+
+  // Heavily based on 6328's PhoenixOdometryThread class from 2024.
+
+  /**
+   * Provides an interface for asynchronously reading high-frequency measurements to a set of
+   * queues.
+   *
+   * <p>This version is intended for Phoenix 6 devices on both the RIO and CANivore buses. When
+   * using a CANivore, the thread uses the "waitForAll" blocking method to enable more consistent
+   * sampling. This also allows Phoenix Pro users to benefit from lower latency between devices
+   * using CANivore time synchronization.
+   */
+  private class PhoenixOdometryThread extends Thread {
+    private final Lock signalsLock =
+        new ReentrantLock(); // Prevents conflicts when registering signals
+    private BaseStatusSignal[] signals = new BaseStatusSignal[0];
+    private final List<Queue<Double>> queues = new ArrayList<>();
+    private boolean isCANFD = false;
+
+    private PhoenixOdometryThread() {
+      setName("PhoenixOdometryThread");
+      setDaemon(true);
+      start();
+    }
+
+    public Queue<Double> registerSignal(ParentDevice device, StatusSignal<Double> signal) {
+      Queue<Double> queue = new ArrayBlockingQueue<>(20);
+      signalsLock.lock();
+      odometryLock.lock();
+      try {
+        isCANFD = CANBus.isNetworkFD(device.getNetwork());
+        BaseStatusSignal[] newSignals = new BaseStatusSignal[signals.length + 1];
+        System.arraycopy(signals, 0, newSignals, 0, signals.length);
+        newSignals[signals.length] = signal.clone();
+        BaseStatusSignal.setUpdateFrequencyForAll(
+            RobotConfig.getInstance().getOdometryUpdateFrequency(), newSignals[signals.length]);
+        signals = newSignals;
+        queues.add(queue);
+      } finally {
+        signalsLock.unlock();
+        odometryLock.unlock();
+      }
+      return queue;
+    }
+
+    @Override
+    public void run() {
+      while (true) {
+        // Wait for updates from all signals
+        signalsLock.lock();
+        try {
+          if (isCANFD) {
+            BaseStatusSignal.waitForAll(Constants.LOOP_PERIOD_SECS, signals);
+          } else {
+            Thread.sleep((long) (1000.0 / RobotConfig.getInstance().getOdometryUpdateFrequency()));
+            if (signals.length > 0) BaseStatusSignal.refreshAll(signals);
+          }
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        } finally {
+          signalsLock.unlock();
+        }
+        double fpgaTimestamp = Logger.getRealTimestamp() / 1.0e6;
+
+        // Save new data to queues
+        odometryLock.lock();
+        try {
+          for (int i = 0; i < signals.length; i++) {
+            queues.get(i).offer(signals[i].getValueAsDouble());
+          }
+          timestampQueue.offer(fpgaTimestamp);
+        } finally {
+          odometryLock.unlock();
+        }
+      }
     }
   }
 }

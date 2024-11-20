@@ -118,12 +118,13 @@ public class RobotContainer {
             break;
           }
         case ROBOT_PRACTICE:
-        case ROBOT_COMPETITION:
+        case ROBOT_COMPETITION_CTRE:
           {
             createCTRESubsystems();
             break;
           }
         case ROBOT_SIMBOT:
+        case ROBOT_COMPETITION_GENERIC:
           {
             createSubsystems();
             break;
@@ -176,7 +177,8 @@ public class RobotContainer {
       case ROBOT_PRACTICE:
         config = new PracticeRobotConfig();
         break;
-      case ROBOT_COMPETITION:
+      case ROBOT_COMPETITION_CTRE:
+      case ROBOT_COMPETITION_GENERIC:
       case ROBOT_SIMBOT_CTRE:
         config = new ArtemisRobotConfig();
         break;
@@ -238,9 +240,15 @@ public class RobotContainer {
                 blModule,
                 brModule));
 
-    intake = new Intake(new IntakeIOTalonFX());
-    climber = new Climber(new ClimberIOTalonFX());
-    shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
+    // FIXME: disable other subsystems for testing
+    // intake = new Intake(new IntakeIOTalonFX());
+    // climber = new Climber(new ClimberIOTalonFX());
+    // shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
+    // intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
+
+    intake = new Intake(new IntakeIO() {});
+    climber = new Climber(new ClimberIOTalonFX() {});
+    shooter = new Shooter(new ShooterIO() {}, intake, drivetrain);
     intake.setShooterAngleReady(shooter.getShooterAngleReadySupplier());
 
     noteTargeting = new NoteTargeting(new NoteTargetingIO() {});

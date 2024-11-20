@@ -4,9 +4,8 @@
 
 package frc.lib.team3061.gyro;
 
-import com.ctre.phoenix6.StatusSignal;
-import java.util.ArrayList;
-import java.util.List;
+import edu.wpi.first.math.geometry.Rotation2d;
+import frc.lib.team3061.drivetrain.DrivetrainIO.SignalPair;
 import org.littletonrobotics.junction.AutoLog;
 
 @java.lang.SuppressWarnings({"java:S1104"})
@@ -37,6 +36,8 @@ public interface GyroIO {
     public double pitchDegPerSec = 0.0;
     public double rollDeg = 0.0;
     public double rollDegPerSec = 0.0;
+
+    public Rotation2d[] odometryYawPositions = new Rotation2d[] {};
   }
 
   /**
@@ -62,12 +63,14 @@ public interface GyroIO {
   public default void addYaw(double yaw) {}
 
   /**
-   * Returns a list of status signals for the gyro related to odometry. This can be used to
-   * synchronize the gyro and swerve modules to improve the accuracy of pose estimation.
+   * Returns a pair of status signals related to odometry for gyro. This can be used to synchronize
+   * the gyro and swerve modules to improve the accuracy of pose estimation. The pair must be
+   * constructed such that one signal is the rate of change of the other and latency-compensation
+   * can be performed.
    *
-   * @return the status signals for the gyro
+   * @return the pair of status signals for the gyro
    */
-  public default List<StatusSignal<Double>> getOdometryStatusSignals() {
-    return new ArrayList<>();
+  public default SignalPair getOdometrySignalPair() {
+    return null;
   }
 }
