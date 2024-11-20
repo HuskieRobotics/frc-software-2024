@@ -1,5 +1,5 @@
 {
-  "version": 1.0,
+  "version": "2025.0",
   "waypoints": [
     {
       "anchor": {
@@ -70,7 +70,9 @@
         "maxVelocity": 1.75,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 530.0,
-        "maxAngularAcceleration": 2005.0
+        "maxAngularAcceleration": 2005.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
       }
     },
     {
@@ -81,14 +83,36 @@
         "maxVelocity": 0.75,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 530.0,
-        "maxAngularAcceleration": 2005.0
+        "maxAngularAcceleration": 2005.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
       }
     }
   ],
+  "pointTowardsZones": [],
   "eventMarkers": [
+    {
+      "name": "Shoot Outbound",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Shoot Outbound at 3.5 Meters"
+              }
+            }
+          ]
+        }
+      }
+    },
     {
       "name": "Enable Rotation Override",
       "waypointRelativePos": 0.85,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -106,6 +130,7 @@
     {
       "name": "Disable Rotation Override",
       "waypointRelativePos": 2.0,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -119,41 +144,25 @@
           ]
         }
       }
-    },
-    {
-      "name": "Shoot Outbound",
-      "waypointRelativePos": 0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Shoot Outbound at 3.5 Meters"
-              }
-            }
-          ]
-        }
-      }
     }
   ],
   "globalConstraints": {
     "maxVelocity": 3.25,
     "maxAcceleration": 6.948,
     "maxAngularVelocity": 530.0,
-    "maxAngularAcceleration": 2005.0
+    "maxAngularAcceleration": 2005.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0.7,
-    "rotation": 180.0,
-    "rotateFast": false
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "5 Note Speaker",
-  "previewStartingState": {
-    "rotation": 180.0,
-    "velocity": 0
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
   },
   "useDefaultConstraints": false
 }

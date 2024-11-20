@@ -1,5 +1,5 @@
 {
-  "version": 1.0,
+  "version": "2025.0",
   "waypoints": [
     {
       "anchor": {
@@ -37,7 +37,7 @@
       },
       "prevControl": {
         "x": 5.537066619156935,
-        "y": 0.7781323619519279
+        "y": 0.7781323619519281
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,10 +46,12 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
+  "pointTowardsZones": [],
   "eventMarkers": [
     {
       "name": "Shoot",
       "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -67,6 +69,7 @@
     {
       "name": "Enable Rotation Override",
       "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -84,6 +87,7 @@
     {
       "name": "Disable Rotation Override",
       "waypointRelativePos": 1.25,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -103,18 +107,19 @@
     "maxVelocity": 3.25,
     "maxAcceleration": 6.948,
     "maxAngularVelocity": 530.0,
-    "maxAngularAcceleration": 2005.0
+    "maxAngularAcceleration": 2005.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0,
-    "rotateFast": true
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "Source Side",
-  "previewStartingState": {
-    "rotation": 131.09,
-    "velocity": 0
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

@@ -460,9 +460,15 @@ public class RobotContainer {
         Commands.sequence(
             Commands.runOnce(() -> shooter.setShootingPosition(ShootingPosition.SUBWOOFER)),
             Commands.runOnce(
-                () ->
+                () -> {
+                  try {
                     drivetrain.resetPose(
-                        PathPlannerPath.fromPathFile("1 - rush").getPreviewStartingHolonomicPose()),
+                        PathPlannerPath.fromPathFile("1 - rush").getStartingDifferentialPose());
+                  } catch (Exception e) {
+                    // FIXME: generate an alert about the missing path file;
+                    System.out.println("Path file not found: 1 - rush");
+                  }
+                },
                 drivetrain),
             this.getShootCommand()
                 .withTimeout(1.0)
@@ -556,9 +562,15 @@ public class RobotContainer {
 
     Command startPoint =
         Commands.runOnce(
-            () ->
+            () -> {
+              try {
                 drivetrain.resetPose(
-                    PathPlannerPath.fromPathFile("Start Point").getPreviewStartingHolonomicPose()),
+                    PathPlannerPath.fromPathFile("Start Point").getStartingDifferentialPose());
+              } catch (Exception e) {
+                // FIXME: generate an alert about the missing path file;
+                System.out.println("Path file not found: Start Point");
+              }
+            },
             drivetrain);
     autoChooser.addOption("Start Point", startPoint);
 

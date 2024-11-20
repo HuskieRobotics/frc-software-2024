@@ -158,7 +158,7 @@ public class Shooter extends SubsystemBase {
     double distanceToSpeaker =
         Field2d.getInstance()
             .getAllianceSpeakerCenter()
-            .minus(RobotOdometry.getInstance().getEstimatedPosition())
+            .minus(RobotOdometry.getInstance().getEstimatedPose())
             .getTranslation()
             .getNorm();
     Logger.recordOutput("Shooter/distanceToSpeaker", distanceToSpeaker);
@@ -189,7 +189,7 @@ public class Shooter extends SubsystemBase {
         double distanceToSpeaker =
             Field2d.getInstance()
                 .getAllianceSpeakerCenter()
-                .minus(RobotOdometry.getInstance().getEstimatedPosition())
+                .minus(RobotOdometry.getInstance().getEstimatedPose())
                 .getTranslation()
                 .getNorm();
         this.adjustAngle(distanceToSpeaker);
@@ -199,7 +199,7 @@ public class Shooter extends SubsystemBase {
         double distanceToSpeaker =
             Field2d.getInstance()
                 .getAllianceSpeakerCenter()
-                .minus(RobotOdometry.getInstance().getEstimatedPosition())
+                .minus(RobotOdometry.getInstance().getEstimatedPose())
                 .getTranslation()
                 .getNorm();
         this.adjustAngle(distanceToSpeaker);
@@ -212,7 +212,7 @@ public class Shooter extends SubsystemBase {
         double distanceToSpeaker =
             Field2d.getInstance()
                 .getAllianceSpeakerCenter()
-                .minus(RobotOdometry.getInstance().getEstimatedPosition())
+                .minus(RobotOdometry.getInstance().getEstimatedPose())
                 .getTranslation()
                 .getNorm();
         this.adjustAngle(distanceToSpeaker);
@@ -321,7 +321,7 @@ public class Shooter extends SubsystemBase {
         double distanceToSpeaker =
             Field2d.getInstance()
                 .getAllianceSpeakerCenter()
-                .minus(RobotOdometry.getInstance().getEstimatedPosition())
+                .minus(RobotOdometry.getInstance().getEstimatedPose())
                 .getTranslation()
                 .getNorm();
         double angle =

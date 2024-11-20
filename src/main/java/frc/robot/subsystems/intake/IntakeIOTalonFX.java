@@ -1,5 +1,6 @@
 package frc.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.intake.IntakeConstants.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -13,6 +14,10 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
@@ -42,23 +47,23 @@ public class IntakeIOTalonFX implements IntakeIO {
   private VelocityTorqueCurrentFOC kickerVelocityRequest;
   private VoltageOut kickerVoltageRequest;
 
-  private StatusSignal<Double> rollerVelocityStatusSignal;
-  private StatusSignal<Double> kickerVelocityStatusSignal;
+  private StatusSignal<AngularVelocity> rollerVelocityStatusSignal;
+  private StatusSignal<AngularVelocity> kickerVelocityStatusSignal;
 
-  private StatusSignal<Double> rollerStatorCurrentStatusSignal;
-  private StatusSignal<Double> kickerStatorCurrentStatusSignal;
+  private StatusSignal<Current> rollerStatorCurrentStatusSignal;
+  private StatusSignal<Current> kickerStatorCurrentStatusSignal;
 
-  private StatusSignal<Double> rollerSupplyCurrentStatusSignal;
-  private StatusSignal<Double> kickerSupplyCurrentStatusSignal;
+  private StatusSignal<Current> rollerSupplyCurrentStatusSignal;
+  private StatusSignal<Current> kickerSupplyCurrentStatusSignal;
 
   private StatusSignal<Double> rollerReferenceVelocityStatusSignal;
   private StatusSignal<Double> kickerReferenceVelocityStatusSignal;
 
-  private StatusSignal<Double> rollerTemperatureStatusSignal;
-  private StatusSignal<Double> kickerTemperatureStatusSignal;
+  private StatusSignal<Temperature> rollerTemperatureStatusSignal;
+  private StatusSignal<Temperature> kickerTemperatureStatusSignal;
 
-  private StatusSignal<Double> rollerVoltageStatusSignal;
-  private StatusSignal<Double> kickerVoltageStatusSignal;
+  private StatusSignal<Voltage> rollerVoltageStatusSignal;
+  private StatusSignal<Voltage> kickerVoltageStatusSignal;
 
   // simulation related
   private VelocitySystemSim rollerMotorSim;
@@ -179,26 +184,26 @@ public class IntakeIOTalonFX implements IntakeIO {
 
     inputs.usingMainIRSensors = this.usingMainIRSensors;
 
-    inputs.rollerStatorCurrentAmps = rollerStatorCurrentStatusSignal.getValueAsDouble();
-    inputs.kickerStatorCurrentAmps = kickerStatorCurrentStatusSignal.getValueAsDouble();
+    inputs.rollerStatorCurrentAmps = rollerStatorCurrentStatusSignal.getValue().in(Amps);
+    inputs.kickerStatorCurrentAmps = kickerStatorCurrentStatusSignal.getValue().in(Amps);
 
-    inputs.rollerSupplyCurrentAmps = rollerSupplyCurrentStatusSignal.getValueAsDouble();
-    inputs.kickerSupplyCurrentAmps = kickerSupplyCurrentStatusSignal.getValueAsDouble();
+    inputs.rollerSupplyCurrentAmps = rollerSupplyCurrentStatusSignal.getValue().in(Amps);
+    inputs.kickerSupplyCurrentAmps = kickerSupplyCurrentStatusSignal.getValue().in(Amps);
 
-    inputs.rollerVelocityRPS = rollerVelocityStatusSignal.getValueAsDouble();
-    inputs.kickerVelocityRPS = kickerVelocityStatusSignal.getValueAsDouble();
+    inputs.rollerVelocityRPS = rollerVelocityStatusSignal.getValue().in(RotationsPerSecond);
+    inputs.kickerVelocityRPS = kickerVelocityStatusSignal.getValue().in(RotationsPerSecond);
 
     // Retrieve the closed loop reference status signals directly from the motor in this method
     // instead of retrieving in advance because the status signal returned depends on the current
     // control mode.
-    inputs.rollerReferenceVelocityRPS = rollerMotor.getClosedLoopReference().getValueAsDouble();
-    inputs.kickerReferenceVelocityRPS = kickerMotor.getClosedLoopReference().getValueAsDouble();
+    inputs.rollerReferenceVelocityRPS = rollerMotor.getClosedLoopReference().getValue();
+    inputs.kickerReferenceVelocityRPS = kickerMotor.getClosedLoopReference().getValue();
 
-    inputs.rollerTempCelsius = rollerTemperatureStatusSignal.getValueAsDouble();
-    inputs.kickerTempCelsius = kickerTemperatureStatusSignal.getValueAsDouble();
+    inputs.rollerTempCelsius = rollerTemperatureStatusSignal.getValue().in(Celsius);
+    inputs.kickerTempCelsius = kickerTemperatureStatusSignal.getValue().in(Celsius);
 
-    inputs.rollerVoltage = rollerVoltageStatusSignal.getValueAsDouble();
-    inputs.kickerVoltage = kickerVoltageStatusSignal.getValueAsDouble();
+    inputs.rollerVoltage = rollerVoltageStatusSignal.getValue().in(Volts);
+    inputs.kickerVoltage = kickerVoltageStatusSignal.getValue().in(Volts);
 
     if (rollerMotorsKP.hasChanged()
         || rollerMotorsKI.hasChanged()

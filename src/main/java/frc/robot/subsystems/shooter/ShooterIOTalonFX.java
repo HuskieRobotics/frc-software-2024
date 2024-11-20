@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -24,6 +25,11 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.lib.team3015.subsystem.FaultReporter;
 import frc.lib.team3061.RobotConfig;
@@ -43,36 +49,36 @@ public class ShooterIOTalonFX implements ShooterIO {
   private VoltageOut deflectorMotorVoltageRequest;
 
   // Using StatusSignal to get the stator current of the motors
-  private StatusSignal<Double> shootMotorTopStatorCurrentStatusSignal;
-  private StatusSignal<Double> shootMotorBottomStatorCurrentStatusSignal;
-  private StatusSignal<Double> angleMotorStatorCurrentStatusSignal;
+  private StatusSignal<Current> shootMotorTopStatorCurrentStatusSignal;
+  private StatusSignal<Current> shootMotorBottomStatorCurrentStatusSignal;
+  private StatusSignal<Current> angleMotorStatorCurrentStatusSignal;
 
   // Using StatusSignal to get the supply current of the motors
-  private StatusSignal<Double> shootMotorTopSupplyCurrentStatusSignal;
-  private StatusSignal<Double> shootMotorBottomSupplyCurrentStatusSignal;
-  private StatusSignal<Double> angleMotorSupplyCurrentStatusSignal;
+  private StatusSignal<Current> shootMotorTopSupplyCurrentStatusSignal;
+  private StatusSignal<Current> shootMotorBottomSupplyCurrentStatusSignal;
+  private StatusSignal<Current> angleMotorSupplyCurrentStatusSignal;
 
   // Using StatusSignal to get the velocity of the motors
-  private StatusSignal<Double> shootMotorTopVelocityStatusSignal;
-  private StatusSignal<Double> shootMotorBottomVelocityStatusSignal;
-  private StatusSignal<Double> angleMotorPositionStatusSignal;
+  private StatusSignal<AngularVelocity> shootMotorTopVelocityStatusSignal;
+  private StatusSignal<AngularVelocity> shootMotorBottomVelocityStatusSignal;
+  private StatusSignal<Angle> angleMotorPositionStatusSignal;
 
   private StatusSignal<Double> shootMotorTopReferenceVelocityStatusSignal;
   private StatusSignal<Double> shootMotorBottomReferenceVelocityStatusSignal;
   private StatusSignal<Double> angleMotorReferencePositionStatusSignal;
 
-  private StatusSignal<Double> shootMotorTopTemperatureStatusSignal;
-  private StatusSignal<Double> shootMotorBottomTemperatureStatusSignal;
-  private StatusSignal<Double> angleMotorTemperatureStatusSignal;
+  private StatusSignal<Temperature> shootMotorTopTemperatureStatusSignal;
+  private StatusSignal<Temperature> shootMotorBottomTemperatureStatusSignal;
+  private StatusSignal<Temperature> angleMotorTemperatureStatusSignal;
 
-  private StatusSignal<Double> shootMotorTopVoltageStatusSignal;
-  private StatusSignal<Double> shootMotorBottomVoltageStatusSignal;
-  private StatusSignal<Double> angleMotorVoltageStatusSignal;
+  private StatusSignal<Voltage> shootMotorTopVoltageStatusSignal;
+  private StatusSignal<Voltage> shootMotorBottomVoltageStatusSignal;
+  private StatusSignal<Voltage> angleMotorVoltageStatusSignal;
 
-  private StatusSignal<Double> deflectorMotorVoltageStatusSignal;
-  private StatusSignal<Double> deflectorMotorStatorCurrentStatusSignal;
-  private StatusSignal<Double> deflectorMotorSupplyCurrentStatusSignal;
-  private StatusSignal<Double> deflectorMotorTemperatureStatusSignal;
+  private StatusSignal<Voltage> deflectorMotorVoltageStatusSignal;
+  private StatusSignal<Current> deflectorMotorStatorCurrentStatusSignal;
+  private StatusSignal<Current> deflectorMotorSupplyCurrentStatusSignal;
+  private StatusSignal<Temperature> deflectorMotorTemperatureStatusSignal;
 
   private StatusSignal<Double> angleMotorClosedLoopReferenceSlopeStatusSignal;
 
@@ -262,30 +268,32 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     // Updates Top Shooter Motor Inputs
     shooterInputs.shootMotorTopStatorCurrentAmps =
-        shootMotorTopStatorCurrentStatusSignal.getValueAsDouble();
+        shootMotorTopStatorCurrentStatusSignal.getValue().in(Amps);
     shooterInputs.shootMotorTopSupplyCurrentAmps =
-        shootMotorTopSupplyCurrentStatusSignal.getValueAsDouble();
-    shooterInputs.shootMotorTopVelocityRPS = shootMotorTopVelocityStatusSignal.getValueAsDouble();
+        shootMotorTopSupplyCurrentStatusSignal.getValue().in(Amps);
+    shooterInputs.shootMotorTopVelocityRPS =
+        shootMotorTopVelocityStatusSignal.getValue().in(RotationsPerSecond);
     shooterInputs.shootMotorTopReferenceVelocityRPS = this.topWheelVelocity;
     shooterInputs.shootMotorTopClosedLoopReferenceRPS =
-        shootMotorTop.getClosedLoopReference().getValueAsDouble();
+        shootMotorTop.getClosedLoopReference().getValue();
     shooterInputs.shootMotorTopTemperatureCelsius =
-        shootMotorTopTemperatureStatusSignal.getValueAsDouble();
-    shooterInputs.shootMotorTopVoltage = shootMotorTopVoltageStatusSignal.getValueAsDouble();
+        shootMotorTopTemperatureStatusSignal.getValue().in(Celsius);
+    shooterInputs.shootMotorTopVoltage = shootMotorTopVoltageStatusSignal.getValue().in(Volts);
 
     // Updates Bottom Shooter Motor Inputs
     shooterInputs.shootMotorBottomStatorCurrentAmps =
-        shootMotorBottomStatorCurrentStatusSignal.getValueAsDouble();
+        shootMotorBottomStatorCurrentStatusSignal.getValue().in(Amps);
     shooterInputs.shootMotorBottomSupplyCurrentAmps =
-        shootMotorBottomSupplyCurrentStatusSignal.getValueAsDouble();
+        shootMotorBottomSupplyCurrentStatusSignal.getValue().in(Amps);
     shooterInputs.shootMotorBottomVelocityRPS =
-        shootMotorBottomVelocityStatusSignal.getValueAsDouble();
+        shootMotorBottomVelocityStatusSignal.getValue().in(RotationsPerSecond);
     shooterInputs.shootMotorBottomReferenceVelocityRPS = this.bottomWheelVelocity;
     shooterInputs.shootMotorBottomClosedLoopReferenceRPS =
-        shootMotorBottom.getClosedLoopReference().getValueAsDouble();
+        shootMotorBottom.getClosedLoopReference().getValue();
     shooterInputs.shootMotorBottomTemperatureCelsius =
-        shootMotorBottomTemperatureStatusSignal.getValueAsDouble();
-    shooterInputs.shootMotorBottomVoltage = shootMotorBottomVoltageStatusSignal.getValueAsDouble();
+        shootMotorBottomTemperatureStatusSignal.getValue().in(Celsius);
+    shooterInputs.shootMotorBottomVoltage =
+        shootMotorBottomVoltageStatusSignal.getValue().in(Volts);
 
     // check if the tunable numbers have changed for the top and bottom shooter motors
     if (shootMotorTopKD.hasChanged()
@@ -318,19 +326,18 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     // Updates Angle Motor Inputs
     shooterInputs.angleMotorStatorCurrentAmps =
-        angleMotorStatorCurrentStatusSignal.getValueAsDouble();
+        angleMotorStatorCurrentStatusSignal.getValue().in(Amps);
     shooterInputs.angleMotorSupplyCurrentAmps =
-        angleMotorSupplyCurrentStatusSignal.getValueAsDouble();
-    shooterInputs.angleMotorVoltage = angleMotor.getMotorVoltage().getValue();
-    shooterInputs.angleEncoderAngleDegrees =
-        Units.rotationsToDegrees(angleMotorPositionStatusSignal.getValueAsDouble());
+        angleMotorSupplyCurrentStatusSignal.getValue().in(Amps);
+    shooterInputs.angleMotorVoltage = angleMotor.getMotorVoltage().getValue().in(Volts);
+    shooterInputs.angleEncoderAngleDegrees = angleMotorPositionStatusSignal.getValue().in(Degrees);
     shooterInputs.angleMotorReferenceAngleDegrees = this.angleSetpoint;
     shooterInputs.angleMotorClosedLoopReferenceDegrees =
-        Units.rotationsToDegrees(angleMotor.getClosedLoopReference().getValueAsDouble());
+        Units.rotationsToDegrees(angleMotor.getClosedLoopReference().getValue());
     shooterInputs.angleMotorTemperatureCelsius =
-        angleMotorTemperatureStatusSignal.getValueAsDouble();
+        angleMotorTemperatureStatusSignal.getValue().in(Celsius);
     shooterInputs.angleMotorClosedLoopReferenceSlope =
-        angleMotor.getClosedLoopReferenceSlope().getValueAsDouble();
+        angleMotor.getClosedLoopReferenceSlope().getValue();
     if (rotationMotorKP.hasChanged()
         || rotationMotorKI.hasChanged()
         || rotationMotorKD.hasChanged()
@@ -340,16 +347,16 @@ public class ShooterIOTalonFX implements ShooterIO {
         || rotationMotorKV.hasChanged()
         || rotationMotorExpoKV.hasChanged()
         || rotationMotorExpoKA.hasChanged()) {
-      Slot0Configs angleMotorConfig = new Slot0Configs();
-      angleMotor.getConfigurator().refresh(angleMotorConfig);
-      angleMotorConfig.kP = rotationMotorKP.get();
-      angleMotorConfig.kI = rotationMotorKI.get();
-      angleMotorConfig.kD = rotationMotorKD.get();
-      angleMotorConfig.kS = rotationMotorKS.get();
-      angleMotorConfig.kG = rotationMotorKG.get();
-      angleMotorConfig.kA = rotationMotorKA.get();
-      angleMotorConfig.kV = rotationMotorKV.get();
-      angleMotor.getConfigurator().apply(angleMotorConfig);
+      Slot0Configs config = new Slot0Configs();
+      angleMotor.getConfigurator().refresh(config);
+      config.kP = rotationMotorKP.get();
+      config.kI = rotationMotorKI.get();
+      config.kD = rotationMotorKD.get();
+      config.kS = rotationMotorKS.get();
+      config.kG = rotationMotorKG.get();
+      config.kA = rotationMotorKA.get();
+      config.kV = rotationMotorKV.get();
+      angleMotor.getConfigurator().apply(config);
 
       MotionMagicConfigs rotationMotionMagicConfig = new MotionMagicConfigs();
       angleMotor.getConfigurator().refresh(rotationMotionMagicConfig);
@@ -371,12 +378,12 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     // Updates Deflector Motor Inputs
     shooterInputs.deflectorMotorStatorCurrentAmps =
-        deflectorMotorStatorCurrentStatusSignal.getValueAsDouble();
+        deflectorMotorStatorCurrentStatusSignal.getValue().in(Amps);
     shooterInputs.deflectorMotorSupplyCurrentAmps =
-        deflectorMotorSupplyCurrentStatusSignal.getValueAsDouble();
-    shooterInputs.deflectorMotorVoltage = deflectorMotorVoltageStatusSignal.getValueAsDouble();
+        deflectorMotorSupplyCurrentStatusSignal.getValue().in(Amps);
+    shooterInputs.deflectorMotorVoltage = deflectorMotorVoltageStatusSignal.getValue().in(Volts);
     shooterInputs.deflectorMotorTemperatureCelsius =
-        deflectorMotorTemperatureStatusSignal.getValueAsDouble();
+        deflectorMotorTemperatureStatusSignal.getValue().in(Celsius);
   }
 
   @Override
@@ -480,11 +487,10 @@ public class ShooterIOTalonFX implements ShooterIO {
     CurrentLimitsConfigs angleMotorCurrentLimits = new CurrentLimitsConfigs();
     MotionMagicConfigs rotationMotionMagicConfig = angleMotorConfig.MotionMagic;
 
-    angleMotorCurrentLimits.SupplyCurrentLimit =
+    angleMotorCurrentLimits.SupplyCurrentLimit = ShooterConstants.ANGLE_MOTOR_PEAK_CURRENT_LIMIT;
+    angleMotorCurrentLimits.SupplyCurrentLowerLimit =
         ShooterConstants.ANGLE_MOTOR_CONTINUOUS_CURRENT_LIMIT;
-    angleMotorCurrentLimits.SupplyCurrentThreshold =
-        ShooterConstants.ANGLE_MOTOR_PEAK_CURRENT_LIMIT;
-    angleMotorCurrentLimits.SupplyTimeThreshold =
+    angleMotorCurrentLimits.SupplyCurrentLowerTime =
         ShooterConstants.ANGLE_MOTOR_PEAK_CURRENT_DURATION;
     angleMotorCurrentLimits.SupplyCurrentLimitEnable = true;
     angleMotorConfig.CurrentLimits = angleMotorCurrentLimits;
@@ -540,10 +546,10 @@ public class ShooterIOTalonFX implements ShooterIO {
     TalonFXConfiguration deflectorMotorConfig = new TalonFXConfiguration();
     CurrentLimitsConfigs deflectorMotorCurrentLimits = new CurrentLimitsConfigs();
     deflectorMotorCurrentLimits.SupplyCurrentLimit =
-        ShooterConstants.DEFLECTOR_MOTOR_CONTINUOUS_CURRENT_LIMIT;
-    deflectorMotorCurrentLimits.SupplyCurrentThreshold =
         ShooterConstants.DEFLECTOR_MOTOR_PEAK_CURRENT_LIMIT;
-    deflectorMotorCurrentLimits.SupplyTimeThreshold =
+    deflectorMotorCurrentLimits.SupplyCurrentLowerLimit =
+        ShooterConstants.DEFLECTOR_MOTOR_CONTINUOUS_CURRENT_LIMIT;
+    deflectorMotorCurrentLimits.SupplyCurrentLowerTime =
         ShooterConstants.DEFLECTOR_MOTOR_PEAK_CURRENT_DURATION;
     deflectorMotorCurrentLimits.SupplyCurrentLimitEnable = true;
     deflectorMotorConfig.CurrentLimits = deflectorMotorCurrentLimits;
