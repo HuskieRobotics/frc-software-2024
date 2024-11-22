@@ -348,7 +348,11 @@ public class Drivetrain extends SubsystemBase {
     Pose3d pose = poseSupplier.get();
     if (pose != null) {
       noPoseAlert.set(false);
-      this.io.resetPose(pose.toPose2d());
+      RobotOdometry.getInstance()
+          .resetPosition(
+              Rotation2d.fromDegrees(this.inputs.gyro.yawDeg),
+              this.modulePositions,
+              pose.toPose2d());
       this.prevRobotPose = pose.toPose2d();
     } else {
       noPoseAlert.set(true);
