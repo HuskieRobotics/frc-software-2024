@@ -186,7 +186,7 @@ public class RobotContainer {
   }
 
   private void createCTRESubsystems() {
-    intake = new Intake(new IntakeIOTalonFX());
+    intake = new Intake(new IntakeIO() {});
     drivetrain = new Drivetrain(new DrivetrainIOCTRE());
     climber = new Climber(new ClimberIOTalonFX());
     shooter = new Shooter(new ShooterIOTalonFX(), intake, drivetrain);
