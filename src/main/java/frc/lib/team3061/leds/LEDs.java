@@ -65,7 +65,7 @@ public abstract class LEDs extends SubsystemBase {
     LOW_BATTERY((leds, section) -> leds.solid(section, new Color(255, 20, 0))),
     DISABLED_DEMO_MODE((leds, section) -> leds.updateToPridePattern()),
     DISABLED((leds, section) -> leds.updateToDisabledPattern(section)),
-    AUTO((leds, section) -> leds.orangePulse(section, PULSE_DURATION)),
+    AUTO((leds, section) -> leds.solid(section, Color.kGreen)),
     ENDGAME_ALERT((leds, section) -> leds.strobe(section, Color.kYellow, STROBE_SLOW_DURATION)),
     SHOOTING((leds, section) -> leds.strobe(section, Color.kGreen, STROBE_SLOW_DURATION)),
     AIMING_AT_SPEAKER((leds, section) -> leds.solid(section, Color.kGreen)),
