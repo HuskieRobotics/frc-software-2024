@@ -54,7 +54,8 @@ public class RobotOdometry {
     // resetting position on both estimators at the same time since we are considering both in
     // parallel now
     this.estimator.resetPosition(gyroAngle, modulePositions, poseMeters);
-    this.customOdometry.resetPosition(gyroAngle, modulePositions, poseMeters);
+    if (this.customOdometry != null)
+      this.customOdometry.resetPosition(gyroAngle, modulePositions, poseMeters);
   }
 
   public Pose2d updateWithTime(

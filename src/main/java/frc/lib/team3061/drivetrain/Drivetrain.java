@@ -321,7 +321,8 @@ public class Drivetrain extends SubsystemBase {
    * @param state the specified PathPlanner state to which is set the odometry
    */
   public void resetPose(Pose2d pose) {
-    this.io.resetPose(pose);
+    RobotOdometry.getInstance()
+        .resetPosition(Rotation2d.fromDegrees(this.inputs.gyro.yawDeg), this.modulePositions, pose);
     this.prevRobotPose = pose;
   }
 
