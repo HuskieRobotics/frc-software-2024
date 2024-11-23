@@ -551,6 +551,10 @@ public class Drivetrain extends SubsystemBase {
     Logger.recordOutput(SUBSYSTEM_NAME + "/DefaultPose", this.defaultPose);
     Logger.recordOutput(SUBSYSTEM_NAME + "/CustomPose", this.customPose);
 
+    Logger.recordOutput(
+        SUBSYSTEM_NAME + "/DefaultPoseFR",
+        this.defaultPose.transformBy(new Transform2d(0.36, -0.36, new Rotation2d())));
+
     // check for teleportation
     if (this.inputs.drivetrain.robotPose.minus(prevRobotPose).getTranslation().getNorm() > 0.4) {
       this.resetPose(prevRobotPose);
