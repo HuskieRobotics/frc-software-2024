@@ -108,6 +108,12 @@ public class Vision extends SubsystemBase {
     for (int i = 0; i < this.detectedAprilTags.length; i++) {
       this.detectedAprilTags[i] = new Pose2d();
     }
+
+    Pose3d[] aprilTagsPoses = new Pose3d[this.layout.getTags().size()];
+    for (int i = 0; i < aprilTagsPoses.length; i++) {
+      aprilTagsPoses[i] = this.layout.getTags().get(i).pose;
+    }
+    Logger.recordOutput(SUBSYSTEM_NAME + "/AprilTagsPoses", aprilTagsPoses);
   }
 
   /**
