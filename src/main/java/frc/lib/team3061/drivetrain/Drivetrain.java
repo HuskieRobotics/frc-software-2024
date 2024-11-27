@@ -9,6 +9,7 @@ import static frc.robot.Constants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -40,6 +41,7 @@ import frc.lib.team6328.util.FieldConstants;
 import frc.lib.team6328.util.TunableNumber;
 import frc.robot.Constants;
 import frc.robot.Field2d;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -125,6 +127,8 @@ public class Drivetrain extends SubsystemBase {
 
   private Pose2d defaultPose = new Pose2d();
   private Pose2d customPose = new Pose2d();
+  private Pose2d initialPose = new Pose2d();
+  private double initialDistance = 0.0;
 
   private boolean isRotationOverrideEnabled = false;
 
@@ -888,6 +892,32 @@ public class Drivetrain extends SubsystemBase {
    */
   public boolean isMoveToPoseEnabled() {
     return this.isMoveToPoseEnabled;
+  }
+
+  public void captureInitialConditions() {
+    this.initialPose = this.customPose;
+    double distance = 0.0;
+    for (SwerveIOInputs input : this.inputs.swerve) {
+      distance += Math.abs(input.driveDistanceMeters);
+    }
+
+    this.initialDistance = distance / this.inputs.swerve.length;
+  }
+
+  public void captureFinalConditions(String autoName, boolean measureDistance) {
+    List<Pose2d> pathPoses = PathPlannerPath.fromPathFile(autoName).getPathPoses();
+    Pose2d targetPose = pathPoses.get(pathPoses.size() - 1);
+    Logger.recordOutput(SUBSYSTEM_NAME + "/AutoPoseDiff", targetPose.minus(this.customPose));
+
+    if (measureDistance) {
+      double distance = 0.0;
+      for (SwerveIOInputs input : this.inputs.swerve) {
+        distance += Math.abs(input.driveDistanceMeters);
+      }
+
+      distance /= this.inputs.swerve.length;
+      Logger.recordOutput(SUBSYSTEM_NAME + "/AutoDistanceDiff", distance - this.initialDistance);
+    }
   }
 
   // method to convert swerve module number to location

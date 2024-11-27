@@ -567,15 +567,15 @@ public class RobotContainer {
      * used for empirically determining the wheel diameter
      *
      */
-    autoChooser.addOption("Distance Test Slow", new PathPlannerAuto("DistanceTestSlow"));
-    autoChooser.addOption("Distance Test Med", new PathPlannerAuto("DistanceTestMed"));
-    autoChooser.addOption("Distance Test Fast", new PathPlannerAuto("DistanceTestFast"));
+    autoChooser.addOption("Distance Test Slow", createTuningAutoPath("DistanceTestSlow", true));
+    autoChooser.addOption("Distance Test Med", createTuningAutoPath("DistanceTestMed", true));
+    autoChooser.addOption("Distance Test Fast", createTuningAutoPath("DistanceTestFast", true));
 
-    autoChooser.addOption("Rotation Test Slow", new PathPlannerAuto("RotationTestSlow"));
-    autoChooser.addOption("Rotation Test Fast", new PathPlannerAuto("RotationTestFast"));
+    autoChooser.addOption("Rotation Test Slow", createTuningAutoPath("RotationTestSlow", false));
+    autoChooser.addOption("Rotation Test Fast", createTuningAutoPath("RotationTestFast", false));
 
-    autoChooser.addOption("Oval Test Slow", new PathPlannerAuto("OvalTestSlow"));
-    autoChooser.addOption("Oval Test Fast", new PathPlannerAuto("OvalTestFast"));
+    autoChooser.addOption("Oval Test Slow", createTuningAutoPath("OvalTestSlow", false));
+    autoChooser.addOption("Oval Test Fast", createTuningAutoPath("OvalTestFast", false));
 
     /************ Auto Tuning ************
      *
@@ -663,6 +663,13 @@ public class RobotContainer {
             .withName("Drive Wheel Diameter Characterization"));
 
     Shuffleboard.getTab("MAIN").add(autoChooser.getSendableChooser());
+  }
+
+  private Command createTuningAutoPath(String autoName, boolean measureDistance) {
+    return Commands.sequence(
+        Commands.runOnce(drivetrain::captureInitialConditions),
+        new PathPlannerAuto(autoName),
+        Commands.runOnce(() -> drivetrain.captureFinalConditions(autoName, measureDistance)));
   }
 
   private void configureIntakeCommands() {
