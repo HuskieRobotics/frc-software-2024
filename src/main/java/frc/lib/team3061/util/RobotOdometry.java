@@ -4,11 +4,13 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.drivetrain.DrivetrainIOCTRE;
+import org.littletonrobotics.junction.Logger;
 
 @java.lang.SuppressWarnings({"java:S6548"})
 
@@ -76,6 +78,14 @@ public class RobotOdometry {
     //   this.customOdometry.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds,
     // visionMeasurementStdDevs);
     // }
+
+    // log the difference between the vision pose estimate and the current pose estimate; this is
+    // most useful if the robot is at rest as we aren't accounting for the latency of the vision
+    Pose2d currentPose = this.getCustomEstimatedPosition();
+    if (currentPose != null) {
+      Transform2d diff = currentPose.minus(visionRobotPoseMeters);
+      Logger.recordOutput("RobotOdometry", diff);
+    }
   }
 
   public void setCustomOdometry(DrivetrainIOCTRE customOdometry) {
