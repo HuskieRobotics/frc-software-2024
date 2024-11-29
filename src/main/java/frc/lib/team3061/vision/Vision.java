@@ -50,6 +50,8 @@ public class Vision extends SubsystemBase {
   private boolean isVisionUpdating = false;
 
   private RobotOdometry odometry;
+  private final TunableNumber latencyAdjustmentSeconds =
+      new TunableNumber("Vision/LatencyAdjustmentSeconds", 0.0);
   private final TunableNumber poseDifferenceThreshold =
       new TunableNumber("Vision/VisionPoseThreshold", POSE_DIFFERENCE_THRESHOLD_METERS);
   private final TunableNumber stdDevSlopeDistance =
@@ -175,7 +177,8 @@ public class Vision extends SubsystemBase {
         double timeStamp =
             Math.min(ios[i].estimatedCameraPoseTimestamp, Logger.getRealTimestamp() / 1e6);
         Matrix<N3, N1> stdDev = getStandardDeviations(i, estimatedRobotPose2d, ios[i].ambiguity);
-        odometry.addVisionMeasurement(estimatedRobotPose2d, timeStamp, stdDev);
+        odometry.addVisionMeasurement(
+            estimatedRobotPose2d, timeStamp, latencyAdjustmentSeconds.get(), stdDev);
         isVisionUpdating = true;
         this.updatePoseCount[i]++;
         Logger.recordOutput(SUBSYSTEM_NAME + "/" + i + "/UpdatePoseCount", this.updatePoseCount[i]);

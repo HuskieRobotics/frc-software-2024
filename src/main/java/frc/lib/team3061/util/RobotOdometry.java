@@ -39,6 +39,8 @@ public class RobotOdometry {
   private final TimeInterpolatableBuffer<InterpolationRecord> poseBuffer =
       TimeInterpolatableBuffer.createBuffer(BUFFER_DURATION);
 
+  private static final boolean INCLUDE_VISION_POSE_ESTIMATES = false;
+
   private RobotOdometry() {
     estimator =
         new SwerveDrivePoseEstimator(
@@ -83,20 +85,23 @@ public class RobotOdometry {
   public void addVisionMeasurement(
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
+      double latencyAdjustmentSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
-    // ignore all vision updates in the first stage of tuning
-    // if (this.customOdometry == null) {
-    //   this.estimator.addVisionMeasurement(
-    //   visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
-    // } else {
-    // if (this.customOdometry != null) {
-    //   this.customOdometry.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds,
-    // visionMeasurementStdDevs);
-    // }
+
+    double adjustedTimestamp = timestampSeconds + latencyAdjustmentSeconds;
+    if (INCLUDE_VISION_POSE_ESTIMATES) {
+      this.estimator.addVisionMeasurement(
+          visionRobotPoseMeters, adjustedTimestamp, visionMeasurementStdDevs);
+
+      if (this.customOdometry != null) {
+        this.customOdometry.addVisionMeasurement(
+            visionRobotPoseMeters, adjustedTimestamp, visionMeasurementStdDevs);
+      }
+    }
 
     // log the difference between the vision pose estimate and the pose estimate corresponding to
     // the same timestamp
-    var sample = poseBuffer.getSample(timestampSeconds);
+    var sample = poseBuffer.getSample(adjustedTimestamp);
     if (!sample.isEmpty()) {
       Pose2d pastPose = sample.get().poseMeters;
       Transform2d diff = pastPose.minus(visionRobotPoseMeters);
