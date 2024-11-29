@@ -40,6 +40,7 @@ public class RobotOdometry {
       TimeInterpolatableBuffer.createBuffer(BUFFER_DURATION);
 
   private static final boolean INCLUDE_VISION_POSE_ESTIMATES = false;
+  private static final boolean INCLUDE_VISION_POSE_ESTIMATES_IN_CUSTOM_ODOMETRY = false;
 
   private RobotOdometry() {
     estimator =
@@ -93,7 +94,7 @@ public class RobotOdometry {
       this.estimator.addVisionMeasurement(
           visionRobotPoseMeters, adjustedTimestamp, visionMeasurementStdDevs);
 
-      if (this.customOdometry != null) {
+      if (INCLUDE_VISION_POSE_ESTIMATES_IN_CUSTOM_ODOMETRY && this.customOdometry != null) {
         this.customOdometry.addVisionMeasurement(
             visionRobotPoseMeters, adjustedTimestamp, visionMeasurementStdDevs);
       }
