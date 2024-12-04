@@ -128,7 +128,7 @@ public class Drivetrain extends SubsystemBase {
   private Pose2d defaultPose = new Pose2d();
   private Pose2d customPose = new Pose2d();
   private Pose2d initialPose = new Pose2d();
-  private double initialDistance = 0.0;
+  private double[] initialDistance = {0.0, 0.0, 0.0, 0.0};
 
   private boolean isRotationOverrideEnabled = false;
 
@@ -896,12 +896,9 @@ public class Drivetrain extends SubsystemBase {
 
   public void captureInitialConditions() {
     this.initialPose = this.customPose;
-    double distance = 0.0;
-    for (SwerveIOInputs input : this.inputs.swerve) {
-      distance += Math.abs(input.driveDistanceMeters);
+    for (int i = 0; i < this.inputs.swerve.length; i++) {
+      this.initialDistance[i] = this.inputs.swerve[i].driveDistanceMeters;
     }
-
-    this.initialDistance = distance / this.inputs.swerve.length;
   }
 
   public void captureFinalConditions(String autoName, boolean measureDistance) {
@@ -911,12 +908,12 @@ public class Drivetrain extends SubsystemBase {
 
     if (measureDistance) {
       double distance = 0.0;
-      for (SwerveIOInputs input : this.inputs.swerve) {
-        distance += Math.abs(input.driveDistanceMeters);
+      for (int i = 0; i < this.inputs.swerve.length; i++) {
+        distance += Math.abs(this.inputs.swerve[i].driveDistanceMeters - this.initialDistance[i]);
       }
 
       distance /= this.inputs.swerve.length;
-      Logger.recordOutput(SUBSYSTEM_NAME + "/AutoDistanceDiff", distance - this.initialDistance);
+      Logger.recordOutput(SUBSYSTEM_NAME + "/AutoDistanceDiff", distance);
     }
   }
 
