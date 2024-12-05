@@ -36,8 +36,9 @@ public class ArtemisRobotConfig extends RobotConfig {
 
   private static final double TRACKWIDTH_METERS = 0.57785; // 22.75
   private static final double WHEELBASE_METERS = 0.57785; // 22.75
-  // old wheel diameter: 0.1027125
-  private static final double WHEEL_DIAMETER_METERS = 0.09724328756755853;
+  // old wheel diamteter: 0.09724328756755853;
+  private static final double WHEEL_DIAMETER_METERS = 0.0954405;
+
   private static final double ROBOT_WIDTH_WITH_BUMPERS =
       0.88265; // meters //34.75 in , measure the actual bumpers
   private static final double ROBOT_LENGTH_WITH_BUMPERS = 0.88265; // meters // 34.75 in same above
