@@ -132,6 +132,11 @@ public class Vision extends SubsystemBase {
       Logger.processInputs(SUBSYSTEM_NAME + "/" + i, ios[i]);
 
       processNewVisionData(i);
+
+      Logger.recordOutput(
+          SUBSYSTEM_NAME + "/" + i + "/CameraAxes",
+          new Pose3d(RobotOdometry.getInstance().getEstimatedPosition())
+              .plus(RobotConfig.getInstance().getRobotToCameraTransforms()[i]));
     }
 
     // set the pose of all the tags to the current robot pose such that no vision target lines are
